@@ -1,0 +1,7 @@
+$DEFM                                                                   0001.000
+$NOTE OPTI NOCO                                                         0002.000
+$NBCC -C -V -N -DMPX -B^(BIN) -I^(NCINCLUDE) NBCPP.C                    0003.000
+$NBYACC NBCPY.Y                                                         0004.000
+$DCAT <Y.TAB.C >NBCPY.C                                                 0005.000
+$NBCC -C -V -N -DMPX -B^(BIN) -I^(NCINCLUDE) NBCPY.C                    0006.000
+$ENDM                                                                   0007.000

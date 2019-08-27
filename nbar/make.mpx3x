@@ -1,0 +1,38 @@
+#
+# Makefile for nbar for running nbar on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.NBAR command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+SYSBIN = /system/bin
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+OBJS = nbar.o
+HDRS =
+SRCS= nbar.c
+MAIN = $(OBJS)
+SLD = ld.nbar3x
+LD = LD.NBAR
+
+all:	$(SLD) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/NBAR.O $(LBIN)/NBAR.C $(LBIN)/$(LD)
+
+install: all
+	mpxblk <nbar.c >$(LBIN)/NBAR.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	$(INSTALL) nbar.o $(LBIN)/NBAR.O
+	/bin/chmod 664 $(LBIN)/*.?
+

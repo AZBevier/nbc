@@ -1,0 +1,34 @@
+#
+# Makefile for nbar for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = nbar.o
+HDRS =
+SRCS = nbar.c
+MAIN = nbar
+
+all:	$(MAIN)
+
+$(MAIN): $(MAKEFILE) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+
+clean:
+	-rm -f $(OBJ)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+
+install: all
+	$(INSTALL) $(LBIN)/nbar $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/*.?
+

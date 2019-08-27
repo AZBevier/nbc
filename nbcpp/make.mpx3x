@@ -1,0 +1,56 @@
+#
+# Makefile for nbcpp for running nbar on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.NBCPP command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+SYSBIN = /system/bin
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+OBJS = nbcpp.o nbcpy.o
+HDRS =
+SRCS= nbcpp.c nbcpy.c
+MAIN = $(OBJS)
+SLD = ld.nbcpp3x
+LD = LD.NBCPP
+SMK = mk.nbcpp3x
+MK = MK.NBCPP
+
+all:	$(SLD) $(SMK) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O nbcpy.c y.tab.c
+
+nbcpy.o: nbcpy.c
+
+nbcpy.c: nbcpy.y
+	$(SYSBIN)/nbyacc nbcpy.y
+	cp y.tab.c nbcpy.c
+	$(CC) $(CFLAGS) nbcpy.c
+
+clobber: clean
+	-rm -f $(LBIN)/NBCPP.O $(LBIN)/NBCPP.C $(LBIN)/$(LD)
+	-rm -f $(LBIN)/NBCPY.O $(LBIN)/NBCPY.C $(LBIN)/$(MK)
+	-rm -f $(LBIN)/NBCPY.Y $(LBIN)/YYLEX.C
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+
+install: all
+	mpxblk <nbcpp.c >$(LBIN)/NBCPP.C
+	mpxblk <nbcpy.c >$(LBIN)/NBCPY.C
+	-rm -f nbcpy.c
+	mpxblk <nbcpy.y >$(LBIN)/NBCPY.Y
+	mpxblk <yylex.c >$(LBIN)/YYLEX.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	$(INSTALL) nbcpp.o $(LBIN)/NBCPP.O
+	$(INSTALL) nbcpy.o $(LBIN)/NBCPY.O
+	/bin/chmod 664 $(LBIN)/*.?
+

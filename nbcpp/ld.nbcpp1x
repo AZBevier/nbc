@@ -1,0 +1,38 @@
+$DEFM                                                                           
+$PAGE 0                                                                         
+$JOB NBCPP                                                                      
+$IFT FILE CCOBJ.O OBJSKIP                                                       
+$FILEMGR                                                                        
+CREATE CCOBJ.O,DM,300                                                           
+X                                                                               
+$DEFNAME OBJSKIP                                                                
+$IFT FILE NBCPPMAP MAPSKIP                                                      
+$FILEMGR                                                                        
+CREATE NBCPPMAP,DM,100                                                          
+X                                                                               
+$DEFNAME MAPSKIP                                                                
+$A2 IN=SYC                                                                      
+$A1 OT=CCOBJ.O                                                                  
+$COMPRESS                                                                       
+C.SRTE.O                                                                         
+NBCPP.O                                                                         
+NBCPY.O                                                                         
+$NOTE  END OF COMPRESS                                                          
+$OPTION 19 25                                                                   
+$A1 SLO=NBCPPMAP                                                                
+$ALLOCATE 27000                                                                 
+$A1 SGO=CCOBJ.O                                                                 
+$A1 LIB=CLB,,U                                                                  
+$A1 DIR=CDR,,U                                                                  
+$CATALOG                                                                        
+FILES 16                                                                        
+BUFFERS 16                                                                      
+OPTION LOWER PROMPT                                                             
+ENVIRONMENT ,,SHARED,MAP2048                                                    
+CATALOG NBCPP                                                                   
+$IFF ABORT ENDJOB                                                               
+$NOTE *** ERROR *** CATALOG OF NBCPP FAILED                                     
+$DEFN ENDJOB                                                                    
+$EOJ                                                                            
+$PAGE 24                                                                        
+$ENDM                                                                           
