@@ -1,0 +1,68 @@
+#
+# /* makefile for nbasm when running on Linux */
+# 			Makefile for NBASM
+# 	    (c) Copyright 1990 J B Systems, Morrison, CO
+# 			All Rights Reserved
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+SYSLIB = /system/lib
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+YACC = yacc
+MAKEFILE = make.unix
+
+HDRS	= defs.h
+SRCS 	= main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c \
+	xref.c float.c myatof.c
+OBJS 	= main.o macro.o goasm.o parse.o io.o opcode.o pseudo.o symbol.o \
+	xref.o float.o myatof.o
+
+MAIN = nbasm
+
+all:	$(MAIN)
+	-/bin/echo $(MAIN) is up to date.
+
+$(MAIN):	$(HDRS) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
+	/bin/chmod 755 $(MAIN)
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+
+xref.o:	xref.c defs.h
+
+float.o:	float.c float.h
+
+myatof.o:	myatof.c float.h
+
+goasm.o:	goasm.c defs.h
+
+io.o:	io.c defs.h
+
+main.o:		main.c defs.h
+
+macro.o:	macro.c defs.h
+
+opcode.o:	opcode.c defs.h
+
+parse.o:	parse.c defs.h float.h
+
+pseudo.o:	pseudo.c defs.h
+
+symbol.o:	symbol.c defs.h
+
+clean:
+	-rm -f $(OBJS) 
+
+clobber:	clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN)
+	-rm -f $(LBIN)/io.c $(LBIN)/main.c $(LBIN)/macro.c $(LBIN)/opcode.c
+	-rm -f $(LBIN)/xref.c $(LBIN)/float.c $(LBIN)/myatof.c $(LBIN)/goasm.c
+	-rm -f $(LBIN)/parse.c $(LBIN)/pseudo.c $(LBIN)/symbol.c $(LBIN)/defs.h
+
+install:	all
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	$(INSTALL) $(HDRS) $(SRCS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/*.?
+

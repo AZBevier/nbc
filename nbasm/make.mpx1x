@@ -1,0 +1,64 @@
+#
+# Makefile for nbasm for running nbasm on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.NBASM command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+BIN = /bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+YACC = nbyacc
+MAKEFILE = make.mpx1x
+
+HDRS = defs.h float.h
+SRCS = main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c \
+	xref.c float.c myatof.c
+OBJS = main.o macro.o goasm.o parse.o io.o opcode.o pseudo.o symbol.o \
+	xref.o float.o myatof.o
+
+SLD = ld.nbasm1x
+LD = LD.NBASM
+SMK = mk.nbasm1x
+MK = MK.NBASM
+ALLS = $(HDRS) $(SRCS)
+
+MAIN = $(OBJS)
+
+all:	$(MAIN)
+	-echo $(MAIN) object created
+
+$(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
+	$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f $(OBJS)
+
+#	$(BIN)/cp $(MAIN) $(SBIN)/$(MAIN)
+clobber: clean		# delete main from current directory
+	@for n in $(ALLS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
+	@for n in $(OBJS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+
+install: all 		# build and then copy main to install directory
+	@for n in $(OBJS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		$(INSTALL) $$n $(LBIN)/$$nn ; \
+	done
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	@for n in $(ALLS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD) $(LBIN)/$(MK)
+

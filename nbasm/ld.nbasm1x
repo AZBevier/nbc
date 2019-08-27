@@ -1,0 +1,47 @@
+$DEFM                                                                   0001.000
+$JOB NBASM                                                              0002.000
+$PAGE 0                                                                 0003.000
+$IFT FILE CCOBJ.O OBJSKIP                                               0004.000
+$FILEMGR                                                                0005.000
+CREATE CCOBJ.O,DM,300                                                   0006.000
+X                                                                       0007.000
+$DEFNAME OBJSKIP                                                        0008.000
+$IFT FILE NBASMMAP MAPSKIP                                              0009.000
+$FILEMGR                                                                0010.000
+CREATE NBASMMAP,DM,100                                                  0011.000
+X                                                                       0012.000
+$DEFNAME MAPSKIP                                                        0013.000
+$A2 IN=SYC                                                              0014.000
+$A1 OT=CCOBJ.O                                                          0015.000
+$COMPRESS                                                               0016.000
+C.SRTE.O                                                                0017.000
+MAIN.O                                                                  0018.000
+MACRO.O                                                                 0019.000
+GOASM.O                                                                 0020.000
+PARSE.O                                                                 0021.000
+IO.O                                                                    0022.000
+OPCODE.O                                                                0023.000
+PSEUDO.O                                                                0024.000
+SYMBOL.O                                                                0025.000
+XREF.O                                                                  0026.000
+FLOAT.O                                                                 0027.000
+MYATOF.O                                                                0028.000
+$NOTE  END OF COMPRESS                                                  0029.000
+$OPTION 19 25                                                           0030.000
+$A1 SLO=NBASMMAP                                                        0031.000
+$ALLOCATE 1B800                                                         0032.000
+$A1 SGO=CCOBJ.O                                                         0033.000
+$A1 LIB=CLB,,U                                                          0034.000
+$A1 DIR=CDR,,U                                                          0035.000
+$CATALOG                                                                0036.000
+FILES 16                                                                0037.000
+BUFFERS 16                                                              0038.000
+OPTION LOWER PROMPT                                                     0039.000
+ENVIRONMENT ,,SHARED,MAP2048                                            0040.000
+CATALOG NBASM                                                           0041.000
+$IFF ABORT ENDJOB                                                       0042.000
+$NOTE *** ERROR *** CATALOG OF NBASM FAILED                             0043.000
+$DEFN ENDJOB                                                            0044.000
+$EOJ                                                                    0045.000
+$PAGE 24                                                                0046.000
+$ENDM                                                                   0047.000
