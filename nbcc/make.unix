@@ -1,0 +1,34 @@
+#
+# Makefile for nbcc for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = nbcc.o
+HDRS =
+SRCS = nbcc.c
+MAIN = nbcc
+
+all:	$(MAIN)
+
+$(MAIN): $(MAKEFILE) $(SRCS)
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+
+clean:
+	-rm -f $(OBJ)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+
+install: all
+	$(INSTALL) $(LBIN)/nbcc $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/*.?
+

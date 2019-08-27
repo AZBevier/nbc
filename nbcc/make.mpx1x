@@ -1,0 +1,38 @@
+#
+# Makefile for nbcc for running nbcc on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.NBCC command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx1x
+
+OBJS = nbcc.o
+HDRS =
+SRCS= nbcc.c
+MAIN = $(OBJS)
+SLD = ld.nbcc1x
+LD = LD.NBCC
+
+all:	$(SLD) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/NBCC.O $(LBIN)/NBCC.C $(LBIN)/$(LD)
+
+install: all
+	mpxblk <nbcc.c >$(LBIN)/NBCC.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	$(INSTALL) nbcc.o $(LBIN)/NBCC.O
+	/bin/chmod 664 $(LBIN)/*.?
+
