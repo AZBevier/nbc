@@ -1,0 +1,76 @@
+#
+# Makefile for nblex for running nblex on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.NBLEX command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+YACC = nbyacc
+MAKEFILE = make.mpx1x
+
+OBJS = lmain.o sub1.o sub2.o header.o parser.o
+HDRS =
+SRCS = lmain.c sub1.c sub2.c header.c parser.c
+# define depends
+DEPS = ldefs.c once.c nrform ncform
+
+MAIN = $(OBJS)
+SLD = ld.nblex1x
+LD = LD.NBLEX
+SMK = mk.nblex1x
+MK = MK.NBLEX
+ALLOBJ = $(OBJS)
+
+all:	$(SLD) $(SMK) $(MAIN)
+
+MAIN = $(OBJS)
+
+all:	$(SRCS) $(MAIN)				# build all object files
+	-/bin/echo $(MAIN) objects created
+
+parser.o:	parser.c ldefs.c
+
+parser.c:	parser.y
+	$(SYSBIN)/$(YACC) parser.y
+	$(INSTALL) y.tab.c parser.c
+
+$(MAIN):	$(DEPS) $(MAKEFILE) $(SRCS)  # build main
+	$(CC) $(CFLAGS) $(SRCS)
+
+clean:				# delete object files
+	-rm -f $(OBJS) parser.c
+
+clobber: clean		# delete main from current directory
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/LMAIN.C
+	-rm -f $(LBIN)/ONCE.C $(LBIN)/PARSER.Y $(LBIN)/PARSER.C
+	-rm -f $(LBIN)/SUB1.C $(LBIN)/SUB2.C $(LBIN)/HEADER.C
+	-rm -f $(LBIN)/NRFORM $(LBIN)/NCFORM $(LBIN)/LDEFS.C
+	-rm -f $(LBIN)/SUB1.O $(LBIN)/SUB2.O $(LBIN)/HEADER.O
+	-rm -f $(LBIN)/PARSER.O $(LBIN)/LMAIN.O
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+
+install: all    # build if necessary, and then copy main to system directory
+	mpxblk <header.c >$(LBIN)/HEADER.C
+	mpxblk <ldefs.c >$(LBIN)/LDEFS.C
+	mpxblk <lmain.c >$(LBIN)/LMAIN.C
+	mpxblk <ncform >$(LBIN)/NCFORM
+	mpxblk <nrform >$(LBIN)/NRFORM
+	mpxblk <once.c >$(LBIN)/ONCE.C
+	mpxblk <parser.c >$(LBIN)/PARSER.C
+	mpxblk <parser.y >$(LBIN)/PARSER.Y
+	mpxblk <sub1.c >$(LBIN)/SUB1.C
+	mpxblk <sub2.c >$(LBIN)/SUB2.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	$(INSTALL) header.o $(LBIN)/HEADER.O
+	$(INSTALL) lmain.o $(LBIN)/LMAIN.O
+	$(INSTALL) parser.o $(LBIN)/PARSER.O
+	$(INSTALL) sub1.o $(LBIN)/SUB1.O
+	$(INSTALL) sub2.o $(LBIN)/SUB2.O
+	/bin/chmod 664 $(LBIN)/*.?
+

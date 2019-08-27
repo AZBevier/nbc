@@ -1,0 +1,50 @@
+#
+# Makefile for nblex for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+YACC = yacc
+MAKEFILE = make.unix
+
+OBJS = lmain.o sub1.o sub2.o header.o parser.o
+HDRS =
+SRCS = lmain.c sub1.c sub2.c header.c parser.c
+# define depends
+DEPS = ldefs.c once.c nrform ncform
+
+# loadmodule name
+MAIN = nblex
+
+all:	$(SRCS) $(MAIN)			# build everything
+	/bin/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(DEPS) $(OBJS)  # build main
+	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
+	/bin/chmod 775 $(MAIN)
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+
+parser.o:	parser.c ldefs.c
+
+parser.c:	parser.y
+	$(YACC) parser.y
+	mv y.tab.c parser.c
+
+clean:				# delete object files
+	/bin/rm -f $(OBJS) parser.c
+
+clobber: clean			# delete main from current directory
+	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/lmain.c
+	/bin/rm -f $(LBIN)/sub1.c $(LBIN)/sub2.c $(LBIN)/header.c
+	/bin/rm -f $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/ldefs.c
+	/bin/rm -f $(LBIN)/once.c $(LBIN)/parser.y $(LBIN)/parser.c
+
+install: all	# build if necessary, and then copy main to system directory
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	$(INSTALL) $(DEPS) $(LBIN)
+	$(INSTALL) parser.y $(LBIN)
+	$(INSTALL) $(SRCS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/*.?

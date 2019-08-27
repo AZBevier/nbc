@@ -1,0 +1,41 @@
+$DEFM                                                                   0001.000
+$PAGE 0                                                                 0002.000
+$JOB NBLEX                                                              0003.000
+$IFT FILE CCOBJ.O OBJSKIP                                               0004.000
+$FILEMGR                                                                0005.000
+CREATE CCOBJ.O,DM,100                                                   0006.000
+X                                                                       0007.000
+$DEFNAME OBJSKIP                                                        0008.000
+$IFT FILE NBLEXMAP MAPSKIP                                              0009.000
+$FILEMGR                                                                0010.000
+CREATE NBLEXMAP,DM,200                                                  0011.000
+X                                                                       0012.000
+$DEFNAME MAPSKIP                                                        0013.000
+$A2 IN=SYC                                                              0014.000
+$A1 OT=CCOBJ.O                                                          0015.000
+$COMPRESS                                                               0016.000
+C.SRTE.O                                                                0017.000
+LMAIN.O                                                                 0018.000
+HEADER.O                                                                0019.000
+SUB1.O                                                                  0020.000
+SUB2.O                                                                  0021.000
+PARSER.O                                                                0022.000
+$NOTE  END OF COMPRESS                                                  0023.000
+$OPTION 19 25                                                           0024.000
+$A1 SLO=NBLEXMAP                                                        0025.000
+$ALLOCATE 1B800                                                         0026.000
+$A1 SGO=CCOBJ.O                                                         0027.000
+$A1 LIB=CLB,,U                                                          0028.000
+$A1 DIR=CDR,,U                                                          0029.000
+$CATALOG                                                                0030.000
+FILES 16                                                                0031.000
+BUFFERS 16                                                              0032.000
+OPTION LOWER PROMPT                                                     0033.000
+ENVIRONMENT ,,SHARED,MAP2048                                            0034.000
+CATALOG NBLEX                                                           0035.000
+$IFF ABORT ENDJOB                                                       0036.000
+$NOTE *** ERROR *** CATALOG OF NBLEX FAILED                             0037.000
+$DEFN ENDJOB                                                            0038.000
+$EOJ                                                                    0039.000
+$PAGE 24                                                                0040.000
+$ENDM                                                                   0041.000

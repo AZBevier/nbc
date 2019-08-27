@@ -1,0 +1,9 @@
+$DEFM                                                                   0001.000
+$NBYACC PARSER.Y                                                        0002.000
+$DCAT <Y.TAB.C >PARSER.C                                                0003.000
+$NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX LMAIN.C               0004.000
+$NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX SUB1.C                0005.000
+$NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX SUB2.C                0006.000
+$NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX HEADER.C              0007.000
+$NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX PARSER.C              0008.000
+$ENDM                                                                   0009.000
