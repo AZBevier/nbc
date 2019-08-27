@@ -1,0 +1,60 @@
+
+     NAME
+          umask, setsiz, setacc, getacc, setdft - set and get file
+          creation mask and set default file creation size/access/type.
+
+     SYNTAX
+          int umask (cmask)
+          int cmask;
+
+          int setsiz (start, mini, maxi)
+          int start, mini, maxi;
+
+          int setacc (owner, group, other)
+          int owner, group, other;
+
+          int setdft (type)
+          int type;
+
+          int * getacc (filename)
+          char * filename;
+
+     DESCRIPTION
+          Umask is not supported on MPX.  It has been replaced with
+          MPX specific functions.
+
+          Setsiz sets the default file creation parameters of MPX
+          files.  For MPX 2.X and 3.X, the defaults of zero are
+          used for starting size, minimum increment, and maximum
+          increment.  For MPX 1.X, the default starting size is
+          100 sectors.  The minimum and maximum increments are not
+          used.  The specified values remain in effect for all created
+          files until changed.
+
+          Setacc sets the MPX access rights for file creation.  The
+          default is all rights; i.e., R, W, M, U, A, and D.  The
+          specified values remain in effect for all created files
+          until changed.
+
+          Setdft sets the MPX file type.  The default is zero.  The
+          previous default file type is returned.  The specified
+          type remains in effect for all created files until changed.
+
+          Getacc will return a pointer to the access rights in the
+          resource descriptor for the specified file.  The bits will
+          be in bits 0-11 of each word as specified in the MPX 3.X
+          technical manual.  For MPX 1.X systems, a pointer to the
+          default access rights is returned.  The bits will be in
+          bits 26-31 of each word.
+
+     RETURN VALUE
+          A value of zero is returned for setsiz and setacc.  The
+          previous default file type is returned from setdft.  For
+          getacc, a -1 is returned if the specified file is not
+          found, else a pointer to a three word array is returned.
+
+     SEE ALSO
+          mkdir.m, chmod.m, creat.m, open.m
+
+          (printed 05/31/94 - J B Systems)
+

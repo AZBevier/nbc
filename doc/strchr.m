@@ -1,0 +1,217 @@
+
+     NAME
+          strcat, strncat, strcmp, strncmp, strcpy, strncpy, strdup,
+          strlen, strchr, strrchr, strpbrk, strspn, strcspn, strtok,
+          stradd, strcasecmp, strncasecmp, str2up, str2lc, strccpy,
+          strecnt, strecpy, stricmp, strnlen, strpos, strrpos
+          - string operations
+
+     SYNTAX
+          #include <string.h>
+          #include <sys/types.h>
+
+          char *strcat (s1, s2)
+          char *s1, *s2;
+
+          char *strncat (s1, s2, n)
+          char *s1, *s2;
+          size_t n;
+
+          int strcmp (s1, s2)
+          char *s1, *s2;
+
+          int strncmp (s1, s2, n)
+          char *s1, *s2;
+          size_t n;
+
+          char *strcpy (s1, s2)
+          char *s1, *s2;
+
+          char *strncpy (s1, s2, n)
+          char *s1, *s2;
+          size_t n;
+
+          char *strdup (s1)
+          char *s1;
+
+          int strlen (s)
+          char *s;
+
+          int strlen (s, n)
+          char *s;
+          size_t n;
+
+          char *strchr (s, c)
+          char *s;
+          int c;
+
+          char *strrchr (s, c)
+          char *s;
+          int c;
+
+          char *strpbrk (s1, s2)
+          char *s1, *s2;
+
+          int strspn (s1, s2)
+          char *s1, *s2;
+
+          int strcspn (s1, s2)
+          char *s1, *s2;
+
+          char *strtok (s1, s2)
+          char *s1, *s2;
+
+          char *stradd (s1, s2)
+          char *s1, *s2;
+
+          int strcasecmp (s1, s2)
+          char *s1, *s2;
+
+          int strncasecmp (s1, s2, n)
+          char *s1, *s2;
+          size_t n;
+
+          char *str2lc (s1)
+          char *s1;
+
+          char *str2up (s1)
+          char *s1;
+
+          char *strccpy (s1, s2)
+          char *s1, *s2;
+
+          char *strecnt (s1, s2, s3, n)
+          char *s1, *s2, *s3;
+          size_t n;
+
+          char *strecpy (s1, s2, s3)
+          char *s1, *s2, *s3;
+
+          int stricmp (s1, s2)
+          char *s1, *s2;
+
+          int strnicmp (s1, s2, n)
+          char *s1, *s2;
+          size_t n;
+
+          int strpos (s, c)
+          char *s;
+          int c;
+
+          int strrpos (s, c)
+          char *s;
+          int c;
+
+     DESCRIPTION
+          The arguments s1, s2 and s point to strings (arrays of
+          characters terminated by a null character).  c is a
+          character.  The functions strcat, strncat, strcpy, strncpy,
+          str2up, str2lc, stradd, strccpy, and strtok all alter s1.
+          These functions do not check for overflow of the array pointed
+          to by s1.  The type size_t is defined in the <sys/types.h>
+          header file.
+
+          Strcat appends a copy of string s2 to the end of string s1.
+          Strncat appends at most n characters.  Each returns a
+          pointer to the null-terminated result.
+
+          Stradd copies string s2 to string s1, just like strcpy.
+          However, stradd returns a pointer to the end of the
+          string (the null-terminater).
+
+          Strcmp compares its arguments and returns an integer less
+          than, equal to, or greater than 0, according as s1 is
+          lexicographically less than, equal to, or greater than s2.
+          Strncmp makes the same comparison but looks at most n
+          characters.  Strcasecmp and strncasecmp are the case
+          insensitive equivalents to strcmp and strncmp.  Stricmp
+          strnicmp do translated uppercase comparisons.
+
+          Strcpy copies string s2 to s1, stopping after the null
+          character has been copied.  Strncpy copies exactly n
+          characters, truncating s2 or adding null characters to s1 if
+          necessary.  The result will not be null-terminated if the
+          length of s2 is n or more.  Each function returns s1.
+
+          Strccpy copies string s2 to s1 compressing any C-like escape
+          sequences to the real character.  Escape sequences recognized
+          are those defined in "The C Programming Language" pages 180-181.
+          Strccpy returns s1.
+
+          Strecnt copies string s2 to s1 expanding any non-graphic
+          character with the C escape sequence.  Escape sequences produced
+          are those defined in "The C Programming Language" pages 180-181.
+          String s3 defines the except characters which are not to be
+          expanded.  Strccpy returns a pointer to the null terminater for
+          string s1.  A maximum of n input characters will be expanded.
+
+          Strecpy copies string s2 to s1 expanding any non-graphic
+          character with the C escape sequence.  Escape sequences produced
+          are those defined in "The C Programming Language" pages 180-181.
+          String s3 defines the except characters which are not to be
+          expanded.  Strccpy returns a pointer to the null terminater for
+          string s1.
+
+          Strdup returns a pointer to a new string, which is a
+          duplicate of the string pointed to by s1 . Space for the new
+          string is obtained using malloc(2).  A NULL pointer is
+          returned if the new string cannot be created.
+
+          Strlen returns the number of characters in s, not including
+          the terminating null character.  Strnlen returns the length
+          <= n.
+
+          Str2lc returns a pointer to s1.  The string s1 will be
+          translated to lower case in place, distroying the previous
+          contents of string s1.
+
+          Str2up returns a pointer to s1.  The string s1 will be
+          translated to upper case in place, distroying the previous
+          contents of string s1.
+
+          Strchr (strrchr) returns a pointer to the first (last)
+          occurrence of character c in string s, or a NULL pointer if
+          c does not occur in the string.  The null character
+          terminating a string is considered to be part of the string.
+          Strpos and strrpos return an index into the string c.
+
+          Strpbrk returns a pointer to the first occurrence in string
+          s1 of any character from string s2, or a NULL pointer if no
+          character from s2 exists in s1.
+
+          Strspn (strcspn) returns the length of the initial segment
+          of string s1 which consists entirely of characters from (not
+          from) string s2.
+
+          Strtok considers the string s1 to consist of a sequence of
+          zero or more text tokens separated by spans of one or more
+          characters from the separator string s2.  The first call
+          (with pointer s1 specified) returns a pointer to the first
+          character of the first token, and will have written a null
+          character into s1 immediately following the returned token.
+          The function keeps track of its position in the string
+          between separate calls, so that subsequent calls (which must
+          be made with the first argument a NULL pointer) will work
+          through the string s1 immediately following that token.  In
+          this way subsequent calls will work through the string s1
+          until no tokens remain.  The separator string s2 may be
+          different from call to call.  When no token remains in s1, a
+          NULL pointer is returned.
+
+     NOTE
+          For user convenience, all these functions are declared in
+          the optional <string.h> header file.
+
+     SPECIAL CONSIDERATIONS
+          Strcmp and strncmp use native character comparison, which is
+          signed on PDP-11s and VAX-11s, unsigned on other machines.
+          Thus the sign of the value returned when one of the
+          characters has its high-order bit set is implementation-
+          dependent.
+
+          Character movement is performed differently in different
+          implementations.  Thus overlapping moves may yield
+          surprises.
+
+          (printed 05/31/94 - J B Systems)
+
