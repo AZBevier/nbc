@@ -1,0 +1,69 @@
+cd bin/mpx1x
+mkfmtape -p ../../nbctape.tap CAT CAT1X DCAT NBCAS NBCC NBCCOM NBCP? NBLEX NBYACC UCAT
+mkfmtape -ap -uBIN ../../nbctape.tap CAT CAT1X DCAT NBCAS NBCC NBCCOM NBCP? NBLEX NBYACC
+mkfmtape -al ../../nbctape.tap CLB CDR
+mkfmtape -ao ../../nbctape.tap C.SRT*
+mkfmtape -al -uBIN ../../nbctape.tap CLB CDR
+mkfmtape -at -uBIN ../../nbctape.tap NBLD MKTAPE1X
+mkfmtape -ao -uBIN ../../nbctape.tap C.SRT*
+cd ../..
+cd cinclude/mpx1x
+mkfmtape -at -uCINCLUDE ../../nbctape.tap *.H
+cd ../..
+cd doc1x
+mkfmtape -at -uDOC ../nbctape.tap *
+cd ..
+cd lib
+mkfmtape -at -uLIB ../../nbctape.tap NCFORM NRFORM YACCPAR
+cd ..
+cd sample1x
+mkfmtape -ap -uSAMPLE ../../nbctape.tap DCAT FIXER UCAT
+mkfmtape -at -uSAMPLE ../../nbctape.tap *.C *.H *MAP M*SAMP NBLD
+mkfmtape -ao -uSAMPLE ../../nbctape.tap *.O
+mkfmtape -at ../../nbctape.tap NBLD
+cd ..
+cd nbar1x
+mkfmtape -at -uNBAR ../../nbctape.tap *.C ??.NBAR NBARMAP
+mkfmtape -ao -uNBAR ../../nbctape.tap *.O 
+mkfmtape -ap -uNBAR ../../nbctape.tap NBAR
+cd ..
+cd nbyacc1x
+mkfmtape -at -uNBYACC ../../nbctape.tap DEXTERN YACC* FILES Y?.C IN* ??.NBYAC
+mkfmtape -ao -uNBYACC ../../nbctape.tap Y?.O CCOBJ.O 
+mkfmtape -ap -uNBYACC ../../nbctape.tap NBYACC 
+mkfmtape -at -uLIB ../../nbctape.tap YACCPAR
+cd ..
+cd nblex1x
+mkfmtape -at -uNBLEX ../../nbctape.tap N?FORM *.C *.Y ??.NBLEX NBLEXMAP
+mkfmtape -ao -uNBLEX ../../nbctape.tap *.O 
+mkfmtape -ap -uNBLEX ../../nbctape.tap NBLEX 
+cd ..
+cd nbcc1x
+mkfmtape -at -uNBCC ../../nbctape.tap *.C ??.NBCC NBCCMAP
+mkfmtape -ao -uNBCC ../../nbctape.tap *.O 
+mkfmtape -ap -uNBCC ../../nbctape.tap NBCC
+cd ..
+cd nbcpp1x
+mkfmtape -at -uNBCPP ../../nbctape.tap *.C *.Y ??.NBCPP NBCPPMAP
+mkfmtape -ao -uNBCPP ../../nbctape.tap *.O 
+mkfmtape -ap -uNBCPP ../../nbctape.tap NBCPP
+cd ..
+cd nbcom1x
+mkfmtape -at -uNBCCOM ../../nbctape.tap *.C *.Y ??.NBCOM NBCOMMAP
+mkfmtape -ao -uNBCCOM ../../nbctape.tap *.O 
+mkfmtape -ap -uNBCCOM ../../nbctape.tap NBCCOM
+cd ..
+cd nbcas1x
+mkfmtape -at -uNBCAS ../../nbctape.tap *.S ??.NBCAS NBCASMAP MPXPRE
+mkfmtape -ao -uNBCAS ../../nbctape.tap *.O 
+mkfmtape -ap -uNBCAS ../../nbctape.tap NBCAS
+cd ..
+cd nbasm1x
+mkfmtape -at -uNBASM ../../nbctape.tap *.C *.H ??.NBASM NBASMMAP MPXPRE
+mkfmtape -ao -uNBASM ../../nbctape.tap *.O 
+mkfmtape -ap -uNBASM ../../nbctape.tap NBASM
+cd ..
+cd nblib1x
+mkfmtape -at -uNBLIB ../../nbctape.tap MK.* PREFILE
+mkfmtape -al -uNBLIB ../../nbctape.tap CLB CDR
+cd ..

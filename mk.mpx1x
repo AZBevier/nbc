@@ -1,0 +1,167 @@
+#########
+#
+#         THIS MAKEFILE IS FOR UNIX INSTALLS ON NBC ENVIRONMENT
+#
+#########
+
+######### INSTALLATION INSTRUCTIONS ########
+#
+# ROOT is the parent of the directory where you want the binary files to go.
+# On Linux (Unix) it is the /system directory, then the binares will go into
+# /system/bin, the libs into /system/lib, the includes into /system/include,
+# and the documentation into /system/doc.  These directores must be world
+# readable and writable by the installer.  You most likely will need root
+# provledges tp create the top level directory.  To allow access to these
+# directories you should add the following two lines to your .bashrc file
+# in your home directory:
+# PATH=$PATH:/system/bin
+# export PATH
+#
+ROOT = /system
+#
+# OPTC is the optimization flag for your C compiler (-O for most)
+OPTC = '-C -1 -N'
+#
+#******  END INPUT--BUT KEEP READING!! THERE IS MORE TO DO!! ******#
+
+#########
+#
+# Beware!  This makefile is experimental.  It may well require some
+#          intervention by a user willing to modify the makefiles
+#          for a specific computer/operating system.
+#
+#    To install NBC, adjust ROOT, OPTC as indicated above and run
+#	"make -f mk.unix install"
+#    to compile and install the executables.
+#
+######## THANKS.
+
+# Some convenient abbreviations
+B =	$(ROOT)/bin1x
+D =	$(ROOT)/doc1x
+#J = $(ROOT)/jcl
+I =	$(ROOT)/cinclude
+L =	$(ROOT)/lib1x
+S = $(ROOT)/sample1x
+
+# To protect against an idle "make" to "see what happens"
+donothing:
+	@echo "This is a dangerous makefile--so the default is do_nothing"
+
+install: mkdirs compile
+
+# Make the SW binary directories if not already there
+mkdirs:
+	@echo ""
+	@echo "Creating binary directories (if not already there) ..."
+	@if [ -d $(ROOT) ]; then \
+		echo "$(ROOT) already exits"; \
+	else \
+		mkdir $(ROOT); \
+	fi;
+	@if [ -d $(B) ]; then \
+		echo "$(B) already exits"; \
+	else \
+		mkdir $(B); \
+	fi;
+	@if [ -d $(D) ]; then \
+		echo "$(D) already exits"; \
+	else \
+		mkdir $(D); \
+	fi;
+	@if [ -d $(S) ]; then \
+		echo "$(S) already exits"; \
+	else \
+		mkdir $(S); \
+	fi;
+	@if [ -d $(L) ]; then \
+		echo "$(L) already exits"; \
+	else \
+		mkdir $(L); \
+	fi;
+	@if [ -d $(I) ]; then \
+		echo "$(I) already exits"; \
+	else \
+		mkdir $(I); \
+	fi;
+#	-mkdir $B $S $L $I
+
+compile	:
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) install
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+
+remake	: mkdirs
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) remake
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+
+clean	:
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) clean
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+
+clobber	:
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) clobber
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	@if [ -d $(D) ]; then \
+		rmdir --ignore-fail-on-non-empty $D; \
+	fi;
+	@if [ -d $(B) ]; then \
+		rmdir --ignore-fail-on-non-empty $B; \
+	fi;
+	@if [ -d $(S) ]; then \
+		rmdir --ignore-fail-on-non-empty $S; \
+	fi;
+	@if [ -d $(L) ]; then \
+		rmdir --ignore-fail-on-non-empty $L; \
+	fi;
+	@if [ -d $(I) ]; then \
+		rmdir --ignore-fail-on-non-empty $I; \
+	fi;
+

@@ -1,0 +1,75 @@
+/*~!fcntl.h*/
+/* Name:  fcntl.h Part No.: _______-____r
+ *
+ * Copyright 1991 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbinclude:fcntl.h	1.0"
+
+#ifndef FCNTL_H
+#define FCNTL_H
+
+/* Flag values accessible to open(2) and fcntl(2) */
+/*  (The first three can only be set by open) */
+#define	O_RDONLY 0
+#define	O_WRONLY 1
+#define	O_RDWR	 2
+#define	O_NDELAY 04	/* Non-blocking I/O */
+#define	O_APPEND 010	/* append (writes guaranteed at the end) */
+#define O_SYNC	 020	/* synchronous write option */
+
+/* Flag values accessible only to open(2) */
+#define	O_CREAT	00400	/* open with file create (uses third open arg) */
+#define	O_TRUNC	01000	/* open with truncation */
+#define	O_EXCL	02000	/* exclusive open */
+
+#ifdef mpx
+#define	O_UNBLK	04000	/* unblock open */
+#define	O_BIN	010000	/* binary open */
+#define O_DWAIT 020000	/* Don't wait for exclusive access */
+#endif
+
+/* fcntl(2) requests */
+#define	F_DUPFD		0	/* Duplicate fildes */
+#define	F_GETFD		1	/* Get fildes flags */
+#define	F_SETFD		2	/* Set fildes flags */
+#define	F_GETFL		3	/* Get file flags */
+#define	F_SETFL		4	/* Set file flags */
+#define	F_GETLK		5	/* Get file lock */
+#define	F_SETLK		6	/* Set file lock */
+#define	F_SETLKW	7	/* Set file lock and wait */
+#define	F_CHKFL		8	/* reserved */
+#define	F_ALLOCSP	10	/* reserved */
+#define	F_FREESP	11	/* reserved */
+
+/* file segment locking set data type - information passed to system by user */
+struct flock {
+	short	l_type;
+	short	l_whence;
+	long	l_start;
+	long	l_len;		/* len = 0 means until end of file */
+        short   l_sysid;
+        short   l_pid;
+};
+
+/* file segment locking types */
+	/* Read lock */
+#define	F_RDLCK	01
+	/* Write lock */
+#define	F_WRLCK	02
+	/* Remove lock(s) */
+#define	F_UNLCK	03
+
+#endif /* FCNTL_H */

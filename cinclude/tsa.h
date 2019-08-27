@@ -1,0 +1,167 @@
+/*~!tsa.h*/
+/* Name:  tsa.h Part No.: _______-____r
+ *
+ * Copyright 1990 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ifndef TSA_H
+#define TSA_H
+
+#ident	"@(#)nbinclude:tsa.h	1.0"
+
+/* tsa.h - task service area definition */
+
+#ifndef C_TSAD
+#define C_TSAD 0xa80    /* c.tsad address */
+#endif
+
+/*
+ * to define a pointer to the curr tsa:
+ * #define TSAP (*(struct tsa **)C_TSAD)
+ * then you can reference the tsa like the following examples:
+ *
+ * to get program option word (T.PGOW)
+ *  TSAP->pgow;
+ *
+ * to get 3rd midl from tsa
+ *  TSAP->midla[3]
+ *
+ * to get r3 from current stack frame in tsa
+ *  TSAP->regp->reg[3]
+ *
+ */
+
+struct stkfrm {
+    int     reg[8];         /* regs 0-7 */
+    int     psd[2];         /* saved psd */
+    int     scrpas[22];     /* 22 word scratch pad area */
+};
+
+struct cxtfrm {
+    int     reg[8];         /* regs 0-7 */
+    int     psd[2];         /* saved psd */
+};
+
+struct tsa {
+    struct stkfrm stf[11];  /* 11 stack frames of 32 words */
+    struct cxtfrm cxf;      /* 1 context frame of 10w */
+    char    prjct[8];       /* project group */
+    int     pgow;           /* task option word */
+    int     parent;         /* task no of parent */
+    struct stkfrm* regp;    /* curr stack frame pointer */
+    int     *fssp;          /* file system stack pointer */
+    int     contxt[18];     /* debug context area */
+    int     free[4];        /* free list head cell */
+    int     used[4];        /* alloc list head cell */
+    int*    first;          /* first locical mem addr mapped into user */
+    int*    last;           /* last locical mem addr mapped into user */
+    int     itac;           /* interval timer acct value */
+    int*    basep;          /* addr of file system buffer */
+    int     bfcb[16];       /* system service fcb */
+    int     prot[8];        /* reserved */
+    int     bregs[8];       /* base reg contect area */
+    int     mpp[8];         /* memory pool pointers */
+    int*    dbhat;          /* addr of debugger hat table */
+    struct dqe *prno;       /* address of task's dqe */
+    int*    abrta;          /* addr of task's abort receiver */
+    int*    bbufa;          /* addr of task's blocking buf */
+    int*    vata;           /* addr of task's vol assn tbl */
+    char    vatn;           /* num of vat entries */
+    char    wscr;           /* work space scr area */
+    char    segn;           /* num dynam seg def areas */
+    char    bit3;           /* tsa bit field 3 */
+    int*    fata;           /* addr of task's file assign tbl */
+    int*    fpta;           /* addr of file ptr table */
+    int*    sega;           /* addr of seg definition area */
+    int*    brka;           /* addr of break receiver (actually t.break) */
+    int*    msgr;           /* addr of msg receiver */
+    int*    bias;           /* starting addr of dsect area */
+    int*    tend;           /* ending address of tsa when task loaded */
+    int*    end;            /* last loc loaded + 1w in dsect */
+    int*    trad;           /* transfer address of task */
+    short   linno;          /* num of lines on a tsm screen */
+    short   ukey;           /* compressed user key */
+    char    bit1;           /* tsa bit field 1 */
+    char    bit2;           /* tsa bit field 2 */
+    char    bbufn;          /* num of blocking buffers */
+    char    files;          /* num of fat/pft pairs */
+    short   dsor;           /* dsect origin within midl/meml */
+    short   dssz;           /* dsect size in map blocks */
+    short   csor;           /* csect origing within midl/mems */
+    short   cssz;           /* csect size in map blocks */
+    short   meml1;          /* meml overlay map 1 */
+    short   meml2;          /* meml overlay map 2 */
+    short   midl1;          /* midl overlay map 1 */
+    short   midl2;          /* midl overlay map 2 */
+    short   eaor;           /* extended addr origin within midl/meml */
+    short   easz;           /* extended addr size */
+    int     access[2];      /* privilege flags */
+    int*    linbuf;         /* address of tsm's line buffer */
+    int     filler;         /* 1w filler */
+    int     sgos[8];        /* sgo definition */
+    int     slos[8];        /* slo definition */
+    int     sbos[8];        /* sbo definition */
+    char    cdir[16];       /* current working directory */
+    char    cvol[32];       /* current working volume */
+    int     ipuac;          /* ipu acct info */
+    int     curh;           /* current high addr in map */
+    int     crhx;           /* current high address in extended space */
+    int*    sycf;           /* addr of syc dedicated fat */
+    int*    sgof;           /* addr of sgo dedicated fat */
+    int*    slof;           /* addr of slo dedicated fat */
+    int*    sbof;           /* addr of sbo dedicated fat */
+    char    cpush;          /* compatability push levels */
+    char    ldattr;         /* h.tamm loader attributes */
+    short   dbor;           /* task debugger origin in midl/meml */
+    short   dpinfo;         /* dual-processor info */
+    char    taskk;          /* num of maps in tsa and call stack */
+    char    bit4;           /* tsa bit flags 4 */
+    int*    rdbufa;         /* addr of dual processor rd buffer */
+    int*    excpad;         /* arith except handler addr */
+    int*    rorg;           /* read only sect origin */
+    int*    rworg;          /* read/write sect orgin */
+    int     dbstat;         /* debugger status word */
+    short*  midla;          /* midl array address */
+    short*  memla;          /* meml array address */
+    int     memlo;          /* midl to meml offset */
+    int     stksz;          /* num of bytes in CALL stack */
+    char    dbname[16];     /* base mode debugger name */
+    int     expsd[2];       /* psd at arith except */
+    int     idxa;           /* overlay cnt (byte 0) and tbl addr (bytes 1-3) */
+    short   work;           /* work scratch area */
+    short   nsi;            /* num of shared image descr */
+    int*    shimda;         /* shared image tbl addr */
+    int     prel;           /* prelocation delta */
+    int     dbstw2;         /* debugger status wd 2 */
+    int*    bbhca;          /* addr of task's blocking buf head cell */
+    int     bit5;           /* tsa flag wd 5 */
+    int*    shtbl;          /* shadow mem tbl address */
+    int     smtmlt;         /* smt index for multi copies shr image */
+    int*    sigstk;         /* ADA stack pointer */
+    int     mpxbr[8];       /* 8wd area for ext mpx base pointers */
+    int     mpxlm;          /* len and offset to ext mpx im midl */
+    short   nstat;          /* num of static part maps in use */
+    short   sparhw;         /* spare hw */
+    int     spares[25];     /* spare words */
+    int*    stbrga;         /* addr of gcl task's startup base reg area */
+    int*    pioqa;          /* addr of static ioq table */
+    int*    tiqa;           /* terminal input queue entry address */
+    int     ldbss;          /* gcl task's bss sect size in bytes */
+    int     ptrmp;          /* ptrace mem pool use wd */
+    int*    wkadr;          /* addr of working map block during activ */
+    int     abpsd;          /* abort psd wd 1 */
+    short   midl[4096];     /* start of variable tsa - midl's first */
+};
+#endif
