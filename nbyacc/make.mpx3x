@@ -1,0 +1,62 @@
+#
+# Makefile for nbyacc for running nbyacc on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.NBYAC command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -DMPX -DMPX1X -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+SYSBIN = /system/bin
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+YACC = nbyacc
+MAKEFILE = make.mpx3x
+
+OBJS = y1.o y2.o y3.o y4.o
+HDRS =
+SRCS = y1.c y2.c y3.c y4.c
+DEPS = dextern files
+PAR = yaccpar
+
+MAIN = $(OBJS)
+SLD = ld.nbyac3x
+LD = LD.NBYACC
+SMK = mk.nbyac3x
+MK = MK.NBYACC
+
+all:	$(MAIN)
+	-/bin/echo $(MAIN) objects created
+
+$(MAIN):	$(MAKEFILE) $(DEPS) $(SRCS)
+	$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	/bin/rm -f $(OBJS)
+
+clobber: clean      # delete main from current directory
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/Y1.C
+	-rm -f $(LBIN)/Y2.C $(LBIN)/Y3.C $(LBIN)/Y4.C
+	-rm -f $(LBIN)/DEXTERN $(LBIN)/FILES $(LBIN)/YACCPAR
+	-rm -f $(LBIN)/Y1.O $(LBIN)/Y2.O $(LBIN)/Y3.O
+	-rm -f $(LBIN)/Y4.O $(LBIN)/DEXTERN $(LBIN)FILES
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+
+install: all    # build if necessary, and then copy main to system directory
+	mpxblk <y1.c >$(LBIN)/Y1.C
+	mpxblk <y2.c >$(LBIN)/Y2.C
+	mpxblk <y3.c >$(LBIN)/Y3.C
+	mpxblk <y4.c >$(LBIN)/Y4.C
+	mpxblk <dextern >$(LBIN)/DEXTERN
+	mpxblk <files >$(LBIN)/FILES
+	mpxblk <yaccpar >$(LBIN)/YACCPAR
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	$(INSTALL) y1.o $(LBIN)/Y1.O
+	$(INSTALL) y2.o $(LBIN)/Y2.O
+	$(INSTALL) y3.o $(LBIN)/Y3.O
+	$(INSTALL) y4.o $(LBIN)/Y4.O
+	/bin/chmod 664 $(LBIN)/*.?
+	/bin/chmod 664 $(LBIN)/DEXTERN
+	/bin/chmod 664 $(LBIN)/FILES
+

@@ -1,0 +1,40 @@
+$DEFM                                                                   0001.000
+$PAGE 0                                                                 0002.000
+$JOB NBYACC                                                             0003.000
+$IFT FILE CCOBJ.O OBJSKIP                                               0004.000
+$FILEMGR                                                                0005.000
+CREATE CCOBJ.O,DC,100                                                   0006.000
+X                                                                       0007.000
+DEFNAME OBJSKIP                                                         0008.000
+$IFT FILE YACCMAP MAPSKIP                                               0009.000
+$FILEMGR                                                                0010.000
+CREATE YACCMAP,DC,100                                                   0011.000
+X                                                                       0012.000
+$DEFNAME MAPSKIP                                                        0013.000
+$A2 IN=SYC                                                              0014.000
+$A1 OT=CCOBJ.O                                                          0015.000
+$COMPRESS                                                               0016.000
+C.SRTE.O                                                                0017.000
+Y1.O                                                                    0018.000
+Y2.O                                                                    0019.000
+Y3.O                                                                    0020.000
+Y4.O                                                                    0021.000
+$NOTE  END OF COMPRESS                                                  0022.000
+$OPTION 19 25                                                           0023.000
+$A1 SLO=YACCMAP                                                         0024.000
+$ALLOCATE 1B800                                                         0025.000
+$A1 SGO=CCOBJ.O                                                         0026.000
+$A1 LIB=CLB,,U                                                          0027.000
+$A1 DIR=CDR,,U                                                          0028.000
+$CATALOG                                                                0029.000
+FILES 16                                                                0030.000
+BUFFERS 16                                                              0031.000
+OPTION LOWER PROMPT                                                     0032.000
+ENVIRONMENT ,,SHARED,MAP2048                                            0033.000
+CATALOG NBYACC                                                          0034.000
+$IFF ABORT ENDJOB                                                       0035.000
+$NOTE *** ERROR *** CATALOG OF NBYACC FAILED                            0036.000
+$DEFN ENDJOB                                                            0037.000
+$EOJ                                                                    0038.000
+$PAGE 24                                                                0039.000
+$ENDM                                                                   0040.000

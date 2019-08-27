@@ -1,0 +1,37 @@
+DEFM                                                                            
+IFT PATH=OBJ.O SKIP                                                             
+CREA OBJ.O                                                                      
+%SKIP                                                                           
+JOB LINKCF UNIX                                                                 
+$AS IN TO SYC                                                                   
+$AS OT TO OBJ.O                                                                 
+$COMPRESS                                                                       
+Y1.O                                                                            
+Y2.O                                                                            
+Y3.O                                                                            
+Y4.O                                                                            
+$NOTE  END OF COMPRESS                                                          
+IFT PATH=YACCMAP SKIP                                                           
+CREA YACCMAP                                                                    
+%SKIP                                                                           
+AS SLO TO YACCMAP                                                               
+AS SGO TO OBJ.O                                                                 
+AS LIB TO @SYSTEM(BIN)CLB                                                     
+AS DIR TO @SYSTEM(BIN)CDR                                                     
+OPTION 19 25                                                                   
+$CATALOG                                                                        
+FILES 8                                                                        
+BUFFERS 8                                                                      
+SPACE 16                                                                        
+OPTION LOWER PROMPT                                                             
+ENVIRONMENT ,,SHARED,MAP2048                                                    
+BUILD NBYACC                                                                    
+$IFT ABORT ERROR1                                                               
+GOTO END                                                                        
+%ERROR1                                                                         
+NOTE *** ERROR ***  CATALOG FAILED                                              
+%END                                                                            
+PAGE
+EOJ                                                                             
+%ENDHELP                                                                        
+ENDM                                                                            

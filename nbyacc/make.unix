@@ -1,0 +1,47 @@
+#
+# Makefile for nbyacc for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+SYSLIB = /system/lib
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+YACC = yacc
+MAKEFILE = make.unix
+
+# Fill in with correct information
+
+OBJS = y1.o y2.o y3.o y4.o
+HDRS =
+SRCS = y1.c y2.c y3.c y4.c
+DEPS = dextern files
+PAR = yaccpar
+
+MAIN = nbyacc
+
+all:	$(MAIN)
+	-/bin/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(PAR) $(DEPS) $(OBJS)
+	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
+	/bin/chmod 755 $(MAIN)
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	$(INSTALL) $(PAR) $(LBIN)/$(PAR)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber:	clean		# delete main from current directory
+	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/y1.c
+	/bin/rm -f $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
+	/bin/rm -f $(LBIN)/dextern $(LBIN)/files $(LBIN)/yaccpar
+
+install:	all			# build if necessary, and then copy main to system directory
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	$(INSTALL) $(LBIN)/$(PAR) $(SYSLIB)/$(PAR)
+	$(INSTALL) $(DEPS) $(LBIN)
+	$(INSTALL) $(SRCS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/dextern $(LBIN)/files $(LBIN)/*.?
+

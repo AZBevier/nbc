@@ -1,0 +1,6 @@
+$DEFM                                                                   0001.000
+$NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y1.C              0002.000
+$NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y2.C              0003.000
+$NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y3.C              0004.000
+$NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y4.C              0005.000
+$ENDM                                                                   0006.000

@@ -1,0 +1,48 @@
+/*~!files*/
+/* Name:  files Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)yacc:files	1.0"
+
+/* this file has the location of the parser, and the size of the progam desired */
+/* It may also contain definitions to override various defaults: for example,
+/* WORD32 tells yacc that there are at least 32 bits per int */
+
+#ifndef WORD32
+# define WORD32
+#endif
+
+/* on some systems, notably IBM, the names for the output files and tempfiles must
+/* also be changed  */
+
+/* location of the parser text file */
+#if defined(mpx)
+# define PARSER "/system/lib/yaccpar"
+#else
+# define PARSER "/system/lib/yaccpar"
+#endif
+
+	/* basic size of the Yacc implementation */
+#ifdef WORD32
+#ifdef mpx
+# define MEDIUM
+#else
+# define HUGE
+#endif
+#else
+# define MEDIUM
+#endif
