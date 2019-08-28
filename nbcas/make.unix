@@ -1,0 +1,13 @@
+#
+# This makefile does nothing.  nbcas is only available on MPX.
+# Linux users must use nbasm to assemble on Linux.
+#
+
+all:
+	@echo "nothing to do on Linux for nbcas."
+
+clean: all
+
+clobber: clean
+
+install: all
