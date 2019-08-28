@@ -1,0 +1,239 @@
+/*~!stat.c*/
+/* Name:  stat.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbclib:stat.c	1.1"
+
+#include <types.h>
+#include <limits.h>
+#include <stat.h>
+#include <string.h>
+#include <errno.h>
+
+#ifdef MPX1X
+#include <finfo.h>
+#endif
+
+#ifndef MPX1X
+/* do not move this definition, must be 2w bounded */
+asm (" bound 1d");
+static int rdbuf[192];		/* resource descriptor buffer 2w bounded */
+#else
+asm (" bound 1d");
+static unsigned int smd[8];	/* SMD entry buffer */
+static struct finfo * foo;	/* file info block pointer */
+#endif
+
+/* test for the existance of a file */
+/* returns -1 if file not found */
+/*   else returns status buffer */
+
+int
+stat(pname, sb)			/* get file status */
+char *pname;
+struct stat *sb;		/* status buffer pointer */
+{
+    int reg[8];
+    char path[PATH_MAX];
+    int modft, readt, acc;
+
+    if (!(pname != 0 && *pname != 0)) {
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    strcpy(path, pname);	/* make a local copy */
+    unix2mpx(path);		/* convert to MPX path */
+
+#ifdef MPX1X
+    if ((foo = pn2fib(path)) == NULL) {
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    /* set username for this file, save old */
+    if (setuser(foo->username, foo->userkey) != NULL) {
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    ZINT (smd, 8);		/* clear SMD entry */
+    reg[4] = 0;
+    reg[5] = (int)smd;		/* where SMD entry goes */
+    reg[6] = foo->filename[0];	/* first part of filename */
+    reg[7] = foo->filename[1];	/* second part of filename */
+    mpxsvc (0x1073, reg, reg);	/* m.log service */
+
+    /* if r5 returned 0, file not found */
+    if (reg[5] == 0) {
+      resetuser();		/* reset username to what it was */
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+    /* must reset username to what it before log */
+    resetuser();		/* reset username to what it was */
+
+#else /* MPX1X */
+
+    reg[1] =  (int) path;		/* get pnv */
+    reg[1] |= (strlen(path) << 24);	/* get pnv */
+    reg[6] = (int)rdbuf;		/* rd buffer address */
+    reg[7] = 0;				/* no cnp */
+    mpxsvc (0x202c, reg, reg);		/* m.loc service */
+    if (reg[7] != 0) {
+      errno=ENOENT;			/* set file not found error */
+      return(-1);			/* error return value */
+    }
+#endif
+
+#ifdef MPX1X
+    /* simulate status buffer info from SMD entry */
+    sb->st_dev = smd[5] & 0xffff;	/* use udt index for dev */
+    sb->st_ino = smd[2] & 0xffffff;	/* use starting blk # for inode */
+    sb->st_blocks = smd[2] & 0xffffff;	/* above is 16 bits, need 24 */
+    /* use file type for link cnt */
+    sb->st_nlink = ((unsigned int)smd[2] >> 24) & 0xff;
+    /* use uid for file inds */
+    sb->st_uid = ((unsigned int)smd[3] >> 24) & 0xff;
+    sb->st_gid = 0;			/* unused fields */
+    /* password for file */
+    sb->st_rdev = ((unsigned int)smd[6] >> 16) & 0xffff;
+    sb->st_size = (smd[3] & 0xffffff) * 768; /* eof size in bytes */
+
+    /* no time are available, set to zero */
+    sb->st_ctime = time(0);		/* create time is now */
+    sb->st_atime = sb->st_ctime;	/* last access was read */
+    sb->st_mtime = sb->st_ctime;	/* last modify time */
+    sb->st_mode = 0666;			/* assume r/w for everybody */
+    if (sb->st_nlink == 0 || sb->st_nlink == 0xed ||
+      sb->st_nlink == 0xee || sb->st_nlink == 0x40)
+      sb->st_mode |= S_IFCHR;		/* set char file type */
+    else
+      sb->st_mode |= S_IFREG;		/* set to regular file */
+
+#else /* MPX1X */
+
+    sb->st_dev=0;			/* no device */
+    sb->st_ino=rdbuf[6];		/* use block # for inode */
+#ifdef CHANGED25AUG93
+    sb->st_nlink=rdbuf[34];		/* use link count */
+#else
+    /* use file type for link cnt */
+    sb->st_nlink = ((unsigned int)rdbuf[64] >> 24) & 0xff;
+#endif
+    sb->st_uid = sb->st_gid = sb->st_rdev = 0;  /* unused fields */
+    sb->st_size = rdbuf[68] * 768;	/* eof size in bytes */
+    readt = ((rdbuf[12] - 3653)*86400) + (rdbuf[13] / 10000); /* secs */
+    modft = ((rdbuf[14] - 3653)*86400) + (rdbuf[15] / 10000); /* secs */
+    if  (modft > readt) {
+      sb->st_atime = sb->st_ctime = modft;  /* last access was mod */
+    } else {
+      sb->st_atime = sb->st_ctime = readt;  /* last access was read */
+    }
+    sb->st_mtime = modft;		/* last modify time */
+
+    /* convert mpx access to unix access */
+    /* do owner */
+    acc = ((unsigned)rdbuf[30] >> 26) & 62;	/* make into RWMUA? */
+    if (acc & 0x1e)
+      acc |=0x30;			/* if WMUA, allow read/write */
+    acc = (acc >> 3) & 6;		/* set UNIX RW? bits */
+    acc |= (sb->st_nlink == 0xca) ? 1 : 0;	/* if type ca, set X */
+    sb->st_mode = (acc << 6);		/* put in correct place */
+
+    /* do group */
+    acc = ((unsigned)rdbuf[31] >> 26) & 62;	/* make into RWMUA? */
+    if (acc & 0x1e)
+      acc |=0x30;			/* if WMUA, allow read/write */
+    acc = (acc >> 3) & 6;		/* set UNIX RW? bits */
+    acc |= (sb->st_nlink == 0xca) ? 1 : 0;	/* if type ca, set X */
+    sb->st_mode |= (acc << 3);		/* put in correct place */
+
+    /* do other */
+    acc = ((unsigned)rdbuf[32] >> 26) & 62;	/* make into RWMUA? */
+    if (acc & 0x1e)
+      acc |=0x30;			/* if WMUA, allow read/write */
+    acc = (acc >> 3) & 6;		/* set UNIX RW? bits */
+    acc |= (sb->st_nlink == 0xca) ? 1 : 0;	/* if type ca, set X */
+    sb->st_mode |= acc;			/* put in correct place */
+
+    /* now set type of file */
+    acc = rdbuf[7] & 0x1f;		/* get type */
+    if (acc == 1 || acc == 11)		/* see if directory */
+      sb->st_mode |= S_IFDIR;		/* set directory flag */
+    if (acc == 10 || acc == 12)		/* see if file (tmp/perm) */
+      sb->st_mode |= S_IFREG;		/* set file flag */
+#endif
+    /* no flag means it is partition or other */
+    return (0);				/* return o.k. */
+}
+
+#ifdef MPX1X
+/* get SMD entry for mpx1x files */
+
+int
+stat1x(pname, usmd)		/* get file status */ /* MAC */
+char *pname;
+unsigned int *usmd;		/* SMD buffer pointer */ /* MAC */
+{
+    struct finfo * foo;		/* file info block pointer */
+    int reg[8], i;				/* MAC */
+    char path[PATH_MAX];
+
+    if (!(pname != 0 && pname != 0)) {
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    strcpy(path, pname);	/* make a local copy */
+    unix2mpx(path);		/* convert to MPX path */
+
+    if ((foo = pn2fib(path)) == NULL) {
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    /* set username for this file, save old */
+    if (setuser(foo->username, foo->userkey) != NULL) {
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    ZINT (smd, 8);		/* clear SMD entry */
+    reg[4] = 0;
+    reg[5] = (int)smd;		/* where SMD entry goes */
+    reg[6] = foo->filename[0];	/* first part of filename */
+    reg[7] = foo->filename[1];	/* second part of filename */
+    mpxsvc (0x1073, reg, reg);	/* m.log service */
+
+    /* copy our smd entry to user smd buffer */	/* MAC */
+    for (i=0; i<8; i++)				/* MAC */
+    	usmd[i] = smd[i];			/* MAC */
+
+    /* if r5 returned 0, file not found */
+    if (reg[5] == 0) {
+      resetuser();		/* reset username to what it was */
+      errno=ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    /* must reset username to what it before log */
+    resetuser();		/* reset username to what it was */
+
+    return (0);			/* return o.k. */
+}
+#endif

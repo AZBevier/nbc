@@ -1,0 +1,106 @@
+/*~!memcpy.c*/
+/* Name:  memcpy.c Part No.: _______-____r
+ *
+ * Copyright 1991 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbclib:memcpy.c	1.1"
+
+/*
+ * Copy src to dst, always copy n bytes.
+ * Return dst
+ */
+char *
+memcpy(dst, src, n)
+#ifndef MPX
+register char *dst, *src;
+register int n;
+#else
+char *dst, *src;
+int n;
+#endif
+{
+#ifndef MPX
+    register char *old = dst;
+
+    while (--n >= 0)
+    	*dst++ = *src++;
+    return (old);
+#else
+    /* Do fast memory copy on MPX */
+    asm(" lw r2,16w,sp");	/* get dest address */
+    asm(" lw r1,17w,sp");	/* get src address */
+    asm(" lw r5,18w,sp");	/* get length */
+    asm(" ci r5,2d");		/* test for at least 2 dw */
+    asm(" blt DOB");		/* no, do bytes */
+    /* see if the source address is dw bounded */
+    asm(" li r4,7");		/* dw mask */
+    asm(" trrm r1,r4");		/* mask addr into r4 */
+    asm(" bz SDW");		/* source on dw, go test dest */
+    asm(" sui r4,1d");		/* move bytes to dw bound src addr */
+    asm(" adr r4,r5");		/* r4 = bytes to move, r5 = adj total */
+    asm("M1 lb r6,0b,r1");	/* get src byte */
+    asm(" stb r6,0b,r2");	/* put in dest loc */
+    asm(" abr r1,31");		/* next byte addr */
+    asm(" abr r2,31");		/* next byte addr */
+    asm(" bib r4,M1");		/* move all the bytes */
+    /* source address is now dw bounded, test destination */
+    asm("SDW tbr r2,31");	/* target byte bound? */
+    asm(" bs DOB");		/* yes, move bytes */
+    asm(" tbr r2,30");		/* target hw bound? */
+    asm(" bs DOH");		/* yes, move hw's */
+    asm(" tbr r2,29");		/* target word bound? */
+    asm(" bs DOW");		/* yes, move words */
+    /* source and destination dw bound, move dw's */
+    asm(" dvi r4,1d");		/* get num of dw's to move */
+    asm(" xcr r4,r5");		/* into r4, r5 = rem byte count */
+    asm(" trn r4,r4");		/* make count negative */
+    asm("MDW ld r6,0d,r1");	/* get src dw */
+    asm(" std r6,0d,r2");	/* put dst dw */
+    asm(" abr r1,28");		/* next dw addr */
+    asm(" abr r2,28");		/* next dw addr */
+    asm(" bib r4,MDW");		/* loop for all dw's */
+    asm(" bu DOB");		/* move remaining bytes */
+    /* destination word bounded, move words */
+    asm("DOW dvi r4,1w");	/* get num of words to move */
+    asm(" xcr r4,r5");		/* into r4, r5 = rem byte count */
+    asm(" trn r4,r4");		/* make count negative */
+    asm("MWD lw r6,0w,r1");	/* get src wd */
+    asm(" stw r6,0w,r2");	/* put dst wd */
+    asm(" abr r1,29");		/* next wd addr */
+    asm(" abr r2,29");		/* next wd addr */
+    asm(" bib r4,MWD");		/* loop for all wd's */
+    asm(" bu DOB");		/* move remaining bytes */
+    /* destination halfword bounded, move halfwords */
+    asm("DOH dvi r4,1h");	/* get num of hw's to move */
+    asm(" xcr r4,r5");		/* into r4, r5 = rem byte count */
+    asm(" trn r4,r4");		/* make count negative */
+    asm("MHW lh r6,0h,r1");	/* get src hw */
+    asm(" sth r6,0h,r2");	/* put dst hw */
+    asm(" abr r1,30");		/* next hw addr */
+    asm(" abr r2,30");		/* next hw addr */
+    asm(" bib r4,MHW");		/* loop for all hw's */
+    /* destination byte bounded or remaining bytes to move */
+    asm("DOB trn r5,r4");	/* see if any left to move */
+    asm(" bge RET");		/* none left, return */
+    asm("MBT lb r6,0b,r1");	/* get src byte */
+    asm(" stb r6,0b,r2");	/* put dst byte */
+    asm(" abr r1,31");		/* next byte addr */
+    asm(" abr r2,31");		/* next byte addr */
+    asm(" bib r4,MBT");		/* loop for all bytes */
+    asm("RET cequ $");		/* return dest address */
+    return(dst);
+#endif
+}
