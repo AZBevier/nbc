@@ -1,0 +1,57 @@
+$DEFM                                                                   0001.000
+$PAGE 0                                                                 0002.000
+$JOB NBCCOM                                                             0003.000
+$IFT FILE CCOBJ.O OBJSKIP                                               0004.000
+$FILEMGR                                                                0005.000
+CREATE CCOBJ.O,DM,350                                                   0006.000
+X                                                                       0007.000
+$DEFNAME OBJSKIP                                                        0008.000
+$IFT FILE NBCOMMAP MAPSKIP                                              0009.000
+$FILEMGR                                                                0010.000
+CREATE NBCOMMAP,DM,100                                                  0011.000
+X                                                                       0012.000
+$DEFNAME MAPSKIP                                                        0013.000
+$A2 IN=SYC                                                              0014.000
+$A1 OT=CCOBJ.O                                                          0015.000
+$COMPRESS                                                               0016.000
+C.SRTE.O                                                                0017.000
+FLOAT.O                                                                 0018.000
+MYATOF.O                                                                0019.000
+ALLO.O                                                                  0020.000
+CGRAM.O                                                                 0021.000
+CODE.O                                                                  0022.000
+COMM1.O                                                                 0023.000
+FIXCALL.O                                                               0024.000
+LOCAL.O                                                                 0025.000
+LOCAL2.O                                                                0026.000
+MATCH.O                                                                 0027.000
+OPTIM.O                                                                 0028.000
+ORDER.O                                                                 0029.000
+PFTN.O                                                                  0030.000
+READER.O                                                                0031.000
+SCAN.O                                                                  0032.000
+STAB.O                                                                  0033.000
+SWITCH.O                                                                0034.000
+TABLE.O                                                                 0035.000
+TREES.O                                                                 0036.000
+VERSION.O                                                               0037.000
+XDEFS.O                                                                 0038.000
+$NOTE  END OF COMPRESS                                                  0039.000
+$OPTION 19 25                                                           0040.000
+$A1 SLO=NBCOMMAP                                                        0041.000
+$ALLOCATE 27000                                                         0042.000
+$A1 SGO=CCOBJ.O                                                         0043.000
+$A1 LIB=CLB,,U                                                          0044.000
+$A1 DIR=CDR,,U                                                          0045.000
+$CATALOG                                                                0046.000
+FILES 8                                                                 0047.000
+BUFFERS 8                                                               0048.000
+OPTION LOWER PROMPT                                                     0049.000
+ENVIRONMENT ,,SHARED,MAP2048                                            0050.000
+CATALOG NBCCOM                                                          0051.000
+$IFF ABORT ENDJOB                                                       0052.000
+$NOTE *** ERROR *** CATALOG OF NBCCOM FAILED                            0053.000
+$DEFN ENDJOB                                                            0054.000
+$EOJ                                                                    0055.000
+$PAGE 24                                                                0056.000
+$ENDM                                                                   0057.000

@@ -1,0 +1,50 @@
+$DEFM                                                                   0001.000
+$PAGE 0                                                                 0002.000
+$JOB NBCCOM                                                             0003.000
+$IFT FILE P1OBJ.O OBJSKIP                                               0004.000
+$FILEMGR                                                                0005.000
+CREATE P1OBJ.O,DM,350                                                   0006.000
+X                                                                       0007.000
+$DEFNAME OBJSKIP                                                        0008.000
+$IFT FILE NBCP1MAP MAPSKIP                                              0009.000
+$FILEMGR                                                                0010.000
+CREATE NBCP1MAP,DM,100                                                  0011.000
+X                                                                       0012.000
+$DEFNAME MAPSKIP                                                        0013.000
+$A2 IN=SYC                                                              0014.000
+$A1 OT=P1OBJ.O                                                          0015.000
+$COMPRESS                                                               0016.000
+C.SRTE.O                                                                0017.000
+FLOAT.O                                                                 0018.000
+MYATOF.O                                                                0019.000
+CGRAM.O                                                                 0020.000
+CODE.O                                                                  0021.000
+COMM1.O                                                                 0022.000
+FIXCALL.O                                                               0023.000
+LOCAL.O                                                                 0024.000
+OPTIM.O                                                                 0025.000
+PFTN.O                                                                  0026.000
+SCAN.O                                                                  0027.000
+STAB.O                                                                  0028.000
+TREES.O                                                                 0029.000
+VERSION.O                                                               0030.000
+XDEFS.O                                                                 0031.000
+$NOTE  END OF COMPRESS                                                  0032.000
+$OPTION 19 25                                                           0033.000
+$A1 SLO=NBCP1MAP                                                        0034.000
+$ALLOCATE 27000                                                         0035.000
+$A1 SGO=P1OBJ.O                                                         0036.000
+$A1 LIB=CLB,,U                                                          0037.000
+$A1 DIR=CDR,,U                                                          0038.000
+$CATALOG                                                                0039.000
+FILES 8                                                                 0040.000
+BUFFERS 8                                                               0041.000
+OPTION LOWER PROMPT                                                     0042.000
+ENVIRONMENT ,,SHARED,MAP2048                                            0043.000
+CATALOG NBCP1                                                           0044.000
+$IFF ABORT ENDJOB                                                       0045.000
+$NOTE *** ERROR *** CATALOG OF NBCP1 FAILED                             0046.000
+$DEFN ENDJOB                                                            0047.000
+$EOJ                                                                    0048.000
+$PAGE 24                                                                0049.000
+$ENDM                                                                   0050.000

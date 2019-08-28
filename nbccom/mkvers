@@ -1,0 +1,7 @@
+# /* mkvers */
+# 	(c) Copyright 1986 Gould Inc.
+#  	    All Rights Reserved.
+# 
+#	 @(#) (Gould) $Header: /bulk2/simhv/nbc-master/nbccom/RCS/mkvers,v 1.1 1995/01/27 22:03:53 jbev Exp $
+
+echo "char version[] = \"@(#)$* -" `date`"\";"

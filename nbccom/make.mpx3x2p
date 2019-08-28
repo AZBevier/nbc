@@ -1,0 +1,97 @@
+#
+# Makefile for nbccom for running nbcp1 & nbcp2 on MPX3x.
+# Object files must be produced and then cataloged on
+# MPX3.X using the LD.NBCP1 and LD.NBCP2 command files.
+#
+CC = nbcc
+SLIB = /system/lib
+SYSBIN = /system/bin
+LBIN = ./mpx3x2p
+CFLAGS = -C -DMPX -DMYATOF -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+INSTALL = cp
+MOVE = mv
+YACC = nbyacc
+MAKEFILE = make.mpx3x2p
+
+P1SRC = cgram.c code.c comm1.c fixcall.c local.c optim.c pftn.c \
+	scan.c stab.c trees.c version.c xdefs.c fparith.c
+
+P1OBJ = cgram.o code.o comm1.o fixcall.o local.o optim.o pftn.o \
+	scan.o stab.o trees.o version.o xdefs.o fparith.o
+
+P2SRC = allo.c comm2.c local2.c match.c order.c reader.c switch.c table.c
+
+P2OBJ = allo.o comm2.o local2.o match.o order.o reader.o switch.o table.o
+
+FHDRS = float.h
+FSRCS = float.c myatof.c
+FOBJS = float.o myatof.o
+
+HDRS = a.out.h caloff.h common.h error.h fp.h mac2defs.h macdefs.h manifest.h \
+	mfile1.h mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h
+
+ALLHDR = $(FHDRS) $(HDRS)
+ALLSRC = $(FSRCS) $(P1SRC) $(P2SRC)
+ALLOBJ = $(FOBJS) $(P1OBJ) $(P2OBJ)
+
+MAIN = $(ALLOBJ)
+
+SLD1 = ld.nbcp13x
+LD1 = LD.NBCP1
+SLD2 = ld.nbcp23x
+LD2 = LD.NBCP2
+SMK = mk.nbcom3x2p
+MK = MK.NBC2P
+
+#Two pass compiler
+all:	$(ALLOBJ)
+	-echo $(MAIN) objects created
+
+$(P1OBJ):	$(MAKEFILE) $(ALLHDR) $(P1SRC)
+	$(CC) $(CFLAGS) $(P1SRC)
+
+$(P2OBJ):	$(MAKEFILE) $(ALLHDR) $(P2SRC)
+	$(CC) $(CFLAGS) $(P2SRC)
+
+cgram.c: cgram.y
+	$(SYSBIN)/nbyacc cgram.y
+	cp y.tab.c cgram.c
+	$(CC) $(CFLAGS) cgram.c
+
+clean:
+	-rm -f $(ALLOBJ) cgram.c y.tab.c version.c
+
+clobber: clean		# delete main from current directory
+	@for n in $(ALLSRC) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
+	@for n in $(ALLOBJ) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
+	@for n in $(ALLHDR) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
+	-rm -f $(LBIN)/$(LD1) $(LBIN)/$(LD2) $(LBIN)/$(MK)
+
+install: all		# build and then copy main to install directory
+	@for n in $(ALLOBJ) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		$(MOVE) $$n $(LBIN)/$$nn ; \
+	done
+	@for n in $(ALLSRC) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+	@for n in $(ALLHDR) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SLD1) >$(LBIN)/$(LD1)
+	mpxblk <$(SLD2) >$(LBIN)/$(LD2)
+	-rm -f cgram.c y.tab.c version.c
+	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD1) $(LBIN)/$(LD2) $(LBIN)/$(MK)
+

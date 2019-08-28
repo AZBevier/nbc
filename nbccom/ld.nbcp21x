@@ -1,0 +1,46 @@
+$DEFM                                                                   0001.000
+$PAGE 0                                                                 0002.000
+$JOB NBCP2                                                              0003.000
+$IFT FILE P2OBJ.O OBJSKIP                                               0004.000
+$FILEMGR                                                                0005.000
+CREATE P2OBJ.O,DM,350                                                   0006.000
+X                                                                       0007.000
+$DEFNAME OBJSKIP                                                        0008.000
+$IFT FILE NBCP2MAP MAPSKIP                                              0009.000
+$FILEMGR                                                                0010.000
+CREATE NBCP2MAP,DM,100                                                  0011.000
+X                                                                       0012.000
+$DEFNAME MAPSKIP                                                        0013.000
+$A2 IN=SYC                                                              0014.000
+$A1 OT=P2OBJ.O                                                          0015.000
+$COMPRESS                                                               0016.000
+C.SRTE.O                                                                0017.000
+FLOAT.O                                                                 0018.000
+MYATOF.O                                                                0019.000
+ALLO.O                                                                  0020.000
+COMM2.O                                                                 0021.000
+LOCAL2.O                                                                0022.000
+MATCH.O                                                                 0023.000
+ORDER.O                                                                 0024.000
+READER.O                                                                0025.000
+SWITCH.O                                                                0026.000
+TABLE.O                                                                 0027.000
+$NOTE  END OF COMPRESS                                                  0028.000
+$OPTION 19 25                                                           0029.000
+$A1 SLO=NBCP2MAP                                                        0030.000
+$ALLOCATE 27000                                                         0031.000
+$A1 SGO=P2OBJ.O                                                         0032.000
+$A1 LIB=CLB,,U                                                          0033.000
+$A1 DIR=CDR,,U                                                          0034.000
+$CATALOG                                                                0035.000
+FILES 8                                                                 0036.000
+BUFFERS 8                                                               0037.000
+OPTION LOWER PROMPT                                                     0038.000
+ENVIRONMENT ,,SHARED,MAP2048                                            0039.000
+CATALOG NBCP2                                                           0040.000
+$IFF ABORT ENDJOB                                                       0041.000
+$NOTE *** ERROR *** CATALOG OF NBCP2 FAILED                             0042.000
+$DEFN ENDJOB                                                            0043.000
+$EOJ                                                                    0044.000
+$PAGE 24                                                                0045.000
+$ENDM                                                                   0046.000

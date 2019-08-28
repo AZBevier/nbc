@@ -1,0 +1,29 @@
+$DEFM                                                                   0001.000
+$PAGE 0                                                                 0002.000
+$NOTE OPTI NOCO                                                         0003.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF FLOAT.C                        0004.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF MYATOF.C                       0005.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF ALLO.C                         0006.000
+$NBYACC CGRAM.Y                                                         0007.000
+$DCAT <Y.TAB.C >CGRAM.C                                                 0008.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF CGRAM.C                        0009.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF CODE.C                         0010.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF COMM1.C                        0011.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF FIXCALL.C                      0012.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF LOCAL.C                        0013.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF LOCAL2.C                       0014.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF MATCH.C                        0015.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF OPTIM.C                        0016.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF ORDER.C                        0017.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF PFTN.C                         0018.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF READER.C                       0019.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF SCAN.C                         0020.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF STAB.C                         0021.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF SWITCH.C                       0022.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF TABLE.C                        0023.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF TREES.C                        0024.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF VERSION.C                      0025.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF XDEFS.C                        0026.000
+$NBCC -N -1 -V -C -DMPX -DMPX1X -DMYATOF FPARITH.C                      0027.000
+$PAGE 24                                                                0028.000
+$ENDM                                                                   0029.000
