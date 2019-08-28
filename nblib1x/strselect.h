@@ -1,0 +1,65 @@
+/*~!strselect.h*/
+/* Name:  strselect Part No.: _______-____r
+ *
+ * Copyright 1991 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbclib:strselect.h	1.1"
+
+#ifndef STRSELECT_H
+#define STRSELECT_H
+
+/*
+	defines for the STRSELECT construct
+	for selecting among character strings
+*/
+
+/*
+	Hide characters from the preprocessor so it won't rescan them.
+	This allows us to contruct comment delimiters, e.g. "/*", that are
+	not stripped by the preprocessor and hence get through to the compiler.
+	STRSELECT depends on this working.
+*/
+
+#define	WoRD(x)x
+
+#define	STRSELECT(a)	{  char *STRSeLeCT; STRSeLeCT = a;  WoRD(/)WoRD(*)
+
+#define	WHEN(a)	} else WoRD(/)WoRD(*) WoRD(*)WoRD(/) \
+		if( !strcmp(STRSeLeCT, a) ) {
+
+#define	WHEN2(a1,a2)	} else WoRD(/)WoRD(*) WoRD(*)WoRD(/)\
+		if( !strcmp(STRSeLeCT, a1)  ||  !strcmp(STRSeLeCT, a2) ) {
+
+#define	WHEN3(a1,a2,a3)	} else WoRD(/)WoRD(*) WoRD(*)WoRD(/)\
+		if( !strcmp(STRSeLeCT, a1)  ||  !strcmp(STRSeLeCT, a2)  ||\
+		!strcmp(STRSeLeCT, a3) ) {
+
+#define	WHENN(a)	} else WoRD(/)WoRD(*) WoRD(*)WoRD(/)\
+		if( !strncmp(STRSeLeCT, a, sizeof(a)-1) ) {
+
+#define	WHENN2(a1,a2)	} else WoRD(/)WoRD(*) WoRD(*)WoRD(/)\
+		if( !strncmp(STRSeLeCT, a1, sizeof(a1)-1)  ||\
+		!strncmp(STRSeLeCT, a2, sizeof(a2)-1) ) {
+
+#define	WHENN3(a1,a2,a3)	} else WoRD(/)WoRD(*) WoRD(*)WoRD(/)\
+		if( !strncmp(STRSeLeCT, a1, sizeof(a1)-1)  ||\
+		!strncmp(STRSeLeCT, a2, sizeof(a2)-1)  ||\
+		!strncmp(STRSeLeCT, a3, sizeof(a3)-1) ) {
+
+#define	DEFAULT	} else WoRD(/)WoRD(*) WoRD(*)WoRD(/) {
+
+#define	ENDSEL	}  WoRD(/)WoRD(*) WoRD(*)WoRD(/) }
+#endif /* STRSELECT_H */

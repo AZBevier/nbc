@@ -1,0 +1,71 @@
+/*~!bgets.c*/
+/* Name:  bgets.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbclib:bgets.c	1.1"
+
+/*
+	read no more that <count> characters into <buf> from stream <fp>,
+	stopping at any characters listed in <stopstr>.
+	stopstr == 0 uses previous value of stopstr.
+*/
+
+#include <stdio.h>
+
+#define CHARS	256
+
+static unsigned char	stop[CHARS];
+
+unsigned char *
+bgets( buf, count, fp, stopstr )
+unsigned char	*buf;
+register
+  int	count;
+FILE	*fp;
+unsigned char	*stopstr;
+{
+	register unsigned char	*cp;
+	register int	c;
+
+	if( stopstr ) {
+		/* clear and set stopstr array */
+		for( cp = stop;  cp < &stop[CHARS]; )
+			*cp++ = 0;
+		for( cp = stopstr;  *cp; )
+			stop[ *cp++ ] = 1;
+	}
+	for( cp = buf;  ; ) {
+		if( --count < 0 ) {
+			*cp = '\0';
+			break;
+		}
+		if( (c = getc(fp)) == EOF ) {
+			*cp = '\0';
+			if( cp == buf ) {
+				cp = (unsigned char *) EOF;
+			}
+			break;
+		}
+		*cp++ = c;
+		if( stop[ c ] ) {
+			*cp = '\0';
+			break;
+		}
+	}
+
+	return  cp;
+}

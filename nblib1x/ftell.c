@@ -1,0 +1,52 @@
+/*~!ftell.c*/
+/* Name:  ftell.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbclib:ftell.c	1.1"
+
+/*
+ * Return file offset.
+ * Coordinates with buffering.
+ */
+
+#include <stdio.h>
+
+extern long lseek();
+
+long
+ftell(iop)
+FILE	*iop;
+{
+	long	tres;
+	register int adjust;
+
+	if(iop->_cnt < 0)
+		iop->_cnt = 0;
+	if(iop->_flag & _IOREAD)
+		adjust = - iop->_cnt;
+	else if(iop->_flag & (_IOWRT | _IORW)) {
+		adjust = 0;
+		if(iop->_flag & _IOWRT && iop->_base &&
+					(iop->_flag & _IONBF) == 0)
+			adjust = iop->_ptr - iop->_base;
+	} else
+		return(-1);
+	tres = lseek(fileno(iop), 0L, 1);
+	if(tres >= 0)
+		tres += (long)adjust;
+	return(tres);
+}

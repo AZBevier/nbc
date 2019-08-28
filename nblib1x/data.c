@@ -1,0 +1,54 @@
+/*~!data.c*/
+/* Name:  data.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbclib:data.c	1.1"
+
+#include <stdio.h>
+
+/* some slop is allowed at the end of the buffers in case an upset in
+ * the synchronization of _cnt and _ptr (caused by an interrupt or other
+ * signal) is not immediately detected.
+ */
+
+unsigned char _sibuf[BUFSIZ+8], _sobuf[BUFSIZ+8];
+
+/*
+ * Ptrs to start of preallocated buffers for stdin, stdout.
+ */
+
+unsigned char _smbuf[_NFILE+1][_SBFSIZ];
+
+FILE _iob[_NFILE] = {
+	{0, NULL, NULL, _IOREAD, 0},
+	{0, NULL, NULL, _IOWRT, 1},
+	{0, _smbuf[2], _smbuf[2], _IOWRT+_IONBF, 2},
+};
+
+/*
+ * Ptr to end of io control blocks
+ */
+
+FILE *_lastbuf = {&_iob[_NFILE]};
+
+/*
+ * Ptrs to end of read/write buffers for each device
+ * There is an extra bufend pointer which corresponds to the dummy
+ * file number _NFILE, which is used by sscanf and sprintf.
+ */
+
+unsigned char *_bufendtab[_NFILE+1] = {NULL, NULL, _smbuf[2]+_SBFSIZ,};

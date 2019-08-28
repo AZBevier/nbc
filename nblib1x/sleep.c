@@ -1,0 +1,109 @@
+/*~!sleep.c*/
+/* Name:  sleep.c Part No.: _______-____r
+ *
+ * Copyright 1990 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@(#)nbclib:sleep.c	1.0"
+
+#ifdef mpx
+
+sleep(time)        /* sleep for time */
+int time;
+{
+
+	int reg[8];
+
+	reg[5] = -time;		/* neg time val  */
+	reg[6] = 0;		/* our task */
+	reg[7] = 0;		/* our task */
+	mpxsvc(0x1054,reg,reg);         /* call m.susp service */
+	return(0);                      /* indicate good return */
+}
+
+#else
+
+/*
+ * Suspend the process for `sleep_tm' seconds - using alarm/pause
+ * system calls.  If caller had an alarm already set to go off `n'
+ * seconds from now, then Case 1: (sleep_tm >= n) sleep for n, and
+ * cause the callers previously specified alarm interrupt routine
+ * to be executed, then return the value (sleep_tm - n) to the caller
+ * as the unslept amount of time, Case 2: (sleep_tm < n) sleep for
+ * sleep_tm, after which, reset alarm to go off when it would have
+ * anyway.  In case process is aroused during sleep by any caught
+ * signal, then reset any prior alarm, as above, and return to the
+ * caller the (unsigned) quantity of (requested) seconds unslept.
+ */
+#include <signal.h>
+#include <setjmp.h>
+
+extern int pause();
+extern unsigned alarm();
+static jmp_buf env;
+
+unsigned
+sleep(sleep_tm)
+unsigned sleep_tm;
+{
+	int  alrm_flg;
+ 	void (*alrm_sig)();
+	int  awake();
+	unsigned unslept, alrm_tm, left_ovr;
+
+	if(sleep_tm == 0)
+		return(0);
+
+	alrm_tm = alarm(0);			/* prev. alarm time */
+	alrm_sig = signal(SIGALRM, awake);	/* prev. alarm prog */
+
+	alrm_flg = 0;
+	left_ovr = 0;
+
+	if(alrm_tm != 0) {	/* skip all this if no prev. alarm */
+		if(alrm_tm > sleep_tm) {	/* alarm set way-out */
+			alrm_tm -= sleep_tm;
+			++alrm_flg;
+		} else {	/* alarm will shorten sleep time */
+			left_ovr = sleep_tm - alrm_tm;
+			sleep_tm = alrm_tm;
+			alrm_tm = 0;
+			--alrm_flg;
+			(void) signal(SIGALRM, alrm_sig);
+		}
+	}
+
+	/* use setjmp and long jump to avoid infinite sleep if alarm
+	   goes off before pause is called.  The interupt handling
+	   routine will return via a longjmp, not a return. */
+	if (setjmp(env) == 0)  {
+		(void) alarm(sleep_tm);
+		pause();		/* Some other signal may be caught,
+					   returning here, in which case we
+					   set-up to return to our caller */
+	}
+	unslept = alarm(0);
+	if(alrm_flg >= 0)
+		(void) signal(SIGALRM, alrm_sig);
+	if(alrm_flg > 0 || (alrm_flg < 0 && unslept != 0))
+		(void) alarm(alrm_tm + unslept);
+	return(left_ovr + unslept);
+}
+
+static
+awake() {
+	longjmp(env, 1);
+}
+#endif
