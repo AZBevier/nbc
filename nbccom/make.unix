@@ -33,7 +33,7 @@ MAIN = nbccom
 
 all: $(MAIN)
 
-$(MAIN): $(MAKEFILE) $(ALLHDR) $(FPOBJ) $(OBJS)
+$(MAIN): $(MAKEFILE) $(ALLSRC) $(ALLHDR) $(FPOBJ) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(FPOBJ) $(OBJS)
 	/bin/chmod 755 nbccom
 #	-rm -f version.o
