@@ -1,0 +1,62 @@
+#~!Makefile for SAMPLE directory on Unix
+#
+# Make parameters when running on MPX
+#
+CC = cc
+CFLAGS = -O -m32
+BINDIR = /system/bin
+INSTALL = cp
+
+# define all sources
+SRCS = dcat.c ucat.c fixer.c obd.c caid.c summer.c
+
+# define all headers
+HDRS = caid.h
+
+# loadmodule names
+MAINS = dcat ucat fixer obd caid summer
+
+# build everything
+all:	$(MAINS)
+	/bin/echo $(MAINS) are up to date.
+
+#build dcat
+dcat:	dcat.o
+	$(CC) $(CFLAGS) -o dcat dcat.o
+	/bin/chmod 775 dcat
+
+#build ucat
+ucat:	ucat.o
+	$(CC) $(CFLAGS) -o ucat ucat.o
+	/bin/chmod 775 ucat
+
+#build fixer
+fixer:	fixer.o
+	$(CC) $(CFLAGS) -o fixer fixer.o
+	/bin/chmod 775 fixer
+
+#build obd
+obd:	obd.o
+	$(CC) $(CFLAGS) -o obd obd.o
+	/bin/chmod 775 obd
+
+#build caid
+caid:	caid.o
+	$(CC) $(CFLAGS) -o caid caid.o
+	/bin/chmod 775 caid
+
+#build summer
+summer:	summer.o
+	$(CC) $(CFLAGS) -o summer summer.o
+	/bin/chmod 775 summer
+
+clean:				# delete object files
+	-rm -f dcat.o ucat.o fixer.o obd.o caid.o summer.o
+
+clobber: clean		# delete main from current directory
+	-rm -f $(MAINS)
+
+INSTALL: install
+install: all	# build if necessary, and then copy main to bin directory
+	$(INSTALL) $(MAINS) $(BINDIR)
+
