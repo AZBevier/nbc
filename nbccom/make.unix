@@ -67,5 +67,5 @@ install: all
 	$(INSTALL) $(ALLHDR) $(LBIN)
 	$(INSTALL) cgram.y $(LBIN)
 	$(MOVE) $(FPOBJ) $(OBJS) $(LBIN)
-	-rm -f $(OBJS) $(FPOBJ) cgram.c y.tab.c version.c
+	-rm -f $(OBJS) $(FPOBJ) cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.?

@@ -54,7 +54,7 @@ cgram.c: cgram.y
 	$(CC) $(CFLAGS) cgram.c
 
 clean:
-	-rm -f $(ALLOBJ) cgram.c y.tab.c version.c
+	-rm -f $(ALLOBJ) cgram.c y.tab.c #version.c
 
 clobber: clean          # delete main from current directory
 	@for n in $(ALLS) ; do \
@@ -83,6 +83,6 @@ install: all            # build and then copy main to install directory
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
-	-rm -f cgram.c y.tab.c version.c
+	-rm -f cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD) $(LBIN)/$(MK)
 
