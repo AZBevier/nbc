@@ -1,0 +1,39 @@
+/*~!varargs.h*/
+/* Name:  varargs.h Part No.: _______-____r
+ *
+ * Copyright 1990 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ifndef	VARARGS_H
+#define	VARARGS_H
+
+#ident	"@(#)nbinclude:varargs.h	1.0"
+
+typedef char *va_list;
+#define va_dcl int va_alist;
+#define va_start(list) list = (char *) &va_alist
+#define va_end(list)
+
+#ifdef gould
+/*
+ *   take care of alignment of arguments for GOULD hardware
+ */
+# define va_arg(list,mode) ((mode *)(sizeof(mode) > 4 ? \
+ (list = (va_list)(((int)(list+15)) & ~7)) : (list = (va_list)(((int)(list + 7)) & ~3)) ))[-1]
+#else /* NOT gould */
+#define va_arg(list,mode) ((mode *)(list += sizeof(mode)))[-1]
+#endif /* gould */
+
+#endif

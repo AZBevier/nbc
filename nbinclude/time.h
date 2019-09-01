@@ -1,0 +1,42 @@
+/*~!time.h*/
+/* Name:  time.h Part No.: _______-____r
+ *
+ * Copyright 1990 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ifndef TIME_H
+#define TIME_H
+
+#ident	"@(#)nbinclude:time.h	1.0"
+
+struct	tm {			/* see ctime.m */
+	int	tm_sec;
+	int	tm_min;
+	int	tm_hour;
+	int	tm_mday;
+	int	tm_mon;
+	int	tm_year;
+	int	tm_wday;
+	int	tm_yday;
+	int	tm_isdst;
+};
+extern struct tm *gmtime(), *localtime();
+extern char *ctime(), *asctime();
+int  cftime(),  ascftime();
+extern void tzset();
+extern long timezone, altzone;
+extern int daylight;
+extern char *tzname[];
+#endif
