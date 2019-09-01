@@ -25,7 +25,6 @@ all:	$(SRCS) $(MAIN)			# build everything
 $(MAIN):	$(MAKEFILE) $(DEPS) $(OBJS)  # build main
 	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
 	/bin/chmod 775 $(MAIN)
-	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 
 parser.o:	parser.c ldefs.c
 
@@ -48,6 +47,7 @@ install: all	# build if necessary, and then copy main to system directory
 	else \
 			mkdir $(LBIN); \
 	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	$(INSTALL) $(DEPS) $(LBIN)
 	$(INSTALL) parser.y $(LBIN)
