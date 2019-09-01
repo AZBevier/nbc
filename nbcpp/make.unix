@@ -38,7 +38,6 @@ all: $(MAIN)
 $(MAIN): $(MAKEFILE) $(OBJS)
 	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
 	/bin/chmod 755 $(MAIN)
-	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 
 # nbcpp modules
 nbcpp.o: nbcpp.c
@@ -64,6 +63,7 @@ install: all
 	else \
 			mkdir $(LBIN); \
 	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	$(INSTALL) $(OBJS) $(LBIN)

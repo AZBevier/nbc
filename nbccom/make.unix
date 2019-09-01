@@ -36,7 +36,6 @@ all: $(MAIN)
 $(MAIN): $(MAKEFILE) $(ALLHDR) $(FPOBJ) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(FPOBJ) $(OBJS)
 	/bin/chmod 755 nbccom
-	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 #	-rm -f version.o
 
 version.c: mkvers
@@ -62,6 +61,7 @@ install: all
 	else \
 			mkdir $(LBIN); \
 	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) $(ALLSRC) $(LBIN)
 	$(INSTALL) $(ALLHDR) $(LBIN)

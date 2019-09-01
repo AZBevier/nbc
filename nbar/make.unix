@@ -19,7 +19,6 @@ all:	$(MAIN)
 $(MAIN): $(MAKEFILE) $(SRCS)	
 	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
 	/bin/chmod 755 $(MAIN)
-	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 
 clean:
 	-rm -f $(OBJ)
@@ -33,6 +32,7 @@ install: all
 	else \
 			mkdir $(LBIN); \
 	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/nbar $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?

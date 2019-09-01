@@ -28,7 +28,6 @@ all:	$(MAIN)
 $(MAIN):	$(HDRS) $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
 	/bin/chmod 755 $(MAIN)
-	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 
 xref.o:	xref.c defs.h
 
@@ -67,6 +66,7 @@ install:	all
 	else \
 			mkdir $(LBIN); \
 	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	$(INSTALL) $(HDRS) $(SRCS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?
