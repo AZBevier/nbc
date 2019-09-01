@@ -39,6 +39,11 @@ clobber: clean
 	rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	cp $(MAIN) $(LBIN)/NBCAS.O
 	mpxblk <$(SRCS) >$(LBIN)/NBCAS.S
 	mpxblk <$(SLD) >$(LBIN)/$(LD)

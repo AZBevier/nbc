@@ -59,6 +59,11 @@ clobber: clean
 	-rm -f $(LBIN)/nbcpy.c $(LBIN)/yylex.c
 
 install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	$(INSTALL) $(OBJS) $(LBIN)

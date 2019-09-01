@@ -50,6 +50,11 @@ clobber: clean		# delete main from current directory
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all 		# build and then copy main to install directory
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		$(INSTALL) $$n $(LBIN)/$$nn ; \

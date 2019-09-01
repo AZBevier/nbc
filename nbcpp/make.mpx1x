@@ -43,6 +43,11 @@ clobber: clean
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	mpxblk <nbcpp.c >$(LBIN)/NBCPP.C
 	mpxblk <nbcpy.c >$(LBIN)/NBCPY.C
 	-rm -f nbcpy.c

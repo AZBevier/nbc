@@ -55,6 +55,11 @@ clobber: clean		# delete main from current directory
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all    # build if necessary, and then copy main to system directory
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	mpxblk <header.c >$(LBIN)/HEADER.C
 	mpxblk <ldefs.c >$(LBIN)/LDEFS.C
 	mpxblk <lmain.c >$(LBIN)/LMAIN.C

@@ -34,6 +34,11 @@ clobber: clean
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	mpxblk <nbcc.c >$(LBIN)/NBCC.C
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)

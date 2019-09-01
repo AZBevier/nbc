@@ -1,0 +1,82 @@
+#
+# Makefile for nbcp1/nbcp2 (2 pass version) when running on Linux
+#
+CC = cc 
+CFLAGS = -O -DMPX -DMYATOF -DTWOPASS -m32 # -DIEEE
+SYSBIN = /system/bin
+SYSLIB = /system/lib
+LBIN = ./linux2p
+INSTALL = cp
+MOVE = mv
+YACC = yacc
+MAKEFILE = make.unix2p
+
+P1SRC = cgram.c code.c comm1.c fixcall.c local.c optim.c pftn.c \
+	scan.c stab.c trees.c version.c xdefs.c fparith.c
+
+P1OBJ = cgram.o code.o comm1.o fixcall.o local.o optim.o pftn.o \
+	scan.o stab.o trees.o version.o xdefs.o fparith.o
+
+P2SRC = allo.c comm2.c local2.c match.c order.c reader.c switch.c table.c
+
+P2OBJ = allo.o comm2.o local2.o match.o order.o reader.o switch.o table.o
+
+FPHDR = float.h
+FPSRC = float.c myatof.c
+FPOBJ = float.o myatof.o
+
+HDRS = a.out.h caloff.h common.h error.h fp.h mac2defs.h macdefs.h manifest.h \
+	mfile1.h mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h
+
+ALLHDR = $(FPHDR) $(HDRS)
+ALLSRC = $(FPSRC) $(P1SRC) $(P2SRC)
+
+MAIN = nbcp1 nbcp2
+
+all: $(MAIN)
+
+nbcp1: $(MAKEFILE) $(ALLHDR) $(FPOBJ) $(P1OBJ)
+	$(CC) $(CFLAGS) -o $@ $(FPOBJ) $(P1OBJ)
+	/bin/chmod 755 nbcp1
+	$(MOVE) nbcp1 $(LBIN)/nbcp1
+#	-rm -f version.o
+
+nbcp2: $(MAKEFILE) $(ALLHDR) $(FPOBJ) $(P2OBJ)
+	$(CC) $(CFLAGS) -o $@ $(FPOBJ) $(P2OBJ)
+	/bin/chmod 755 nbcp2
+	$(MOVE) nbcp2 $(LBIN)/nbcp2
+#	-rm -f version.o
+
+version.c: mkvers
+	-rm -f version.c
+	sh mkvers "J B Systems Non-Base C Compiler V1.4" > version.c
+
+cgram.c: cgram.y
+	yacc cgram.y
+	cp y.tab.c cgram.c
+#	$(CC) $(CFLAGS) cgram.c
+
+clean:
+	-rm -f $(P1OBJ) $(P2OBJ) $(FPOBJ)
+
+clobber: clean
+	-rm -f $(P1OBJ) nbcp1 $(LBIN)/nbcp1
+	-rm -f $(P2OBJ) nbcp2 $(LBIN)/nbcp2
+	-rm -f $(LBIN)/*.?
+	-rm -f cgram.c version.c y.tab.c
+
+# Copy the files into linuxp2 directory
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(INSTALL) $(LBIN)/nbcp1 $(SYSBIN)
+	$(INSTALL) $(LBIN)/nbcp2 $(SYSBIN)
+	$(INSTALL) $(ALLSRC) $(LBIN)
+	$(INSTALL) $(ALLHDR) $(LBIN)
+	$(INSTALL) cgram.y $(LBIN)
+	$(MOVE) $(FPOBJ) $(P1OBJ) $(P2OBJ) $(LBIN)
+	-rm -f cgram.c version.c y.tab.c
+	/bin/chmod 664 $(LBIN)/*.?

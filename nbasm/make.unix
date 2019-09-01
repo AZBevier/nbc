@@ -62,6 +62,11 @@ clobber:	clean
 	-rm -f $(LBIN)/parse.c $(LBIN)/pseudo.c $(LBIN)/symbol.c $(LBIN)/defs.h
 
 install:	all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	$(INSTALL) $(HDRS) $(SRCS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?

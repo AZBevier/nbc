@@ -1,0 +1,71 @@
+#
+# Makefile for nbccom (1 pass version) when running on Linux
+#
+CC = cc 
+CFLAGS = -O -DMPX -DMYATOF -m32 # -DIEEE
+SYSBIN = /system/bin
+SYSLIB = /system/lib
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+YACC = yacc
+MAKEFILE = make.unix
+
+SRCS = allo.c cgram.c code.c comm1.c fixcall.c local.c local2.c \
+	match.c optim.c order.c pftn.c reader.c scan.c stab.c switch.c \
+	table.c trees.c version.c xdefs.c fparith.c
+
+OBJS = allo.o cgram.o code.o comm1.o fixcall.o local.o local2.o \
+	match.o optim.o order.o pftn.o reader.o scan.o stab.o switch.o \
+	table.o trees.o version.o xdefs.o fparith.o
+
+FPHDR = float.h
+FPSRC = float.c myatof.c
+FPOBJ = float.o myatof.o
+
+HDRS = a.out.h caloff.h common.h error.h fp.h mac2defs.h macdefs.h manifest.h \
+	mfile1.h mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h
+
+ALLHDR = $(FPHDR) $(HDRS)
+ALLSRC = $(FPSRC) $(SRCS)
+
+MAIN = nbccom
+
+all: $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(ALLHDR) $(FPOBJ) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(FPOBJ) $(OBJS)
+	/bin/chmod 755 nbccom
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	-rm -f version.o
+
+version.c: mkvers
+	-rm -f version.c
+	sh mkvers "J B Systems Non-Base C Compiler V1.4" > version.c
+
+cgram.c: cgram.y
+	yacc cgram.y
+	cp y.tab.c cgram.c
+#	$(CC) $(CFLAGS) cgram.c
+
+clean:
+	-rm -f $(OBJS) $(FPOBJ) cgram.c y.tab.c version.c
+
+clobber: clean
+	-rm -f $(OBJS) $(MAIN) $(LBIN)/$(MAIN)
+	-rm -f $(LBIN)/*.?
+
+# Copy the files into linux directory
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
+	$(INSTALL) $(ALLSRC) $(LBIN)
+	$(INSTALL) $(ALLHDR) $(LBIN)
+	$(INSTALL) cgram.y $(LBIN)
+	$(MOVE) $(FPOBJ) $(OBJS) $(LBIN)
+	-rm -f $(OBJS) $(FPOBJ) cgram.c y.tab.c version.c
+	/bin/chmod 664 $(LBIN)/*.?

@@ -39,6 +39,11 @@ clobber:	clean		# delete main from current directory
 	/bin/rm -f $(LBIN)/dextern $(LBIN)/files $(LBIN)/yaccpar
 
 install:	all			# build if necessary, and then copy main to system directory
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/$(PAR) $(SYSLIB)/$(PAR)
 	$(INSTALL) $(DEPS) $(LBIN)

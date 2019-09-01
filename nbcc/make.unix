@@ -28,6 +28,11 @@ clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
 
 install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	$(INSTALL) $(LBIN)/nbcc $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?

@@ -31,6 +31,11 @@ clobber: clean
 	-rm -f $(LBIN)/NBAR.O $(LBIN)/NBAR.C $(LBIN)/$(LD)
 
 install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
 	mpxblk <nbar.c >$(LBIN)/NBAR.C
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	$(INSTALL) nbar.o $(LBIN)/NBAR.O
