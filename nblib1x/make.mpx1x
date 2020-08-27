@@ -155,7 +155,7 @@ CLOBBER: clobber
 
 clobber: clean
 	$(BIN)/rm -f clib cdir
-	$(BIN)/rm -f clb cdr
+	$(BIN)/rm -f clb cdr CLB CDR
 
 DEPEND: depend
 
@@ -191,7 +191,9 @@ INSTALL: install
 
 install: all
 	$(BIN)/cp clib clb
+	$(BIN)/cp clib CLB
 	$(BIN)/cp cdir cdr
+	$(BIN)/cp cdir CDR
 #	$(BIN)/cp clib $(BIN)/clb
 #	$(BIN)/cp cdir $(BIN)/cdr
 
@@ -199,11 +201,11 @@ prefile:
 
 # Source file 'c.srt.s'
 c.srt.o: $(PRE) c.srt.s
-	$(CC) -P$(PRE) -C c.srt.s -o c.srt.o -Lc.srt.L
+	$(CC) -P$(PRE) -C c.srt.s -o c.srt.o #-Lc.srt.L
 
 # Source file 'c.srte.s'
 c.srte.o: $(PRE) c.srte.s
-	$(CC) -P$(PRE) -C c.srte.s -o c.srte.o -Lc.srte.L
+	$(CC) -P$(PRE) -C c.srte.s -o c.srte.o #-Lc.srte.L
 
 # Source file 'fcall.s'
 fcall.o: prefile fcall.s

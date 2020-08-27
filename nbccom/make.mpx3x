@@ -1,7 +1,7 @@
 #
 # Makefile for nbccom for running nbccom on mpx3x
 # Object files must be produced and then cataloged
-# on MPX13X using the LD.NBCOM command file.
+# on MPX3X using the LD.NBCOM command file.
 #
 CC = nbcc
 BIN = /bin

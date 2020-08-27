@@ -55,7 +55,7 @@ install: all
 	mpxblk <yylex.c >$(LBIN)/YYLEX.C
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
-	$(INSTALL) nbcpp.o $(LBIN)/NBCPP.O
-	$(INSTALL) nbcpy.o $(LBIN)/NBCPY.O
+	$(MOVE) nbcpp.o $(LBIN)/NBCPP.O
+	$(MOVE) nbcpy.o $(LBIN)/NBCPY.O
 	/bin/chmod 664 $(LBIN)/*.?
-
+	-rm -f $(OBJS)

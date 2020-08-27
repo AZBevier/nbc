@@ -42,7 +42,7 @@ D =	$(ROOT)/doc1x
 #J = $(ROOT)/jcl
 I =	$(ROOT)/cinclude
 L =	$(ROOT)/lib1x
-S = $(ROOT)/sample1x
+S = $(ROOT)/sample  
 
 # To protect against an idle "make" to "see what happens"
 donothing:
@@ -99,7 +99,7 @@ compile	:
 	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
-	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 #	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 
 remake	: mkdirs
@@ -115,7 +115,7 @@ remake	: mkdirs
 	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) remake
 	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
-	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 #	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 
 clean	:
@@ -131,7 +131,7 @@ clean	:
 	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) clean
 	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
-	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 #	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 
 clobber	:
@@ -147,7 +147,7 @@ clobber	:
 	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) clobber
 	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
-	cd sample1x  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 #	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 	@if [ -d $(D) ]; then \
 		rmdir --ignore-fail-on-non-empty $D; \

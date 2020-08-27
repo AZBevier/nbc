@@ -72,10 +72,10 @@ install: all    # build if necessary, and then copy main to system directory
 	mpxblk <sub2.c >$(LBIN)/SUB2.C
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
-	$(INSTALL) header.o $(LBIN)/HEADER.O
-	$(INSTALL) lmain.o $(LBIN)/LMAIN.O
-	$(INSTALL) parser.o $(LBIN)/PARSER.O
-	$(INSTALL) sub1.o $(LBIN)/SUB1.O
-	$(INSTALL) sub2.o $(LBIN)/SUB2.O
+	$(MOVE) header.o $(LBIN)/HEADER.O
+	$(MOVE) lmain.o $(LBIN)/LMAIN.O
+	$(MOVE) parser.o $(LBIN)/PARSER.O
+	$(MOVE) sub1.o $(LBIN)/SUB1.O
+	$(MOVE) sub2.o $(LBIN)/SUB2.O
 	/bin/chmod 664 $(LBIN)/*.?
 
