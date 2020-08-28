@@ -1,0 +1,8 @@
+DEFM                                                                            
+PAGE 0
+NBCC -N -C -V -DWORD32 -DMPX Y1.C                                               
+NBCC -N -C -V -DWORD32 -DMPX Y2.C                                               
+NBCC -N -C -V -DWORD32 -DMPX Y3.C                                               
+NBCC -N -C -V -DWORD32 -DMPX Y4.C                                               
+PAGE
+ENDM                                                                            

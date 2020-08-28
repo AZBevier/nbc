@@ -1,29 +1,42 @@
+#~!Makefile for sample1x on Linux
+# Name:  Makefile Part No.: _______-____r
 #
-# Makefile for samples when running nbccom on mpx3x
-# Object files must be produced and then cataloged
-# on MPX3X using the LD.NBCOM command file.
+# Copyright 1995 - J B Systems, Morrison, CO
 #
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"$Id: make.mpx1x,v 1.1 2019/02/26 18:23:03 jbev Exp jbev $"
+
+# Make parameters when running on Linux
+
 CC = nbcc
 BIN = /bin
 SLIB = /system/lib
 SYSBIN = /system/bin
-LBIN = ./mpx3x
-CFLAGS = -C -DMPX -DMYATOF -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+LBIN = ./mpx1x
+CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 INSTALL = cp
 MOVE = mv
 YACC = nbyacc
-MAKEFILE = make.mpx3x
+MAKEFILE = make.mpx1x
 MPXMAKE = makefile
 
-# define all source
-SRCS = dcat.c ucat.c fixer.c fort.c prtinc.c obd.c caid.c summer.c cp.c ls.c mv.c rm.c kill.c oscode.c
-# define all objects
-OBJS = dcat.o ucat.o fixer.o fort.o prtinc.o obd.o caid.o summer.o cp.o ls.o mv.o rm.o kill.o oscode.o
-# define all headers
-HDRS = caid.h
-# define all load module names
-MAINS = dcat ucat fixer obd caid summer cp ls mv rm
+# Fill in with correct information
 
+SRCS = dcat.c ucat.c fixer.c fort.c prtinc.c obd.c caid.c summer.c cp.c ls.c mv.c rm.c kill.c oscode.c
+OBJS = dcat.o ucat.o fixer.o fort.o prtinc.o obd.o caid.o summer.o cp.o ls.o mv.o rm.o kill.o oscode.o
+HDRS = caid.h
 ALLS = $(SRCS) $(HDRS)
 
 SLD = ld.samp
@@ -32,21 +45,20 @@ SMK = mak.samp
 MK = MAK.SAMP
 SMPXMK = makefile
 MPXMK = MAKEFILE
-SCNBLD = nbld3x
+SCNBLD = nbld1x
 CNBLD = NBLD
 MAIN = $(OBJS)
 
 ALL:	all
 
-#all:	$(SLD) $(SMK) $(SMPXMK) $(MAIN)
+#all:	$(HDRS) $(SRCS) $(MAIN)
 all:	$(MAIN)
-	$(BIN)/echo $(MAINS) are up to date
-	$(BIN)/echo $(OBJS) objects created
-
-#$(MAIN):	$(MAKEFILE) $(OBJS)
-#	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+	-$(BIN)/echo $(MAIN) objects created
 
 prefile:
+
+#$(MAIN):	$(MAKEFILE) $(HDRS)
+#	$(CC) $(CFLAGS) $(SRCS)
 
 # Source file 'fort.c'
 fort.o: prefile fort.c
@@ -98,13 +110,13 @@ clobber: clean
 INSTALL: install
 
 install: all
-	# make the mpx3x directory
+	# make the mpx1x directory
 	@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
 	fi;
-	# move in object files for MPX3X
+	# move in object files for MPX1X
 	@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		$(MOVE) $$n $(LBIN)/$$nn ; \

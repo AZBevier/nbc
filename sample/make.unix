@@ -2,10 +2,16 @@
 #
 # Make parameters when running on MPX
 #
-CC = cc
-CFLAGS = -O -m32
-BINDIR = /system/bin
+CC = cc 
+CFLAGS = -O -DMPX -DMYATOF -m32 # -DIEEE
+#CFLAGS = -O -m32
+SYSBIN = /system/bin
+SYSLIB = /system/lib
+LBIN = ./linux
 INSTALL = cp
+MOVE = mv
+YACC = yacc
+MAKEFILE = make.unix
 
 # define all sources
 SRCS = dcat.c ucat.c fixer.c obd.c caid.c summer.c
@@ -51,12 +57,18 @@ summer:	summer.o
 	/bin/chmod 775 summer
 
 clean:				# delete object files
-	-rm -f dcat.o ucat.o fixer.o obd.o caid.o summer.o
+	-rm -f $(LBIN)/*.o
 
 clobber: clean		# delete main from current directory
-	-rm -f $(MAINS)
+	-rm -f $(LBIN)/$(MAINS)
 
 INSTALL: install
 install: all	# build if necessary, and then copy main to bin directory
-	$(INSTALL) $(MAINS) $(BINDIR)
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+#	$(INSTALL) $(MAINS) $(BINDIR)
+	$(MOVE) $(MAINS) $(LBIN)/
 

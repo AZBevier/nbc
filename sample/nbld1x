@@ -1,0 +1,101 @@
+$DEFM PGMNAME,LISTING                                                           
+$JOB %PGMNAME                                                                   
+$IFT %PGMNAME NE HELP MACRO                                                     
+$NOTE                                                                           
+$NOTE       --- HELP ---                                                        
+$NOTE                                                                           
+$NOTE command ::= 'LD'* pgmparm                                                 
+$NOTE                                                                           
+$NOTE pgmparm ::= Pgmname listparm |                                            
+$NOTE             'HELP'*                                                       
+$NOTE                                                                           
+$NOTE listparm ::=     'LIST'* |                                                
+$NOTE              ',' 'PRINT'* |                                               
+$NOTE              ',' 'NULL'* |                                                
+$NOTE              ',' Listpath                                                 
+$NOTE                                                                           
+$NOTE     --- WHERE ---                                                         
+$NOTE                                                                           
+$NOTE LD -> a TSM macro for cataloging a C program.  The program has            
+$NOTE       "OPTION LOWER" and "ENVIRONMENT ,,MULTI" set and is put             
+$NOTE       in the current working directory.                                   
+$NOTE                                                                           
+$NOTE Pgmname -> the name of the load module and, when suffixed by a            
+$NOTE            ".O", the name of the object.                                  
+$NOTE                                                                           
+$NOTE HELP -> a parameter that results in listing this file.                    
+$NOTE                                                                           
+$NOTE LIST -> a parameter that causes all of the text output of                 
+$NOTE         this command to be displayed on the terminal of the               
+$NOTE         user.                                                             
+$NOTE                                                                           
+$NOTE PRINT -> a parameter that causes all of the text output of                
+$NOTE          this command to be placed in a spooling file normally            
+$NOTE          destined for the line printer.                                   
+$NOTE                                                                           
+$NOTE NULL -> a parameter that causes all of the text output of this            
+$NOTE         command to be discarded.                                          
+$NOTE                                                                           
+$NOTE Listpath -> a parameter that causes all of the text output of             
+$NOTE             this command to be placed in the file identified              
+$NOTE             by its pathname.                                              
+$NOTE                                                                           
+$GOTO ENDHELP                                                                   
+$DEFN MACRO                                                                     
+$IFA %PGMNAME;.O ERROR1                                                         
+$PAGE 0                                                                         
+$A2 IN=SYC                                                                      
+$A2 OT=SGO                                                                      
+$COMPRESS                                                                       
+%PGMNAME;.O                                                                     
+$NOTE  END OF COMPRESS                                                          
+$OPTION 19 25                                                                   
+$A1 LIB=CLB,,U                                                                  
+$A1 DIR=CDR,,U                                                                  
+$IFP %LISTING SOMELIST                                                          
+$A3 SLO=NU                                                                      
+$GOTO CATALOG                                                                   
+$DEFN SOMELIST                                                                  
+$IFT %LISTING NE NULL LIST                                                      
+$A3 SLO=NU                                                                      
+$GOTO CATALOG                                                                   
+$DEFN LIST                                                                      
+$IFT %LISTING NE LIST PRINT                                                     
+$A4 SLO=UT                                                                      
+$GOTO CATALOG                                                                   
+$DEFN PRINT                                                                     
+$IFT %LISTING NE PRINT FILENAME                                                 
+$A2 SLO=SLO,2000                                                                
+$GOTO CATALOG                                                                   
+$DEFN FILENAME                                                                  
+$IFT FILE %LISTING SKIP                                                         
+$NOTE A4 SYC=UT                                                                 
+$A2 SLO=SYC                                                                     
+$OPTION 3                                                                       
+$FILEMGR                                                                        
+CREATE %LISTING,DM,500                                                          
+$DEFN SKIP                                                                      
+$A1 SLO=%LISTING                                                                
+$GOTO CATALOG                                                                   
+$DEFN CATALOG                                                                   
+$NOTE                                                                           
+$NOTE                                                                           
+$DEFN STACKSET                                                                  
+$ALLOCATE 1B800                                                                 
+$PAGE 24                                                                        
+$CATALOG                                                                        
+OPTION LOWER PROMPT                                                             
+FILES 16                                                                        
+BUFFERS 16                                                                      
+ENVIRONMENT ,,SHARE,MAP2048                                                     
+CATALOG %PGMNAME                                                                
+$IFT ABORT ERROR2                                                               
+$GOTO END                                                                       
+$DEFN ERROR1                                                                    
+$NOTE *** ERROR ***  NO PROGRAM NAME GIVEN                                      
+$GOTO ENDHELP                                                                   
+$DEFN ERROR2                                                                    
+$NOTE *** ERROR ***  CATALOG FAILED                                             
+$DEFN END                                                                       
+$EOJ                                                                            
+$DEFN ENDHELP                                                                   
