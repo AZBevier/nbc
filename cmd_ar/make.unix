@@ -26,6 +26,7 @@ clean:
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+	-rm -f $(LBIN)/$(DOC)
 
 install: all
 	@if [ -d $(LBIN) ]; then \
