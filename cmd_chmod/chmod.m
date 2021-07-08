@@ -1,0 +1,200 @@
+ 
+ 
+     CHMOD(C)		       UNIX System V		      CHMOD(C)
+ 
+ 
+     Name
+	  chmod	- Changes the access permissions of a file or
+	  directory.
+ 
+     Syntax
+	  chmod	mode file ...
+ 
+	       chmod [who] +-= [permission ...]	file ...
+ 
+     Description
+	  The chmod command changes the	access permissions (or mode)
+	  of a specified file or directory. It is used to control file
+	  and directory	access by users	other than the owner and
+	  super-user.  The mode	may be an expression composed of
+	  letters and operators	(called	symbolic mode),	or a number
+	  (called absolute mode).
+ 
+	  A chmod command using	symbolic mode has the form:
+ 
+	       chmod [who] +-= [permission ...]	filename
+ 
+	  In place of who you can use one or any combination of	the
+	  following letters:
+ 
+	  a    Stands for ``all	users''. If who	is not indicated on
+	       the command line, a is the default. The definition of
+	       ``all users'' depends on	the user's umask. See
+	       umask(C).
+ 
+	  g    Stands for ``group'', all users who have	the same group
+	       ID as the owner of the file or directory.
+ 
+	  o    Stands for ``others'', all users	on the system.
+ 
+	  u    Stands for ``user'', the	owner of the file or
+	       directory.
+ 
+	  The operators	are:
+ 
+	  +    Adds permission
+ 
+	  -    Removes permission
+ 
+	  =    Assigns the indicated permission	and removes all	other
+	       permissions (if any) for	that who. If no	permission is
+	       assigned, existing permissions are removed.
+ 
+	  Permissions can be any combination of	the following letters:
+ 
+	  x    Execute (search permission for directories)
+ 
+	  r    Read
+ 
+ 
+     Page 1					      (printed 5/7/94)
+ 
+ 
+     CHMOD(C)		       UNIX System V		      CHMOD(C)
+ 
+ 
+	  w    Write
+ 
+	  s    Sets owner or group ID on execution of the file to that
+	       of the owner of the file.  The mode ``u+s'' sets	the
+	       user ID bit for the file.  The mode ``g+s'' sets	the
+	       group ID	bit.  Other combinations have no effect.
+ 
+	  t    Saves text in memory upon execution. (``Sticky bit'',
+	       see chmod(S)).  Only the	mode ``u+t'' sets the sticky
+	       bit.  All other combinations have no effect.  This mode
+	       can only	be set by the super-user.
+ 
+	  l    Mandatory locking will occur during access
+ 
+	  Multiple symbolic modes may be given,	separated by commas,
+	  on a single command line. See	the following Examples section
+	  for sample permission	settings.
+ 
+	  Mandatory file and record locking refers to a	file's ability
+	  to have it's reading or writing permissions locked while a
+	  program is accessing that file. A file cannot	have group
+	  execution permission and be able to be locked	on execution.
+	  In addition, it is not possible to turn on the set-group-ID
+	  and enable a file to be locked on execution at the same
+	  time.	The following examples show illegal uses of chmod and
+	  will generate	error messages:	chmod g+x,+1 filename
+ 
+	  chmod	g+s,+1 filename
+ 
+	  A chmod command using	absolute mode has the form:
+ 
+	       chmod mode filename
+ 
+	  where	mode is	an octal number	constructed by performing
+	  logical OR on	the following:
+ 
+	  4000	    Set	user ID	on execution
+ 
+	  20#0	    Set	group ID on execution if ``#'' is 7, 5,	3, or
+		    1 and enable mandatory locking if ``#'' is 6, 4,
+		    2, or 0.
+ 
+	  1000	    Sets the sticky bit	(see chmod(S))
+ 
+	  0400	    Read by owner
+ 
+	  0200	    Write by owner
+ 
+	  0100	    Execute (search in directory) by owner
+ 
+	  0040	    Read by group
+ 
+ 
+     Page 2					      (printed 5/7/94)
+ 
+ 
+     CHMOD(C)		       UNIX System V		      CHMOD(C)
+ 
+ 
+	  0020	    Write by group
+ 
+	  0010	    Execute (search in directory) by group
+ 
+	  0004	    Read by others
+ 
+	  0002	    Write by others
+ 
+	  0001	    Execute (search in directory) by others
+ 
+	  0000	    No permissions
+ 
+     Examples
+	Symbolic Mode
+	  The following	command	gives all users	execute	permission for
+	  file:
+ 
+	       chmod +x	file
+ 
+	  The following	command	removes	read and write permission for
+	  group	and others from	file:
+ 
+	       chmod go-rw file
+ 
+	  The following	command	gives other users read and write
+	  permission for file:
+ 
+	       chmod o+rw file
+ 
+	  The following	command	gives read permission to group and
+	  other:
+ 
+	       chmod g+r,o+r file
+ 
+	Absolute Mode
+	  The following	command	gives all users	read, write and
+	  execute permission for file:
+ 
+	       chmod 0777 file
+ 
+	  The following	command	gives read and write permission	to all
+	  users	for file:
+ 
+	       chmod 0666 file
+ 
+	  The following	command	gives read and write permission	to the
+	  owner	of file	only:
+ 
+	       chmod 0600 file
+ 
+	  The following	example	causes the file	to be locked on
+	  access:
+ 
+ 
+     Page 3					      (printed 5/7/94)
+ 
+ 
+     CHMOD(C)		       UNIX System V		      CHMOD(C)
+ 
+ 
+	       chmod +l	file
+ 
+     See Also
+	  ls(C), chmod(S)
+ 
+     Notes
+	  The user ID, group ID	and sticky bit settings	are only
+	  useful for binary executable files. They have	no effect on
+	  shell	scripts.
+ 
+ 
+     Page 4					      (printed 5/7/94)
+ 
+ 
+See also chmod(DOS)
+See also chmod(S)

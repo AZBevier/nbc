@@ -1,0 +1,74 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.02.19.48.34;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Update build parameters.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for chmod for running chmod on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.CHMOD command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx1x
+
+OBJS = chmod.o
+HDRS =
+SRCS= chmod.c
+MAIN = $(OBJS)
+SLD = ld.chmod1x
+LD = LD.CHMOD
+SMK = mk.chmod1x
+MK = MK.CHMOD
+SDOC = chmod.m
+DOC = CHMOD.M
+
+all:	$(SLD) $(SMK) $(SDOC) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/CHMOD.O $(LBIN)/CHMOD.C $(LBIN)/$(LD)
+	-rm -f $(LBIN)/$(MK) $(LBIN)/$(DOC)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <chmod.c >$(LBIN)/CHMOD.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	$(MOVE) chmod.o $(LBIN)/CHMOD.O
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
