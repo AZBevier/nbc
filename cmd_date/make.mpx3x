@@ -1,0 +1,50 @@
+#
+# Makefile for date for running date on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.DATE command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+SYSBIN = /system/bin
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+OBJS = date.o
+HDRS =
+SRCS= date.c
+MAIN = $(OBJS)
+SLD = ld.date3x
+LD = LD.DATE
+SMK = mk.date3x
+MK = MK.DATE
+SDOC = date.m
+DOC = DATE.M
+
+all:	$(SLD) $(SMK) $(SDOC) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/DATE.O $(LBIN)/DATE.C $(LBIN)/$(LD)
+	-rm -f $(LBIN)/$(MK) $(LBIN)/$(DOC)
+
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <date.c >$(LBIN)/DATE.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	$(MOVE) date.o $(LBIN)/DATE.O
+	/bin/chmod 664 $(LBIN)/*.?
+
