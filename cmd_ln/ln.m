@@ -1,0 +1,37 @@
+ 
+ 
+     LN(C)		       UNIX System V			 LN(C)
+ 
+ 
+     Name
+	  ln  -	 Makes a link to a file.
+ 
+     Syntax
+	  ln file1 file2
+	  ln file1 ... directory
+ 
+     Description
+	  A link is a directory	entry referring	to a file; the same
+	  file (together with its size,	all its	protection
+	  information, etc).  may have several links to	it.  There is
+	  no way to distinguish	a link to a file from its original
+	  directory entry.  Any	changes	to the file are	effective
+	  independent of the name by which the file is known.
+ 
+	  In the first case, ln	creates	a link to the existing file,
+	  file1.  The file2 argument is	a new name referring to	the
+	  same file contents as	file1.
+ 
+	  In the second	case, directory	is the location	of a directory
+	  into which one or more links are created with	corresponding
+	  file names.
+ 
+	  You cannot link to a directory or link across	file systems.
+ 
+     See Also
+	  cp(C), mv(C),	rm(C)
+ 
+ 
+     Page 1					      (printed 5/7/94)
+ 
+ 
