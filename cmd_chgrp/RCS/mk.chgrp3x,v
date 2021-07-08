@@ -1,0 +1,27 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.02.18.45.10;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) CHGRP.C
+$ENDM
+@
