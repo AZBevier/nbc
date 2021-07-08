@@ -1,0 +1,35 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	2021.06.30.21.16.19;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!stab.h*/
+
+/* for compatibility with berkeley unix, which has sdb symbols */
+/* in this file.  Our sdb symbols are defined in a.out.h       */
+/* Below are symbols defined in berkeley but not in v32.       */
+#define N_FNAME  0x22
+#define N_LCSYM  0x28
+#define N_ENTRY  0xa4
+#define N_BCOMM  0xe2
+#define N_ECOMM  0xe4
+#define N_ECOML  0xe8
+@

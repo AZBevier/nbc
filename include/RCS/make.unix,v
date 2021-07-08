@@ -1,0 +1,136 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.03.23.56.52;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.03.23.34.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Change build to be from single directory
+@
+
+
+1.2
+log
+@Update file mdes to r/w from ro.
+@
+text
+@# Makefile for NBC /system/cinclude directory on Linux
+# Makefile for NBC /system/nbinclude directory on Linux
+#
+
+SHELL = /bin/sh
+ROOT = /system
+C = $(ROOT)/cinclude
+X = $(ROOT)/cinclude/sys
+I = $(ROOT)/nbinclude
+Y = $(ROOT)/nbinclude/sys
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+INC1X = a.out.h art.h assert.h cdots.h ctype.h dca.h \
+	dirent.h dir.h dqe.h errno.h fat.h fcb.h \
+	fcntl.h finfo.h ident.h ioq.h limits.h math.h \
+	mosde.h mpxdef.h mpxsvc.h nan.h param.h prb.h \
+	psb.h rxb.h search.h setjmp.h signal.h smt.h \
+	stab.h stat.h stdio.h stdlib.h string.h termio.h \
+	timeb.h time.h times.h tsa.h types.h udt.h \
+	unixio.h utmp.h values.h varargs.h version.h	# mpx1x
+
+INC3X = a.out.h art.h assert.h cdots.h ctype.h dca.h \
+	dirent.h dir.h dqe.h errno.h fat.h fcb.h \
+	fcntl.h finfo.h ident.h ioq.h limits.h math.h \
+	mosde.h mpxdef.h mpxsvc.h nan.h param.h prb.h \
+	psb.h rxb.h search.h setjmp.h signal.h smt.h \
+	stab.h stat.h stdio.h stdlib.h string.h termio.h \
+	timeb.h time.h times.h tsa.h types.h udt.h \
+	unixio.h utmp.h values.h varargs.h version.h # mpx3x & unix
+
+all	: $(C) $(X) $(I) $(Y) $(INC3X)
+	@@echo "include files created";
+
+$(C)	:
+	@@if [ -d $(C) ]; then \
+		echo "$(C) already exits"; \
+	else \
+		mkdir $(C) ; \
+		echo "$(C) created" ; \
+	fi;
+#	@@ln -s $(C) $(X);
+
+$(X)	:
+	@@if [ -d $(X) ]; then \
+		echo "$(X) already exits"; \
+	else \
+		ln -s $(C) $(X);  \
+		echo "$(X) link created"; \
+	fi;
+#	@@ln -s $(C) $(X);
+
+$(I)	:
+	@@if [ -d $(I) ]; then \
+		echo "$(I) already exits"; \
+	else \
+		mkdir $(I) ; \
+		echo "$(I) created" ; \
+	fi;
+#	@@ln -s $(I) $(Y);
+
+$(Y)	:
+	@@if [ -d $(Y) ]; then \
+		echo "$(Y) already exits"; \
+	else \
+		ln -s $(I) $(Y);  \
+		echo "$(Y) link created"; \
+	fi;
+	@@ln -s $(I) $(Y);
+
+install	:	all
+	@@if [ -d $(LBIN) ]; then \
+		echo "$LBIN already exits"; \
+	else \
+		mkdir $(LBIN); \
+	fi;
+	$(INSTALL) $(INC3X) $(LBIN)
+	@@-chmod 664 $(LBIN)/*.h
+	$(INSTALL) $(INC1X) $(C)
+	@@-chmod 664 $(C)/*.h
+	# Fix up two MPX1X file names
+	$(MOVE) $(C)/varargs.h $(C)/vararg.h
+	$(MOVE) $(C)/version.h $(C)/verson.h
+	$(INSTALL) $(INC3X) $(I)
+	@@-chmod 664 $(I)/*.h
+
+remake	:	clobber
+	@@make ROOT=$(ROOT)
+
+clean	:
+#	@@-rm -f $(INC3X)
+
+clobber	:	clean
+	@@-rm -f $(LBIN)/*.h
+	@@-rm -f $(C)/*.h
+	@@-rm -f $(I)/*.h
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d87 1
+@

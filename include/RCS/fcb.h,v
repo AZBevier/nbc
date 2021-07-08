@@ -1,0 +1,146 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	2021.06.30.21.16.19;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!fcb.h*/
+/* Name:  fcb.h Part No.: _______-____r
+ *
+ * Copyright 1990 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ifndef FCB_H
+#define FCB_H
+
+#ident	"@@(#)nbinclude:fcb.h	1.0"
+
+typedef struct fcb {  /* FCB structure */
+
+/*** word 0 ***/
+    char opcd;  /* opcode specified by iocs to handler */
+    char lfc[3]; /* logical file code */
+
+/*** word 1 ***/
+int  tcw;         /* transfer control word */
+/*         bit  0-11;     transfer count */
+/*         bit    12;     byte address flag */
+/*         bit 13-31;     data buffer address */
+
+/*** word 2 ***/
+int cbra;       /* control bits */
+/*       nwt bit  0;     no-wait i/o flag */
+/*       ner      1;     no error return processing */
+/*       dfi      2;     data format inhibit */
+/*       nst      3;     no status checked or returned by handler */
+/*       ran      4;     random access i/o */
+/*       bl       5;     blocked mode */
+/*       exp      6;     expanded fcb specified (16w) */
+/*       iec      7;     inhibit error abort of task */
+/*       dfd      8;     device format definition */
+/*       sctl  9-12;     special control specification */
+/*       radr 13-31;     random access address (8w fcb only) */
+
+/*** word 3 ***/
+int  sflg;      /* status flags */
+/*       op bit   0;     operation in progress */
+/*       err      1;     error condition found */
+/*       bb       2;     blocking buffer error */
+/*       pro      3;     write protect violation */
+/*       inop     4;     device is inoperable */
+/*       bom      5;     BOM present */
+/*       eof      6;     end of file encountered */
+/*       eom      7;     end of medium encountered */
+/*       null1  8-9;     unassigned */
+/*       time    10;     last command exceeded timeout */
+/*       null2 11-15;    unassigned */
+/*       echo    16;     echo on channel */
+/*       int     17;     ppci on channel */
+/*       len     18;     incorrect record length */
+/*       prog    19;     channel progran check */
+/*       data    20;     channel data check */
+/*       ctrl    21;     channel control check */
+/*       intf    22;     interface check */
+/*       chai    23;     channel chaining check */
+/*       busy    24;     controller/device busy */
+/*       st      25;     controller/device status modified */
+/*       ctr     26;     controller end */
+/*       attn    27;     attention */
+/*       cha     28;     channel end */
+/*       dev     29;     device end */
+/*       chk     30;     unit check */
+/*       exc     31;     unit exception */
+
+/*** word 4 ***/
+    int recl;   /* record length read (in bytes) */
+
+/*** word 5 ***/
+   char *ioqa;  /* i/o queue address */
+
+/*** word 6 ***/
+int  errt;      /* special status flags and wait i/o error address */
+/*       nean bit 0;     no-wait i/o normal end action addr not taken */
+/*       eean     1;     no-wait i/o error end action addr not taken */
+/*       kill     2;     kill command issued */
+/*       excp     3;     exceptional condition occured in i/o req */
+/*       null3  4-7;     not assigned */
+/*       weadr 8-31;     wait i/o error address */
+
+/*** word 7 ***/
+    char  *fata ;  /* fat address */
+
+/*** word 8 ***/
+    char  *erwa ;  /* expanded data address */
+
+/*** word 9 ***/
+    int eqty ;     /* expanded transfer quantity */
+
+/*** word 10***/
+    int eraa;      /* expanded randon access address */
+
+/*** word 11***/
+    int ist1;      /* extended i/o status word one */
+
+/*** word 12***/
+    int ist2;      /* extended i/o status word two */
+
+/*** word 13***/
+    char *nwok;    /* no-wait normal end action address */
+
+/*** word 14***/
+    char *nwer;    /* no-wait error end action address */
+
+/*** word 15***/
+    char *bba;     /* user supplied blocking buffer address */
+} ;
+#endif
+@

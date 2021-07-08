@@ -1,0 +1,51 @@
+# Makefile for NBC /system/nbinclude directory for MPX3X on Unix
+
+SHELL = /bin/sh
+
+ROOT = .
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+INC1X = a.out.h art.h assert.h cdots.h ctype.h dca.h \
+	dirent.h dir.h dqe.h errno.h fat.h fcb.h \
+	fcntl.h finfo.h ident.h ioq.h limits.h math.h \
+	mosde.h mpxdef.h mpxsvc.h nan.h param.h prb.h \
+	psb.h rxb.h search.h setjmp.h signal.h smt.h \
+	stab.h stat.h stdio.h stdlib.h string.h termio.h \
+	timeb.h time.h times.h tsa.h types.h udt.h \
+	unixio.h utmp.h values.h varargs.h version.h	# mpx1x
+
+INC3X = a.out.h art.h assert.h cdots.h ctype.h dca.h \
+	dirent.h dir.h dqe.h errno.h fat.h fcb.h \
+	fcntl.h finfo.h ident.h ioq.h limits.h math.h \
+	mosde.h mpxdef.h mpxsvc.h nan.h param.h prb.h \
+	psb.h rxb.h search.h setjmp.h signal.h smt.h \
+	stab.h stat.h stdio.h stdlib.h string.h termio.h \
+	timeb.h time.h times.h tsa.h types.h udt.h \
+	unixio.h utmp.h values.h varargs.h version.h # mpx3x & unix
+
+all	: $(INC3X)
+	@echo nbinclude files created 
+
+install	:	all
+	@if [ -d $(LBIN) ]; then \
+		echo "$(LBIN) already exits"; \
+	else \
+		mkdir $(LBIN); \
+	fi;
+	@for n in $(INC3X) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+		echo "Installing $(LBIN)/$$nn"; \
+	done
+
+remake	:	clobber
+	@make ROOT=$(ROOT)
+
+clean	:
+#	@-rm -f $(INC3X)
+
+clobber	:	clean
+	@-rm -f $(LBIN)/*.H
