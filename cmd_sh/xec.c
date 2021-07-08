@@ -1,0 +1,1085 @@
+/*~!xec.c*/
+/* Name:  xec.c Part No.: _______-____r
+ *
+ * Copyright 1994 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"$Id: xec.c,v 1.2 2021/07/07 23:09:52 jbev Exp $"
+
+/*	$Log $
+ */
+
+/* #define NOTNOW */
+
+#include	"defs.h"
+#include	<errno.h>
+#include	"sym.h"
+#include	"hash.h"
+#include	<signal.h>
+#ifndef mpx
+#include	<stdlib.h>
+#include	<unistd.h>
+#include	<sys/times.h>
+#include	<sys/stat.h>
+#endif
+
+extern void prc();
+extern void prn();
+extern void prp();
+extern void prl();
+extern void prs();
+extern void prt();
+extern void initf();
+extern void push();
+extern void trim();
+extern void post();
+extern void estabf();
+extern void zapcd();
+extern void assign();
+extern void assnum();
+extern void chkpipe();
+extern void hashpr();
+extern void prc_buff();
+extern void prn_buff();
+extern void prs_buff();
+extern void what_is_path();
+extern void unset_name();
+extern void rename();
+extern void flushb();
+extern void restore();
+extern void chktrap();
+extern void link_iodocs();
+extern void settmp();
+extern void zaphash();
+extern void postclr();
+extern void swap_iodoc_nm();
+extern void rmtemp();
+extern void exitsh();
+extern void failed();
+extern void freefunc();
+extern void hash_func();
+extern void tdystak();
+extern void setlist();
+extern void clrsig();
+extern void oldsigs();
+extern void replace();
+extern void setargs();
+extern void getsig();
+extern void await();
+extern void cwdprint();
+extern int pop();
+extern int stoi();
+extern int test();
+extern int echo();
+extern int chkopen();
+extern int namscan();
+extern int readvar();
+extern int options();
+extern int gmatch();
+extern int error();
+extern int ignsig();
+extern int getarg();
+extern int length();
+extern int execa();
+extern int cf();
+extern int any();
+extern int initio();
+extern int pathopen();
+extern struct dolnod *freeargs();
+extern short pathlook();
+extern short hash_cmd();
+
+void execprint();
+void execexp();
+
+extern int exitval;
+
+static int parent;
+int cmdtype;
+
+/* ========	command execution	========*/
+
+int execute(argt, exec_link, errorflg, pf1, pf2)
+struct trenod *argt;
+int exec_link, errorflg;
+int *pf1, *pf2;
+{
+    /*
+     * `stakbot' is preserved by this routine
+     */
+    register struct trenod *t;
+    char *sav;
+    short saveio;
+
+    cmdtype = 0;
+#ifdef NOTNOW
+printf("xec:execute entry\n");
+#endif
+    sav = savstak();
+    sigchk();
+    if (!errorflg)
+    	flags &= ~errflg;
+
+    if ((t = argt) && execbrk == 0) {
+    	register int treeflgs;
+    	int type;
+    	register char **com;
+    	short pos;
+    	int linked;
+    	int execflg;
+
+    	linked = exec_link >> 1;
+    	execflg = exec_link & 01;
+
+    	treeflgs = t->tretyp;
+    	type = treeflgs & COMMSK;
+
+#ifdef NOTNOW
+printf("xec:execute before switch, type = %x\n", type);
+#endif
+    	switch (type) {
+    	case TFND:
+    	     {
+    	    	struct fndnod *f = (struct fndnod *)t;
+    	    	struct namnod *n = lookup(f->fndnam);
+
+#ifdef NOTNOW
+printf("xec: TFND\n");
+#endif
+    	    	exitval = 0;
+
+    	    	if (n->namflg & N_RDONLY)
+    	    	    failed(n->namid, wtfailed);
+
+    	    	if (n->namflg & N_FUNCTN)
+    	    	    freefunc(n);
+    	    	else
+    	    	 {
+    	    	    free(n->namval);
+    	    	    free(n->namenv);
+
+    	    	    n->namval = 0;
+    	    	    n->namflg &= ~(N_EXPORT | N_ENVCHG);
+    	    	}
+
+    	    	if (funcnt)
+    	    	    f->fndval->tretyp++;
+
+    	    	n->namenv = (char *)f->fndval;
+    	    	attrib(n, N_FUNCTN);
+    	    	hash_func(n->namid);
+    	    	break;
+    	    }
+
+    	case TCOM:
+    	     {
+    	    	char *a1;
+    	    	int argn, internal;
+    	    	struct argnod *schain = gchain;
+    	    	struct ionod *io = t->treio;
+    	    	short cmdhash = 0;
+    	    	short comtype = 0;
+
+#ifdef NOTNOW
+printf("xec: TCOM\n");
+#endif
+    	    	exitval = 0;
+
+    	    	gchain = 0;
+    	    	argn = getarg(t);
+    	    	com = scan(argn);
+    	    	a1 = com[1];
+#ifdef NOTNOW
+printf("xec: TCOM argn = %d, com[0] = %s, a1 = %s\n", argn, com[0], a1);
+#endif
+    	    	gchain = schain;
+
+    	    	if (argn != 0)
+    	    	    cmdhash = pathlook(com[0], 1, comptr(t)->comset);
+
+    	    	if (argn == 0 || (comtype = hashtype(cmdhash)) == BUILTIN)
+    	    	    setlist(comptr(t)->comset, 0);
+
+    		cmdtype = comtype;	/* save for initio */
+    	    	if (argn && (flags & noexec) == 0) {
+    	    	    /* print command if execpr */
+
+    	    	    if (flags & execpr)
+    	    	    	execprint(com);
+
+    	    	    if (comtype == NOTFOUND) {
+    	    	    	pos = hashdata(cmdhash);
+    	    	    	if (pos == 1)
+    	    	    	    failed(*com, notfound);
+    	    	    	else if (pos == 2)
+    	    	    	    failed(*com, badexec);
+    	    	    	else
+    	    	    	    failed(*com, badperm);
+    	    	    	break;
+    	    	    } else if (comtype == PATH_COMMAND) {
+    	    	    	pos = -1;
+    	    	    } else if (comtype & (COMMAND | REL_COMMAND)) {
+    	    	    	pos = hashdata(cmdhash);
+    	    	    } else if (comtype == BUILTIN) {
+    	    	    	short index;
+
+    	    	    	internal = hashdata(cmdhash);
+    	    	    	index = initio(io, (internal != SYSEXEC));
+
+    	    	    	switch (internal) {
+    	    	    	case SYSDOT:
+#ifdef NOTNOW
+printf("xec: SYSDOT\n");
+#endif
+    	    	    	    if (a1) {
+    	    	    	    	register int f;
+
+    	    	    	    	if ((f = pathopen(getpath(a1), a1)) < 0)
+    				    failed(a1, notfound);
+    	    	    	    	else
+    				    execexp(0, f);
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSTIMES:
+    	    	    	     {
+#ifdef mpx
+    	    	    	    	long int t[4];
+#else
+                                struct tms t;
+#endif
+#ifdef NOTNOW
+printf("xec: SYSTIMES\n");
+#endif
+#ifdef mpx
+    	    	    	    	times(t);
+    	    	    	    	prt(t[2]);
+    	    	    	    	prc_buff(SP);
+    	    	    	    	prt(t[3]);
+    	    	    	    	prc_buff(NL);
+#else
+    	    	    	    	times(&t);
+    	    	    	    	prt(t.tms_cutime);
+    	    	    	    	prc_buff(SP);
+    	    	    	    	prt(t.tms_cstime);
+    	    	    	    	prc_buff(NL);
+#endif
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSEXIT:
+#ifdef NOTNOW
+printf("xec: SYSEXIT\n");
+#endif
+    	    	    	    flags |= forked;	/* force exit */
+    	    	    	    exitsh(a1 ? stoi(a1) : retval);
+
+    	    	    	case SYSNULL:
+#ifdef NOTNOW
+printf("xec: SYSNULL\n");
+#endif
+    	    	    	    io = 0;
+    	    	    	    break;
+
+    	    	    	case SYSCONT:
+#ifdef NOTNOW
+printf("xec: SYSCONT\n");
+#endif
+    	    	    	    if (loopcnt) {
+    	    	    	    	execbrk = breakcnt = 1;
+    	    	    	    	if (a1)
+    				    breakcnt = stoi(a1);
+    	    	    	    	if (breakcnt > loopcnt)
+    				    breakcnt = loopcnt;
+    	    	    	    	else
+    				    breakcnt = -breakcnt;
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSBREAK:
+#ifdef NOTNOW
+printf("xec: SYSBREAK\n");
+#endif
+    	    	    	    if (loopcnt) {
+    	    	    	    	execbrk = breakcnt = 1;
+    	    	    	    	if (a1)
+    				    breakcnt = stoi(a1);
+    	    	    	    	if (breakcnt > loopcnt)
+    				    breakcnt = loopcnt;
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSTRAP:
+#ifdef NOTNOW
+printf("xec: SYSTRAP\n");
+#endif
+    	    	    	    if (a1) {
+    	    	    	    	BOOL 	clear;
+
+    	    	    	    	if ((clear = digit(*a1)) == 0)
+    				    ++com;
+    	    	    	    	while (*++com) {
+    				    int i;
+
+    				    if ((i = stoi(*com)) >= MAXTRAP || i < MINTRAP)
+    					failed(*com, badtrap);
+    				    else if (clear)
+    					clrsig(i);
+    				    else {
+    					replace(&trapcom[i], a1);
+    					if (*a1)
+    					    getsig(i);
+    					else
+    					    ignsig(i);
+    					}
+    	    	    	    	}
+    	    	    	    } else {	/* print out current traps */
+    	    	    	    	int i;
+
+    	    	    	    	for (i = 0; i < MAXTRAP; i++) {
+    				    if (trapcom[i]) {
+    					prn_buff(i);
+    					prs_buff(colon);
+    					prs_buff(trapcom[i]);
+    					prc_buff(NL);
+    				    }
+    	    	    	    	}
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSEXEC:
+    	    	    	     {
+#ifdef NOTNOW
+printf("xec: SYSEXEC\n");
+#endif
+    	    	    	    	com++;
+    	    	    	    	ioset = 0;
+    	    	    	    	io = 0;
+    	    	    	    	if (a1 == 0) {
+    				    break;
+    	    	    	    	}
+    	    	    	    }
+
+#ifdef RES	/* Research includes login as part of the shell */
+
+    	    	    	case SYSLOGIN:
+    	    	    	    flags |= forked;
+    	    	    	    oldsigs();
+    	    	    	    execa(com, -1);
+    	    	    	    done();
+#else
+    	    	    	case SYSNEWGRP:
+#ifdef NOTNOW
+printf("xec: SYSNEWGRP\n");
+#endif
+    	    	    	    if (flags & rshflg)
+    	    	    	    	failed(com[0], restricted);
+    	    	    	    else
+    	    	    	     {
+    	    	    	    	flags |= forked;	/* force bad exec to terminate shell */
+    	    	    	    	oldsigs();
+    	    	    	    	execa(com, -1);
+    	    	    	    	done();
+    	    	    	    }
+
+#endif	/* RES */
+
+    	    	    	case SYSCD:
+#ifdef NOTNOW
+printf("xec: SYSCD\n");
+#endif
+    	    	    	    if (flags & rshflg)
+    	    	    	    	failed(com[0], restricted);
+    	    	    	    else if ((a1 && *a1) || (a1 == 0 && (a1 = homenod.namval))) {
+    	    	    	    	register char *safe;
+    	    	    	    	char *cdpath;
+    	    	    	    	char *dir;
+    	    	    	    	int f;
+
+    	    	    	    	if ((cdpath = cdpnod.namval) == 0 || 
+    	    	    	    	  *a1 == '/' || 
+    	    	    	    	  cf(a1, pdstr) == 0 ||
+    	    	    	    	cf(a1, dotdot) == 0 ||
+    	    	    	    	(*a1 == '.' && (*(a1 + 1) == '/' || *(a1 + 1) ==
+    	    	    	    	  '.' && *(a1 + 2) == '/')))
+    				    cdpath = nullstr;
+
+/* DAG -- catpath() leaves the trial directory above the top of the "stack".
+ This is too dangerous; systems using directory access routines may
+ alloc() storage and clobber the string.  Therefore I have changed the
+ code to alloc() a safe place to put the trial strings.  Most of the
+ changes involved replacing "curstak()" with "safe".
+ */
+    				    safe = alloc((unsigned)(length(cdpath) +
+    				      length(a1)));
+
+    	    	    	    	do
+    	    	    	    	 {
+    				    dir = cdpath;
+    				    cdpath = catpath(cdpath, a1);
+    				    (void)movstr(curstak(), safe);
+    	    	    	    	}
+    	    	    	    	while ((f = (chdir(safe) < 0)) && cdpath)
+    				    ;
+    	    	    	    	if (f) {
+    				    free(safe);
+    				    failed(a1, baddir);
+    	    	    	    	} else {
+    				    if (cf(nullstr, dir) && 
+    				      *dir != ':' && 
+    				      any('/', safe) &&
+    				      flags & prompt)
+    					cwdprint();
+    				    free(safe);
+    	    	    	    	}
+    	    	    	    	zapcd();
+    	    	    	    } else {
+    	    	    	    	if (a1)
+    				    failed(a1, baddir);
+    	    	    	    	else
+    				    error(nohome);
+    	    	    	    }
+
+    	    	    	    break;
+
+    	    	    	case SYSSHFT:
+    	    	    	     {
+    	    	    	    	int places;
+
+#ifdef NOTNOW
+printf("xec: SYSSHFT\n");
+#endif
+    	    	    	    	places = a1 ? stoi(a1) : 1;
+
+    	    	    	    	if ((dolc -= places) < 0) {
+    				    dolc = 0;
+    				    error(badshift);
+    	    	    	    	} else
+    				    dolv += places;
+    	    	    	    }
+
+    	    	    	    break;
+
+    	    	    	case SYSWAIT:
+#ifdef NOTNOW
+printf("xec: SYSWAIT\n");
+#endif
+#ifndef mpx
+    	    	    	    await(a1 ? stoi(a1) : -1, 1);
+#endif
+    	    	    	    break;
+
+    	    	    	case SYSREAD:
+#ifdef NOTNOW
+printf("xec: SYSREAD\n");
+#endif
+    	    	    	    rwait = 1;
+    	    	    	    exitval = readvar(&com[1]);
+    	    	    	    rwait = 0;
+    	    	    	    break;
+
+    	    	    	case SYSSET:
+#ifdef NOTNOW
+printf("xec: SYSSET\n");
+#endif
+    	    	    	    if (a1) {
+    	    	    	    	int argc;
+
+    	    	    	    	argc = options(argn, com);
+    	    	    	    	if (argc > 1)
+    				    setargs(com + argn - argc);
+    	    	    	    } else if (comptr(t)->comset == 0) {
+    	    	    	    	/*
+				 * scan name chain and print
+				 */
+    	    	    	    	namscan(printnam);
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSRDONLY:
+#ifdef NOTNOW
+printf("xec: SYSRDONLY\n");
+#endif
+    	    	    	    exitval = 0;
+    	    	    	    if (a1) {
+    	    	    	    	while (*++com)
+    				    attrib(lookup(*com), N_RDONLY);
+    	    	    	    } else
+    	    	    	    	namscan(printro);
+
+    	    	    	    break;
+
+    	    	    	case SYSXPORT:
+    	    	    	     {
+    	    	    	    	struct namnod *n;
+
+#ifdef NOTNOW
+printf("xec: SYSXPORT\n");
+#endif
+    	    	    	    	exitval = 0;
+    	    	    	    	if (a1) {
+    				    while (*++com) {
+    					n = lookup(*com);
+    					if (n->namflg & N_FUNCTN)
+    					    error(badexport);
+    					else
+    					    attrib(n, N_EXPORT);
+    				    }
+    	    	    	    	} else
+    				    namscan(printexp);
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSEVAL:
+#ifdef NOTNOW
+printf("xec: SYSEVAL\n");
+#endif
+    	    	    	    if (a1)
+    	    	    	    	execexp(a1, &com[2]);
+    	    	    	    break;
+
+#ifndef RES
+#ifndef mpx
+    	    	    	case SYSULIMIT:
+    	    	    	     {
+    	    	    	    	long int i;
+    	    	    	    	long ulimit();
+    	    	    	    	int command = 2;
+
+    	    	    	    	if (a1 && *a1 == '-') {
+    				    switch (*(a1 + 1)) {
+    					case 'f':
+    					    command = 2;
+    					    break;
+
+#ifdef rt
+    					case 'p':
+    					    command = 5;
+    					    break;
+#endif
+
+    					default:
+    					    error(badopt);
+    				    }
+    				    a1 = com[2];
+    	    	    	    	}
+    	    	    	    	if (a1) {
+    				    int c;
+
+    				    i = 0;
+    				    while ((c = *a1++) >= '0' && c <= '9') {
+    					i = (i * 10) + (long)(c - '0');
+    					if (i < 0)
+    					    error(badulimit);
+    				    }
+    				    if (c || i < 0)
+    					error(badulimit);
+    	    	    	    	} else {
+    				    i = -1;
+    				    command--;
+    	    	    	    	}
+
+    	    	    	    	if ((i = ulimit(command, i)) < 0)
+    				    error(badulimit);
+
+    	    	    	    	if (command == 1 || command == 4) {
+    				    prl(i);
+    				    prc_buff(NL);	/* ADR */
+    	    	    	    	}
+    	    	    	    	break;
+    	    	    	    }
+
+    	    	    	case SYSUMASK:
+    	    	    	    if (a1) {
+    	    	    	    	int c, i;
+
+    	    	    	    	i = 0;
+    	    	    	    	while ((c = *a1++) >= '0' && c <= '7')
+    				    i = (i << 3) + c - '0';
+    	    	    	    	umask(i);
+    	    	    	    } else {
+    	    	    	    	int i, j;
+
+    	    	    	    	umask(i = umask(0));
+    	    	    	    	prc_buff('0');
+    	    	    	    	for (j = 6; j >= 0; j -= 3)
+    				    prc_buff(((i >> j) & 07) + '0');
+    	    	    	    	prc_buff(NL);
+    	    	    	    }
+    	    	    	    break;
+#endif /* mpx */
+
+    	    	    	case SYSTST:
+#ifdef NOTNOW
+printf("xec: SYSTST\n");
+#endif
+    	    	    	    exitval = test(argn, com);
+    	    	    	    break;
+#endif	/* RES (DAG -- bug fix: SYSTST not in RES) */
+
+    	    	    	case SYSECHO:
+#ifdef NOTNOW
+printf("xec: SYSECHO argn = %x, com = %s com1 = %s\n",argn, com[0], com[1]);
+#endif
+    	    	    	    exitval = echo(argn, com);
+    	    	    	    break;
+
+     	    	    	case SYSHASH:
+#ifdef NOTNOW
+printf("xec: SYSHASH\n");
+#endif
+    	    	    	    exitval = 0;
+
+    	    	    	    if (a1) {
+    	    	    	    	if (a1[0] == '-') {
+    				    if (a1[1] == 'r')
+    					zaphash();
+    				    else
+    					error(badopt);
+    	    	    	    	} else {
+    				    while (*++com) {
+    					if (hashtype(hash_cmd(*com)) == NOTFOUND)
+    					    failed(*com, notfound);
+    				    }
+    	    	    	    	}
+    	    	    	    } else
+    	    	    	    	hashpr();
+
+    	    	    	    break;
+
+    	    	    	case SYSPWD:
+#ifdef NOTNOW
+printf("xec: SYSPWD\n");
+#endif
+    	    	    	     {
+    	    	    	    	exitval = 0;
+    	    	    	    	cwdprint();
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSRETURN:
+#ifdef NOTNOW
+printf("xec: SYSRETURN\n");
+#endif
+    	    	    	    if (funcnt == 0)
+    	    	    	    	error(badreturn);
+
+    	    	    	    execbrk = 1;
+    	    	    	    exitval = (a1 ? stoi(a1) : retval);
+    	    	    	    break;
+
+    	    	    	case SYSTYPE:
+#ifdef NOTNOW
+printf("xec: SYSTYPE\n");
+#endif
+    	    	    	    exitval = 0;
+    	    	    	    if (a1) {
+    	    	    	    	while (*++com)
+    				    what_is_path(*com);
+    	    	    	    }
+    	    	    	    break;
+
+    	    	    	case SYSUNS:
+#ifdef NOTNOW
+printf("xec: SYSUNS\n");
+#endif
+    	    	    	    exitval = 0;
+    	    	    	    if (a1) {
+    	    	    	    	while (*++com)
+    				    unset_name(*com);
+    	    	    	    }
+    	    	    	    break;
+
+
+    	    	    	default:
+#ifdef NOTNOW
+printf("xec: UNKNOWN\n");
+#endif
+    	    	    	    prs_buff("unknown builtin\n");
+    	    	    	}
+
+
+    	    	    	flushb();
+    	    	    	restore(index);
+    	    	    	chktrap();
+    	    	    	break;
+    	    	    } else if (comtype == FUNCTION) {
+    	    	    	struct namnod *n;
+    	    	    	short index;
+
+#ifdef NOTNOW
+printf("xec:execute FUNCTION\n");
+#endif
+    	    	    	n = findnam(com[0]);
+
+#ifdef NOTNOW
+printf("xec:after findnam, before initio\n");
+#endif
+    	    	    	funcnt++;
+    	    	    	index = initio(io, 1);
+#ifdef NOTNOW
+printf("xec:after initio, before setargs\n");
+#endif
+    	    	    	setargs(com);
+#ifdef NOTNOW
+printf("xec:after setargs, before execute\n");
+#endif
+    	    	    	execute((struct trenod *)(n->namenv),
+    			  exec_link, errorflg, pf1, pf2);
+#ifdef NOTNOW
+printf("xec:after execute\n");
+#endif
+    	    	    	execbrk = 0;
+    	    	    	restore(index);
+    	    	    	funcnt--;
+
+    	    	    	break;
+    	    	    }
+    	    	} else if (t->treio == 0) {
+    	    	    chktrap();
+    	    	    break;
+    	    	}
+
+    	    }
+
+    	case TFORK:
+#ifdef NOTNOW
+printf("xec: 1 TFORK flags = %x\n", flags);
+#endif
+    	    exitval = 0;
+    	    if (execflg && (treeflgs & (FAMP | FPOU)) == 0)
+    	    	parent = 0;
+    	    else {
+#ifdef NOTNOW
+printf("xec: doing FORK, coms = %s %s %s\n", *com, com[1], com[2]);
+#endif
+#ifdef TESTING
+    	    	parent = 0;
+#else
+    	    	if (treeflgs & (FAMP | FPOU)) {
+    	    	    link_iodocs(iotemp);
+    	    	    linked = 1;
+    	    	}
+
+    	    	parent = getpid();
+#ifdef NOTNOW
+printf("xec: 2 TFORK:child\n");
+#endif
+/*	    flags |= forked; */
+    	    fiotemp  = 0;
+
+    	    if (linked == 1) {
+    		swap_iodoc_nm(iotemp);
+    		exec_link |= 06;
+    	    } else if (linked == 0)
+    	    iotemp = 0;
+
+    	    /* clear any process wait flags */
+#ifndef mpx
+    	    postclr();
+    	    settmp();
+    	    /*
+    	     * Turn off INTR and QUIT if `FINT'
+    	     * Reset ramaining signals to parent
+    	     * except for those `lost' by trap
+    	     */
+    	    oldsigs();
+    	    if (treeflgs & FINT) {
+    		signal(SIGINT, SIG_IGN);
+    		signal(SIGQUIT, SIG_IGN);
+    	    }
+
+    	    /*
+    	     * pipe in or out
+    	     */
+    	    if (treeflgs &FPIN) {
+    		rename(pf1[INPIPE], 0);
+    		close(pf1[OTPIPE]);
+    	    }
+
+    	    if (treeflgs &FPOU) {
+    		close(pf2[INPIPE]);
+    		rename(pf2[OTPIPE], 1);
+    	    }
+#endif
+
+    	    /*
+    	     * default std input for &
+    	     */
+    	    if (treeflgs &FINT && ioset == 0)
+    		rename(chkopen(devnull), 0);
+    	    /*
+    	     * io redirection
+    	     */
+#ifdef NOTNOW
+printf("xec:TFORK, before initio\n");
+#endif
+    	    saveio = initio(t->treio, 1);
+#ifdef NOTNOW
+printf("xec:TFORK initio, before setargs\n");
+#endif
+
+    	    if (type != TCOM) {
+#ifdef NOTNOW
+printf("xec: 3 TFORK:child execute call\n");
+#endif
+    		execute(forkptr(t)->forktre, exec_link | 01, errorflg, (int *)0,
+    		  (int *)0);
+    	    } else if (com[0] != ENDARGS) {
+    		eflag = 0;
+#ifdef NOTNOW
+printf("xec: 4 TFORK:child setlist call, flags = %x, prompt = (%s)\n", flags, ps1nod.namval);
+#endif
+    		setlist(comptr(t)->comset, N_EXPORT);
+    		rmtemp(0);
+#ifdef NOTNOW
+printf("xec: 5 TFORK:child execa call, flags = %x, prompt = (%s)\n", flags, ps1nod.namval);
+#endif
+    		execa(com, pos);
+#ifdef NOTNOW
+printf("xec: 6 TFORK:after execa call, flags = %x, prompt = (%s)\n", flags, ps1nod.namval);
+#endif
+    	    }
+    	    restore(saveio);
+	    assnum(&pcsadr, parent);
+    	    chktrap();
+
+#ifdef mpx
+/*    	    break; */
+#else
+    	    done();
+#endif
+#endif
+    	    }
+#ifdef NOTNOW
+printf("xec: 7 TFORK:parent\n");
+#endif
+    	    	/*
+		 * This is the parent branch of fork;
+		 * it may or may not wait for the child
+		 */
+    	    	if (treeflgs & FPRS && flags & ttyflg) {
+    	    	    prn(parent);
+    		    newline();
+    		}
+    		if (treeflgs & FPCL)
+    		    closepipe(pf1);
+#ifndef mpx
+    		if ((treeflgs & (FAMP | FPOU)) == 0) {
+    		    await(parent, 0);
+    		} else if ((treeflgs & FAMP) == 0)
+    		    post(parent);
+    		else
+#endif
+    		    assnum(&pcsadr, parent);
+    		chktrap();
+    		break;
+
+case TPAR:
+#ifdef NOTNOW
+printf("xec: TPAR\n");
+#endif
+    execute(parptr(t)->partre, exec_link, errorflg, (int *)0, (int *)0);
+    done();
+
+case TFIL:
+     {
+    	int pv[2];
+
+#ifdef NOTNOW
+printf("xec: TFIL\n");
+#endif
+    	chkpipe(pv);
+    	if (execute(lstptr(t)->lstlef, 0, errorflg, pf1, pv) == 0)
+    	    execute(lstptr(t)->lstrit, exec_link, errorflg, pv, pf2);
+    	else
+    	    closepipe(pv);
+    }
+    break;
+
+case TLST:
+#ifdef NOTNOW
+printf("xec: TLST\n");
+#endif
+    execute(lstptr(t)->lstlef, 0, errorflg, (int *)0, (int *)0);
+    execute(lstptr(t)->lstrit, exec_link, errorflg, (int *)0, (int *)0);
+    break;
+
+case TAND:
+#ifdef NOTNOW
+printf("xec: TAND\n");
+#endif
+    if (execute(lstptr(t)->lstlef, 0, 0, (int *)0, (int *)0) == 0)
+    	execute(lstptr(t)->lstrit, exec_link, errorflg, (int *)0, (int *)0);
+    break;
+
+case TORF:
+#ifdef NOTNOW
+printf("xec: TORF\n");
+#endif
+    if (execute(lstptr(t)->lstlef, 0, 0, (int *)0, (int *)0) != 0)
+    	execute(lstptr(t)->lstrit, exec_link, errorflg, (int *)0, (int *)0);
+    break;
+
+case TFOR:
+     {
+    	struct namnod *n = lookup(forptr(t)->fornam);
+    	char **args;
+    	struct dolnod *argsav = 0;
+
+#ifdef NOTNOW
+printf("xec: TFOR\n");
+#endif
+    	if (forptr(t)->forlst == 0) {
+    	    args = dolv + 1;
+    	    argsav = useargs();
+    	} else
+    	 {
+    	    struct argnod *schain = gchain;
+
+    	    gchain = 0;
+    	    trim((args = scan(getarg(forptr(t)->forlst)))[0]);
+    	    gchain = schain;
+    	}
+    	loopcnt++;
+    	while (*args != ENDARGS && execbrk == 0) {
+    	    assign(n, *args++);
+    	    execute(forptr(t)->fortre, 0, errorflg, (int *)0, (int *)0);
+    	    if (breakcnt < 0)
+    	    	execbrk = (++breakcnt != 0);
+    	}
+    	if (breakcnt > 0)
+    	    execbrk = (--breakcnt != 0);
+
+    	loopcnt--;
+    	argfor = (struct dolnod *)freeargs(argsav);
+    }
+    break;
+
+case TWH:
+case TUN:
+     {
+    	int i = 0;
+
+#ifdef NOTNOW
+printf("xec: TWH/TUN\n");
+#endif
+    	loopcnt++;
+    	while (execbrk == 0 && (execute(whptr(t)->whtre, 0, 0, (int *)0,
+    	  (int *)0) == 0) == (type == TWH)) {
+    	    i = execute(whptr(t)->dotre, 0, errorflg, (int *)0, (int *)0);
+    	    if (breakcnt < 0)
+    	    	execbrk = (++breakcnt != 0);
+    	}
+    	if (breakcnt > 0)
+    	    execbrk = (--breakcnt != 0);
+
+    	loopcnt--;
+    	exitval = i;
+    }
+    break;
+
+case TIF:
+#ifdef NOTNOW
+printf("xec: TIF\n");
+#endif
+    if (execute(ifptr(t)->iftre, 0, 0, (int *)0, (int *)0) == 0)
+    	execute(ifptr(t)->thtre, exec_link, errorflg, (int *)0, (int *)0);
+    else if (ifptr(t)->eltre)
+    	execute(ifptr(t)->eltre, exec_link, errorflg, (int *)0, (int *)0);
+    else
+    	exitval = 0;	/* force zero exit for if-then-fi */
+    break;
+
+case TSW:
+     {
+    	register char *r = mactrim(swptr(t)->swarg);
+    	register struct regnod *regp;
+
+#ifdef NOTNOW
+printf("xec: TSW\n");
+#endif
+    	regp = swptr(t)->swlst;
+    	while (regp) {
+    	    struct argnod *rex = regp->regptr;
+
+    	    while (rex) {
+    	    	register char *s;
+
+    	    	if (gmatch(r, s = macro(rex->argval)) || (trim(s), eq(r,
+    	    	  s))) {
+    	    	    execute(regp->regcom, 0, errorflg, (int *)0, (int *)0);
+    	    	    regp = 0;
+    	    	    break;
+    	    	} else
+    	    	    rex = rex->argnxt;
+    	    }
+    	    if (regp)
+    	    	regp = regp->regnxt;
+    	}
+    }
+    	break;
+    	}
+    	exitset();
+    }
+
+#ifdef NOTNOW
+printf("xec:execute exit\n");
+#endif
+    sigchk();
+    tdystak(sav);
+    flags |= eflag;
+    return(exitval);
+}
+
+
+void execexp(s, f)
+char *s;
+int f;
+{
+    struct fileblk fb;
+
+#ifdef NOTNOW
+printf("execexp entry\n");
+#endif
+    push(&fb);
+    if (s) {
+    	estabf(s);
+    	fb.feval = (char **)(f);
+    } else if (f >= 0)
+    	initf(f);
+    execute(cmd(NL, NLFLG | MTFLG), 0, (int)(flags & errflg), (int *)0, (int *)0);
+    pop();
+#ifdef NOTNOW
+printf("execexp exit\n");
+#endif
+}
+
+
+void execprint(com)
+char **com;
+{
+    register int argn = 0;
+
+    prs(execpmsg);
+
+    while (com[argn] != ENDARGS) {
+    	prs(com[argn++]);
+    	blank();
+    }
+
+    newline();
+}
+

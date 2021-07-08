@@ -1,0 +1,137 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.04.04.22.33.24;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#~!Makefile for sh
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1994 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"$Id: $"
+
+#	$Log $
+#
+
+# Make parameters when running on MPX
+# Uncomment if running on MPX
+
+ROOT = /system/system
+TARGET = /system/system
+SOURCE = .
+PREFIX = nb
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/system
+BIN = /system/bin
+UBIN = /system/bin
+LIB = /system/bin
+YBIN = /system/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+DEFS = # -DTILDE_SUB
+CFLAGS = -DMPX $(DEFS) #-N 
+LD = $(UBIN)/$(PREFIX)ld
+LDFLAGS = -Yshmap -Rcdirs
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+MAKEFILE = makefile
+
+# Fill in with correct information
+
+OBJECTS	= setbrk.o blok.o stak.o cmd.o fault.o main.o word.o string.o\
+	  name.o args.o xec.o service.o error.o io.o print.o macro.o expand.o\
+	  ctype.o msg.o test.o defs.o hash.o hashserv.o pwd.o func.o\
+	  echo.o\
+	  homedir.o
+#	  signal.o ulimit.o	# for BSD, also remove echo.o
+#	  homedir.o		# for TILDE_SUB
+
+SRCS	= setbrk.c blok.c stak.c cmd.c fault.c main.c word.c string.c\
+	  name.c args.c xec.c service.c error.c io.c print.c macro.c expand.c\
+	  ctype.c msg.c test.c defs.c hash.c hashserv.c pwd.c func.c\
+	  echo.c\
+	  homedir.c
+#	  signal.c ulimit.c	# for BSD, also remove echo.c
+#	  homedir.c		# for TILDE_SUB
+
+HDRS	= brkincr.h c_type.h defs.h hash.h mac.h mode.h name.h stak.h \
+	sym.h timeout.h
+
+MAIN = sh
+
+ALL:	all
+
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+	$(BIN)/chmod 775 $(MAIN)
+	$(BIN)/chgrp bin $(MAIN)
+	$(BIN)/chown bin $(MAIN)
+
+CLEAN:  clean
+
+clean:
+	$(BIN)/rm -f $(OBJECTS)
+
+CLOBBER: clobber
+
+clobber: clean
+	$(BIN)/rm -f $(MAIN)
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+#	$(BIN)/mkdep $(MAKEFILE) >dep.out
+#	@@for i in $(SRCS); do \
+#	$(BIN)/echo # Source file '$$i' >> dep.out; \
+#	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+#	done;
+#	$(BIN)/echo # End of dependencies >> dep.out
+#	$(BIN)/mv dep.out $(MAKEFILE);
+
+INSTALL: install
+
+install: all
+	$(BIN)/cp $(MAIN) $(BIN)/$(MAIN)
+	$(BIN)/cp $(MAIN) $(ROOT)/$(MAIN)
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@

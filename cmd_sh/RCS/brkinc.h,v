@@ -1,0 +1,98 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	2021.07.07.23.09.52;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.04.04.22.39.21;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.04.04.22.03.57;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.3
+log
+@Remove warning errors.  Remake for nbc-master.
+@
+text
+@/*~!brkinc.h*/
+/* Name:  brkinc.h Part No.: _______-____r
+ *
+ * Copyright 1994 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"$Id: brkinc.h,v 1.2 1995/04/04 22:39:21 jbev Exp jbev $"
+
+/*	$Log $
+ */
+
+#ifndef BRKINC_H
+#define BRKINC_H
+
+#define BRKINCR 01000
+#define BRKMAX 04000
+/* #define BRKMAX 0xc000 */
+
+#endif /* BRKINC_H */
+@
+
+
+1.2
+log
+@Added Log.
+@
+text
+@d1 2
+a2 2
+/*~!brkincr.h*/
+/* Name:  brkincr.h Part No.: _______-____r
+d19 1
+a19 1
+#ident	"$Id: $"
+d24 2
+a25 2
+#ifndef BRKINCR_H
+#define BRKINCR_H
+d31 1
+a31 1
+#endif /* BRKINCR_H */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d19 4
+a22 1
+#ident	"Id: $"
+@

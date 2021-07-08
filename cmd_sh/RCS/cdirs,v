@@ -1,0 +1,31 @@
+head	1.1;
+access;
+symbols;
+locks
+	jbev:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	95.04.04.22.34.30;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@FILES 8
+BUFFERS 8
+SPACE 16
+OPTION LOWER
+ENVIRONMENT ,,SHARED,MAP2048
+BUILD SH
+@

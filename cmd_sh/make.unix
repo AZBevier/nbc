@@ -1,0 +1,55 @@
+#
+# Makefile for make for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 # -Wall
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = setbrk.o blok.o stak.o cmd.o fault.o main.o word.o string.o\
+	name.o args.o xec.o servic.o error.o io.o print.o macro.o expand.o\
+	ctype.o msg.o test.o defs.o hash.o hashsv.o pwd.o func.o\
+	echo.o homedr.o
+HDRS = brkinc.h c_type.h defs.h hash.h mac.h mode.h name.h stak.h \
+	sym.h timeot.h
+SRCS = setbrk.c blok.c stak.c cmd.c fault.c main.c word.c string.c\
+	name.c args.c xec.c servic.c error.c io.c print.c macro.c expand.c\
+	ctype.c msg.c test.c defs.c hash.c hashsv.c pwd.c func.c\
+	echo.c homedr.c
+MAIN = sh
+DOC = sh.m
+
+all:	$(DOC) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(HDRS) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(DOC)
+	-rm -f $(LBIN)/*.c $(LBIN)/*.h
+
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	@for n in $(SRCS) ; do \
+		$(INSTALL) $$n $(LBIN)/$$n ; \
+	done
+#	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	@for n in $(HDRS) ; do \
+		$(INSTALL) $$n $(LBIN)/$$n ; \
+	done
+#	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+

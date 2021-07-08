@@ -1,0 +1,664 @@
+/*~!name.c*/
+/* Name:  name.c Part No.: _______-____r
+ *
+ * Copyright 1994 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"$Id: name.c,v 1.2 2021/07/07 23:09:52 jbev Exp $"
+
+/*	$Log $
+ */
+
+/* #define NOTNOW */
+
+#include	"defs.h"
+#ifndef mpx
+#include <stdlib.h>
+#endif
+
+extern BOOL	chkid();
+extern char *simple();
+extern int mailchk;
+
+extern void prs_buff();
+extern void exitsh();
+extern void prc_buff();
+extern void prn_buff();
+extern void setname();
+extern void assign();
+extern void failed();
+extern void freefunc();
+extern void func_unhash();
+extern void prs();
+extern void prf();
+extern void prc();
+extern void zaphash();
+extern void set_dotpath();
+extern void setmail();
+extern void push();
+extern void initf();
+extern void printro();
+extern void printexp();
+extern void printname();
+extern void exname();
+
+extern int cf();
+extern int stoi();
+extern int dup();
+extern int itos();
+extern int any();
+extern int pop();
+extern int length();
+
+extern char nextc();
+
+static char *staknam();
+
+static int (*namfn)();
+static int namwalk();
+
+struct namnod ps2nod = 
+{
+    (struct namnod *)NIL,
+    &acctnod,
+    ps2name
+};
+
+struct namnod cdpnod = 
+{
+    (struct namnod *)NIL,
+    (struct namnod *)NIL,
+    cdpname
+};
+
+struct namnod pathnod = 
+{
+    &mailpnod,
+    (struct namnod *)NIL,
+    pathname
+};
+
+struct namnod ifsnod = 
+{
+    &homenod,
+    &mailnod,
+    ifsname
+};
+
+struct namnod ps1nod = 
+{
+    &pathnod,
+    &ps2nod,
+    ps1name
+};
+
+struct namnod homenod = 
+{
+    &cdpnod,
+    (struct namnod *)NIL,
+    homename
+};
+
+struct namnod mailnod = 
+{
+    (struct namnod *)NIL,
+    (struct namnod *)NIL,
+    mailname
+};
+
+struct namnod mchknod = 
+{
+    &ifsnod,
+    &ps1nod,
+    mchkname
+};
+
+struct namnod acctnod = 
+{
+    (struct namnod *)NIL,
+    (struct namnod *)NIL,
+    acctname
+};
+
+struct namnod mailpnod = 
+{
+    (struct namnod *)NIL,
+    (struct namnod *)NIL,
+    mailpname
+};
+
+struct namnod *namep = &mchknod;
+
+/* ========	variable and string handling	======== */
+
+int syslook(w, syswds, n)
+register char *w;
+register struct sysnod syswds[];
+int n;
+{
+    int low;
+    int high;
+    int mid;
+    register int cond;
+
+    if (w == 0 || *w == 0)
+    	return(0);
+
+    low = 0;
+    high = n - 1;
+
+    while (low <= high) {
+    	mid = (low + high) / 2;
+
+    	if ((cond = cf(w, syswds[mid].sysnam)) < 0)
+    	    high = mid - 1;
+    	else if (cond > 0)
+    	    low = mid + 1;
+    	else
+    	    return(syswds[mid].sysval);
+    }
+    return(0);
+}
+
+
+void setlist(arg, xp)
+register struct argnod *arg;
+int xp;
+{
+    if (flags & exportflg)
+    	xp |= N_EXPORT;
+
+    while (arg) {
+    	register char *s = mactrim(arg->argval);
+#ifdef NOTNOW
+printf("setlist: call setname (%s)\n", arg->argval);
+#endif
+    	setname(s, xp);
+    	arg = arg->argnxt;
+    	if (flags & execpr) {
+    	    prs(s);
+    	    if (arg)
+    	    	blank();
+    	    else
+    	    	newline();
+    	}
+    }
+}
+
+
+void setname(argi, xp)	/* does parameter assignments */
+char *argi;
+int xp;
+{
+    register char *argscan = argi;
+    register struct namnod *n;
+
+    if (letter(*argscan)) {
+    	while (alphanum(*argscan))
+    	    argscan++;
+
+    	if (*argscan == '=') {
+    	    *argscan = 0;	/* make name a cohesive string */
+
+    	    n = lookup(argi);
+    	    *argscan++ = '=';
+    	    attrib(n, xp);
+    	    if (xp & N_ENVNAM)
+    	    	n->namenv = n->namval = argscan;
+    	    else
+    	    	assign(n, argscan);
+#ifdef NOTNOW1
+printf("setname: now set %s\n", argi);
+#endif
+    	    return;
+    	}
+    }
+    failed(argi, notid);
+}
+
+
+void replace(a, v)
+register char **a;
+char *v;
+{
+#ifdef NOTNOW
+if (*a || **a)
+printf("replace: (%s, %s)\n", *a, v);
+#endif
+    free(*a);
+    *a = make(v);
+}
+
+
+void dfault(n, v)
+struct namnod *n;
+char *v;
+{
+    if (n->namval == 0)
+    	assign(n, v);
+}
+
+
+void assign(n, v)
+struct namnod *n;
+char *v;
+{
+    if (n->namflg & N_RDONLY)
+    	failed(n->namid, wtfailed);
+
+#ifndef RES
+    else if (flags & rshflg) {
+    	if (n == &pathnod || eq(n->namid, shell))
+    	    failed(n->namid, restricted);
+    } 
+#endif
+
+      else if (n->namflg & N_FUNCTN) {
+    	func_unhash(n->namid);
+    	freefunc(n);
+
+    	n->namenv = 0;
+    	n->namflg = N_DEFAULT;
+    }
+
+    if (n == &mchknod) {
+    	mailchk = stoi(v);
+    }
+
+    replace(&n->namval, v);
+    attrib(n, N_ENVCHG);
+
+    if (n == &pathnod) {
+    	zaphash();
+    	set_dotpath();
+    	return;
+    }
+
+#ifndef mpx
+    if (flags & prompt) {
+    	if ((n == &mailpnod) || (n == &mailnod && mailpnod.namflg == N_DEFAULT))
+    	    setmail(n->namval);
+    }
+#endif
+}
+
+
+int readvar(names)
+char **names;
+{
+    extern long lseek();
+    struct fileblk fb;
+    register struct fileblk *f = &fb;
+    register char c;
+    register int rc = 0;
+    struct namnod *n = lookup(*names++);	/* done now to avoid storage mess */
+    char *rel = (char *)relstak();
+#ifdef NOTNOW
+printf("readvar: called (%s, %s, %s)\n", names[0], names[1], names[2]);
+#endif
+
+    push(f);
+    initf(dup(0));
+
+    if (lseek(0, 0L, 1) == -1L)
+    	f->fsiz = 1;
+
+    /*
+     * strip leading IFS characters
+     */
+    while ((any((c = nextc(0)), ifsnod.namval)) && !(eolchar(c)))
+    	;
+    for (; ; ) {
+    	if ((*names && any(c, ifsnod.namval)) || eolchar(c)) {
+    	    zerostak();
+    	    assign(n, absstak(rel));
+    	    setstak(rel);
+    	    if (*names)
+    	    	n = lookup(*names++);
+    	    else
+    	    	n = 0;
+    	    if (eolchar(c)) {
+    	    	break;
+    	    } else {	/* strip imbedded IFS characters */
+     	    	while ((any((c = nextc(0)), ifsnod.namval)) && 
+   	    	  !(eolchar(c)))
+    	    	    ;
+    	    }
+    	} else
+    	 {
+    	    pushstak(c);
+    	    c = nextc(0);
+
+    	    if (eolchar(c)) {
+    	    	char *top = staktop;
+
+    	    	while (any(*(--top), ifsnod.namval))
+    	    	    ;
+    	    	staktop = top + 1;
+    	    }
+
+
+    	}
+    }
+    while (n) {
+    	assign(n, nullstr);
+    	if (*names)
+    	    n = lookup(*names++);
+    	else
+    	    n = 0;
+    }
+
+    if (eof)
+    	rc = 1;
+    lseek(0, (long)(f->fnxt - f->fend), 1);
+    pop();
+    return(rc);
+}
+
+
+void assnum(p, i)
+char **p;
+int i;
+{
+    itos(i);
+    replace(p, numbuf);
+}
+
+
+char *make(v)
+char *v;
+{
+    register char *p;
+
+    if (v) {
+    	movstr(v, p = alloc(length(v)));
+    	return(p);
+    } else
+    	return((char *)0);
+}
+
+
+struct namnod *lookup(nam)
+register char *nam;
+{
+    register struct namnod *nscan = namep;
+    register struct namnod **prev;
+    int LR;
+
+    if (!chkid(nam))
+    	failed(nam, notid);
+    while (nscan) {
+    	if ((LR = cf(nam, nscan->namid)) == 0)
+    	    return(nscan);
+
+    	else if (LR < 0)
+    	    prev = &(nscan->namlft);
+    	else
+    	    prev = &(nscan->namrgt);
+    	nscan = *prev;
+    }
+    /*
+     * add name node
+     */
+    nscan = (struct namnod *)alloc(sizeof * nscan);
+    nscan->namlft = nscan->namrgt = (struct namnod *)NIL;
+    nscan->namid = make(nam);
+    nscan->namval = 0;
+    nscan->namflg = N_DEFAULT;
+    nscan->namenv = 0;
+
+    return(*prev = nscan);
+}
+
+
+BOOL chkid(nam)
+char *nam;
+{
+    register char *cp = nam;
+
+    if (!letter(*cp))
+    	return(FALSE);
+    else
+     {
+    	while (*++cp) {
+    	    if (!alphanum(*cp))
+    	    	return(FALSE);
+    	}
+    }
+    return(TRUE);
+}
+
+
+int namscan(fn)
+int (*fn)();
+{
+    namfn = fn;
+    namwalk(namep);
+}
+
+
+static int namwalk(np)
+register struct namnod *np;
+{
+    if (np) {
+    	namwalk(np->namlft);
+    	(*namfn)(np);
+    	namwalk(np->namrgt);
+    }
+}
+
+
+void printnam(n)
+struct namnod *n;
+{
+    register char *s;
+
+    sigchk();
+
+    if (n->namflg & N_FUNCTN) {
+    	prs_buff(n->namid);
+    	prs_buff(sfuncstr);
+    	prf(n->namenv);
+    	prs_buff(efnlstr);
+    } else if (s = n->namval) {
+    	prs_buff(n->namid);
+    	prc_buff('=');
+    	prs_buff(s);
+    	prc_buff(NL);
+    }
+}
+
+
+static char *staknam(n)
+register struct namnod *n;
+{
+    register char *p;
+
+    p = movstr(n->namid, staktop);
+    p = movstr(eqlstr, p);
+    p = movstr(n->namval, p);
+    return(getstak(p + 1 - (char *)(stakbot)));
+}
+
+
+static int namec;
+
+void exname(n)
+register struct namnod *n;
+{
+    register int flg = n->namflg;
+
+    if (flg & N_ENVCHG) {
+
+    	if (flg & N_EXPORT) {
+#ifdef NOTNOW
+printf("exname:EXPORT name (%s)\n", n->namval);
+#endif
+    	    free(n->namenv);
+    	    n->namenv = make(n->namval);
+    	} else {
+#ifdef NOTNOW
+printf("exname: name (%s) env(%s)\n", n->namval, n->namenv);
+#endif
+#ifdef mpx_old
+    	    free(n->namval);
+    	    n->namval = make(n->namenv);
+#endif
+    	}
+    }
+
+
+    if (!(flg & N_FUNCTN))
+    	n->namflg = N_DEFAULT;
+
+    if (n->namval)
+    	namec++;
+
+}
+
+
+void printro(n)
+register struct namnod *n;
+{
+    if (n->namflg & N_RDONLY) {
+    	prs_buff(readonly);
+    	prc_buff(SP);
+    	prs_buff(n->namid);
+    	prc_buff(NL);
+    }
+}
+
+
+void printexp(n)
+register struct namnod *n;
+{
+    if (n->namflg & N_EXPORT) {
+    	prs_buff(export);
+    	prc_buff(SP);
+    	prs_buff(n->namid);
+    	prc_buff(NL);
+    }
+}
+
+
+void setup_env()
+{
+    register char **e = environ;
+
+    while (*e)
+    	setname(*e++, N_ENVNAM);
+#ifdef smpx
+    setname("PATH=.:/system/bin:/system/system", N_ENVNAM);
+    setname("SHELL=/system/bin/sh", N_ENVNAM);
+#endif
+}
+
+
+static char **argnam;
+
+void pushnam(n)
+struct namnod *n;
+{
+    if (n->namval)
+#ifdef NOTNOW
+printf("pushnam: name (%s)\n", n->namval);
+#endif
+    if (n->namval)
+    	*argnam++ = staknam(n);
+}
+
+
+char **msetenv()
+{
+    register char **er;
+
+    namec = 0;
+    namscan(exname);
+
+    argnam = er = (char **)getstak(namec * BYTESPERWORD + BYTESPERWORD);
+    namscan(pushnam);
+    *argnam++ = 0;
+    return(er);
+}
+
+
+struct namnod *findnam(nam)
+register char *nam;
+{
+    register struct namnod *nscan = namep;
+    int LR;
+
+    if (!chkid(nam))
+    	return(0);
+    while (nscan) {
+    	if ((LR = cf(nam, nscan->namid)) == 0)
+    	    return(nscan);
+    	else if (LR < 0)
+    	    nscan = nscan->namlft;
+    	else
+    	    nscan = nscan->namrgt;
+    }
+    return(0);
+}
+
+
+void unset_name(name)
+register char *name;
+{
+    register struct namnod *n;
+
+    if (n = findnam(name)) {
+    	if (n->namflg & N_RDONLY)
+    	    failed(name, wtfailed);
+
+    	if (n == &pathnod || 
+    	  n == &ifsnod || 
+    	  n == &ps1nod || 
+    	  n == &ps2nod || 
+    	  n == &mchknod) {
+    	    failed(name, badunset);
+    	}
+
+#ifndef RES
+
+    	if ((flags & rshflg) && eq(name, shell))
+    	    failed(name, restricted);
+
+#endif
+
+    	if (n->namflg & N_FUNCTN) {
+    	    func_unhash(name);
+    	    freefunc(n);
+    	} else
+    	 {
+    	    free(n->namval);
+    	    free(n->namenv);
+    	}
+
+    	n->namval = n->namenv = 0;
+    	n->namflg = N_DEFAULT;
+
+#ifndef mpx
+    	if (flags & prompt) {
+    	    if (n == &mailpnod)
+    	    	setmail(mailnod.namval);
+    	    else if (n == &mailnod && mailpnod.namflg == N_DEFAULT)
+    	    	setmail(0);
+    	}
+#endif
+    }
+}
+
+

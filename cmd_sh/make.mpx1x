@@ -1,0 +1,75 @@
+#
+# Makefile for make for running make on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.MAKE command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx1x
+
+OBJS = setbrk.o blok.o stak.o cmd.o fault.o main.o word.o string.o\
+	name.o args.o xec.o servic.o error.o io.o print.o macro.o expand.o\
+	ctype.o msg.o test.o defs.o hash.o hashsv.o pwd.o func.o\
+	echo.o homedr.o
+HDRS = brkinc.h c_type.h defs.h hash.h mac.h mode.h name.h stak.h \
+	sym.h timeot.h
+HD = BRKINC.H C_TYPE.H DEFS.H HASH.H MAC.H MODE.H NAME.H STAK.H \
+	SYM.H TIMEOT.H
+SRCS = setbrk.c blok.c stak.c cmd.c fault.c main.c word.c string.c\
+	name.c args.c xec.c servic.c error.c io.c print.c macro.c expand.c\
+	ctype.c msg.c test.c defs.c hash.c hashsv.c pwd.c func.c\
+	echo.c homedr.c
+SRC = SETBRK.C BLOK.C STAK.C CMD.C FAULT.C MAIN.C WORD.C STRING.C\
+	NAME.C ARGS.C XEC.C SERVIC.C ERROR.C IO.C PRINT.C MACRO.C EXPAND.C\
+	CTYPE.C MSG.C TEST.C DEFS.C HASH.C HASHSV.C PWD.C FUNC.C\
+	ECHO.C HOMEDR.C
+MAIN = $(OBJS)
+SLD = ld.sh1x
+LD = LD.SH
+SMK = mk.sh1x
+MK = MK.SH
+SDOC = sh.m
+DOC = SH.M
+
+all:	$(SLD) $(SMK) $(SDOC) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/*.O $(LBIN)/$(DOC) $(LBIN)/$(LD) $(LBIN)/$(MK)
+	-rm -f $(LBIN)/*.C $(LBIN)/*.H
+
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	@for n in $(SRCS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+#	mpxblk <$(SRCS) >$(LBIN)/$(SRC)
+	@for n in $(HDRS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+#	mpxblk <$(HDRS) >$(LBIN)/$(HD)
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	@for n in $(OBJS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		$(MOVE) $$n $(LBIN)/$$nn ; \
+	done
+	/bin/chmod 664 $(LBIN)/*.?
+
