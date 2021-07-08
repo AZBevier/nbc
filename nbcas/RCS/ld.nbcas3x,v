@@ -1,0 +1,114 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.02.07.17.22.34;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.03.12.23.22.05;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin.
+@
+
+
+1.2
+log
+@Update directives
+@
+text
+@DEFM
+PAGE 0
+JOB NBCAS UNIX
+IFT PATH=OBJ.O SKIP
+CREA OBJ.O
+%SKIP
+$AS IN TO SYC
+$AS OT TO OBJ.O
+$COMPRESS
+^(BIN)C.SRTE.O
+NBCAS.O
+$NOTE  END OF COMPRESS
+IFT PATH=NBCASMAP SKIP
+CREA NBCASMAP
+%SKIP
+$OPTION 19 25
+$AS LIB TO ^(BIN)CLB BLOC=N
+$AS DIR TO ^(BIN)CDR BLOC=N
+$AS SLO TO NBCASMAP
+$AS SGO TO OBJ.O
+$ALLOCATE 1B800
+$CATALOG
+OPTION LOWER PROMPT
+FILES 16
+BUFFERS 16
+ALLOCATE 1000
+ENVIRONMENT ,,SHARE,MAP2048
+SPACE 16
+BUILD NBCAS
+$IFT ABORT END
+$GOTO ENDJOB
+%END
+$NOTE *** ERROR ***  CATALOG of NBCAS FAILED
+%ENDJOB
+PAGE
+EOJ
+ENDM
+~    
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 38
+a38 37
+$DEFM                                                                   0001.000
+$PAGE 0                                                                 0002.000
+$JOB NBCAS                                                              0003.000
+$IFF PATH=NBCAS.O ERROR1                                                0004.000
+$AS IN TO SYC                                                           0005.000
+$AS OT TO SGO                                                           0006.000
+$@@SYSTEM(SYSTEM)COMPRESS                                                0007.000
+^(BIN)C.SRTE.O                                                          0008.000
+NBCAS.O                                                                 0009.000
+$NOTE  END OF COMPRESS                                                  0010.000
+$OPTION 19 25                                                           0011.000
+$AS LIB TO ^(BIN)CLB BLOC=N                                             0012.000
+$AS DIR TO ^(BIN)CDR BLOC=N                                             0013.000
+$IFT PATH NBCASMAP SKIP                                                 0014.000
+$CREA NBCASMAP                                                          0015.000
+$DEFN SKIP                                                              0016.000
+$AS SLO TO NBCASMAP                                                     0017.000
+$ALLOCATE 1B800                                                         0018.000
+$PAGE                                                                   0019.000
+$@@SYSTEM(SYSTEM)CATALOG                                                 0020.000
+OPTION LOWER PROMPT                                                     0021.000
+FILES 16                                                                0022.000
+BUFFERS 16                                                              0023.000
+ALLOCATE 1000                                                           0024.000
+ENVIRONMENT ,,SHARE,MAP2048                                             0025.000
+SPACE 16                                                                0026.000
+BUILD NBCAS                                                             0027.000
+$IFT ABORT ERROR2                                                       0028.000
+$GOTO END                                                               0029.000
+$DEFN ERROR1                                                            0030.000
+$NOTE *** ERROR ***  NBCAS.O OBJECT NOT AVAILABLE                       0031.000
+$GOTO ENDHELP                                                           0032.000
+$DEFN ERROR2                                                            0033.000
+$NOTE *** ERROR ***  CATALOG of NBCAS FAILED                            0034.000
+$DEFN END                                                               0035.000
+$EOJ                                                                    0036.000
+$DEFN ENDHELP                                                           0037.000
+@

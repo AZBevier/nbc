@@ -1,0 +1,5 @@
+* PRE FILE FOR NON-EXTENDED MODE OF MPX-32 REV 3                MPX_NON         
+C.3227   SETT                                                                   
+C.TRACF  SETF                                                                   
+C.MEMO   SETF                                                                   
+BOPT_MPX SETF                                                                   
