@@ -1,0 +1,56 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.1
+date	2021.07.04.03.46.10;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initital RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@ 
+ 
+     TRUE(C)		       UNIX System V		       TRUE(C)
+ 
+ 
+     Name
+	  true - Returns with a	zero exit value.
+ 
+     Syntax
+	  true
+ 
+     Description
+	  true does nothing except return with a zero exit value.
+	  false(C), true's counterpart,	does nothing except return
+	  with a nonzero exit value.  true is typically	used in	shell
+	  procedures such as:
+ 
+	       while true
+	       do
+		    command
+	       done
+ 
+     See Also
+	  sh(C), false (C)
+ 
+     Diagnostics
+	  true has exit	status zero.
+ 
+ 
+     Page 1					      (printed 5/7/94)
+ 
+ 
+@

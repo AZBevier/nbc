@@ -1,0 +1,43 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.04.15.27.54;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.04.03.47.46;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build method.
+@
+
+
+1.2
+log
+@Correct program name.
+@
+text
+@$DEFM
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) TRUE.C
+$ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+a2 1
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) FALSE.C
+@

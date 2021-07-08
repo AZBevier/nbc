@@ -1,0 +1,64 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	2021.07.04.03.46.45;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.03.14.02.56.42;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+@
+
+
+1.2
+log
+@Fix warnings.
+@
+text
+@/*~!true.c*/
+/* Name:  true.c Part No.: _______-____r
+ *
+ * Copyright 1994 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)make:true.c	1.0"
+
+int main()
+{
+    return(0);		/* return true */
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d21 1
+a21 1
+main()
+@

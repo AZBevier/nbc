@@ -1,0 +1,92 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.04.15.27.54;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.04.03.47.19;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build method.
+@
+
+
+1.2
+log
+@Correct program name.
+@
+text
+@DEFM
+IFT PATH=OBJ.O SKIP
+CREA OBJ.O
+%SKIP
+JOB TRUE UNIX
+$AS IN TO SYC
+$AS OT TO OBJ.O
+$COMPRESS
+^(BIN)C.SRTE.O
+TRUE.O
+$NOTE  END OF COMPRESS
+IFT PATH=TRUEMAP SKIP
+CREA TRUEMAP
+%SKIP
+AS SLO TO TRUEMAP
+AS SGO TO OBJ.O
+AS LIB TO ^(BIN)CLB BLOC=N
+AS DIR TO ^(BIN)CDR BLOC=N
+OPTION 19 25
+ALLOCATE 1B800
+$CATALOG
+FILES 8
+BUFFERS 8
+ALLOCATE 1000
+OPTION LOWER PROMPT
+ENVIRONMENT ,,SHARE,MAP2048
+SPACE 16
+BUILD TRUE
+$IFT ABORT END
+GOTO ENDJOB
+%END
+$NOTE *** ERROR *** CATALOG OF TRUE FAILED
+%ENDJOB
+PAGE
+EOJ
+ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+JOB FALSE UNIX
+d10 1
+a10 1
+FALSE.O
+d12 2
+a13 2
+IFT PATH=FALSEMAP SKIP
+CREA FALSEMAP
+d15 1
+a15 1
+AS SLO TO FALSEMAP
+d28 1
+a28 1
+BUILD FALSE
+d32 1
+a32 1
+$NOTE *** ERROR *** CATALOG OF FALSE FAILED
+@
