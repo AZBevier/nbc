@@ -1,0 +1,95 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.1
+date	2021.07.05.19.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@ 
+ 
+     RM(C)		       UNIX System V			 RM(C)
+ 
+ 
+     Name
+	  rm, rmdir  - Removes files or	directories.
+ 
+     Syntax
+	  rm [ -fri ] file ...
+ 
+	  rmdir	dir ...
+ 
+     Description
+	  rm removes the entries for one or more files from a
+	  directory.  If an entry was the last link to the file, the
+	  file is destroyed.  Removal of a file	requires write
+	  permission in	its directory, but neither read	nor write
+	  permission on	the file itself.
+ 
+	  If a file has	no write permission and	the standard input is
+	  a terminal, its permissions are printed and a	line is	read
+	  from the standard input.  If that line begins	with y,	the
+	  file is deleted, otherwise the file remains.	No questions
+	  are asked when the -f	option is given	or if the standard
+	  input	is not a terminal.
+ 
+	  If a designated file is a directory, an error	comment	is
+	  printed unless the optional argument -r has been used.  In
+	  that case, rm	recursively deletes the	entire contents	of the
+	  specified directory, and the directory itself.
+ 
+	  If the -i (interactive) option is in effect, rm asks whether
+	  to delete each file, and if the -r option is in effect,
+	  whether to examine each directory.
+ 
+	  The special option ``--'' can	be used	to delimit options.
+	  For example, a file named ``-f'' could not be	removed	by rm
+	  because the hyphen is	interpreted as an option; the command
+	  rm -f	would do nothing, since	no file	is specified.  Using
+	  rm --	-f removes the file successfully.
+ 
+	  rmdir	removes	empty directories.
+ 
+     See Also
+	  rmdir(C)
+ 
+     Diagnostics
+	  Generally self-explanatory.  It is forbidden to remove the
+	  file .. to avoid the consequences of inadvertently doing
+	  something like:
+ 
+	       rm -r .*
+ 
+	  It is	also forbidden to remove the root directory of a given
+	  file system.
+ 
+ 
+     Page 1					      (printed 5/7/94)
+ 
+ 
+     RM(C)		       UNIX System V			 RM(C)
+ 
+ 
+	  No more than 17 levels of subdirectories can be removed
+	  using	the -r option.
+ 
+ 
+     Page 2					      (printed 5/7/94)
+ 
+ 
+@

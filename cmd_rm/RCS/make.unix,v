@@ -1,0 +1,67 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.05.20.06.14;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New makefile.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for rm for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 -Wall
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = rm.o
+HDRS =
+SRCS = rm.c
+MAIN = rm
+DOC = rm.m
+
+all:	$(DOC) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(HDRS) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+	-rm -f $(LBIN)/$(DOC) # $(LBIN)/$(HDRS)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	$(INSTALL) $(LBIN)/rm $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+#	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
