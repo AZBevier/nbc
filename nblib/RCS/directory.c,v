@@ -1,4 +1,33 @@
-/*~!directory.c*/
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	2020.08.31.16.21.31;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.2
+log
+@add SHAR=Y for MPX1X
+@
+text
+@/*~!directory.c*/
 /* Name:  directory.c Part No.: _______-____r
  *
  * Copyright 1993 - J B Systems, Morrison, CO
@@ -16,7 +45,7 @@
  * (a).
  */
 
-#ident	"@(#)nbclib:directory.c	1.2"
+#ident	"@@(#)nbclib:directory.c	1.2"
 
 #ifdef MPX1X
 #include <finfo.h>
@@ -67,15 +96,15 @@ char *name;
 
     slen = strlen(dirnam);	/* get length */
 
-    /* see if name has ^ or @ or ( as 1st char.
+    /* see if name has ^ or @@ or ( as 1st char.
      * if not, try to make it a volume name
      */
     switch (*dirnam) {
       case '\'':		/* it is O.K. */
         break;
-      case '@':			/* it is O.K. */
+      case '@@':			/* it is O.K. */
 #ifdef JUNK
-    	/* see if @vol^, if so delete ^ */
+    	/* see if @@vol^, if so delete ^ */
     	if (dirnam[slen-1] == '^')
     	    dirnam[slen-1] = '\0';
 #endif
@@ -211,8 +240,8 @@ DIR *dirp;
   while (*++ptr)if(isupper(*ptr))*ptr = tolower(*ptr);
   for (i=0; ((i < PATH_MAX) && (ptr[i] != ' ')); i++);
   ptr = dp->d_name;
-  if (ptr[0] == '@')
-    ptr[0] = '/';         /* replace @ with slash */
+  if (ptr[0] == '@@')
+    ptr[0] = '/';         /* replace @@ with slash */
   tp = strchr(ptr, '(');     /*  find '(' */
   if (tp)*tp = '/';
   tp = strchr(ptr, ')');     /*  find ')' */
@@ -375,3 +404,13 @@ DIR	*dirp;			/* stream from opendir() */
     return(0);			/* return 0 */
 #endif
 }
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d63 5
+@

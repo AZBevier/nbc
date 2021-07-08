@@ -34,7 +34,8 @@ YBIN = /system/bin
 CPP = $(LIB)/$(PREFIX)cpp
 CPFLAGS = -C -UMPX
 CC = $(UBIN)/$(PREFIX)cc
-CFLAGS = -C -N -DMPX -Ui386 0M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+#CFLAGS = -C -N -DMPX -Ui386 -M$(LIB)/m.mpxmac3x -P$(LIB)/mpxpre3x
+CFLAGS = -C -DMPX -Ui386 -M$(LIB)/m.mpxmac3x -P$(LIB)/mpxpre3x
 LD = $(UBIN)/$(PREFIX)nbcat
 LDFLAGS = #-YXXXXmap
 YACC = $(YBIN)/$(PREFIX)yacc
@@ -133,23 +134,23 @@ all:	files $(MAIN)
 	$(BIN)/echo clib/cdir are up to date.
 
 files:
-	$(BIN)/touch clib
-	$(BIN)/touch cdir
+	-touch clib
+	-touch cdir
 
 CLEAN:  clean
 
 clean:
-	$(BIN)/rm -f $(OBJS_A)
-	$(BIN)/rm -f $(OBJ1)
-	$(BIN)/rm -f $(OBJ2)
-	$(BIN)/rm -f $(OBJ3)
-	$(BIN)/rm -f $(OBJ4)
-#	$(BIN)/rm -f $(OBJ_1X)
+	-rm -f $(OBJS_A)
+	-rm -f $(OBJ1)
+	-rm -f $(OBJ2)
+	-rm -f $(OBJ3)
+	-rm -f $(OBJ4)
+#	-rm -f $(OBJ_1X)
 
 CLOBBER: clobber
 
 clobber: clean
-	$(BIN)/rm -f clib cdir
+	-rm -f clib cdir
 
 DEPEND: depend
 
@@ -179,13 +180,13 @@ depend: $(SRCS) $(HDRS) $(MAKEFILE)
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	$(BIN)/echo "# End of dependencies" >> dep.out;
-	$(BIN)/mv dep.out $(MAKEFILE)
+	-mv dep.out $(MAKEFILE)
 
 INSTALL: install
 
 install: all
-	$(BIN)/cp clib clb
-	$(BIN)/cp cdir cdr
+	-cp clib clb
+	-cp cdir cdr
 
 prefile:
 

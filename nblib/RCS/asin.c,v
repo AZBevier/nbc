@@ -1,4 +1,29 @@
-/*~!asin.c*/
+head	1.1;
+access;
+symbols;
+locks
+	jbev:1.1; strict;
+comment	@ * @;
+
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!asin.c*/
 /* Name:  asin.c Part No.: _______-____r
  *
  * Copyright 1991 - J B Systems, Morrison, CO
@@ -16,7 +41,7 @@
  * (a).
  */
 
-#ident	"@(#)nbclib:asin.c	1.1"
+#ident	"@@(#)nbclib:asin.c	1.1"
 
 /*
  *	C program for double-precision asin/acos.
@@ -63,9 +88,7 @@ int acosflag;
 		}
 		return (exc.retval);
 	}
-    /* skip for efficiency and to prevent underflow */
-	if (x > X_EPS) {
-/*??    if (x < (X_EPS)) { */
+	if (x > X_EPS) { /* skip for efficiency and to prevent underflow */
 		static double p[] = {
 			-0.69674573447350646411e0,
 			 0.10152522233806463645e2,
@@ -107,3 +130,4 @@ double x;
 {
 	return (asin_acos(x, 1));
 }
+@

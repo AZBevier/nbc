@@ -1,0 +1,85 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!mktemp.c*/
+/* Name:  mktemp.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)nbclib:mktemp.c	1.1"
+
+/****************************************************************
+ *	Routine expects a string of length at least 6, with
+ *	six trailing 'X's.  These will be overlaid with a
+ *	letter and the last (5) digits of the proccess ID.
+ *	If every letter (a thru z) thus inserted leads to
+ *	an existing file name, your string is shortened to
+ *	length zero upon return (first character set to '\0').
+ ***************************************************************/
+#define XCNT  6
+
+extern int strlen(), access(), getpid();
+
+char *
+mktemp(as)
+char *as;
+{
+    register char *s = as;
+    register unsigned pid;
+    register unsigned xcnt = 0;	/* keeps track of number of X's seen */
+
+    pid = getpid();
+    s += strlen(as);		/* point at the terminal null */
+    while(*--s == 'X' && ++xcnt <= XCNT) {
+      *s = (pid%10) + '0';
+      pid /= 10;
+    }
+    if(*++s) {			/* maybe there were no 'X's */
+      *s = 'a';
+      while(access(as, 0) == 0) {	/* see if name is in use */
+    	if(++*s > 'z') {
+    	  *as = '\0';
+    	  break;
+    	}
+      }
+    } else {
+      if(access(as, 0) == 0)
+    	*as = '\0';
+    }
+    return(as);
+}
+@

@@ -1,0 +1,98 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!fdopen.c*/
+/* Name:  fdopen.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)nbclib:fdopen.c	1.1"
+
+/*
+ * Unix routine to do an "fopen" on file descriptor
+ * The mode has to be repeated because you can't query its
+ * status
+ */
+
+#include <stdio.h>
+#include <sys/errno.h>
+
+extern long lseek();
+extern FILE *_findiop();
+
+FILE *
+fdopen(fd, mode)
+int	fd;
+register char *mode;
+{
+    register FILE *iop;
+
+    if((iop = _findiop()) == NULL)
+      return(NULL);
+
+    iop->_cnt = 0;
+    iop->_flag = 0;
+    iop->_file = fd;
+    _bufend(iop) = iop->_base = iop->_ptr = NULL;
+    switch(*mode) {
+
+      case 'r':
+    	iop->_flag |= _IOREAD;
+    	break;
+      case 'a':
+    	(void) lseek(fd, 0L, 2);
+    	/* No break */
+      case 'w':
+    	iop->_flag |= _IOWRT;
+    	break;
+#ifdef mpx
+      case 'u':	/* unblocked assign */
+    	iop->_flag |= _IOUBLK;
+    	break;
+#endif
+      default:
+    	return(NULL);
+    }
+
+    if(mode[1] == '+') {
+      iop->_flag &= ~(_IOREAD | _IOWRT);
+      iop->_flag |= _IORW;
+    }
+
+    return(iop);
+}
+@
