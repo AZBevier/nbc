@@ -43,6 +43,9 @@ D =	$(ROOT)/doc
 I =	$(ROOT)/nbinclude
 L =	$(ROOT)/lib
 S =	$(ROOT)/sample
+BF = basename chgrp chmod chown ci cmp co cp diff echo expr false grep \
+    ident ln make merge mv pwd rcs rcsdiff rcsmerge rlog rm sdiff \
+    sed sh sum touch true uniq
 
 # To protect against an idle "make" to "see what happens"
 donothing:
@@ -85,12 +88,20 @@ mkdirs:
 		mkdir $(I); \
 	fi;
 #	-mkdir $B $S $L $I
+#	make symbolic links to unix versions of some utilites
+	@for i in $(BF); do \
+	    if [ -f /system/bin/$$i ]; then \
+			echo "Link to $$i already exits"; \
+		else \
+			/bin/ln -s /bin/$$i /system/bin; \
+		fi; \
+	done;
 
 compile	:
-	cd nbinclude ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd include   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd doc       ; $(MAKE) -f make.unix ROOT=$(ROOT) install
-	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd nbyacc    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd nbar      ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd nbcc      ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd nbcpp     ; $(MAKE) -f make.unix ROOT=$(ROOT) install
@@ -99,13 +110,45 @@ compile	:
 	cd nbccom    ; $(MAKE) -f make.unix2p ROOT=$(ROOT) install
 	cd nblib     ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd sample    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_ar    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_basename ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_cd    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_chgrp ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_chmod ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_chown ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_chtyp ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_cmprs ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_cp    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_date  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_dodep ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_echo  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_expr  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_false ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_uniq  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 #	cd jcl       ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 
 remake	: mkdirs
-	cd nbinclude ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd include   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd doc       ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
-	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd nbyacc    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd nbar      ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd nbcc      ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd nbcpp     ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
@@ -114,13 +157,45 @@ remake	: mkdirs
 	cd nbccom    ; $(MAKE) -f make.unix2p ROOT=$(ROOT) remake
 	cd nblib     ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd sample    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_ar    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_basename ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_cd    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_chgrp ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_chmod ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_chown ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_chtyp ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_cmprs ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_cp    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_date  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_dodep ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_echo  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_expr  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_false ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_uniq  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 #	cd jcl       ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 
 clean	:
-	cd nbinclude ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd include   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd doc       ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
-	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd nbyacc    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd nbar      ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd nbcc      ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd nbcpp     ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
@@ -129,13 +204,51 @@ clean	:
 	cd nbccom    ; $(MAKE) -f make.unix2p ROOT=$(ROOT) clean
 	cd nblib     ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd sample    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_ar    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_basename ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_cd    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_chgrp ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_chmod ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_chown ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_chtyp ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_cmprs ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_cp    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_date  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_dodep ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_echo  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_expr  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_false ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_uniq  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 #	cd jcl       ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 
 clobber	:
-	cd nbinclude ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	@for i in $(BF); do \
+	    if [ -f /system/bin/$$i ]; then \
+			rm /system/bin/$$i; \
+		fi; \
+	done;
+
+	cd include   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd doc       ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
-	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd nbyacc    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd nblex     ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd nbar      ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd nbcc      ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd nbcpp     ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
@@ -144,7 +257,40 @@ clobber	:
 	cd nbccom    ; $(MAKE) -f make.unix2p ROOT=$(ROOT) clobber
 	cd nblib     ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd sample    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_ar    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_basename ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_cd    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_chgrp ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_chmod ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_chown ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_chtyp ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_cmprs ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_cp    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_date  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_dodep ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_echo  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_expr  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_false ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_uniq  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 #	cd jcl       ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+
 	@if [ -d $(D) ]; then \
 		rmdir --ignore-fail-on-non-empty $D; \
 	fi;

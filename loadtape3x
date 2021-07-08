@@ -1,75 +1,76 @@
 cd bin/mpx3x
-mkvmtape -p -dSYSTEM ../../nbctape.tap CFT COPY ?CAT MAKE RM MV LN CP
-mkvmtape -ap -dSYSTEM ../../nbctape.tap MPXDB ECHO FIXER NBCAS NBCC NBCCOM NBCP? NBLEX NBYACC
-mkvmtape -ap -dSYSTEM ../../nbctape.tap CA*
-mkvmtape -ap -dBIN../../nbctape.tap CA* CFT COPY ?CAT ECHO MAKE NBCAS NBCC NBCCOM NBCP? NBLEX NBYACC RM MV LN CP
-mkvmtape -al -dSYSTEM ../../nbctape.tap CLB CDR M.MPX*
-mkvmtape -ao -dSYSTEM ../../nbctape.tap C.SRT*
-mkvmtape -al -dBIN ../../nbctape.tap CLB CDR M.MPX*
-mkvmtape -at -dBIN ../../nbctape.tap NBLD OBJ.DOC
-mkvmtape -ao -dBIN ../../nbctape.tap C.SRT*
+mkvmtape -p -dSYSTEM ../../nbctape3x.tap CFT COPY ?CAT MAKE RM MV LN CP
+mkvmtape -ap -dSYSTEM ../../nbctape3x.tap MPXDB ECHO FIXER NBCAS NBCC NBCCOM NBCP? NBLEX NBYACC
+mkvmtape -ap -dSYSTEM ../../nbctape3x.tap CA*
+mkvmtape -ap -dBIN../../nbctape3x.tap CA* CH* CFT COPY ?CAT ECHO MAKE NBCAS NBCC NBCCOM NBCP?
+mkvmtape -ap -dBIN../../nbctape3x.tap AID* NBLEX NBYACC RM MV LN CP CO* U* TO* TR* CM*
+mkvmtape -al -dSYSTEM ../../nbctape3x.tap CLB CDR M.MPX*
+mkvmtape -ao -dSYSTEM ../../nbctape3x.tap C.SRT*
+mkvmtape -al -dBIN ../../nbctape3x.tap CLB CDR M.MPX*
+mkvmtape -at -dBIN ../../nbctape3x.tap NBLD OBJ.DOC
+mkvmtape -ao -dBIN ../../nbctape3x.tap C.SRT*
 cd ../..
 cd nbinclude/BLOCKED
-mkvmtape -at -dNBINCLUDE ../../nbctape.tap *.H
+mkvmtape -at -dNBINCLUDE ../../nbctape3x.tap *.H
 cd ../..
 cd doc/BLOCKED
-mkvmtape -at -dNBCDOC ../nbctape.tap [A-H]*
-mkvmtape -at -dNBCDOC ../nbctape.tap [I-R]* _*
-mkvmtape -at -dNBCDOC ../nbctape.tap [S-Z]*
+mkvmtape -at -dNBCDOC ../../nbctape3x.tap [A-H]*
+mkvmtape -at -dNBCDOC ../../nbctape3x.tap [I-R]* _*
+mkvmtape -at -dNBCDOC ../../nbctape3x.tap [S-Z]*
 cd ../..
 cd lib
-mkvmtape -at -dLIB ../nbctape.tap NCFORM NRFORM YACCPAR
+mkvmtape -at -dLIB ../nbctape3x.tap NCFORM NRFORM YACCPAR
 cd ..
-cd sample/BLOCKED
-mkvmtape -ap -dSAMPLE ../../nbctape.tap DCAT FIXER
-mkvmtape -at -dSAMPLE ../../nbctape.tap *.C *MAP M*SAMP NBLD
-mkvmtape -ao -dSAMPLE ../../nbctape.tap *.O
+cd sample/mpx3x
+mkvmtape -ap -dSAMPLE ../../nbctape3x.tap DCAT FIXER
+mkvmtape -at -dSAMPLE ../../nbctape3x.tap *.C *MAP M*SAMP NBLD
+mkvmtape -ao -dSAMPLE ../../nbctape3x.tap *.O
 cd ../..
 cd nbar/mpx3x
-mkvmtape -at -dNBAR ../../nbctape.tap *.C ??.NBAR
-mkvmtape -ao -dNBAR ../../nbctape.tap *.O 
-#mkvmtape -ap -dNBAR ../../nbctape.tap NBAR
+mkvmtape -at -dNBAR ../../nbctape3x.tap *.C ??.NBAR
+mkvmtape -ao -dNBAR ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBAR ../../nbctape3x.tap NBAR
 cd ../..
 cd nbyacc/mpx3x
-mkvmtape -at -dNBYACC ../../nbctape.tap DEXTERN YACC* IN* M* FILES Y?.C LD.*
-mkvmtape -ao -dNBYACC ../../nbctape.tap Y?.O
-mkvmtape -ap -dNBYACC ../../nbctape.tap NBYACC 
-mkvmtape -at -dLIB ../../nbctape.tap YACCPAR
+mkvmtape -at -dNBYACC ../../nbctape3x.tap DEXTERN YACC* M* FILES Y?.C LD.*
+mkvmtape -ao -dNBYACC ../../nbctape3x.tap Y?.O
+mkvmtape -ap -dNBYACC ../../nbctape3x.tap NBYACC 
+mkvmtape -at -dLIB ../../nbctape3x.tap YACCPAR
 cd ../..
 cd nblex/mpx3x
-mkvmtape -at -dNBLEX ../../nbctape.tap N?FORM *.C *.Y ??.NBLEX NBLEXMAP
-mkvmtape -ao -dNBLEX ../../nbctape.tap *.O 
-mkvmtape -ap -dNBLEX ../../nbctape.tap NBLEX 
+mkvmtape -at -dNBLEX ../../nbctape3x.tap N?FORM *.C *.Y ??.NBLEX NBLEXMAP
+mkvmtape -ao -dNBLEX ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBLEX ../../nbctape3x.tap NBLEX 
 cd ../..
 cd nbcc/mpx3x
-mkvmtape -at -dNBCC ../../nbctape.tap *.C ??.NBCC NBCCMAP
-mkvmtape -ao -dNBCC ../../nbctape.tap *.O 
-mkvmtape -ap -dNBCC ../../nbctape.tap NBCC
+mkvmtape -at -dNBCC ../../nbctape3x.tap *.C ??.NBCC NBCCMAP
+mkvmtape -ao -dNBCC ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBCC ../../nbctape3x.tap NBCC
 cd ../..
 cd nbcpp/mpx3x
-mkvmtape -at -dNBCPP ../../nbctape.tap *.C *.Y ??.NBCPP
-mkvmtape -ao -dNBCPP ../../nbctape.tap *.O 
-mkvmtape -ap -dNBCPP ../../nbctape.tap NBCPP
+mkvmtape -at -dNBCPP ../../nbctape3x.tap *.C *.Y ??.NBCPP
+mkvmtape -ao -dNBCPP ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBCPP ../../nbctape3x.tap NBCPP
 cd ../..
 cd nbccom/mpx3x
-mkvmtape -at -dNBCCOM ../../nbctape.tap *.C *.H *.NBCOM NBCOMMAP
-mkvmtape -ao -dNBCCOM ../../nbctape.tap *.O 
-mkvmtape -ap -dNBCCOM ../../nbctape.tap NBCCOM
+mkvmtape -at -dNBCCOM ../../nbctape3x.tap *.C *.H *.Y *.NBCOM NBCOMMAP
+mkvmtape -ao -dNBCCOM ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBCCOM ../../nbctape3x.tap NBCCOM
 cd ../..
 cd nbcas/mpx3x
-mkvmtape -at -dNBCAS ../../nbctape.tap *.S ??.NBCAS NBCASMAP
-mkvmtape -ao -dNBCAS ../../nbctape.tap *.O 
-mkvmtape -ap -dNBCAS ../../nbctape.tap NBCAS
+mkvmtape -at -dNBCAS ../../nbctape3x.tap *.S ??.NBCAS NBCASMAP
+mkvmtape -ao -dNBCAS ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBCAS ../../nbctape3x.tap NBCAS
 cd ../..
 cd nbasm/mpx3x
-mkvmtape -at -dNBASM ../../nbctape.tap *.C *.H ??.NBASM NBASMMAP MPXPRE
-mkvmtape -ao -dNBASM ../../nbctape.tap *.O 
-mkvmtape -ap -dNBASM ../../nbctape.tap NBASM
+mkvmtape -at -dNBASM ../../nbctape3x.tap *.C *.H ??.NBASM NBASMMAP MPXPRE
+mkvmtape -ao -dNBASM ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBASM ../../nbctape3x.tap NBASM
 cd ../..
 cd nblib/BLOCKED
-mkvmtape -at -dNBLIB ../../nbctape.tap MAK.* PREFILE *.H *.S
-mkvmtape -at -dNBLIB ../../nbctape.tap [A-F]*.C
-mkvmtape -at -dNBLIB ../../nbctape.tap [G-R]*.C
-mkvmtape -at -dNBLIB ../../nbctape.tap [S-Z]*.C
-mkvmtape -al -dNBLIB ../../nbctape.tap CLB CDR
+mkvmtape -at -dNBLIB ../../nbctape3x.tap MAK.* PREFILE *.H *.S
+mkvmtape -at -dNBLIB ../../nbctape3x.tap [A-F]*.C
+mkvmtape -at -dNBLIB ../../nbctape3x.tap [G-R]*.C
+mkvmtape -at -dNBLIB ../../nbctape3x.tap [S-Z]*.C
+mkvmtape -al -dNBLIB ../../nbctape3x.tap CLB CDR
 cd ../..

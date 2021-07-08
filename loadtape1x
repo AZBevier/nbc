@@ -20,12 +20,12 @@ cd ../..
 cd nbyacc/mpx1x
 mkfmtape -at -uLIB ../../nbctape1x.tap YACCPAR
 cd ../..
-cd sample1x
-mkfmtape -ap -uSAMPLE ../nbctape1x.tap DCAT FIXER UCAT
-mkfmtape -at -uSAMPLE ../nbctape1x.tap *.C *.H *MAP M*SAMP NBLD
-mkfmtape -ao -uSAMPLE ../nbctape1x.tap *.O
-mkfmtape -at ../nbctape1x.tap NBLD
-cd ..
+cd sample/mpx1x
+mkfmtape -ap -uSAMPLE ../../nbctape1x.tap DCAT FIXER UCAT
+mkfmtape -at -uSAMPLE ../../nbctape1x.tap *.C *.H *MAP M*SAMP NBLD
+mkfmtape -ao -uSAMPLE ../../nbctape1x.tap *.O
+mkfmtape -at ../../nbctape1x.tap NBLD
+cd ../..
 cd nbar/mpx1x
 mkfmtape -at -uNBAR ../../nbctape1x.tap *.C ??.NBAR NBARMAP
 mkfmtape -ao -uNBAR ../../nbctape1x.tap *.O 
