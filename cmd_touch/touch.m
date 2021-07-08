@@ -1,0 +1,33 @@
+ 
+ 
+     TOUCH(C)		       UNIX System V		      TOUCH(C)
+ 
+ 
+     Name
+	  touch	- Updates access and modification times	of a file.
+ 
+     Syntax
+	  touch	[ -amc ] [ mmddhhmm[yy]	] files
+ 
+     Description
+	  touch	causes the access and modification times of each
+	  argument to be updated.  If no time is specified (see
+	  date(C)) the current time is used.  The first	mm refers to
+	  the month, dd	refers to the day, hh refers to	the hour, the
+	  second mm refers to the minute, and yy refers	to the year.
+	  The -a and -m	options	cause touch to update only the access
+	  or modification times	respectively (default is -am).	The -c
+	  option silently prevents touch from creating the file	if it
+	  did not previously exist.
+ 
+	  The return code from touch is	the number of files for	which
+	  the times could not be successfully modified (including
+	  files	that did not exist and were not	created).
+ 
+     See Also
+	  date(C), utime(S)
+ 
+ 
+     Page 1					      (printed 5/7/94)
+ 
+ 
