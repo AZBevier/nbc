@@ -1,0 +1,65 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.02.17.41.13;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Update for new build.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for ar for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = ar.o
+HDRS =
+SRCS = ar.c
+MAIN = ar
+DOC = ar.m
+
+all:	$(DOC) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJ)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	$(INSTALL) $(LBIN)/ar $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+
+@

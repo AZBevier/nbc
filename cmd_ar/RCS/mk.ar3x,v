@@ -1,0 +1,43 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.02.17.53.28;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.02.17.13.44;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Udate for new build.
+@
+
+
+1.2
+log
+@Fix build name.
+@
+text
+@$DEFM
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) AR.C
+$ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+a2 1
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(CINCLUDE) NBAR.C
+@
