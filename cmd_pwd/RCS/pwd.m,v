@@ -1,0 +1,51 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.1
+date	2021.07.05.19.13.16;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@ 
+ 
+     PWD(C)		       UNIX System V			PWD(C)
+ 
+ 
+     Name
+	  pwd -	Prints working directory name.
+ 
+     Syntax
+	  pwd
+ 
+     Description
+	  pwd prints the pathname of the working (current) directory.
+ 
+     See Also
+	  cd(C)
+ 
+     Diagnostics
+	  ``Cannot open	..'' and ``Read	error in ..'' indicate
+	  possible file	system trouble.	 In such cases,	see the	XENIX
+	  System Administrator's Guide for information on fixing the
+	  file system.
+ 
+ 
+     Page 1					      (printed 5/7/94)
+ 
+ 
+@
