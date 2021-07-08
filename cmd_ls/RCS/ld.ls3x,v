@@ -1,0 +1,76 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.05.01.36.03;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.05.00.14.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build file.
+@
+
+
+1.2
+log
+@Add other objects to compress.
+@
+text
+@DEFM
+IFT PATH=OBJ.O SKIP
+CREA OBJ.O
+%SKIP
+JOB LS UNIX
+$AS IN TO SYC
+$AS OT TO OBJ.O
+$COMPRESS
+^(BIN)C.SRTE.O
+LS.O
+DIRUTIL.O
+WILDMAT.O
+$NOTE  END OF COMPRESS
+IFT PATH=LSMAP SKIP
+CREA LSMAP
+%SKIP
+AS SLO TO LSMAP
+AS SGO TO OBJ.O
+AS LIB TO ^(BIN)CLB BLOC=N
+AS DIR TO ^(BIN)CDR BLOC=N
+OPTION 19 25
+ALLOCATE 1B800
+$CATALOG
+FILES 8
+BUFFERS 8
+ALLOCATE 1000
+OPTION LOWER PROMPT
+ENVIRONMENT ,,SHARE,MAP2048
+SPACE 16
+BUILD LS
+$IFT ABORT END
+GOTO ENDJOB
+%END
+$NOTE *** ERROR *** CATALOG OF LS FAILED
+%ENDJOB
+PAGE
+EOJ
+ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d11 2
+@
