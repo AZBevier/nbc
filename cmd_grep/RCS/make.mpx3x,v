@@ -1,0 +1,77 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.04.19.06.37;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New akefile for sel32.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for grep for running grep on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.GREP command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+SYSBIN = /system/bin
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+OBJS = grep.o
+HDRS = regexp.h
+HD = REGEXP.H
+SRCS= grep.c
+SRC= GREP.C
+MAIN = $(OBJS)
+SLD = ld.grep3x
+LD = LD.GREP
+SMK = mk.grep3x
+MK = MK.GREP
+SDOC = grep.m
+DOC = GREP.M
+
+all:	$(SLD) $(SMK) $(SDOC) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/GREP.O $(LBIN)/GREP.C $(LBIN)/$(LD)
+	-rm -f $(LBIN)/$(MK) $(LBIN)/$(DOC) $(LBIN)/$(HD)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <$(SRCS) >$(LBIN)/$(SRC)
+	mpxblk <$(HDRS) >$(LBIN)/$(HD)
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	$(MOVE) grep.o $(LBIN)/GREP.O
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
