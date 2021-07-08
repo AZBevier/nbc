@@ -1,0 +1,61 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2021.02.11.02.26.12;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.03.12.17.24.30;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.03.10.18.31.59;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Build command when running on mpx1x
+@
+
+
+1.3
+log
+@remove line numbers
+@
+text
+@$DEFM
+$NBCC -C -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DMPX NBCC.C
+$ENDM
+@
+
+
+1.2
+log
+@Add line numbers for MPX
+@
+text
+@d1 3
+a3 3
+$DEFM                                                                   0001.000
+$NBCC -C -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DMPX NBCC.C              0002.000
+$ENDM                                                                   0003.000
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 3
+a3 1
+nbcc -C -V -1 -N -M/system/lib/m.mpxmac1x -DMPX1X -P/system/lib/mpxpre1x -B/system/bin/ -I/system/cinclude nbcc.c
+@

@@ -1,0 +1,172 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.03.06.16.34.14;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin to RCS.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#~!Makefile for nbcc
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1994 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"@@(#)Make:nbcc/Makefile	1.0"
+
+# Make parameters when running on MPX
+# Uncomment if running on MPX
+
+#ROOT = /system/system
+#TARGET = /system/system
+#SOURCE = .
+#PREFIX = nb
+#INCLUDE = /system/$(PREFIX)include
+#SINCLUDE = $(INCLUDE)
+#SBIN = /system/system
+#BIN = /system/bin
+#UBIN = /system/bin
+#LIB = /system/bin
+#YBIN = /system/bin
+#CPP = $(LIB)/$(PREFIX)cpp
+#CPFLAGS = -M
+#CC = $(UBIN)/$(PREFIX)cc
+#CFLAGS =
+#LD = $(UBIN)/$(PREFIX)ld
+#LDFLAGS =
+#YACC = $(YBIN)/$(PREFIX)yacc
+#YFLAGS =
+#MAKEFILE = makefile
+
+# Make parameters when using NBC on UNIX
+# Uncomment if running on UNIX
+
+ROOT = /
+TARGET = /u/bin
+SOURCE = .
+PREFIX = nb
+INCLUDE = /u/cinclude
+SINCLUDE = $(INCLUDE)/sys
+SBIN = /bin
+BIN = /bin
+UBIN = /u/bin
+LIB = /u/bin
+YBIN = /usr/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS =
+LD = $(UBIN)/$(PREFIX)ld
+LDFLAGS =
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+MAKEFILE = make.nbc
+
+# Make parameters when using RCC on UNIX
+# Uncomment if running on UNIX
+
+#ROOT = /
+#TARGET = /bin
+#SOURCE = .
+#PREFIX =
+#INCLUDE = /usr/include
+#SINCLUDE = $(INCLUDE)/sys
+#SBIN = /bin
+#BIN = /bin
+#UBIN = /bin
+#LIB = /u/bin
+#YBIN = /usr/bin
+#CPP = $(LIB)/$(PREFIX)cpp
+#CPFLAGS = -M
+#CC = $(UBIN)/$(PREFIX)rcc
+#CFLAGS = -O -DNULL=0
+#LD = $(UBIN)/$(PREFIX)ld
+#LDFLAGS =
+#YACC = $(YBIN)/$(PREFIX)yacc
+#YFLAGS =
+#MAKEFILE = make.unix
+
+# Fill in with correct information
+
+OBJECTS = nbcc.o
+
+HDRS =
+
+SRCS = nbcc.c
+
+MAIN = nbcc
+
+ALL:	all
+
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+#	$(BIN)/echo "All objects built OK, do the ld now";
+
+$(MAIN):	$(MAKEFILE) $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+#	$(BIN)/chmod 755 $(MAIN)
+#	$(BIN)/chgrp bin $(MAIN)
+#	$(BIN)/chown bin $(MAIN)
+#	$(BIN)/touch $(MAIN)
+
+CLEAN:  clean
+
+clean:
+	$(BIN)/rm -f $(OBJECTS)
+
+CLOBBER: clobber
+
+clobber: clean
+	$(BIN)/rm -f $(MAIN)
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/mkdep $(MAKEFILE) >dep.out;
+	@@for i in $(SRCS); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE);
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+# Source file 'nbcc.c'
+nbcc.o: nbcc.c
+nbcc.o: /u/cinclude/param.h
+nbcc.o: /u/cinclude/stdio.h
+nbcc.o: /u/cinclude/fcntl.h
+nbcc.o: /u/cinclude/ctype.h
+nbcc.o: /u/cinclude/signal.h
+nbcc.o: /u/cinclude/dirent.h
+nbcc.o: /u/cinclude/limits.h
+nbcc.o: /u/cinclude/string.h
+# End of dependencies
+@

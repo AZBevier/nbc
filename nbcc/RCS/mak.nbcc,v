@@ -1,0 +1,28 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.03.06.16.34.14;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin to RCS.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM                                                                           
+$NOTE OPTI NOCO                                                                 
+$NBCC -C -N NBCC.C                                                             
+$ENDM                                                                           
+@

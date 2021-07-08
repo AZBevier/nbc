@@ -2,7 +2,7 @@
 # Makefile for nbcc for running on Linux
 #
 CC = cc
-CFLAGS = -O -DMPX -m32
+CFLAGS = -O -DMPX -m32 -Wall
 SYSBIN = /system/bin
 LBIN = ./linux
 INSTALL = cp
@@ -21,7 +21,7 @@ $(MAIN): $(MAKEFILE) $(SRCS)
 	/bin/chmod 755 $(MAIN)
 
 clean:
-	-rm -f $(OBJ)
+	-rm -f $(OBJS)
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
@@ -33,7 +33,7 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-	$(INSTALL) $(LBIN)/nbcc $(SYSBIN)
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?
 

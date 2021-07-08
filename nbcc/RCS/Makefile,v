@@ -1,0 +1,119 @@
+head	1.5;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.5
+date	96.03.20.21.13.46;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.03.18.23.36.35;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.03.18.23.33.40;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.03.18.23.20.38;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.03.06.16.34.14;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin to RCS.
+@
+
+
+1.5
+log
+@Mods for alpha port.
+@
+text
+@#
+# Makefile for nbcc
+#
+CC = cc
+CFLAGS = -O
+BINDIR = /system/bin
+INSTALL = cp
+
+all:	nbcc
+
+nbcc:	nbcc.c	
+	$(CC) $(CFLAGS) -o nbcc nbcc.c
+	/bin/chmod 755 nbcc
+
+clean:
+	-rm -f *.o
+
+clobber: clean
+	-rm -f nbcc core
+
+install: all
+	$(INSTALL) nbcc $(BINDIR)
+@
+
+
+1.4
+log
+@Split out version for Alpha, now just for Linux.
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -Di386 -Umpx
+d16 1
+a16 1
+	-rm -f *.o core
+d19 1
+a19 1
+	-rm -f nbcc
+@
+
+
+1.3
+log
+@Add -Olimit 777 to allow optimizing.
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -Olimit 777 -Di386 -Umpx
+@
+
+
+1.2
+log
+@Alpha port mods.
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -Di386 -Umpx
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 1
+a4 1
+CC = cc -DNULL=0
+d16 4
+a19 1
+	-rm -f *.o nbcc core
+@

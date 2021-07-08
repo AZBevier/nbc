@@ -1,0 +1,68 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	96.03.20.21.15.09;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	96.03.18.23.35.30;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New options for Alpha port.
+@
+
+
+1.2
+log
+@Mods for alpha port.
+@
+text
+@#
+# Makefile for nbcc
+#
+CC = cc
+CFLAGS = -O -Olimit 1000
+BINDIR = /system/bin
+INSTALL = cp
+
+all:	nbcc
+
+nbcc:	nbcc.c	
+	$(CC) $(CFLAGS) -o nbcc nbcc.c
+	/bin/chmod 755 nbcc
+
+clean:
+	-rm -f *.o
+
+clobber: clean
+	-rm -f nbcc core
+
+install: all
+	$(INSTALL) nbcc $(BINDIR)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -Olimit 777 -Di386 -Umpx
+d16 1
+a16 1
+	-rm -f *.o core
+d19 1
+a19 1
+	-rm -f nbcc
+@

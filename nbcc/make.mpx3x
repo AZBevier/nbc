@@ -42,6 +42,6 @@ install: all
 	mpxblk <nbcc.c >$(LBIN)/NBCC.C
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
-	$(INSTALL) nbcc.o $(LBIN)/NBCC.O
+	$(MOVE) nbcc.o $(LBIN)/NBCC.O
 	/bin/chmod 664 $(LBIN)/*.?
 
