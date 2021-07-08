@@ -1,4 +1,27 @@
-DEFM
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.07.16.54.21;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New directive file
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@DEFM
 IFT PATH=OBJ.O SKIP
 CREA OBJ.O
 %SKIP
@@ -34,3 +57,4 @@ $NOTE *** ERROR *** CATALOG OF NBAR FAILED
 PAGE
 EOJ
 ENDM
+@

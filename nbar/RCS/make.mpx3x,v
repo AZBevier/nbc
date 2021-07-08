@@ -1,4 +1,37 @@
-#
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2021.07.02.03.38.45;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.02.11.01.52.29;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.02.06.00.14.55;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move object instead ov copy
+@
+
+
+1.3
+log
+@Correct make.
+@
+text
+@#
 # Makefile for nbar for running nbar on mpx3x
 # Object files must be produced and then cataloged
 # on MPX3.X using the LD.NBAR command file.
@@ -33,7 +66,7 @@ clobber: clean
 	-rm -f $(LBIN)/NBAR.O $(LBIN)/NBAR.C $(LBIN)/$(LD) $(LBIN)/$(LD)
 
 install: all
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
@@ -44,3 +77,28 @@ install: all
 	$(MOVE) nbar.o $(LBIN)/NBAR.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.2
+log
+@Add mk.mbar to file list
+@
+text
+@d24 1
+a24 1
+all:	$(SLD) $(MAIN)
+d33 1
+a33 1
+	-rm -f $(LBIN)/NBAR.O $(LBIN)/NBAR.C $(LBIN)/$(LD)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d21 2
+d43 1
+@

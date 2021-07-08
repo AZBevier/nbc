@@ -1,0 +1,46 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2019.01.10.23.05.00;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial revision
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for nbar
+#
+CC = cc
+CFLAGS = -O
+BINDIR = /system/bin
+INSTALL = cp
+
+all:	nbar
+
+nbcc:	nbar.c	
+	$(CC) $(CFLAGS) -o nbar nbar.c
+	/bin/chmod 755 nbar
+
+clean:
+	-rm -f *.o
+
+clobber: clean
+	-rm -f nbar core
+
+install: all
+	$(INSTALL) nbar $(BINDIR)
+@

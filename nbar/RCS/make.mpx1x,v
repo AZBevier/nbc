@@ -1,0 +1,191 @@
+head	1.7;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.7
+date	2021.07.02.03.38.45;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2021.02.11.02.02.00;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2021.02.11.01.53.04;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2021.02.06.00.14.29;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2019.03.10.00.09.02;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.03.09.22.24.13;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.03.09.22.01.42;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.7
+log
+@Correct make.
+@
+text
+@#
+# Makefile for nbar for running nbar on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.NBAR command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx1x
+
+OBJS = nbar.o
+HDRS =
+SRCS= nbar.c
+MAIN = $(OBJS)
+SLD = ld.nbar1x
+LD = LD.NBAR
+SMK = mk.nbar1x
+MK = MK.NBAR
+
+all:	$(SLD) $(SMK) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/NBAR.O $(LBIN)/NBAR.C $(LBIN)/$(LD) $(LBIN)/$(MK)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <nbar.c >$(LBIN)/NBAR.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	$(MOVE) nbar.o $(LBIN)/NBAR.O
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
+
+
+1.6
+log
+@fix syntax error
+@
+text
+@d24 1
+a24 1
+all:	$(SLD) $(MAIN)
+d33 1
+a33 1
+	-rm -f $(LBIN)/NBAR.O $(LBIN)/NBAR.C $(LBIN)/$(LD)
+@
+
+
+1.5
+log
+@Add mk.nbar to file list
+@
+text
+@d43 1
+a43 1
+	mpxblk <$(SMK) >$(LBIN)/$(mk)
+@
+
+
+1.4
+log
+@Move object instead of copy
+@
+text
+@d21 2
+d43 1
+@
+
+
+1.3
+log
+@use ld.nbar1x instead of ld.nbar to make LD.NBAR
+@
+text
+@d19 1
+a19 1
+SLD = ld.nbar
+d34 5
+d41 1
+a41 1
+	$(INSTALL) nbar.o $(LBIN)/NBAR.O
+@
+
+
+1.2
+log
+@Fix some typos
+@
+text
+@d19 2
+a20 1
+LD = ld.nbar
+d22 1
+a22 1
+all:	$(LD) $(MAIN)
+d31 1
+a31 1
+	-rm -f $(LBIN)/NBAR.O $(LBIN)/NBAR.C $(LBIN)/LD.NBAR
+d35 1
+a35 1
+	mpxblk <ld.nbar >$(LBIN)/LD.NBAR
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 1
+a8 1
+CFLAGS = -V -C -1 -DMPX -DMPX1X -M/$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+d17 2
+a18 2
+SRC = nbar.c
+MAIN = $(LBIN)/$(OBJ)
+a25 2
+ld: $(LD)
+
+d35 1
+a35 1
+	$(MOVE) nbar.o $(LBIN)/NBAR.O
+@

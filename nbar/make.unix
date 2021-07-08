@@ -21,7 +21,7 @@ $(MAIN): $(MAKEFILE) $(SRCS)
 	/bin/chmod 755 $(MAIN)
 
 clean:
-	-rm -f $(OBJ)
+	-rm -f $(OBJS)
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)

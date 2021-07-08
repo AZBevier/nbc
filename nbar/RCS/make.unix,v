@@ -1,0 +1,168 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.6
+date	2021.07.01.23.35.30;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2021.02.11.01.59.51;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2019.03.09.23.26.42;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2019.03.09.22.02.05;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.31.21.20.04;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.01.10.23.04.41;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial revision
+@
+
+
+1.6
+log
+@Fix clean object list.
+@
+text
+@#
+# Makefile for nbar for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = nbar.o
+HDRS =
+SRCS = nbar.c
+MAIN = nbar
+
+all:	$(MAIN)
+
+$(MAIN): $(MAKEFILE) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	$(INSTALL) $(LBIN)/nbar $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
+
+
+1.5
+log
+@Fix syntax error
+@
+text
+@d24 1
+a24 1
+	-rm -f $(OBJ)
+@
+
+
+1.4
+log
+@remove -DMPX and -DMAP1X
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -m32
+a21 1
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+d30 6
+@
+
+
+1.3
+log
+@Update build environment
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -DMPX -DMPX1x -m32
+@
+
+
+1.2
+log
+@Add -m32 to build options for 32bit builds
+@
+text
+@d2 1
+a2 1
+# Makefile for nbar
+d5 3
+a7 2
+CFLAGS = -O -m32
+BINDIR = /system/bin
+d9 2
+d12 4
+a15 1
+all:	nbar
+d17 6
+a22 3
+nbcc:	nbar.c	
+	$(CC) $(CFLAGS) -o nbar nbar.c
+	/bin/chmod 755 nbar
+d25 1
+a25 1
+	-rm -f *.o
+d28 1
+a28 1
+	-rm -f nbar core
+d31 4
+a34 1
+	$(INSTALL) nbar $(BINDIR)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O
+@
