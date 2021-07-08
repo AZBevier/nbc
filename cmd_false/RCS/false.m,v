@@ -1,0 +1,56 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.1
+date	2021.07.04.03.18.14;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@ 
+ 
+     FALSE(C)		       UNIX System V		      FALSE(C)
+ 
+ 
+     Name
+	  false	- Returns with a nonzero exit value.
+ 
+     Syntax
+	  false
+ 
+     Description
+	  false	does nothing except return with	a nonzero exit value.
+	  true(C), false's counterpart,	does nothing except return
+	  with a zero exit value.  ``False'' is	typically used in
+	  shell	procedures such	as:
+ 
+	       until false
+	       do
+		    command
+	       done
+ 
+     See Also
+	  sh(C), true(C)
+ 
+     Diagnostics
+	  false	is any non-zero	value.
+ 
+ 
+     Page 1					      (printed 5/7/94)
+ 
+ 
+@
