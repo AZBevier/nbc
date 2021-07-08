@@ -10,7 +10,7 @@ SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-YACC = yacc
+#YACC = yacc
 MAKEFILE = make.unix
 
 # define all sources

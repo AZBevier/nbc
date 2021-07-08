@@ -1,0 +1,418 @@
+
+
+    New Format Debug Information Object Record for "C"
+
+                 0   3 4    7 8         15 16        23 24        31
+    		+------------+------------+------------+------------+
+    Wd 0	| 0D  |  ST  |    0E      |  length    |   flags    |
+    		+------------+------------+------------+------------+
+    Wd 1	|   type     |   level    |          size           |
+    		+------------+------------+------------+------------+
+    Wd 2	|                      address                      |
+    		+------------+------------+------------+------------+
+    Wd 3	|                   8 character                     |
+    		+------------                           ------------+
+    Wd 4	|                   symbol name                     |
+    		+------------+------------+------------+------------+
+
+    0D		Object record type. Extended object command.
+
+    ST		Subtype must be 00 for debugger records.
+
+    0E		Record type, debugger information.
+
+    length	Length of this object record including bytes 0-3.
+    		len = 20, symbol not in common.
+    		len = 28, symbol is in common or struct/union ref.
+
+    flags	A combination of the old 0B type debug record's flag
+    		and flg fields.  Bits 26 - 29 correspond to the flg
+    		field and bits 30 - 31 correspond to the flag field.
+
+    		bit	'C'			FORTRAN
+    		---	---			-------
+
+    		24	N/U			N/U
+    		25	Array information is	Array information is
+    			present.  Three or	present.  Three or
+    			more words follow	more words follow
+    			starting at word 5.	starting at word 5.
+    			If array of structures
+    			bit 28 will also be set
+    			and information will
+    			start in word 7.
+    		26	Symbol is pointer to	Extended memory symbol.
+    			type given.  Level	Address is a 24-bit
+    			will have indirection	pointer to the symbol.
+    			level.
+    		27	Stack value.		Formal parameter.
+    						Address is a pointer to
+    						the symbol.
+    		28	Structure/union		Common symbol.  The
+    			reference.  The union/	common name follows
+    			structure name follows	the symbol name in
+    			the symbol name in	words 5 - 6.  Len
+    			words 5 - 6. Len is 28.	is 28.
+    			If also array definition
+    			length will be > 28.
+    		29	Register variable.	Datapool symbol.  The
+    						datapool name follows
+    						the symbol name in
+    						words 5 - 6.  Len
+    						is 28.
+    		30	Absolute address.	Absolute address.
+    		31	CSECT symbol if set.	CSECT symbol if set.
+    			DSECT symbol if not.	DSECT symbol if not.
+
+    type	The symbols type:
+
+    		value	'C'				FORTRAN
+    		-----	---				-------
+
+    		0	char				integer * 1
+    		1	short				integer * 2
+    		2	int				integer * 4
+    		3	long (reserved)			integer * 8
+    		4	float				real * 4
+    		5	double				real * 8
+    		6	struct				complex * 8
+    		7	union				complex * 16
+    		8	unsigned char			bit logical
+    		9	unsigned short			logical * 1
+    		10	unsigned int			logical * 4
+    		11	unsigned long (reserved)	character * n
+    		12	enum				n/u
+    		13	structure definition		n/u
+    		14	statement label			statement label
+    		15	n/u				entry point
+    		16	n/u				common definition
+    		17	CSECT load origin		CSECT load origin
+    		18	DSECT load origin		DSECT load origin
+
+    		19-31	n/u				n/u
+
+    		To define a parameter, add 32 to types 0-11 for Fortran.
+    		To define an enum variable, add 32 to types 0-12 for 'C'.
+
+    		32	n/u				integer * 1 parameter
+    		33	n/u				integer * 2 parameter
+    		34	n/u				integer * 4 parameter
+    		35	enum name			integer * 8 parameter
+    		36	n/u				real * 4 parameter
+    		37	n/u				real * 8 parameter
+    		38	n/u				complex * 8 parameter
+    		39	n/u				complex * 16 parameter
+    		40	n/u				bit logical parameter
+    		41	n/u				logical * 1 parameter
+    		42	n/u				logical * 4 parameter
+    		43	n/u				character parameter
+    		44	n/u				n/u
+    		45	n/u				n/u
+
+    		46-63	n/u				n/u
+
+    level	Pointer reference level.  I.e., 1 would be for char *,
+    		2 would be for char **, etc.  Not used in Fortran.
+
+    size	The size of the symbol type in bytes.  For base types
+    		(types 0 - 13) it is just their size.  For pointers,
+    		it is the size of the variable pointed to.  For arrays,
+    		structures, and unions it is the size of the base
+    		element.  I.e., for a short array, it would be 2.  For
+    		a structure or union it is the size of the structure/
+    		union and is double word bounded and rounded to	double
+    		words.  For type 14, statement label, it is always 4.
+
+    address	29 bit address value.  Bits 0 - 28 indicates the byte
+    		address, and bits 29 - 31 indicates the bit within
+    		the byte.  The bit value will be zero for types other
+    		than 7 (Fortran only), but the address will still be
+    		shifted left by three bits.
+
+    symbol	Eight character symbol name blank filled.
+
+    When bit 25 of the flags byte is set, words 5 thru N become the
+    description of an array of variables.  This may be an array of
+    simple variables or of structures.  The size field defines the
+    element size.  The total array size in bytes can be determined
+    by multiplying the base size times the dimension range information.
+    The length is of the object record is increased to contain the
+    number bytes required to define the array information.
+
+                 0   3 4    7 8         15 16        23 24        31
+    		+------------+------------+------------+------------+
+    Wd 5	|   ndims    |   nbnds    |         lbflags         |
+    		+------------+------------+------------+------------+
+    Wd 6	|   ailen    |    rsvd    |         syflags         |
+    		+------------+------------+------------+------------+
+
+    		if bit 15 is one and bit 14 is zero in lbflags and
+    		bits 15 and 14 are zero in syflags, a lower and upper
+    		bound word will be generated for dimension one and
+    		would require 2 words.
+    		+------------+------------+------------+------------+
+    Wd 7	|                lower bound value                  |
+    		+------------+------------+------------+------------+
+    Wd 8	|                upper bound value                  |
+    		+------------+------------+------------+------------+
+
+    		if bit 15 is zero in lbflags and bit 15 is zero in
+    		syflags, only an upper bound word will be generated
+    		for dimension one.  The lower bound is assumed to be
+    		one.
+    		+------------+------------+------------+------------+
+    Wd 7	|                upper bound value                  |
+    		+------------+------------+------------+------------+
+
+    		if bit 15 is one and bit 14 is zero in lbflags and
+    		bit 15 is one and bit 14 is zero in syflags, a lower
+    		and upper bound value will be generated for dimension
+    		one.  The lower bound would be symbolic and require
+    		two words to define the symbol.  The upper bound would
+    		be absolute and require one word to define the upper
+    		bound.
+    		+------------+------------+------------+------------+
+    Wd 7	|                   8 character                     |
+    		+------------       compressed          ------------+
+    Wd 8	|                   symbol name                     |
+    		+------------+------------+------------+------------+
+    Wd 9	|                upper bound value                  |
+    		+------------+------------+------------+------------+
+
+    ndims	number of dimensions in the array (max of 7).
+
+    rsvd	unused byte and must be zero.
+
+    nbnds	number of non-one lower bound plus the number of
+    		upper bounds.  Fortran assumes lower bounds of one
+    		for arrays and will usually only contain upper bounds
+    		information.  For C, lower bounds are always zero and
+    		the upper bound is the dimensions size minus one.
+    		This field will always be 2 * ndims for C, because
+    		we must define a lower bound of zero and the upper
+    		bound.
+
+    lbflags	flags defining whether a lower bound value is being
+    		provided for the dimension.  Bit 15 describes array
+    		dimension 1, bit 14 describes array dimension 2, and
+    		so on up to a maximum of 14.  Each time a bit is set
+    		one word will follow specifing the lower or upper
+    		bounds information.  If a lower and upper bound value
+    		is required, then two bits will be required as well
+    		as two words of information.  These bits are in a
+    		one to one relationship with the bits in syflags.
+
+    syflags	flags defining whether a symbolic value is being
+    		provided for the dimension.  If a bit is set, then
+    		two words (8 characters) are used to define the
+    		symbol in compress format.  These bits are on a one
+    		to one relationship with those in lbflags.
+
+    bound	an upper or lower bound value as specified by a bit
+    		in lbflags and whos corresponding bit in syflags is
+    		not set.  That is, an absolute dimension value.
+
+    sumbol	an 8 character blank filled compress symbol that
+    		defines the bound information.  A bit in lbflags
+    		defines whether it is a lower or upper bound value.
+
+    When bit 29 of the flags byte is set, words 5 and 6 become the
+    name of the datapool that contains the symbol.  The length is
+    increased to 28 from 20 to contain the information.  This is
+    valid for Fortran only.
+
+                 0          7 8         15 16        23 24        31
+    		+------------+------------+------------+------------+
+    Wd 5	|                   8 character                     |
+    		+------------                           ------------+
+    Wd 6	|                  datapool name                    |
+    		+------------+------------+------------+------------+
+
+    datapool	Eight character datapool name blank filled.
+
+    When bit 28 of the flags byte is set, words 5 and 6 become the
+    name of the common that contains the symbol.  The length is
+    increased to 28 from 20 to contain the information.  This is
+    valid for Fortran only.
+
+                 0          7 8         15 16        23 24        31
+    		+------------+------------+------------+------------+
+    Wd 5	|                   8 character                     |
+    		+------------                           ------------+
+    Wd 6	|                   common name                     |
+    		+------------+------------+------------+------------+
+
+    common	Eight character common name blank filled.
+
+    When bit 28 of the flags byte is set, words 5 and 6 become the
+    name of the structure/union that is being referenced.  The length
+    is increased to 28 from 20 to contain the information.  This a
+    redefinition of the common reference.  Bit 29 is currently not
+    used.  This is valid for C only.
+
+                 0          7 8         15 16        23 24        31
+    		+------------+------------+------------+------------+
+    Wd 5	|                   8 character                     |
+    		+------------                           ------------+
+    Wd 6	|                structure/union name               |
+    		+------------+------------+------------+------------+
+
+    s/u name	Eight character structure/union name blank filled.
+
+    When none of the flag bits are set (except 31, CSECT symbol) and
+    the length field is greater than 20, this object record becomes a
+    source record.  Words 5 and 6 - N are redefined to contain source
+    code information.
+
+                 0   3 4    7 8         15 16        23 24        31
+    		+------------+------------+------------+------------+
+    Wd 5	|U| isctype  |   caret    |    srccnt  |   blnkcnt  |
+    		+------------+------------+------------+------------+
+    Wd 6-N	|                      source                       |
+    		+------------+------------+------------+------------+
+
+    U		set if source is in uncompressed format.  This flag is
+    		required to represent lowercase source.  This flag will
+    		always be set for C source.
+
+    isctype	source sub type.
+
+    		0   No source is available.  This is usually for a source
+    		    line that contains multiple statement.  Caret will
+    		    have the offset from the first non-blank character
+    		    in the source line to where this statement starts.
+    		    The length will be 22 for this type of record.
+
+    		1   Declaration statement.  This a line that defines
+    		    something that is non executable but would be
+    		    displayed with the first executable statement.
+
+    		2   Executable statement.  Source lines that are displayed
+    		    during the trace operation.
+
+    		3   Continuation line.  The source was too long to be
+    		    displayed on one line and required additional lines
+    		    for the statement.  This is defined as a character
+    		    in column 6 for Fortran, but is automatically done
+    		    for C source line exceeding 72 characters.
+
+    		4   Comment line.  In fortran it is a line containing
+    		    no source.  In C, it may contain a comment or be a
+    		    line of definition from an include file.
+
+    		5   Fortran error.  Not used in C.
+
+    caret	The offset from the first non-blank character in the
+    		previous source line where the next statement begins.
+    		Not used in C.
+
+    srccnt	number of bytes of source.
+
+    blnkcnt	number of blanks to prepend to the source line.  Not
+    		included in srccnt.
+
+    source	the source line starting with the first non blank
+    		character on the line.  If U is not set, the source
+    		will be 6 bit compressed, otherwise it will be pure
+    		8 bit ASCII.
+
+James Bevier - J B Systems 05/20/93 - First Draft
+James Bevier - J B Systems 06/01/93 - Second Draft
+James Bevier - J B Systems 06/03/93 - Third Draft
+
+    New Load Module Symbol Table Entry -- Non-Subprogram Symbols
+    Without Source for "C"
+
+                 0   3 4    7 8         15 16        23 24        31
+    		+------------+------------+------------+------------+
+    Wd 0	|0|                 8 character                     |
+    		+------------                           ------------+
+    Wd 1	|                   symbol name                     |
+    		+------------+------------+------------+------------+
+    Wd 2	|ST|  type   |         address                      |
+    		+------------+------------+------------+------------+
+    Wd 3	|          size           | level/ndim |  flags   |A|
+    		+------------+------------+------------+------------+
+
+    field	word:bits	description
+    -----	---------	-----------
+     0		0:0		Must be zero for this this type entry.
+    symbol	0:1-31		Symbol name with bit zero off for
+    		1:0-31		non-subprogram entries.
+    ST		2:0-2		ISC sybtype:
+    				0: no source
+    				It is this field and type which determine
+    				whether or not a symbol has source.  For
+    				a symbol to have source, its type must be
+    				14 and ST must be non-zero.  Therefore,
+    				these symbols will all have ST field equal
+    				to zero.
+    type	2:3-7		Type field, which describes the type of
+    				symbol.  Symbols without source will have
+    				the following values:
+    				0	char
+    				1	short
+    				2	int
+    				3	long (reserved)
+    				4	float
+    				5	real
+    				6	struct
+    				7	union
+    				8	uchar
+    				9	ushort
+    				10	uint
+    				11	ulong
+    				12	enum
+    				13	structure definition
+    				14	statement label
+    				15	n/u (entry point)
+    				16	n/u
+    				17	CSECT load origin
+    				18	DSECT load origin
+    				19	structure reference
+    				20-31	n/u
+
+    address	2:8-31		Address of the symbol.  See also
+    				flag fields.  If the variable is an
+    				absolute symbol, the address will be
+    				the stack offset of the variable.
+    size	3:0-15		The size of the symbol type in bytes.
+    				For base types (types 0 - 13) it is
+    				just their size.  For pointers,	it is
+    				the size of the variable pointed to.
+    				For arrays, structures, and unions it
+    				is the size of the base	element.  I.e.,
+    				for a short array, it would be 2.  For
+    				a structure or union it is the size of
+    				the structure/union and is double word
+    				bounded and rounded to double words.
+    				For type 14, statement label, it is
+    				always 4.
+    level	3:16:19		The pointer indirection level.  I.e.,
+    				1 for int *, 2 for int **, etc.  Valid
+    				only when F1 is set.
+    ndim	3:20:23		The number of dimensions for an array.
+    				Valid only when F7 is set.
+    indent	3:16:23		Structure/union nesting level.  Valid
+    				only when doing a structure definition.
+    flags	3:24:30		A series of bit flags that describe the
+    				symbol.  If the flag is on, the symbol
+    				is:
+    				F1 (24): pointer variable
+    				F2 (25): stack variable
+    				F3 (26): structure/union continuation
+    				F4 (27): register variable
+    				F5 (28): enum parameter
+    				F6 (29): symbol in CSECT
+    				F7 (30): an array
+    A		3:31		Absolute address indicator.  If this
+    				field is on, then the address is a
+    				mapped address, with no further relocation
+    				needed.  If this field is off, then $CSS
+    				or $DSS will be added to address to
+    				generate a mapped address.  This flag
+    				will also be set for stack variables.
+    				When a stack variable is defined, the
+    				contents of register 3 must be added
+    				to the offset to obtain the memory
+    				address.

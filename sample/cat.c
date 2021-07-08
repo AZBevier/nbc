@@ -2,7 +2,10 @@
 
 #include <stdio.h>
 
-main (argc, argv)
+void filecopy();
+void exit();
+
+int main (argc, argv)
 int	argc;
 char	**argv;
 {
@@ -22,7 +25,7 @@ char	**argv;
     exit(0);
 }
 
-filecopy(fp)	/* copy file fp to std out */
+void filecopy(fp)	/* copy file fp to std out */
 FILE	*fp;
 {
     int	c;

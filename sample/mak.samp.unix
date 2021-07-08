@@ -1,0 +1,2 @@
+nbcc -l -v -c -g -DMPX cat.c kill.c fixer.c prtinc.c fort.c recmsg.c sndmsg.c
+nbcc -l -v -c -H -DMPX oscode.c
