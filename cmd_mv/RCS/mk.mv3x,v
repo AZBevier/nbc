@@ -1,0 +1,27 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.05.18.25.22;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New makefile.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) MV.C
+$ENDM
+@
