@@ -1,0 +1,27 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.05.20.48.10;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) SUM.C
+$ENDM
+@
