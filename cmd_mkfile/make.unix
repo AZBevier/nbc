@@ -32,7 +32,7 @@ install: all
 	@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
-			mkfile $(LBIN); \
+			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 #	$(INSTALL) $(LBIN)/mkfile $(SYSBIN)
