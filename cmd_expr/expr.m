@@ -1,0 +1,117 @@
+ 
+ 
+     EXPR		       MAKE4MPX		       EXPR
+ 
+ 
+     Name
+	  expr - Evaluates arguments as	an expression.
+ 
+     Syntax
+	  expr arguments
+ 
+     Description
+	  The arguments	are taken as an	expression.  After evaluation,
+	  the result is	written	on the standard	output.	 Terms of the
+	  expression must be separated by blanks.  Characters special
+	  to the shell must be escaped.	 Note that zero	is returned to
+	  indicate a zero value, rather	than the null string.  Strings
+	  containing blanks or other special characters	should be
+	  quoted.  Integer-valued arguments may	be preceded by a unary
+	  minus	sign.  Internally, integers are	treated	as 32-bit, 2's
+	  complement numbers.
+ 
+	  The operators	and keywords are listed	below.	Expressions
+	  should be quoted by the shell, since many of the characters
+	  that have special meaning in the shell also have special
+	  meaning in expr. The list is in order	of increasing
+	  precedence, with equal precedence operators grouped within
+	  braces ({ and	}).
+ 
+	  expr | expr
+	       Returns the first expr if it is neither null nor	0,
+	       otherwise returns the second expr.
+ 
+	  expr & expr
+	       Returns the first expr if neither expr is null nor 0,
+	       otherwise returns 0.
+ 
+	  expr { =, >, >=, <, <=, != } expr
+	       Returns the result of an	integer	comparison if both
+	       arguments are integers, otherwise returns the result of
+	       a lexical comparison.
+ 
+	  expr { +, - }	expr
+	       Addition	or subtraction of integer-valued arguments.
+ 
+	  expr { *, /, % } expr
+	       Multiplication, division, or remainder of the integer-
+	       valued arguments.
+ 
+	  expr : expr
+	       The matching operator : compares	the first argument
+	       with the	second argument	which must be a	regular
+	       expression; regular expression syntax is	the same as
+	       that of ed(C), except that all patterns are
+	       ``anchored'' (i.e., begin with a	caret (^)) and
+	       therefore the caret is not a special character in that
+	       context.  Normally the matching operator returns the
+    	       number of characters matched (zero on failure).
+    	       Alternatively, the \(...\) pattern symbols can be used
+    	       to return a portion of the first argument.
+ 
+     Examples
+	  1.   a=`expr $a + 1`
+ 
+		    Adds 1 to the shell	variable a.
+ 
+	  2.   #  'For $a equal	to either "/usr/abc/file" or just
+	       "/file"'
+	       expr  $a	 :  '.*/\(.*\)'
+ 
+		    Returns the	last segment of	a pathname (i.e.,
+		    file).  Watch out for the slash alone as an
+		    argument: expr will	take it	as the division
+		    operator (see Notes	on the next page).
+ 
+	  3.   expr  $VAR  :  '.*'
+ 
+		    Returns the	number of characters in	$VAR.
+ 
+     See Also
+	  sed, sh
+ 
+     Diagnostics
+	  As a side effect of expression evaluation, expr returns the
+	  following exit values:
+ 
+	       0    If the expression is neither null nor zero
+	       1    If the expression is null or zero
+	       2    For	invalid	expressions
+ 
+	  Other	diagnostics include:
+ 
+	  syntax error	 For operator/operand errors
+ 
+	  nonnumeric argument
+		 If arithmetic is attempted on such a string
+ 
+     Notes
+	  After	argument processing by the shell, expr cannot tell the
+	  difference between an	operator and an	operand	except by the
+	  value.  If $a	is an equals sign (=), the command:
+ 
+	       expr  $a	 =  '='
+ 
+	  looks	like:
+ 
+	       expr  =	=  =
+ 
+	  Thus the arguments are passed	to expr	(and will all be taken
+	  as the = operator).  The following permits comparing equals
+	  signs:
+ 
+	       expr  X$a  =  X=
+ 
+ 
+     (printed 4/29/94)
+ 
