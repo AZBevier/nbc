@@ -1,0 +1,83 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.02.22.00.25;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.02.21.39.20;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.2
+log
+@Correct spelling error.
+@
+text
+@$DEFM
+$PAGE 0
+$JOB CHOWN
+$IFT FILE CCOBJ.O OBJSKIP
+$FILEMGR
+CREATE CCOBJ.O,DM,100
+X
+$DEFNAME OBJSKIP
+$IFT FILE CHOWNMAP MAPSKIP
+$FILEMGR
+CREATE CHOWNMAP,DM,200
+X
+$DEFNAME MAPSKIP
+$A2 IN=SYC
+$A1 OT=CCOBJ.O
+$COMPRESS
+C.SRTE.O
+CHOWN.O
+$NOTE  END OF COMPRESS
+$OPTION 19 25
+$A1 SLO=CGOWNMAP
+$ALLOCATE 1B800
+$A1 SGO=CCOBJ.O
+$A1 LIB=CLB,,U
+$A1 DIR=CDR,,U
+$CATALOG
+FILES 8
+BUFFERS 8
+OPTION LOWER PROMPT
+ENVIRONMENT ,,SHARED,MAP2048
+CATALOG CHOWN
+$IFF ABORT ENDJOB
+$NOTE *** ERROR *** CATALOG OF CHOWN FAILED
+$DEFN ENDJOB
+$EOJ
+$PAGE 24
+$ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d9 1
+a9 1
+$IFT FILE CHMODMAP MAPSKIP
+d11 1
+a11 1
+CREATE CHMODMAP,DM,200
+d21 1
+a21 1
+$A1 SLO=CGMAP
+@
