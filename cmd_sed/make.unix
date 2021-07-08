@@ -1,0 +1,48 @@
+#
+# Makefile for sed for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 -Wall
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = sed0.o sed1.0
+HDRS = sed.h regexp.h
+SRCS = sed0.c sed1.c
+MAIN = sed
+DOC = sed.m
+
+all:	$(DOC) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(HDRS) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(DOC)
+	-rm -f $(LBIN)/sed0.c $(LBIN)/sed1.c
+	-rm -f $(LBIN)/sed.h $(LBIN)/regexp.h
+
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	$(INSTALL) $(LBIN)/sed $(SYSBIN)
+	$(INSTALL) sed0.c $(LBIN)/sed0.c
+	$(INSTALL) sed1.c $(LBIN)/sed1.c
+#	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) sed.h $(LBIN)/sed.h
+	$(INSTALL) regexp.h $(LBIN)/regexp.h
+#	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+

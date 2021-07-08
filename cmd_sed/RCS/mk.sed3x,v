@@ -1,0 +1,44 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.05.23.35.22;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.05.23.21.08;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build.
+@
+
+
+1.2
+log
+@Correct type.
+@
+text
+@$DEFM
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) SED0.C
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) SED1.C
+$ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+a2 1
+$NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) SED.C
+@

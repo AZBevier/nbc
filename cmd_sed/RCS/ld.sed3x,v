@@ -1,0 +1,77 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.05.23.35.22;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.05.23.21.08;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build.
+@
+
+
+1.2
+log
+@Correct type.
+@
+text
+@DEFM
+IFT PATH=OBJ.O SKIP
+CREA OBJ.O
+%SKIP
+JOB SED UNIX
+$AS IN TO SYC
+$AS OT TO OBJ.O
+$COMPRESS
+^(BIN)C.SRTE.O
+SED0.O
+SED1.O
+$NOTE  END OF COMPRESS
+IFT PATH=SEDMAP SKIP
+CREA SEDMAP
+%SKIP
+AS SLO TO SEDMAP
+AS SGO TO OBJ.O
+AS LIB TO ^(BIN)CLB BLOC=N
+AS DIR TO ^(BIN)CDR BLOC=N
+OPTION 19 25
+ALLOCATE 1B800
+$CATALOG
+FILES 8
+BUFFERS 8
+ALLOCATE 1000
+OPTION LOWER PROMPT
+ENVIRONMENT ,,SHARE,MAP2048
+SPACE 16
+BUILD SED
+$IFT ABORT END
+GOTO ENDJOB
+%END
+$NOTE *** ERROR *** CATALOG OF SED FAILED
+%ENDJOB
+PAGE
+EOJ
+ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d10 1
+a10 1
+SED.O
+@
