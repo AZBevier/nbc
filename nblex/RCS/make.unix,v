@@ -1,0 +1,319 @@
+head	1.7;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.7
+date	2021.07.01.03.59.08;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2021.02.06.01.31.25;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2021.02.06.00.22.44;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2019.01.31.21.00.35;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2019.01.10.19.00.34;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.09.19.19.43;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.01.08.21.12.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.7
+log
+@Use nbyacc instead of Linux yacc.
+@
+text
+@#
+# Makefile for nblex for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+#YACC = yacc
+YACC = /system/bin/nbyacc
+MAKEFILE = make.unix
+
+OBJS = lmain.o sub1.o sub2.o header.o parser.o
+HDRS =
+SRCS = lmain.c sub1.c sub2.c header.c parser.c
+# define depends
+DEPS = ldefs.c once.c nrform ncform
+
+# loadmodule name
+MAIN = nblex
+
+all:	$(SRCS) $(MAIN)			# build everything
+	/bin/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(DEPS) $(OBJS)  # build main
+	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
+	/bin/chmod 775 $(MAIN)
+
+parser.o:	parser.c ldefs.c
+
+parser.c:	parser.y
+	$(YACC) parser.y
+	mv y.tab.c parser.c
+
+clean:				# delete object files
+	/bin/rm -f $(OBJS) $(LBIN)/*.o $(LBIN)/parser.c
+
+clobber: clean			# delete main from current directory
+	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/lmain.c
+	/bin/rm -f $(LBIN)/sub1.c $(LBIN)/sub2.c $(LBIN)/header.c
+	/bin/rm -f $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/ldefs.c
+	/bin/rm -f $(LBIN)/once.c $(LBIN)/parser.y $(LBIN)/parser.c
+
+install: all	# build if necessary, and then copy main to system directory
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	$(INSTALL) $(DEPS) $(LBIN)
+	$(INSTALL) parser.y $(LBIN)
+	$(INSTALL) $(SRCS) $(LBIN)
+	$(MOVE) parser.c $(LBIN)
+	$(MOVE) $(OBJS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/*.?
+@
+
+
+1.6
+log
+@Correct object removal
+/
+@
+text
+@d10 2
+a11 1
+YACC = yacc
+@
+
+
+1.5
+log
+@Move objects instead of copy
+@
+text
+@d36 1
+a36 1
+	/bin/rm -f $(OBJS) $(LBIN)/$(OBJS) parser.c
+d55 1
+@
+
+
+1.4
+log
+@Update for Linux port
+@
+text
+@a0 2
+#~!Makefile for NBLEX
+# Name:  Makefile Part No.: _______-____r
+d2 1
+a2 1
+# Prototype makefile for MAKE4MPX - J B Systems, Morrison, CO
+d4 7
+a10 37
+# Change all occurances of nblex to be the lower case name of
+# your load module.  Use UNIX style pathnames and insure all
+# file names are lower case.  Use the TAB character to start
+# lines where indicated.  This makefile generates several
+# macros for your use:
+#
+# make depend 		# adds dependencies to makefile
+# make clean		# deletes objects
+# make clobber		# deletes load module and objects
+# make all		# makes everything
+# make			# makes everything, defaults to make all
+# make library		# updates only library
+# make install		# does make all, then copies load module
+#			# to system directory
+
+#ident	"@@(#)Make:nblex/Makefile	1.0"
+
+# Make parameters when running on Linux
+
+ROOT = /
+TARGET = /system/lib
+SOURCE = .
+PREFIX = 
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/bin
+BIN = /bin
+UBIN = /usr/bin
+LIB = /lib
+YBIN = /usr/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M -UMPX
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -O -m32
+LD = $(UBIN)/$(PREFIX)ld
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+d13 4
+a16 13
+# Fill in with correct information
+# Notice! All file names MUST be in lower case.
+# if definition is not to be used, assign to null as follows
+
+# loadmap file for nbcat output
+#LDFLAGS = -Ynblexmap
+LDFLAGS = -m32
+
+# non library objects
+OBJECTS = lmain.o sub1.o sub2.o header.o parser.o
+
+# define all sources for depend
+SRCS = lmain.c sub1.c sub2.c header.c parser.y
+d22 2
+a23 16
+ALL:	all
+
+all:	$(MAKEFILE) $(DEPS) $(MAIN)			# build everything
+	$(BIN)/echo $(MAIN) is up to date.
+
+other:  ldefs.c once.c nrform ncform
+#	co ldefs.c
+#	co once.c
+#	co nrform
+#	co ncform
+
+$(MAIN):	$(MAKEFILE) $(OBJECTS)  # build main
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+#	$(BIN)/chmod 775 $(MAIN)
+#	$(BIN)/chgrp system $(MAIN)
+#	$(BIN)/chown system $(MAIN)
+d25 9
+a33 1
+CLEAN:  clean
+d36 1
+a36 3
+	$(BIN)/rm -f $(OBJECTS)
+
+CLOBBER: clobber
+d39 4
+a42 17
+	$(BIN)/rm -f $(MAIN)
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)	# generate dependencies
+	$(SBIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+#	$(BIN)/mkdep $(MAKEFILE) >dep.out
+#	@@for i in $(SRCS); do \
+#	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+#	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+#	done;
+#	$(BIN)/echo "# End of dependencies" >> dep.out;
+#	$(BIN)/mv dep.out $(MAKEFILE)
+
+INSTALL: install
+d45 12
+a56 4
+	$(BIN)/cp $(MAIN) $(SBIN)/$(MAIN)
+	$(BIN)/cp nrform ncform $(TARGET)
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.3
+log
+@Put nrform & ncform in /system/lib
+@
+text
+@d58 1
+d65 1
+a65 1
+all:	$(MAIN)			# build everything
+d67 6
+@
+
+
+1.2
+log
+@add -m32 option for 32 bit build on Linux
+@
+text
+@d23 1
+a23 1
+# Make parameters when running on MPX
+d26 1
+a26 1
+TARGET = /system/bin
+d101 1
+a101 1
+	$(BIN)/cp nrform ncform /system/lib
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d37 1
+a37 1
+CPFLAGS = -M -Umpx
+d39 1
+a39 1
+CFLAGS = -O
+d51 1
+a51 1
+LDFLAGS =
+a103 16
+# Source file lmain.c
+lmain.o : lmain.c ldefs.c /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h once.c 
+# Source file sub1.c
+sub1.o : sub1.c ldefs.c /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h 
+# Source file sub2.c
+sub2.o : sub2.c ldefs.c /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h 
+# Source file header.c
+header.o : header.c ldefs.c /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h 
+# Source file parser.y
+parser.y.o : parser.y ldefs.c /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h 
+# End of dependencies
+@

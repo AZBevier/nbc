@@ -1,17 +1,45 @@
-#
-# Makefile for nblex for running nblex on mpx1x
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.02.06.01.32.19;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.02.06.00.23.24;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move objects instead of copy
+@
+
+
+1.2
+log
+@Move objects instead of copy
+@
+text
+@#
+# Makefile for nblex for running nblex on mpx3x
 # Object files must be produced and then cataloged
-# on MPX1.X using the LD.NBLEX command file.
+# on MPX3.X using the LD.NBLEX command file.
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
-LBIN = ./mpx1x
+LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
 YACC = nbyacc
-MAKEFILE = make.mpx1x
+MAKEFILE = make.mpx3x
 
 OBJS = lmain.o sub1.o sub2.o header.o parser.o
 HDRS =
@@ -20,9 +48,9 @@ SRCS = lmain.c sub1.c sub2.c header.c parser.c
 DEPS = ldefs.c once.c nrform ncform
 
 MAIN = $(OBJS)
-SLD = ld.nblex1x
+SLD = ld.nblex3x
 LD = LD.NBLEX
-SMK = mk.nblex1x
+SMK = mk.nblex3x
 MK = MK.NBLEX
 ALLOBJ = $(OBJS)
 
@@ -44,18 +72,18 @@ $(MAIN):	$(DEPS) $(MAKEFILE) $(SRCS)  # build main
 
 clean:				# delete object files
 	-rm -f $(OBJS) parser.c
-	-rm -f $(LBIN)/SUB1.O $(LBIN)/SUB2.O $(LBIN)/HEADER.O
-	-rm -f $(LBIN)/PARSER.O $(LBIN)/LMAIN.O
 
 clobber: clean		# delete main from current directory
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/LMAIN.C
 	-rm -f $(LBIN)/ONCE.C $(LBIN)/PARSER.Y $(LBIN)/PARSER.C
 	-rm -f $(LBIN)/SUB1.C $(LBIN)/SUB2.C $(LBIN)/HEADER.C
 	-rm -f $(LBIN)/NRFORM $(LBIN)/NCFORM $(LBIN)/LDEFS.C
+	-rm -f $(LBIN)/SUB1.O $(LBIN)/SUB2.O $(LBIN)/HEADER.O
+	-rm -f $(LBIN)/PARSER.O $(LBIN)/LMAIN.O
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all    # build if necessary, and then copy main to system directory
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
@@ -80,3 +108,16 @@ install: all    # build if necessary, and then copy main to system directory
 	$(MOVE) sub2.o $(LBIN)/SUB2.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d40 1
+a40 1
+	$(INSTALL) y.tab.c parser.c
+d70 1
+@

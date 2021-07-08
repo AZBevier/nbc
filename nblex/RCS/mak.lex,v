@@ -1,0 +1,33 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2019.01.08.21.12.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@DEFM                                                                            
+@@SYSTEM(BIN)NBYACC PARSER.Y                                                     
+VOLMGR COPY Y.TAB.C PARSER.C REPL=T                                             
+NBCC -C -N 
+NBCC -C -N SUB1.C                                                            
+NBCC -C -N SUB2.C                                                            
+NBCC -C -N HEADER.C                                                          
+NBCC -C -N PARSER.C                                                          
+ENDM                                                                            
+@

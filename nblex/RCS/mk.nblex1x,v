@@ -1,4 +1,27 @@
-$DEFM
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.11.02.45.03;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@remove line numbers
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
 $NBYACC PARSER.Y
 $DCAT <Y.TAB.C >PARSER.C
 $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DMPX LMAIN.C
@@ -7,3 +30,4 @@ $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DMPX SUB2.C
 $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DMPX HEADER.C
 $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DMPX PARSER.C
 $ENDM
+@

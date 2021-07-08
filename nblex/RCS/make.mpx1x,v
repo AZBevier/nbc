@@ -1,4 +1,32 @@
-#
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.02.06.01.31.52;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.02.06.00.23.07;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move objects instead of copy
+@
+
+
+1.2
+log
+@Move objects instead of copy
+@
+text
+@#
 # Makefile for nblex for running nblex on mpx1x
 # Object files must be produced and then cataloged
 # on MPX1.X using the LD.NBLEX command file.
@@ -55,7 +83,7 @@ clobber: clean		# delete main from current directory
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all    # build if necessary, and then copy main to system directory
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
@@ -80,3 +108,16 @@ install: all    # build if necessary, and then copy main to system directory
 	$(MOVE) sub2.o $(LBIN)/SUB2.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d40 1
+a40 1
+	$(INSTALL) y.tab.c parser.c
+d70 1
+@

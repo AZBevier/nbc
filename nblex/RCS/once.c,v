@@ -1,11 +1,45 @@
-/* once.c */
+head	1.3;
+access;
+symbols;
+locks
+	jbev:1.3; strict;
+comment	@ * @;
+
+
+1.3
+date	2019.03.11.22.01.08;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.09.18.58.32;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.01.08.21.12.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.3
+log
+@Change some includes to use mpx instead of MPX to fix warning errors
+@
+text
+@/* once.c */
 /*
  * 	(c) Copyright 1986 Gould Inc.
  * 	    All Rights Reserved.
  */
 
 #ifndef lint
-static char *rcsid2 = "@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/once.c,v 1.3 2019/03/11 22:01:08 jbev Exp jbev $";
+static char *rcsid2 = "@@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/once.c,v 1.2 2019/01/09 18:58:32 jbev Exp jbev $";
 #endif /* lint */
 
 /*	once.c	4.1	83/08/11	*/
@@ -103,8 +137,7 @@ int debug;		/* 1 = on */
 #ifdef mpx
 extern int yydebug;	/* 1 = on */
 #else
-/*int yydebug;		/* 1 = on multidef error */
-extern int yydebug;	/* 1 = on */
+int yydebug;		/* 1 = on */
 #endif
 int charc;
 int sargc;
@@ -166,3 +199,44 @@ int buserr(), segviol();
  * 	(c) Copyright 1986 Gould Inc.
  * 	    All Rights Reserved.
  */
+@
+
+
+1.2
+log
+@Correct warning errors for Linux port.
+@
+text
+@d8 1
+a8 1
+static char *rcsid2 = "@@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/once.c,v 1.1 2019/01/08 21:12:11 jbev Exp jbev $";
+d103 1
+a103 1
+#ifdef MPX
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 1
+a8 1
+static char *rcsid2 = "@@(#) (Gould) $Header: once.c,v 5.1.1.2 88/08/24 01:50:55 root LSE-4_0-PN $";
+d80 1
+a80 1
+#if defined(mpx) && !defined(i386)
+d82 1
+a82 2
+#ifdef i386
+char *ratname = "/u/lib/lex/nrform";
+d84 3
+a86 3
+char *ratname = "/system/lib/nrform";
+#endif
+#endif /* mpx */
+d103 1
+a103 1
+#ifdef mpx
+@

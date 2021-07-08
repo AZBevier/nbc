@@ -7,7 +7,8 @@ SYSBIN = /system/bin
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-YACC = yacc
+#YACC = yacc
+YACC = /system/bin/nbyacc
 MAKEFILE = make.unix
 
 OBJS = lmain.o sub1.o sub2.o header.o parser.o
@@ -33,7 +34,7 @@ parser.c:	parser.y
 	mv y.tab.c parser.c
 
 clean:				# delete object files
-	/bin/rm -f $(OBJS) parser.c
+	/bin/rm -f $(OBJS) $(LBIN)/*.o $(LBIN)/parser.c
 
 clobber: clean			# delete main from current directory
 	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/lmain.c
@@ -52,4 +53,6 @@ install: all	# build if necessary, and then copy main to system directory
 	$(INSTALL) $(DEPS) $(LBIN)
 	$(INSTALL) parser.y $(LBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
+	$(MOVE) parser.c $(LBIN)
+	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/*.?

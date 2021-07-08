@@ -1,0 +1,58 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2019.01.08.21.12.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM 
+$JOB NBLEX                                                                      
+$PAGE 0                                                                         
+$AS IN TO SYC                                                                   
+$AS OT TO SGO                                                                   
+$@@SYSTEM(BIN)COMPRESS                                                        
+LMAIN.O                                                                         
+HEADER.O                                                                        
+SUB1.O                                                                          
+SUB2.O                                                                          
+PARSER.O                                                                        
+$NOTE  END OF COMPRESS                                                          
+$OPTION 19 25                                                                   
+$AS LIB TO @@SYSTEM(NBLIB)CLB BLOC=N                                             
+$AS DIR TO @@SYSTEM(NBLIB)CDR BLOC=N                                             
+$IFT PATH NBLEXMAP SKIP                                                         
+$CREA NBLEXMAP                                                                  
+$DEFN SKIP                                                                      
+$AS SLO TO NBLEXMAP                                                             
+$ALLOCATE 1B800                                                                 
+$PAGE                                                                           
+$@@SYSTEM(SYSTEM)CATALOG                                                         
+OPTION LOWER                                                                    
+FILES 6                                                                        
+BUFFERS 6                                                                      
+SPACE 8                                                                        
+ENVIRONMENT ,,SHARE,MAP2048                                                     
+BUILD NBLEX                                                                     
+$IFT ABORT ERROR2                                                               
+$GOTO END                                                                       
+$DEFN ERROR2                                                                    
+$NOTE *** ERROR ***  CATALOG FAILED                                             
+$DEFN END                                                                       
+$EOJ                                                                            
+@

@@ -37,7 +37,7 @@ parser.o:	parser.c ldefs.c
 
 parser.c:	parser.y
 	$(SYSBIN)/$(YACC) parser.y
-	$(INSTALL) y.tab.c parser.c
+	$(MOVE) y.tab.c parser.c
 
 $(MAIN):	$(DEPS) $(MAKEFILE) $(SRCS)  # build main
 	$(CC) $(CFLAGS) $(SRCS)
@@ -67,6 +67,7 @@ install: all    # build if necessary, and then copy main to system directory
 	mpxblk <nrform >$(LBIN)/NRFORM
 	mpxblk <once.c >$(LBIN)/ONCE.C
 	mpxblk <parser.c >$(LBIN)/PARSER.C
+	rm -f parser.c
 	mpxblk <parser.y >$(LBIN)/PARSER.Y
 	mpxblk <sub1.c >$(LBIN)/SUB1.C
 	mpxblk <sub2.c >$(LBIN)/SUB2.C

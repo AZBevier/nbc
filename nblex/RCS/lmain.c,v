@@ -1,12 +1,50 @@
-/* lmain.c */
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.4
+date	2021.07.01.03.57.44;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2019.03.11.22.01.08;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.09.18.56.28;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.01.08.21.12.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.4
+log
+@Change variable definations.
+@
+text
+@/* lmain.c */
 /*
  * 	(c) Copyright 1986 Gould Inc.
  * 	    All Rights Reserved.
  */
 
 #ifndef lint
-static char *rcsid = "@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/lmain.c,v 1.4 2021/07/01 03:57:44 jbev Exp $";
-/* static char sccsid[] = "@(#)lmain.c	4.3 (Berkeley) 2/21/85"; */
+static char *rcsid = "@@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/lmain.c,v 1.3 2019/03/11 22:01:08 jbev Exp jbev $";
+/* static char sccsid[] = "@@(#)lmain.c	4.3 (Berkeley) 2/21/85"; */
 #endif
 
 # include "ldefs.c"
@@ -266,3 +304,70 @@ char *s;
  * 	(c) Copyright 1986 Gould Inc.
  * 	    All Rights Reserved.
  */
+@
+
+
+1.3
+log
+@Change some includes to use mpx instead of MPX to fix warning errors
+@
+text
+@d8 1
+a8 1
+static char *rcsid = "@@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/lmain.c,v 1.2 2019/01/09 18:56:28 jbev Exp jbev $";
+d225 2
+a226 1
+  int a,b; {
+@
+
+
+1.2
+log
+@Correct warning errors for Linux port
+@
+text
+@d8 1
+a8 1
+static char *rcsid = "@@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/lmain.c,v 1.1 2019/01/08 21:12:11 jbev Exp jbev $";
+d220 1
+a220 1
+#if defined(MPX)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 1
+a8 1
+static char *rcsid = "@@(#) (Gould) $Header: lmain.c,v 5.1.1.2 88/08/24 01:50:51 root LSE-4_0-PN $";
+d14 1
+d21 1
+a21 1
+main(argc,argv)
+d148 1
+a148 1
+get1core(){
+d161 1
+a161 1
+free1core(){
+d166 1
+a166 1
+get2core(){
+d184 1
+a184 1
+free2core(){
+d198 1
+a198 1
+get3core(){
+d208 1
+a208 1
+free3core(){
+d220 1
+d222 3
+d257 1
+a257 1
+yyerror(s)
+@

@@ -1,4 +1,27 @@
-$DEFM
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.06.23.35.08;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New nblex makefile on mpx
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
 $NBYACC PARSER.Y
 $DCAT <Y.TAB.C >PARSER.C
 $NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX LMAIN.C
@@ -7,3 +30,4 @@ $NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX SUB2.C
 $NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX HEADER.C
 $NBCC -C -N -PMPXPRE -B^(BIN) -I^(CINCLUDE) -DMPX PARSER.C
 $ENDM
+@

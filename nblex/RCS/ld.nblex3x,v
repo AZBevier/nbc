@@ -1,4 +1,27 @@
-DEFM
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.06.23.32.42;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build 3c build file
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@DEFM
 IFT PATH=OBJ.O SKIP                                                             
 CREA OBJ.O                                                                      
 %SKIP                                                                           
@@ -16,8 +39,8 @@ $NOTE  END OF COMPRESS
 IFT PATH=NBLEXMAP SKIP
 CREA NBLEXMAP
 %SKIP
-AS LIB TO @SYSTEM(NBLIB)CLB BLOC=N
-AS DIR TO @SYSTEM(NBLIB)CDR BLOC=N
+AS LIB TO @@SYSTEM(NBLIB)CLB BLOC=N
+AS DIR TO @@SYSTEM(NBLIB)CDR BLOC=N
 OPTION 19 25
 AS SLO TO NBLEXMAP
 AS SGO TO OBJ.O
@@ -37,3 +60,4 @@ $NOTE *** ERROR ***  CATALOG FAILED
 PAGE
 EOJ
 ENDM
+@

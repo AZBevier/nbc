@@ -1,0 +1,33 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2019.01.08.21.12.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
+$^(BIN)NBYACC PARSER.Y
+$VOLMGR COPY Y.TAB.C PARSER.C REPL=T
+$^(BIN)NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DMPX LMAIN.C
+$^(BIN)NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DMPX SUB1.C
+$^(BIN)NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DMPX SUB2.C
+$^(BIN)NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DMPX HEADER.C
+$^(BIN)NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DMPX PARSER.C
+$ENDM
+@
