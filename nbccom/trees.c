@@ -9,11 +9,14 @@
 
 #ifndef lint
 static char *rcsid =
-"@(#) $Header: /bulk2/simhv/nbc-master/nbccom/RCS/trees.c,v 1.15 2019/01/31 22:03:56 jbev Exp jbev $";
+"@(#) $Header: /bulk2/simhv/nbc-master/nbccom/RCS/trees.c,v 1.16 2021/07/01 02:59:29 jbev Exp $";
 #endif
 
 /*
  * $Log: trees.c,v $
+ * Revision 1.16  2021/07/01 02:59:29  jbev
+ * Add missing external.
+ *
  * Revision 1.15  2019/01/31 22:03:56  jbev
  * Update for Linux
  *

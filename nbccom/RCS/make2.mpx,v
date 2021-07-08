@@ -1,0 +1,537 @@
+head	1.7;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.7
+date	95.03.03.16.25.00;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	95.03.02.22.38.38;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.03.02.21.58.38;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.02.27.16.56.19;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.02.16.03.41.17;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.02.03.03.05.46;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.23.20.33;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS File
+@
+
+
+1.7
+log
+@Update to use MYATOF.
+@
+text
+@#~!Makefile for nbccom
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1995 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"$Id$"
+
+# Make parameters when running on MPX
+
+ROOT = /system/system
+TARGET = /system/bin
+SOURCE = .
+PREFIX = nb
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/system
+BIN = /system/bin
+UBIN = /system/bin
+LIB = /system/bin
+YBIN = /system/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+#CFLAGS = -DMPX -DNOBUG -DMYATOF
+#CFLAGS = -DMPX -DNOBUG -DTWOPASS -DMYATOF
+#CFLAGS = -DMPX -DNOBUG -DTWOPASS
+CFLAGS = -DMPX -DNOBUG -DTWOPASS -DNEWATOF
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS = -Ynbcommap
+LD1FLAGS = -Ynbcp1map
+LD2FLAGS = -Ynbcp2map
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+#MAKEFILE = makefile
+MAKEFILE = makefile2
+
+# Fill in with correct information
+
+P1OBJS = getenv.o version.o fixcall.o stab.o code.o atofn.o float.o \
+	comm1.o cgram.o local.o optim.o pftn.o scan.o trees.o xdefs.o
+
+P2OBJS = allo.o comm2.o local2.o match.o order.o reader.o switch.o \
+	table.o
+
+HDRS = caloff.h common.h mac2defs.h macdefs.h manifest.h mfile1.h \
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h float.h
+
+P1SRCS = getenv.c version.c fixcall.c stab.c code.c atofn.c float.c \
+	comm1.c cgram.c local.c optim.c pftn.c scan.c trees.c xdefs.c
+
+P2SRCS = allo.c comm2.c local2.c match.c order.c reader.c switch.c \
+	table.c
+
+ALLSRC = $(P1SRCS) $(P2SRCS)
+
+#MAIN = nbccom
+MAIN = nbcp1 nbcp2
+
+ALL:	all
+
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+
+nbccom:	$(MAKEFILE) $(P1OBJS) $(P2OBJS)
+	$(CC) $(LDFLAGS) $(P1OBJS) $(P2OBJS) -o nbccom
+	$(BIN)/chmod 755 nbccom
+	$(BIN)/chgrp system nbccom
+	$(BIN)/chown system nbccom
+
+nbcp1:	$(MAKEFILE) $(P1OBJS)
+	$(CC) $(LD1FLAGS) $(P1OBJS) -o nbcp1
+	$(BIN)/chmod 755 nbcp1
+	$(BIN)/chgrp system nbcp1
+	$(BIN)/chown system nbcp1
+
+nbcp2:	$(MAKEFILE) $(P2OBJS)
+	$(CC) $(LD2FLAGS) $(P2OBJS) -o nbcp2
+	$(BIN)/chmod 755 nbcp2
+	$(BIN)/chgrp system nbcp2
+	$(BIN)/chown system nbcp2
+
+CLEAN:  clean
+
+clean:
+	$(BIN)/rm -f $(P1OBJS) $(P2OBJS)
+
+CLOBBER: clobber
+
+clobber: clean
+	$(BIN)/rm -f $(MAIN) cgram.c
+	$(BIN)/rm -f nbcp1map nbcp2map nbcommap
+
+DEPEND: depend
+
+#depend: $(P1SRCS) $(P2SRCS) $(HDRS) $(MAKEFILE)
+#	$(BIN)/dodep $(CFLAGS) $(MAKEFILE) $(P1SRCS) $(P2SRCS) >dep.out
+#	$(BIN)/mv dep.out $(MAKEFILE)
+
+depend: $(P1SRCS) $(P2SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	@@for i in $(ALLSRC); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $(CFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+INSTALL: install
+
+install: all
+	$(BIN)/cp $(MAIN) $(BIN)
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.6
+log
+@Fixed bad define.
+@
+text
+@d19 1
+a19 1
+#ident	"@@(#)Make:nbccom/Makefile	1.1"
+@
+
+
+1.5
+log
+@Use NEWATOF for now.
+@
+text
+@d40 1
+a40 1
+CFLAGS = -DMPX -DNOBUG -DTWOPASS -NEWATOF
+@
+
+
+1.4
+log
+@Use std atof.
+@
+text
+@d39 2
+a40 1
+CFLAGS = -DMPX -DNOBUG -DTWOPASS
+d52 1
+a52 1
+P1OBJS = getenv.o version.o fixcall.o stab.o code.o atof.o \
+d59 1
+a59 1
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h
+d61 1
+a61 1
+P1SRCS = getenv.c version.c fixcall.c stab.c code.c atof.c \
+@
+
+
+1.3
+log
+@fixes
+@
+text
+@d38 2
+a39 1
+CFLAGS = -DMPX -DNOBUG -DTWOPASS -DMYATOF
+d51 1
+a51 1
+P1OBJS = getenv.o version.o fixcall.o stab.o code.o float.o myatof.o \
+d58 1
+a58 1
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h float.h
+d60 1
+a60 1
+P1SRCS = getenv.c version.c fixcall.c stab.c code.c float.c myatof.c \
+a125 195
+# Source file 'getenv.c'
+getenv.o: getenv.c
+getenv.o: /system/nbinclude/timeb.h
+# Source file 'version.c'
+version.o: version.c
+# Source file 'fixcall.c'
+fixcall.o: fixcall.c
+fixcall.o: ./mfile1.h
+fixcall.o: ./macdefs.h
+fixcall.o: ./manifest.h
+fixcall.o: /system/nbinclude/stdio.h
+fixcall.o: ./float.h
+fixcall.o: ./float.h
+# Source file 'stab.c'
+stab.o: stab.c
+stab.o: ./mfile1.h
+stab.o: ./macdefs.h
+stab.o: ./manifest.h
+stab.o: /system/nbinclude/stdio.h
+stab.o: ./float.h
+stab.o: ./float.h
+stab.o: /system/nbinclude/sys/types.h
+stab.o: /system/nbinclude/a.out.h
+# Source file 'code.c'
+code.o: code.c
+code.o: ./mfile1.h
+code.o: ./macdefs.h
+code.o: ./manifest.h
+code.o: /system/nbinclude/stdio.h
+code.o: ./float.h
+code.o: ./float.h
+code.o: /system/nbinclude/sys/types.h
+code.o: /system/nbinclude/a.out.h
+# Source file 'float.c'
+float.o: float.c
+float.o: ./float.h
+# Source file 'myatof.c'
+myatof.o: myatof.c
+myatof.o: /system/nbinclude/ctype.h
+myatof.o: ./float.h
+# Source file 'comm1.c'
+comm1.o: comm1.c
+comm1.o: ./mfile1.h
+comm1.o: ./macdefs.h
+comm1.o: ./manifest.h
+comm1.o: /system/nbinclude/stdio.h
+comm1.o: ./float.h
+comm1.o: ./float.h
+comm1.o: ./common.h
+comm1.o: ./error.h
+comm1.o: ./treewalk.h
+comm1.o: ./opdesc.h
+comm1.o: ./caloff.h
+comm1.o: ./treemgr.h
+# Source file 'cgram.c'
+cgram.o: cgram.c
+cgram.o: ./mfile1.h
+cgram.o: ./macdefs.h
+cgram.o: ./manifest.h
+cgram.o: /system/nbinclude/stdio.h
+cgram.o: ./float.h
+cgram.o: ./float.h
+# Source file 'local.c'
+local.o: local.c
+local.o: ./mfile1.h
+local.o: ./macdefs.h
+local.o: ./manifest.h
+local.o: /system/nbinclude/stdio.h
+local.o: ./float.h
+local.o: ./float.h
+# Source file 'optim.c'
+optim.o: optim.c
+optim.o: ./mfile1.h
+optim.o: ./macdefs.h
+optim.o: ./manifest.h
+optim.o: /system/nbinclude/stdio.h
+optim.o: ./float.h
+optim.o: ./float.h
+# Source file 'pftn.c'
+pftn.o: pftn.c
+pftn.o: ./mfile1.h
+pftn.o: ./macdefs.h
+pftn.o: ./manifest.h
+pftn.o: /system/nbinclude/stdio.h
+pftn.o: ./float.h
+pftn.o: ./float.h
+# Source file 'scan.c'
+scan.o: scan.c
+scan.o: ./mfile1.h
+scan.o: ./macdefs.h
+scan.o: ./manifest.h
+scan.o: /system/nbinclude/stdio.h
+scan.o: ./float.h
+scan.o: ./float.h
+scan.o: /system/nbinclude/a.out.h
+scan.o: /system/nbinclude/ctype.h
+# Source file 'trees.c'
+trees.o: trees.c
+trees.o: ./mfile1.h
+trees.o: ./macdefs.h
+trees.o: ./manifest.h
+trees.o: /system/nbinclude/stdio.h
+trees.o: ./float.h
+trees.o: ./float.h
+# Source file 'xdefs.c'
+xdefs.o: xdefs.c
+xdefs.o: ./mfile1.h
+xdefs.o: ./macdefs.h
+xdefs.o: ./manifest.h
+xdefs.o: /system/nbinclude/stdio.h
+xdefs.o: ./float.h
+xdefs.o: ./float.h
+# Source file 'allo.c'
+allo.o: allo.c
+allo.o: ./mfile2.h
+allo.o: ./macdefs.h
+allo.o: ./mac2defs.h
+allo.o: ./manifest.h
+allo.o: /system/nbinclude/stdio.h
+allo.o: ./float.h
+allo.o: ./float.h
+# Source file 'comm2.c'
+comm2.o: comm2.c
+comm2.o: ./mfile2.h
+comm2.o: ./macdefs.h
+comm2.o: ./mac2defs.h
+comm2.o: ./manifest.h
+comm2.o: /system/nbinclude/stdio.h
+comm2.o: ./float.h
+comm2.o: ./float.h
+comm2.o: ./common.h
+comm2.o: ./error.h
+comm2.o: ./treewalk.h
+comm2.o: ./opdesc.h
+comm2.o: ./caloff.h
+comm2.o: ./treemgr.h
+# Source file 'local2.c'
+local2.o: local2.c
+local2.o: ./mfile2.h
+local2.o: ./macdefs.h
+local2.o: ./mac2defs.h
+local2.o: ./manifest.h
+local2.o: /system/nbinclude/stdio.h
+local2.o: ./float.h
+local2.o: ./float.h
+local2.o: /system/nbinclude/ctype.h
+local2.o: /system/nbinclude/a.out.h
+# Source file 'match.c'
+match.o: match.c
+match.o: ./mfile2.h
+match.o: ./macdefs.h
+match.o: ./mac2defs.h
+match.o: ./manifest.h
+match.o: /system/nbinclude/stdio.h
+match.o: ./float.h
+match.o: ./float.h
+# Source file 'order.c'
+order.o: order.c
+order.o: ./mfile2.h
+order.o: ./macdefs.h
+order.o: ./mac2defs.h
+order.o: ./manifest.h
+order.o: /system/nbinclude/stdio.h
+order.o: ./float.h
+order.o: ./float.h
+# Source file 'reader.c'
+reader.o: reader.c
+reader.o: ./mfile2.h
+reader.o: ./macdefs.h
+reader.o: ./mac2defs.h
+reader.o: ./manifest.h
+reader.o: /system/nbinclude/stdio.h
+reader.o: ./float.h
+reader.o: ./float.h
+reader.o: ./print.h
+# Source file 'switch.c'
+switch.o: switch.c
+switch.o: /system/nbinclude/stdio.h
+switch.o: ./mfile2.h
+switch.o: ./macdefs.h
+switch.o: ./mac2defs.h
+switch.o: ./manifest.h
+switch.o: /system/nbinclude/stdio.h
+switch.o: ./float.h
+switch.o: ./float.h
+# Source file 'table.c'
+table.o: table.c
+table.o: ./mfile2.h
+table.o: ./macdefs.h
+table.o: ./mac2defs.h
+table.o: ./manifest.h
+table.o: /system/nbinclude/stdio.h
+table.o: ./float.h
+table.o: ./float.h
+# End of dependencies
+@
+
+
+1.2
+log
+@The latest......
+@
+text
+@d45 2
+a46 2
+#MAKEFILE = make.mpx
+MAKEFILE = make2.mpx
+d60 1
+a60 1
+	comm1.c cgram.y local.c optim.c pftn.c scan.c trees.c xdefs.c
+d179 2
+a180 2
+# Source file 'cgram.y'
+cgram.o: cgram.y
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 1
+a4 1
+# Copyright 1994 - J B Systems, Morrison, CO
+d19 1
+a19 1
+#ident	"@@(#)Make:nbccom/Makefile	1.0"
+d24 1
+a24 1
+TARGET = /system/system
+d37 2
+a38 2
+#CFLAGS = -DMPX -DNOBUG
+CFLAGS = -DMPX -DNOBUG -DTWOPASS
+d41 2
+d45 1
+d50 1
+a50 1
+P1OBJS = getenv.o version.o fixcall.o stab.o code.o \
+d53 2
+a54 1
+P2OBJS = allo.o comm2.o local2.o match.o order.o reader.o switch.o table.o
+d57 1
+a57 1
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h
+d59 1
+a59 1
+P1SRCS = getenv.c version.c fixcall.c stab.c code.c \
+d62 4
+a65 1
+P2SRCS = allo.c comm2.c local2.c match.c order.c reader.c switch.c table.c
+d82 1
+a82 1
+	$(CC) $(LDFLAGS) -Ynbcp1map $(P1OBJS) -o nbcp1
+d88 1
+a88 1
+	$(CC) $(LDFLAGS) -Ynbcp2map $(P2OBJS) -o nbcp2
+d101 2
+a102 2
+	$(BIN)/rm -f $(MAIN)
+	$(BIN)/rm -f nbcommap
+d106 4
+a110 4
+	$(BIN)/dodep $(CFLAGS) $(MAKEFILE) $(P1SRCS) $(P2SRCS) >dep.out
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+junk:
+d112 1
+a112 1
+	@@for i in $(SRCS); do \
+d125 194
+a318 21
+# Source file getenv.c
+# Source file version.c
+# Source file fixcall.c
+# Source file stab.c
+# Source file code.c
+# Source file comm1.c
+# Source file cgram.y
+# Source file local.c
+# Source file optim.c
+# Source file pftn.c
+# Source file scan.c
+# Source file trees.c
+# Source file xdefs.c
+# Source file allo.c
+# Source file comm2.c
+# Source file local2.c
+# Source file match.c
+# Source file order.c
+# Source file reader.c
+# Source file switch.c
+# Source file table.c
+@

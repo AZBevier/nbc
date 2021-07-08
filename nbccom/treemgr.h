@@ -7,7 +7,7 @@
  *	mode C compiler.
  */
 
-/* $Id: treemgr.h,v 1.5 2019/01/31 22:03:56 jbev Exp jbev $	*/
+/* $Id: treemgr.h,v 1.6 2021/07/01 03:00:13 jbev Exp $	*/
 
 /* 
 	This file contains items removed from common.h for
@@ -16,6 +16,9 @@
 
 /*
  * $Log: treemgr.h,v $
+ * Revision 1.6  2021/07/01 03:00:13  jbev
+ * Add missing external.
+ *
  * Revision 1.5  2019/01/31 22:03:56  jbev
  * Update for Linux
  *

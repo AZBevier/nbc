@@ -1,0 +1,240 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2021.07.01.03.19.08;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.02.26.18.20.58;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.01.31.21.55.48;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial revision
+@
+
+
+1.3
+log
+@Correct makefile commands.
+@
+text
+@#
+# Makefile for nbccom (1 pass version) when running on Linux
+#
+CC = cc 
+CFLAGS = -O -DMPX -DMYATOF -m32 # -DIEEE
+SYSBIN = /system/bin
+SYSLIB = /system/lib
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+#YACC = yacc
+YACC = /system/bin/nbyacc
+MAKEFILE = make.unix
+
+SRCS = allo.c cgram.c code.c comm1.c fixcall.c local.c local2.c \
+	match.c optim.c order.c pftn.c reader.c scan.c stab.c switch.c \
+	table.c trees.c version.c xdefs.c fparith.c
+
+OBJS = allo.o cgram.o code.o comm1.o fixcall.o local.o local2.o \
+	match.o optim.o order.o pftn.o reader.o scan.o stab.o switch.o \
+	table.o trees.o version.o xdefs.o fparith.o
+
+FPHDR = float.h
+FPSRC = float.c myatof.c
+FPOBJ = float.o myatof.o
+
+HDRS = a.out.h caloff.h common.h error.h fp.h mac2defs.h macdefs.h manifest.h \
+	mfile1.h mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h
+
+ALLHDR = $(FPHDR) $(HDRS)
+ALLSRC = $(FPSRC) $(SRCS)
+
+MAIN = nbccom
+
+all: $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(ALLSRC) $(ALLHDR) $(FPOBJ) $(OBJS)
+	$(CC) $(CFLAGS) -o $@@ $(FPOBJ) $(OBJS)
+	/bin/chmod 755 nbccom
+#	-rm -f version.o
+
+version.c: mkvers
+	-rm -f version.c
+	sh mkvers "J B Systems Non-Base C Compiler V1.4" > version.c
+
+cgram.c: cgram.y
+	$(YACC) cgram.y
+	cp y.tab.c cgram.c
+#	$(CC) $(CFLAGS) cgram.c
+
+clean:
+	-rm -f $(OBJS) $(FPOBJ) cgram.c y.tab.c version.c
+
+clobber: clean
+	-rm -f $(OBJS) $(MAIN) $(LBIN)/$(MAIN)
+	-rm -f $(LBIN)/*.?
+
+# Copy the files into linux directory
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
+	$(INSTALL) $(ALLSRC) $(LBIN)
+	$(INSTALL) $(ALLHDR) $(LBIN)
+	$(INSTALL) cgram.y $(LBIN)
+	$(MOVE) $(FPOBJ) $(OBJS) $(LBIN)
+	-rm -f $(OBJS) $(FPOBJ) # cgram.c y.tab.c #version.c
+	/bin/chmod 664 $(LBIN)/*.?
+#	$(INSTALL) nbccomx $(SYSBIN)/nbccom
+@
+
+
+1.2
+log
+@Update makefile to include float.h requirement.
+@
+text
+@d2 1
+a2 1
+# Makefile for nbccom (1 pass version)
+a3 1
+
+d5 4
+a8 7
+#CFLAGS = -g -O -Di386 -Umpx -Dunix -DNODEBUG -DMPX
+#CFLAGS = -O -Di386 -Umpx -Dunix -DNODEBUG -DMPX -DTWOPASS
+#CFLAGS = -g -O -Di386 -Umpx -Dunix -DMPX -DYYDEBUG=1
+#CFLAGS = -g -O -Di386 -Umpx -Dunix -DMPX
+#DFLAGS = -Di386 -Umpx -Dunix -DMPX #-DIEEE
+DFLAGS = -Di386 -Umpx -Dunix -DMPX -DMYATOF -m32
+CFLAGS = -g -O $(DFLAGS)
+d10 3
+a12 1
+YACC = yacc
+d15 7
+a21 15
+BINDIR = /system/bin
+BIN = /bin
+
+P1OBJ = code.o comm1.o cgram.o fixcall.o local.o optim.o pftn.o \
+ scan.o stab.o trees.o version.o xdefs.o atof2.o #fparith.o
+
+P2OBJ = allo.o comm2.o local2.o match.o order.o reader.o switch.o table.o
+
+SRCS = version.c switch.c fixcall.c stab.c code.c comm1.c cgram.c \
+ local.c optim.c pftn.c scan.c trees.c xdefs.c allo.c local2.c match.c \
+ order.c reader.c table.c atof2.c #fparith.c
+
+OBJS = version.o switch.o fixcall.o stab.o code.o comm1.o cgram.o \
+ local.o optim.o pftn.o scan.o trees.o xdefs.o allo.o local2.o match.o \
+ order.o reader.o table.o atof2.o #fparith.o
+a23 1
+
+a24 1
+
+d27 2
+a28 3
+HDRS = caloff.h common.h mac2defs.h macdefs.h manifest.h mfile1.h \
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h float.h \
+	fp.h error.h a.out.h
+d31 1
+d33 1
+a33 1
+ALLSRC = $(FPSRC) $(SRCS)
+d35 1
+a35 2
+all: nbccom
+#all: nbcp1 nbcp2
+d37 2
+a38 2
+nbccom: $(MAKEFILE) $(ALLHDR) $(FPOBJ) $(OBJS)
+	$(CC) $(CFLAGS) -o nbccom $(FPOBJ) $(OBJS)
+a39 10
+	-rm -f version.o
+
+#nbcp1: $(P1OBJ)
+#	$(CC) $(CFLAGS) -o nbcp1 $(P1OBJ)
+#	/bin/chmod 755 nbcp1
+#	-rm -f version.o
+
+#nbcp2: $(P2OBJ)
+#	$(CC) $(CFLAGS) -o nbcp2 $(P2OBJ)
+#	/bin/chmod 755 nbcp2
+a41 13
+#depend: $(SRCS) $(FPSRC) $(HDRS) $(MAKEFILE)
+#	$(BINDIR)/dodep $(DFLAGS) $(MAKEFILE) $(SRCS) $(FPSRC) >dep.out
+#	/bin/mv dep.out $(MAKEFILE)
+
+depend: $(SRCS) $(FPSRC) $(HDRS) $(MAKEFILE)
+	$(BINDIR)/mkdep $(MAKEFILE) >dep.out
+	-for i in $(ALLSRC); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CC) -M $(DFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+d44 6
+a49 2
+#	co mkvers
+	sh mkvers "J B Systems Non-Base C Compiler" > version.c
+d52 1
+a52 2
+#	$(BIN)/rm -f $(P1OBJ) $(P2OBJ)
+	$(BIN)/rm -f $(OBJS) $(FPOBJ)
+d55 2
+a56 5
+	$(BIN)/rm -f nbccom
+	-rm -f $(OBJS)
+#	-rm -f $(P1OBJ) $(P2OBJ) nbcp1 nbcp2
+	-rm -f cgram.c version.c
+	-rm -f core
+d58 1
+a58 3
+realclean:	clobber
+
+# Copy the files into bindir
+d60 14
+a73 5
+	$(INSTALL) nbccom $(BINDIR)
+#	$(INSTALL) nbcp1 $(BINDIR)
+#	$(INSTALL) nbcp2 $(BINDIR)
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d15 1
+a15 1
+MAKEFILE = Makefile
+d33 2
+d43 3
+a45 1
+ALLSRC = $(SRCS) $(FPSRC)
+d50 1
+a50 1
+nbccom: $(FPOBJ) $(OBJS)
+@

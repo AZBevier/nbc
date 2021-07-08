@@ -1,0 +1,317 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.6
+date	2019.01.31.22.03.56;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.03.20.21.36.39;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.03.06.19.18.32;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.02.23.16.27.54;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.02.02.05.08.30;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.21.56.20;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS File
+@
+
+
+1.6
+log
+@Update for Linux
+@
+text
+@/* xdefs.c */
+
+/*
+ * 	(c) Copyright 1990 J B Systems
+ *	This file contains non-based support modifications
+ *	for operation under MPX.  Derived from Encores' base
+ *	mode C compiler.
+ */
+
+#ifndef lint
+static char *rcsid = "$Id: xdefs.c,v 1.5 1996/03/20 21:36:39 jbev Exp jbev $";
+#endif
+
+/*
+    Ported from the 4.1c Berkeley Standard
+	Distribution source for a VAX portable C compiler.
+*/
+
+/*
+ * $Log: xdefs.c,v $
+ * Revision 1.5  1996/03/20 21:36:39  jbev
+ * Mods for alpha port.
+ *
+ * Revision 1.4  1995/03/06 19:18:32  jbev
+ * Malloc tree node table instead of hard coding size.
+ * Allow XTTval  and X2TTval to set node tree table size.
+ * Add new option XJ and X2J to inhibit _ being prepended to names.
+ * Correct XT[DS]val options for setting table sizes.
+ *
+ */
+
+#include "mfile1.h"
+
+/*	communication between lexical routines	*/
+
+char        ftitle[100] = "";	/* title of the file */
+char        ititle[100] = "";	/* title of initial file */
+int         lineno;		/* line number of the input file */
+
+CONSZ       lastcon;	/* the last constant read by the lexical analyzer */
+#ifndef MYATOF
+FP_DOUBLE   dcon;	/* the last double read by the lexical analyzer */
+#endif /* MYATOF */
+
+/*	symbol table maintainence */
+
+struct symtab   *stab;		/* one extra slot for scratch */
+
+int         curftn;		/* "current" function */
+int         ftnno;		/* "current" function number */
+
+#ifdef MPX
+int DIMTABSZ;
+int SYMTSZ;
+int sizeofflag;
+#endif
+
+int         curclass,		/* current storage class */
+            instruct,		/* "in structure" flag */
+            stwart,		/* for accessing names which
+				   are structure members or names */
+            blevel,		/* block level: 0 for extern,
+				   1 for ftn args, >=2 inside function */
+            curdim;		/* current offset into the dimension table */
+int	    forcealign = 0;	/* forced minimum alignment */
+				/* set by ALIGN-n special comment */
+int         ininit=0;		/* "in initializer" flag */
+
+int         *dimtab;
+
+int         paramstk[PARAMSZ];	/* used in the definition of function parameters */
+int         paramno;		/* the number of parameters */
+int         autooff;		/* the next unused automatic offset */
+int         argoff;		/* the next unused argument offset */
+
+int         strucoff;		/*  the next structure offset position */
+
+int         regvar;	/* the next free register for register variables */
+int         minrvar;	/* the smallest that regvar gets witing a function */
+OFFSZ       inoff;	/* offset of external element being initialized */
+
+int         brkflag = 0;  /* complain about break statements not reached */
+
+struct sw   swtab[SWITSZ];	/* table for cases within a switch */
+struct sw  *swp;	/* pointer to next free entry in swtab */
+int         swx;	/* index of beginning of cases for current switch */
+
+#ifndef BUG1
+/* debugging flag */
+int	xdebug = 0;
+#endif
+
+int         strflg;	/* if on, strings are to be treated as lists */
+
+int         reached;	/* true if statement can be reached... */
+
+int         idname;	/* tunnel to buildtree for name id's */
+
+#ifdef NOW_MALLOCED
+NODE        node[TREESZ];
+#else
+NODE        *nodep;
+int	    TREESIZE;
+#endif
+
+#ifdef FIX_27OCT92
+int         cflag = 0;	/* do we check for funny casts */
+int         hflag = 0;	/* do we check for various heuristics 
+				which may indicate errors */
+int         pflag = 0;	/* do we check for portable constructions */
+#else
+int         cflag = 0;	/* do we check for funny casts */
+int         hflag = 1;	/* do we check for various heuristics 
+				which may indicate errors */
+int         pflag = 1;	/* do we check for portable constructions */
+#endif
+
+int         brklab;
+int         contlab;
+int         flostat;
+int         retlab = NOLAB;
+int         retstat;
+
+/* save array for break, continue labels, and flostat */
+
+int         asavbc[BCSZ];
+int        *psavbc = asavbc;
+
+#ifndef BUG1
+static char    *ccnames[] =
+{			/* names of storage classes */
+    "SNULL",
+    "AUTO",
+    "EXTERN",
+    "STATIC",
+    "REGISTER",
+    "EXTDEF",
+    "LABEL",
+    "ULABEL",
+    "MOS",
+    "PARAM",
+    "STNAME",
+    "MOU",
+    "UNAME",
+    "TYPEDEF",
+    "FORTRAN",
+    "ENAME",
+    "MOE",
+    "UFORTRAN",
+    "USTATIC",
+    "ABSLABEL",
+};
+
+char       *scnames(c) register     int c;
+{
+ /* return the name for storage class c */
+    static char     buf[12];
+    if (c & FIELD) {
+	sprintf(buf, "FIELD[%d]", c & FLDSIZ);
+	return(buf);
+    }
+    return(ccnames[c]);
+}
+#endif
+@
+
+
+1.5
+log
+@Mods for alpha port.
+@
+text
+@d11 1
+a11 1
+static char *rcsid = "$Id: xdefs.c,v 1.4 1995/03/06 19:18:32 jbev Exp jbev $";
+d21 3
+d154 1
+a154 1
+char       *scnames(c) register     c;
+@
+
+
+1.4
+log
+@Malloc tree node table instead of hard coding size.
+Allow XTTval  and X2TTval to set node tree table size.
+Add new option XJ and X2J to inhibit _ being prepended to names.
+Correct XT[DS]val options for setting table sizes.
+@
+text
+@d11 1
+a11 1
+static char *rcsid = "$Id$";
+d19 8
+a26 1
+/* $Log: $
+@
+
+
+1.3
+log
+@Delete Needb? and IEEE define.
+@
+text
+@d11 1
+a11 1
+static char *rcsid = "@@(#) (Gould) $Header: /u/nbc/nbccom/RCS/xdefs.c,v 1.2 1995/02/02 05:08:30 jbev Exp jbev $";
+d19 3
+d50 5
+a54 4
+            stwart,	/* for accessing names which are structure members or names */
+            blevel,	/* block level: 0 for extern, 1 for ftn args, >=2 inside
+							   function */
+            curdim;	/* current offset into the dimension table */
+a80 2
+int  start1debug, end1debug;
+int  defer1debug = 0;
+d89 1
+a89 1
+
+d91 4
+@
+
+
+1.2
+log
+@Add internal format for floating point values.
+@
+text
+@d11 1
+a11 1
+static char *rcsid = "@@(#) (Gould) $Header: /u/nbc/nbccom/RCS/xdefs.c,v 1.1 1995/01/27 21:56:20 jbev Exp jbev $";
+a111 3
+
+int		Needb3 = 0;
+int		Needb4 = 0;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a1 4
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+d11 1
+a11 1
+static char *rcsid = "@@(#) (Gould) $Header: xdefs.c,v 5.5 89/05/12 12:45:31 pcc Rel-3_0 $";
+a14 2
+    C compiler for Gould processors, base register instruction set.
+
+d17 1
+a18 1
+*/
+d28 1
+d30 1
+a30 1
+
+a151 5
+
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+@

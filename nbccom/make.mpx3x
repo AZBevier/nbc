@@ -65,7 +65,7 @@ clobber: clean          # delete main from current directory
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
-	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK) $(LBIN)/CGRAM.Y
 
 install: all            # build and then copy main to install directory
 	@if [ -d $(LBIN) ]; then \
@@ -79,6 +79,7 @@ install: all            # build and then copy main to install directory
 	done
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <cgram.y >$(LBIN)/CGRAM.Y
 	@for n in $(ALLS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \

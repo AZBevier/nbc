@@ -1,0 +1,154 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	95.01.27.22.50.35;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.20.53.57;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS File
+@
+
+
+1.2
+log
+@Delete -UAS requirement
+@
+text
+@#
+# Makefile for nbccom - 2 pass version for optimizer
+#
+
+CC = cc -DNULL=0
+CFLAGS = -O -g -Di386 -Umpx -Dunix -DMPX -DTWOPASS -DOPTIMIZER
+#CFLAGS = -O -g -Di386 -Umpx -Dunix -DNODEBUG -DMPX -DTWOPASS
+#CFLAGS = -O -Di386 -Umpx -Dunix -DMPX
+INSTALL = cp
+YACC = yacc
+
+BINDIR = /system/bin
+
+P1OBJ = code.o comm1.o cgram.o fixcall.o local.o optim.o pftn.o \
+ scan.o stab.o trees.o version.o xdefs.o
+
+P2OBJ = allo.o comm2.o local2.o match.o order.o reader.o switch.o table.o
+
+OBJS = version.o switch.o fixcall.o stab.o code.o comm1.o cgram.o \
+ local.o optim.o pftn.o scan.o trees.o xdefs.o allo.o local2.o match.o \
+ order.o reader.o table.o
+
+#all: nbccom
+all: nbcp1 nbcp2
+
+#nbccom: $(OBJS)
+#	$(CC) $(CFLAGS) -o nbccom $(OBJS)
+#	/bin/chmod 755 nbccom
+#	-rm -f version.o
+
+nbcp1: $(P1OBJ)
+	$(CC) $(CFLAGS) -o nbcp1 $(P1OBJ)
+	/bin/chmod 755 nbcp1
+	-rm -f version.o
+
+nbcp2: $(P2OBJ)
+	$(CC) $(CFLAGS) -o nbcp2 $(P2OBJ)
+	/bin/chmod 755 nbcp2
+	-rm -f version.o
+
+# Pass1 modules
+
+#atof.o: atof.c
+
+code.o: code.c mfile1.h stab.h
+
+comm1.o: comm1.c mfile1.h common.h
+
+cgram.o: cgram.c
+
+cgram.c: cgram.y mfile1.h
+	$(YACC) cgram.y
+	mv y.tab.c cgram.c
+
+fixcall.o: fixcall.c mfile1.h
+
+local.o: local.c mfile1.h
+
+optim.o: optim.c mfile1.h
+
+pftn.o: pftn.c mfile1.h
+
+scan.o: scan.c mfile1.h stab.h
+
+stab.o: stab.c mfile1.h stab.h
+
+trees.o: trees.c mfile1.h
+
+#version.o: version.c
+
+version.o:
+	-rm -f version.c
+	sh mkvers "J B Systems Non-Base C Compiler" > version.c
+	$(CC) $(CFLAGS) -c version.c
+#	-rm -f version.c
+
+xdefs.o: xdefs.c
+
+# Pass2 modules
+
+allo.o: allo.c mfile2.h
+
+comm2.o: comm2.c mfile2.h common.h
+
+local2.o: local2.c mfile2.h stab.h
+
+match.o: match.c mfile2.h
+
+order.o: order.c mfile2.h
+
+reader.o: reader.c mfile2.h print.h
+
+switch.o: switch.c mfile1.h mfile2.h
+
+table.o: table.c mfile2.h
+
+clean:
+#	-rm -f $(OBJS) nbccom nbcp1 nbcp2
+	-rm -f $(P1OBJ) $(P2OBJ)
+	-rm -f cgram.c version.c
+	-rm -f core
+
+realclean:	clean
+	-rm -f nbcp1 nbcp2
+
+# Copy the files into bindir
+install: all
+#	$(INSTALL) nbccom $(BINDIR)
+	$(INSTALL) nbcp1 $(BINDIR)
+	$(INSTALL) nbcp2 $(BINDIR)
+
+force:
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d6 3
+a8 3
+CFLAGS = -O -g -Di386 -Umpx -Dunix -DUAS -DMPX -DTWOPASS -DOPTIMIZER
+#CFLAGS = -O -g -Di386 -Umpx -Dunix -DUAS -DNODEBUG -DMPX -DTWOPASS
+#CFLAGS = -O -Di386 -Umpx -Dunix -DUAS -DMPX
+@

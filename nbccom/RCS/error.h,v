@@ -1,0 +1,372 @@
+head	1.8;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.8
+date	2019.02.24.17.17.07;	author jbev;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2019.01.31.21.46.26;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	97.06.10.20.58.28;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	97.01.22.18.28.07;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.10.26.22.18.07;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.03.22.00.05.49;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.02.02.19.34.50;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.20.56.20;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS File
+@
+
+
+1.8
+log
+@Comment out stdlib.h include for mpx
+@
+text
+@/* error.h */
+
+/*
+ * 	(c) Copyright 1990 J B Systems
+ *	This file contains non-based support modifications
+ *	for operation under MPX.  Derived from Encores' base
+ *	mode C compiler.
+ */
+
+/*	$Header: /bulk2/simhv/nbc-master/nbccom/RCS/error.h,v 1.7 2019/01/31 21:46:26 jbev Exp jbev $	      */
+
+#ifndef mpx
+#include <stdlib.h>
+#endif
+
+#ifndef ONEPASS
+#undef BUFSTDERR
+#endif
+#ifndef EXIT
+#define EXIT exit
+#endif
+
+int         nerrors = 0; /* number of errors */
+int         Wflag = 0;	/* Non-zero means do not print warnings */
+extern void where();
+
+/* VARARGS1 */
+void uerror(s, a)		/* second parameter must be a pointer */
+char  *s;
+char *a;
+{
+/*
+ * nonfatal error message
+ * the routine where is different for pass 1 and pass 2;
+ *  it tells where the error took place
+ */
+    ++nerrors;
+    where('u');
+    fprintf(stderr, s, a);
+    fprintf(stderr, "\n");
+#ifdef BUFSTDERR
+    fflush(stderr);
+#endif
+    if (nerrors > 30)
+	cerror("too many errors");
+}
+
+/*
+ * This version is required for the alpha because a pointer
+ * is 64 bits and an int is 32 bits.  It causes an error.
+ */
+/* VARARGS1 */
+void uderror(s, a)		/* second parameter must be an integer */
+char  *s;
+int    a;
+{
+/*
+ * nonfatal error message
+ * the routine where is different for pass 1 and pass 2;
+ *  it tells where the error took place
+ */
+    ++nerrors;
+    where('u');
+    fprintf(stderr, s, a);
+    fprintf(stderr, "\n");
+#ifdef BUFSTDERR
+    fflush(stderr);
+#endif
+    if (nerrors > 30)
+	cerror("too many errors");
+}
+
+/* VARARGS1 */
+void cerror(s, a, b)
+char    *s;
+char    *a;
+char    *b;
+{				/* compiler error: die */
+    fflush(stdout);
+    where('c');
+    if (nerrors && nerrors <= 30) {
+	/* give the compiler the benefit of the doubt */
+	fprintf(stderr, "cannot recover from earlier errors: goodbye!\n");
+    } else {
+	fprintf(stderr, "compiler error: ");
+	fprintf(stderr, s, a, b);
+	fprintf(stderr, "\n");
+    }
+#ifdef BUFSTDERR
+    fflush(stderr);
+#endif
+    EXIT(1);
+}
+
+/*
+ * This version is required for the alpha because a pointer
+ * is 64 bits and an int is 32 bits.  It causes an error.
+ */
+/* VARARGS1 */
+void cderror(s, a, b)
+char    *s;
+int	a;
+int	b;
+{				/* compiler error: die */
+    fflush(stdout);
+    where('c');
+    if (nerrors && nerrors <= 30) {
+	/* give the compiler the benefit of the doubt */
+	fprintf(stderr, "cannot recover from earlier errors: goodbye!\n");
+    } else {
+	fprintf(stderr, "compiler error: ");
+	fprintf(stderr, s, a, b);
+	fprintf(stderr, "\n");
+    }
+#ifdef BUFSTDERR
+    fflush(stderr);
+#endif
+    EXIT(1);
+}
+
+/* VARARGS1 */
+void werror(s, a, b)
+char   *s;
+char   *a;
+char   *b;
+{				/* warning */
+    if (Wflag)
+	return;
+    where('w');
+    fprintf(stderr, "warning: ");
+    fprintf(stderr, s, a, b);
+    fprintf(stderr, "\n");
+#ifdef BUFSTDERR
+    fflush(stderr);
+#endif
+}
+
+/*
+ * This version is required for the alpha because a pointer
+ * is 64 bits and an int is 32 bits.  It causes an error.
+ */
+/* VARARGS1 */
+void wderror(s, a, b)
+char   *s;
+int	a;
+int	b;
+{				/* warning */
+    if (Wflag)
+	return;
+    where('w');
+    fprintf(stderr, "warning: ");
+    fprintf(stderr, s, a, b);
+    fprintf(stderr, "\n");
+#ifdef BUFSTDERR
+    fflush(stderr);
+#endif
+}
+
+@
+
+
+1.7
+log
+@Update for Linux
+@
+text
+@d10 1
+a10 1
+/*	$Header: /bulk2/simhv/nbc-master/nbccom/RCS/error.h,v 1.6 1997/06/10 20:58:28 jbev Exp jbev $	      */
+d12 1
+d14 1
+@
+
+
+1.6
+log
+@Change void * to char * for MPX
+@
+text
+@d10 3
+a12 1
+/*	$Header: /src/u/nbc/nbccom/RCS/error.h,v 1.5 1997/01/22 18:28:07 jbev Exp jbev $	      */
+d23 1
+d26 1
+a26 1
+uerror(s, a)		/* second parameter must be a pointer */
+d51 1
+a51 1
+uderror(s, a)		/* second parameter must be an integer */
+d72 1
+a72 1
+cerror(s, a, b)
+d98 1
+a98 1
+cderror(s, a, b)
+d120 1
+a120 1
+werror(s, a, b)
+d141 1
+a141 1
+wderror(s, a, b)
+@
+
+
+1.5
+log
+@Correct pointer/integer problem with error messages.
+Only on Alpha because of 64 bit pointers and 32 bit ints.
+@
+text
+@d10 1
+a10 1
+/*	$Header: /src/u/nbc/nbccom/RCS/error.h,v 1.4 1996/10/26 22:18:07 jbev Exp jbev $	      */
+d25 1
+a25 1
+void *a;
+@
+
+
+1.4
+log
+@Fix Alpha port error message printing
+Was core dumping with bac pointer.
+@
+text
+@d10 1
+a10 1
+/*	@@(#) (Gould) $Header: /src/u/nbc/nbccom/RCS/error.h,v 1.2 1995/02/02 19:34:50 jbev Exp $	      */
+a11 8
+/* 
+	This file contains items removed from common.h for
+	the PCO port.
+*/
+
+#ifdef FORT
+#undef BUFSTDERR
+#endif
+d22 2
+a23 2
+ /* VARARGS1 */
+uerror(s, a)
+d43 30
+a72 2
+ /* VARARGS1 */
+cerror(s, a, b, c) char    *s;
+d76 2
+a77 1
+    if (nerrors && nerrors <= 30) {	/* give the compiler the benefit of the doubt */
+d79 4
+d84 22
+a105 1
+    else {
+d107 1
+a107 1
+	fprintf(stderr, s, a, b, c);
+d116 26
+a141 2
+ /* VARARGS1 */
+werror(s, a, b) char   *s;
+@
+
+
+1.3
+log
+@Cleanup for Alpha port.
+@
+text
+@d10 1
+a10 5
+/* $Header: /src/u/nbc/nbccom/RCS/error.h,v 1.2 1995/02/02 19:34:50 jbev Exp jbev $ */
+
+/*
+ * $Log: $
+ */
+d31 3
+a33 1
+uerror(s, a) char  *s;
+@
+
+
+1.2
+log
+@general cleanup
+@
+text
+@d10 5
+a14 1
+/*	@@(#) (Gould) $Header: /u/nbc/nbccom/RCS/error.h,v 1.1 1995/01/27 20:56:20 jbev Exp jbev $	      */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a1 4
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+d10 1
+a10 1
+/*	@@(#) (Gould) $Header: error.h,v 5.5 89/05/12 12:43:25 pcc Rel-3_0 $	      */
+a12 1
+
+a14 1
+
+a81 4
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+@

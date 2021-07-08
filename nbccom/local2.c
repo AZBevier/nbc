@@ -8,7 +8,7 @@
  */
 
 #ifndef lint
-static char *rcsid = "$Id: local2.c,v 1.28 2019/03/02 23:31:40 jbev Exp jbev $";
+static char *rcsid = "$Id: local2.c,v 1.29 2021/07/01 02:49:13 jbev Exp $";
 #endif
 
 /*
@@ -18,6 +18,9 @@ static char *rcsid = "$Id: local2.c,v 1.28 2019/03/02 23:31:40 jbev Exp jbev $";
 
 /*
  * $Log: local2.c,v $
+ * Revision 1.29  2021/07/01 02:49:13  jbev
+ * correct some external definitions.
+ *
  * Revision 1.28  2019/03/02 23:31:40  jbev
  * Call do free in common.h as standard free call.
  *

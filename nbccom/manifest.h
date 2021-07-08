@@ -7,7 +7,7 @@
  *	mode C compiler.
  */
 
-/* $Id: manifest.h,v 1.13 2019/01/31 21:56:19 jbev Exp jbev $ */
+/* $Id: manifest.h,v 1.14 2021/07/01 03:14:55 jbev Exp $ */
 
 /*
     Ported from the 4.1c Berkeley Standard
@@ -16,6 +16,9 @@
 
 /*
  * $Log: manifest.h,v $
+ * Revision 1.14  2021/07/01 03:14:55  jbev
+ * Add more externals.
+ *
  * Revision 1.13  2019/01/31 21:56:19  jbev
  * Update for Linux
  *

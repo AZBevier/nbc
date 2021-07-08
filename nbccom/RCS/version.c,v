@@ -1,0 +1,56 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	2021.07.01.02.57.57;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	97.01.22.18.29.58;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.03.06.19.18.32;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@update version to current date.
+@
+text
+@char version[] = "@@(#)J B Systems Non-Base C Compiler V1.4 - Wed Jun 30 19:37:27 MST 2021";
+@
+
+
+1.2
+log
+@Alpha fix for pointer/integer problem.
+@
+text
+@d1 1
+a1 1
+char version[] = "@@(#)J B Systems Non-Base C Compiler - Wed Jan 22 11:29:54 MST 1997";
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+char version[] = "@@(#)J B Systems Non-Base C Compiler - Fri Mar 3 09:15:52 MST 1995";
+@

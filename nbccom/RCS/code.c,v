@@ -1,0 +1,1865 @@
+head	1.14;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.14
+date	2019.02.24.17.15.30;	author jbev;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	2019.01.31.21.43.27;	author jbev;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	96.10.26.22.20.38;	author jbev;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	96.03.22.16.41.23;	author jbev;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	96.03.20.21.36.39;	author jbev;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	95.04.28.20.47.45;	author jbev;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	95.03.06.19.18.32;	author jbev;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	95.02.09.01.05.31;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	95.02.07.22.48.30;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.02.05.04.51.29;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.02.04.03.55.16;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.02.02.05.08.30;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.01.27.23.11.22;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.21.56.20;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS File
+@
+
+
+1.14
+log
+@Comment out stdlib.h include for mpx
+@
+text
+@/* code.c */
+/*
+ * 	(c) Copyright 1990 J B Systems
+ *	This file contains non-based support modifications
+ *	for operation under MPX.  Derived from Encores' base
+ *	mode C compiler.
+ */
+
+#ifndef lint
+static char *rcsid =
+ "$Id: code.c,v 1.13 2019/01/31 21:43:27 jbev Exp jbev $";
+#endif
+
+/*
+ * $Log: code.c,v $
+ * Revision 1.13  2019/01/31 21:43:27  jbev
+ * Update for Linux
+ *
+ * Revision 1.12  1996/10/26 22:20:38  jbev
+ * Fix for alpha port
+ *
+ * Revision 1.11  1996/03/22 16:41:23  jbev
+ * Fix during Alpha port.
+ *
+ * Revision 1.10  1996/03/20 21:36:39  jbev
+ * Mods for alpha port.
+ *
+ * Revision 1.9  1995/04/28 20:47:45  jbev
+ * Modifictions for sectioned code.
+ *
+ */
+
+/*
+    Ported from the 4.1c Berkeley Standard
+	Distribution source for a VAX portable C compiler.
+*/
+
+#include "mfile1.h"
+#include <sys/types.h>
+#include <string.h>
+#ifndef mpx
+#include <stdlib.h>
+#endif
+#include <a.out.h>
+
+extern int lflag;
+
+int	handopt = 0;		/* handler option word */
+int	_flag = 0;		/* don't prepend _ to names */
+int	proflg = 0;		/* are we generating profiling code? */
+int	strftn = 0;		/* is the current function one which returns a value */
+int	gdebug;			/* debugger symbols output if set */
+int	fdefflag;		/* are we within a function definition ? */
+int	SAflag;			/* warn if first arg is a struct */
+char	NULLNAME[8];
+int	labelno;
+int	slineno;		/* last line number from orig file */
+char	progname[20];		/* saved program name */
+char	currprog[20];		/* copy of ftitle when progname set */
+
+void branch(n) int n;
+{
+/* output a branch to label n */
+/* exception is an ordinary function branching to retlab: then, return */
+    if( n == retlab && !strftn ) {
+
+#ifdef ONEPASS
+            LclReturn(n);
+#else
+	    if ( retstat & RETVAL ) {
+        	printf("%c%d\t%d\t\n", IRETURN, n, 1);
+	    } else {
+        	printf("%c%d\t%d\t\n", IRETURN, n, 0);
+	    }
+#endif
+	/* do NOT put a retstat = 0 here!!!! */
+    } else {
+
+#ifdef ONEPASS
+#ifndef NOCAID
+    	    if(lflag)
+    		lineid(lineno, ftitle);
+#endif
+     	    printf("	bu	L%d\n", n);
+#else
+            printf( "%c%d\t\n", IBRANCH, n);
+#endif
+
+    }
+}
+
+int         lastloc = DATA;
+
+short       log2tab[] =
+{
+    0, 0, 1, 2, 2, 3, 3, 3, 3
+};
+#define LOG2SZ 9
+
+void defalign(n) int n;
+{
+ /* cause the alignment to become a multiple of n */
+    n /= SZCHAR;
+    if (lastloc != PROG && n >1)
+	printf("	bound	%d\n", n);
+}
+
+int locctr(l) int l;
+{
+    register int temp;
+    /* l is PROG, ADATA, DATA, STRNG, ISTRNG, or STAB */
+
+    if (l == lastloc )
+	return(l);
+    temp = lastloc;
+    lastloc = l;
+    switch (l) {
+
+	case PROG:
+	    if (handopt)
+#ifdef TWOPASS
+		printf ("%cdsect\n",IDATA);	/* all o/s code is dsect */
+#else
+		printf ("\tdsect\n");	/* all o/s code is dsect */
+#endif
+	    else
+#ifdef TWOPASS
+		printf ("%ccsect\n",ITEXT);
+#else
+		printf ("\tcsect\n");
+#endif
+	    psline();
+	    break;
+
+	case FDATA:
+#ifdef TWOPASS
+	    printf ("%cdsect\n",IDATA);
+#else
+	    printf ("\tdsect\n");
+#endif
+	    break;
+
+	case DATA:
+	case ADATA:
+
+#ifdef TWOPASS
+	    printf ("%cdsect\n",IDATA);
+#else
+	    printf ("\tdsect\n");
+#endif
+	    break;
+
+	case STRNG:
+#ifdef TWOPASS
+    	    printf ("%cdsect\n",IDATA);
+#else
+	    printf ("\tdsect\n");
+#endif
+	    break;
+
+	case ISTRNG:
+#ifdef TWOPASS
+    	    printf ("%cdsect\n",IDATA);
+#else
+	    printf ("\tdsect\n");
+#endif
+	    break;
+
+	case STAB:
+	    printf("	.stab\n");
+	    break;
+
+	default:
+	    cerror("illegal location counter");
+    }
+
+    return(temp);
+}
+
+/*
+**  output line of text from the source
+*/
+void
+defloi(s)
+char *s;
+{
+#ifndef NOCAID
+    if (gdebug) {
+    	char *cp1, *cp2, oldchar;
+    	/* only print if same program */
+    	for(cp1 = cp2 = ftitle; *cp2; cp2++)
+    	    if(*cp2 == '/' || *cp2 == ')') cp1 = cp2;
+    	oldchar = *cp1;		/* save old char */
+    	*cp1 = '\"';
+#ifdef mpx
+    	if (stricmp(currprog, cp1) == 0) {
+#else
+    	if (strcmp(currprog, cp1) == 0) {
+#endif
+    	    *cp1 = oldchar;
+    	    slineno = lineno;	/* save our line number */
+    	    if(fdefflag)	/* if in function do E.?? */
+    		printf(" .xeq s.%d %s", lineno, s);
+    	    else		/* else do S.?? */
+    		printf(" .src s.%d %s", lineno, s);
+    	} else {
+    	    *cp1 = oldchar;
+    	    printf(" .com s.%d %s", slineno, s);
+    	}
+    } else {
+    	if (lflag && gdebug == 0)
+    	    printf("* %s", s);
+    }
+#else
+    if (lflag) {
+    	printf("* %s", s);
+    }
+#endif
+}
+
+/* get a line of input.  called from scan.c   */
+
+int getloi ( s, lim )                    /*  right from the book.  */
+char s [];
+int lim;
+{
+ int c, i;
+
+ for(i = 0; --lim >0 && (c =getchar()) != EOF && (s[i++] = c) != '\n';);
+ if ((s[i-1] == '\n') && (i >1)) {
+  while ((s[i-2] == ' ') && (i >1)) --i;
+  s[i-1] = '\n';
+ }
+ s [ i ] = '\0';
+ return ( i );
+}
+
+void deflab(n) int n;
+{
+ /* output something to define the current position as label n */
+
+#ifdef ONEPASS
+    if( lastloc == PROG )
+/*    printf("L%d 	equ 	$\n", n); */
+    	printf("L%d\tcequ\t$\n", n);
+    else
+    	printf("L%d\tdequ\t$\n", n);
+#else
+    if( lastloc == PROG )
+	printf("%c%d\t\n", ILABEL, n);
+    else
+/*    	printf("L%d\tequ\t$\n", n); */
+    	printf("L%d\tdequ\t$\n", n);
+#endif
+}
+
+int         crslab = 10;
+
+int getlab()
+{
+ /* return a number usable for a label */
+    return(++crslab);
+}
+
+#ifdef TWOPASS
+int         crs2lab = 99999;
+
+int get2lab()
+{
+ /* return a number usable for a label */
+    return(crs2lab--);
+}
+#endif
+
+int         reg_use = 7;
+extern      int calloff, autooff;
+
+void efcode()
+{
+ /* code for the end of a function */
+
+    register struct symtab *p;
+    register TWORD	t;
+    int	i;
+    int	tsz=0;	/* Used to detect func(s) that return >2 words */
+    char	*nm;	/* external name of symbol */
+
+#ifndef BUG2
+    if(edebug) {
+	printf("efcode(): strftn = %d, curftn:\n", strftn);
+	prstab(curftn);
+    }
+#endif
+
+    if (strftn) {	/* copy output (in R2(NP) or R0(PN)) to caller */
+	register NODE  *l, *r;
+	register int    j;
+        int	sz;
+
+	p = &stab[curftn];
+	t = p->stype;
+	t = DECREF(t);
+
+#ifndef ONEPASS
+	printf("%c\n",FEND);
+#endif	/* ONEPASS */
+
+	tsz = tsize(t, p->dimoff, p->sizoff); /* Rev G */
+
+	i = getlab();		/* label for return area */
+	sz = tsize(t, p->dimoff, p->sizoff) / SZCHAR;
+#ifdef OLDWAY
+	if (sz % sizeof(int))
+	    sz += sizeof(int) - (sz % sizeof(int));
+#else
+	if (sz % (SZINT/SZCHAR))
+	    sz += (SZINT/SZCHAR) - (sz % (SZINT/SZCHAR));
+#endif
+	locctr (DATA);
+	defalign (ALDOUBLE);
+	deflab (i);
+	zecode (sz / (SZINT/SZCHAR));
+	locctr (PROG);
+
+	deflab(retlab);
+
+	psline();
+	printf("	la	r1,L%d\n", i);
+
+	reached = 1;
+	l = block(REG, NIL, NIL, PTR | t, p->dimoff, p->sizoff);
+	l->tn.rval = 1;	/* R1 */
+	l->tn.lval = 0;	/* id cookie */
+
+	l = buildtree(UNARY MUL, l, NIL);
+
+	r = block(REG, NIL, NIL, PTR | t, p->dimoff, p->sizoff);
+	r->tn.rval = 0;	/* R0 */
+	r->tn.lval = 0;
+	r = buildtree(UNARY MUL, r, NIL);
+
+	l = buildtree(ASSIGN, l, r);
+	l->in.op = FREE;
+
+#ifndef BUG2
+	if(edebug) {
+		printf("efcode(): before ecomp()\n");
+		fwalk(l->in.left, eprint, 0);
+	}
+#endif
+
+	ecomp(l->in.left);
+	printf("	la	r0,L%d\n", i);
+
+ 	/* turn off strftn flag, so return sequence will be generated */
+	strftn = 0;
+    }
+    else {
+
+#ifndef ONEPASS
+	printf("%c\n",FEND);
+#endif	/* ONEPASS */
+#ifndef MPX
+	branch(retlab);
+#endif
+	deflab(retlab);
+    }
+    p = &stab[curftn];
+    t = p->stype;
+    t = DECREF(t);
+
+    i = t == DOUBLE ? 2 : (t == UNDEF ? 0 : 1);
+    if( (t == STRTY || t == UNIONTY) && tsz <= 2*SZINT) {
+	if(tsz <= SZINT)
+		i = 1;
+	else
+		i = 2;
+    }
+
+    if ((retstat & (RETVAL | NRETVAL)) == (RETVAL | NRETVAL)) {
+	werror("function contains both return and return(expr)");
+    }
+    if (!(retstat & RETVAL)) {
+	if (t != INT && t != UNDEF) {
+	    werror("function has a declared type but never returns a value");
+	}
+	i = 0;
+    }
+
+#ifdef MPX
+    nm = exname (p->sname, p);
+    printf ("\tlf\tr2,2w,sp\n");
+    printf ("\ttrsw\tr2\n");
+#else
+    printf ("	exit	%d,LA%d\n", i, ftnno);
+#endif /* MPX */
+
+    {
+    int ii;
+    ii = (reg_use >= (MINRVAR - 1)) ? reg_use : MINRVAR;
+    reg_use = 7;
+
+    dumpstr();
+
+#ifndef ONEPASS
+    printf("%c%d\t\n",BEND,ii);
+#else	/* not ONEPASS */
+    p2bend(ii);
+#endif	/* ONEPASS */
+    }
+
+    printf("*	.ef #%d %s\n", ftnno, nm);
+    fdefflag = 0;
+#ifndef BUG2
+    if(ddebug) {
+	printf("efcode() complete\n");
+    }
+#endif
+}
+
+int         ftlab1, ftlab2;
+
+void bfcode(a, n) int a[], n;
+{
+ /*
+  * code for the beginning of a function;
+  * a is an array of indices in stab for the arguments;
+  * n is the number
+  */
+    register    int i;
+    register    int temp;
+    register struct symtab *p;
+    struct symtab *r;
+    int         off;
+    char       *toreg();
+    char        regarg[20];
+    char	*nm;	/* external name of symbol */
+    int		basemask;
+
+    p = &stab[curftn];
+#ifndef BUG2
+    if(ddebug) {
+	printf("bfcode(): ftnno = %d\n", ftnno);
+	prstab(curftn);
+	for(i=0; i < n; ++i) {
+		printf("arg %d:\n", i);
+		prstab(a[i]);
+	}
+    }
+#endif
+#ifndef NOCAID
+#ifdef XXXX_CAID
+    for(i=0; i < n; ++i) {
+    	r = &stab[a[i]];
+    	printf("*ARG%d.%d .arg %s ", ftnno, i, r->sname);
+    	tprint(r->stype);
+    	printf(" LA%d+%db\n", ftnno, r->offset/SZCHAR);
+    }
+
+#endif
+#endif
+    nm = exname (p->sname, p);
+
+    locctr(PROG);
+#ifdef NOCAID
+    printf("*	.bf #%d %s\n", ftnno, nm);
+#endif
+    printf ("\tbound\t1w\n");
+#ifndef NOCAID
+    if (p->sclass == EXTDEF) {
+    	printf("*	.ebf #%d %s\n", ftnno, nm);
+    } else {
+    	printf("*	.sbf #%d %s\n", ftnno, nm);
+    }
+#endif
+    defnam(p);
+
+    temp = p->stype;
+    temp = DECREF(temp);
+    strftn = (temp == STRTY) || (temp == UNIONTY);
+
+    retlab = getlab();
+
+ /* routine prolog */
+
+#ifndef NOCAID
+#ifdef DO_LINE_STABS
+#ifdef NOT_4_NOCAID
+    printf("*.stabd 0x%x,0,%d\n", N_SLINE, lineno);
+#endif
+#endif
+#else
+    if (gdebug)
+    	printf("	.stabd	0x%x,0,%d\n", N_SLINE, lineno);
+#endif
+
+        printf("\ttrr\tsp,r1\n");
+#ifndef SECTION_FIX
+	printf("\tsumw\tsp,SLA%d\n", ftnno);
+#else /* SECTION_FIX */
+	printf("\tsumw\tsp,=LA%d\n", ftnno);
+#endif /* SECTION_FIX */
+	printf("\tstd\tr0,2w,sp\n");
+	printf("\tstf\tr4,4w,sp\n");
+#ifdef XXXX
+    	printf("*X.%d	.beg %s\n", ftnno, nm);
+    	printf("X.%d equ $\n", ftnno);
+#endif
+
+    off = ARGINIT;
+    i = 0;
+
+    if (proflg) {		/* profile code */
+	temp = getlab();
+
+	basemask = 0; /* Initially clear the "basemask" value */
+
+	printf("\
+	la	r1,L%d\n\
+	call	mcount,x'%x',0\n\
+L%d	farlcommon	L%d(1)\n",
+		temp,
+		basemask,
+		temp, temp);
+	psline();
+
+    }
+    else {
+	if (n >0) {
+	    p = &stab[a[0]];
+
+	    if (p->stype == STRTY || p->stype == UNIONTY) {
+		if (SAflag)
+		    werror ("First arg of funct is struct");
+	    }
+	}
+    }
+
+#ifndef ONEPASS
+    p = &stab[curftn];		/* (MEY) NP1 code above clobbers p */
+    printf("%c%s\n",FBEGIN,p->sname);
+    printf("%c%d\t\n", PFHERE, ftnno); /* Optimizer to put param fetches here */
+
+    if (n>0) {
+        p = &stab[a[0]];  	/* (MEY) (22-Jan-87) Fixed for PCO */
+        StabInfoPrint(p);
+    }
+#endif /* ONEPASS */
+
+
+    for (; i < n; ++i) {
+	p = &stab[a[i]];
+#ifndef ONEPASS
+	StabInfoPrint(p);
+#endif
+	if (p->sclass == REGISTER) {
+	    temp = p->offset;		/* save register number */
+	    p->sclass = PARAM;	/* forget that it is a register */
+	    p->offset = NOOFFSET;
+	    oalloc(p, &off);
+#ifdef ONEPASS
+   	    ParamFetch(temp, p->offset/SZCHAR, p->stype, ftnno);
+#else
+	    printf("%c%d\t%d\t%d\t\n", PFETCH, temp,
+		p->offset/SZCHAR, p->stype);
+#endif
+	    p->offset = temp;		/* remember register number */
+	    p->sclass = REGISTER;	/* remember that it is a register */
+	}
+	else {
+	    if (p->stype == STRTY || p->stype == UNIONTY) {
+		p->offset = NOOFFSET;
+		if (oalloc(p, &off))
+		    uerror("bad argument");
+		SETOFF(off, ALSTACK);
+	    }
+	    else {
+		if (oalloc(p, &off))
+		    uerror("bad argument");
+	    }
+	}
+
+    }
+
+/*
+ *	Add farscan hook here when "func:variable" implemented.
+ *	If p->sflags & SGERRYREF then rescan farlist file,
+ *	and make SGERRYMANDER entries for all variables that
+ *	are qualified with this function's name.
+ *	Make the entries at blevel 2 so they will be ripped
+ *	out automatically at the end of the function.
+ *	Modify farscan1() to create the SGERRYREF entries.
+ */
+
+#ifndef ONEPASS
+    printf("%c%d\t\n", PSAVE, 42/*filler*/);
+#endif
+    fdefflag = 1;
+}
+
+void bccode()
+{	/* called just before the first executable statment */
+ /* by now, the automatics and register variables are allocated */
+#ifdef MPXTEMP
+    SETOFF(autooff, SZDOUBLE);
+#else
+    SETOFF(autooff, SZINT);
+#endif
+ /* set aside store area offset */
+
+    locctr(PROG);
+
+#ifndef ONEPASS
+    printf("%c%d\t%d\t%d\t\n",BBEG,ftnno,autooff,regvar);
+#else
+    p2bbeg(autooff, regvar);
+#endif
+
+    reg_use = (reg_use >regvar ? regvar : reg_use);
+}
+
+int extflg;
+char *extfun[EXTFUNS] = {
+    "_cvtld",		/* C_LD */
+    "_cvtdl",		/* C_FL */
+    "_cvtuld",		/* C_ULD */
+    "_cvtdul",		/* C_DUL */
+    "_cvtif",		/* C_IF */
+    "_cvtfi",		/* C_FI */
+    "_cvtuif",		/* C_UIF */
+    "_cvtfui",		/* C_FUI */
+    "_f.call",		/* C_FC */
+    "_f.calld",		/* C_FCD */
+};
+
+void ejobcode(flag) int flag;
+{
+    /* called just before final exit */
+    /* flag is 1 if errors, 0 if none */
+    int i;
+    register int isfunct;
+    register char *name;
+    register struct symtab *p;
+
+    dumpstr();
+
+#ifdef TWOPASS
+    printf("%c\n",EOJFLG);
+#endif
+
+    /* print 'EXT' declarations for undefined external functions */
+
+    for (i = 0; i < SYMTSZ; i++){
+    	if( stab[i].stype == TNULL) continue;
+    	p = &stab[i];
+    	name = exname (p->sname, p);
+    	isfunct = ISFTN( stab[i].stype );
+    	switch( stab[i].sclass ){
+    	    case EXTERN:
+    	    case FORTRAN:
+    	    case UFORTRAN:
+    		if ( isfunct ) {
+    		    if( stab[i].suse >0 )
+    			break;  /* declared but not used */
+    		    printf("	ext	%s\n", name);
+    		} else {
+    		    if( stab[i].suse >0 )
+    			break;  /* declared but not used */
+    		    printf("	ext	%s\n", name);
+    		/*  commdec( i ); */
+    		}
+    		break;
+    	    case EXTDEF:	/* external definition */
+    		/* output all def's, referenced or not */
+    		printf("	def	%s\n", name);
+    		break;
+    	}
+    }
+    /* now print out external functions called */
+    if (extflg) {
+    	for( i = 0; i < EXTFUNS; i++)
+    	    if (extflg & (1 << i))
+		if (_flag)
+		    printf("	ext	%s\n", &extfun[i][1]);
+		else
+		    printf("	ext	%s\n", extfun[i]);
+    }
+
+  if(handopt) {
+    locctr (DATA);
+/*     printf ("	dsect\n	end\n"); */
+    printf ("	end\n");
+  } else {
+    locctr (PROG);
+/*     printf ("	csect\n	end\n"); */
+    printf ("	end\n");
+  }
+}
+
+void aobeg()
+{
+ /* called before removing automatics from stab */
+}
+
+void aocode(p) struct symtab    *p;
+{
+ /* called when automatic p removed from stab */
+}
+
+void aoend()
+{
+ /* called after removing all automatics from stab */
+}
+
+void defnam(p) register struct symtab   *p;
+{
+ /* define the current location as the name p->sname */
+    register char *nm;
+
+    if (p->sclass == STATIC && p->slevel >1)
+	deflab(p->offset);
+    else {
+	nm = exname(p->sname, p);
+    if( lastloc == PROG )
+	printf("%s cequ  $\n", nm);
+    else
+/*	printf("%s equ  $\n", nm); */
+	printf("%s dequ  $\n", nm);
+    }
+}
+
+struct	tstrngs *begstrng = NULL; 	/* beginning list of init strings */
+struct	tstrngs *currstng = NULL; 	/* current entry of init string */
+
+static int putting = 0;
+
+void putstring(s,i,ct)
+char *s;
+int  i, ct;
+{
+	char    *ss = s+ct;
+	int	ii;
+
+	i--;		/* so we dont put out the terminating null byte */
+	if(ct == 0)
+	{			/* unbounded -- normal -- string */
+		putting = 0;
+		printf("\tdatab\tc'");
+		for(ii = 0; ii < i; ii++)
+			putabyte( *s++);
+		printf("\"@@'\n");
+		inoff += SZCHAR;	/* MON */
+	}
+	else
+	{       		/* a constrained string */
+		if(i >0)	/* not a null string	*/
+		{
+			int lim = i < ct ? i : ct;
+			putting = 0;
+			printf("\tdatab\tc'");
+			for(ii = 0; ii < lim; ii++)
+				putabyte( *s++);
+			printf("'\n");
+		}
+	}
+}
+
+void putabyte(v)
+char    v;
+{
+	inoff += SZCHAR;
+	if(++putting >= 32)
+	{       /* break string onto several lines */
+		putting = 1;
+		printf("'\n\tdatab\tc'");
+	}
+
+	if (v < ' ') {
+		putchar('"');
+		putchar(v+64);
+		putting++;	/* for extra char */
+		return;
+	}
+
+	if (v > '~') {
+		printf("',x'%x',c'",v);
+		putting += 12;	/* for extra chars */
+		return;
+	}
+
+	/* undo funny characters */
+	switch(v)
+	{
+	case '%':
+	case '"':
+	case '\'':
+	case ';':
+		putchar('"');
+		putting++;	/* for extra char */
+	default:
+		putchar(v);
+	}
+}
+
+void dumpstr()
+{
+	char *strptr;
+    	int xz = 0;
+
+    	if (begstrng) {
+	    locctr(DATA);
+    	    xz = 1;
+    	}
+	while (begstrng)
+	{
+		char *p;
+		int  lim, i;
+
+	    if (begstrng->slabel >= 0) {
+		deflab(begstrng->slabel);
+		putting = 0;
+		printf("\tdatab\tc'");
+		p = begstrng->strng;
+		lim = begstrng->length - 1;
+		/* -1 so we dont put out the null byte */
+		for(i = 0; i < lim; i++,p++)
+			putabyte( *p);
+		printf("\"@@'\n");
+	    } else {
+		printf("L%d\tdata%s\n",-begstrng->slabel, begstrng->strng);
+	    }
+		free(begstrng->strng);  /* string area is removed */
+		currstng = begstrng;    /* so free will work      */
+		begstrng = begstrng->next;
+		free(currstng);         /* string struct is gone  */
+	}
+    	if(xz)
+	    SETOFF(inoff,SZINT);	/* MON */
+	currstng = NULL;
+	begstrng = NULL;
+    	if(xz)
+	    locctr(PROG);
+}
+
+void zecode(n) int n;
+{
+    /* n integer words of zeros */
+    OFFSZ       temp;
+    if (n <= 0)
+	return;
+    printf("\trez\t%d\n", (SZINT / SZCHAR) *n);
+    temp = n;
+    inoff += temp * SZINT;
+}
+
+int fldal(t) unsigned int  t;
+{		/* return the alignment of field of type t */
+    uerror("illegal field type");
+    return(ALINT);
+}
+
+void fldty(p) struct symtab *p;
+{		/* fix up type of field p */
+    ;
+}
+
+void where(c) int c;
+{		/* print location of error  */
+ /* c is either 'u', 'c', or 'w' */
+    fprintf(stderr, "%s, line %d: ", ftitle, lineno);
+}
+
+void swepilog( p, n )
+	register struct sw *p;
+	register int n;
+{
+	/* p points to an array of structures, each consisting
+	 * of a constant value and a label.
+	 * The first is >=0 if there is a default label;
+	 * its value is the label number
+	 * The entries p[1] to p[n] are the nontrivial cases
+	 */
+
+#ifdef ONEPASS
+	genswitch( p, n, 0 );	/* someday this 0 will be a register number */
+
+#else /* TWOPASS */
+
+	register int i;
+
+#ifdef OPTIMIZER
+	/* front end opt cannot have switch fall through */
+	if(p[0].slab < 0 )
+		p[0].slab = brklab;
+#endif
+
+	printf("%c%d\t%d\t%d\t\n", ESWITCH, n, 0, p[0].slab); /* this 0 too */
+	for( i = 1; i <= n; i++ )
+	{
+		printf(CONFMT, p[i].sval );
+		printf("\t%d\t\n", p[i].slab );
+	}
+#endif
+}
+
+int main(argc, argv) int argc; char  *argv[];
+{
+#ifdef BUFSTDERR
+    char        errbuf[BUFSIZ];
+    setbuf(stderr, errbuf);
+#endif
+#ifdef TESTING
+    setbuf(stdout, NULL);
+#endif
+    return(mainp1(argc, argv));
+}
+
+void p1init()
+{
+    char *cp1, *cp2;
+    int pcnt = 0;
+
+    strcpy(currprog, ftitle);
+    for(cp1=cp2=ftitle; *cp2; cp2++)
+    	if(*cp2 == '/' || *cp2 == ')') cp1 = cp2+1;
+    printf("	program	");
+    for (cp2 = cp1; *cp2; cp2++) {
+    	if (*cp2 == '\"') continue;
+    	if (*cp2 == '.') break;
+    	printf("%c", *cp2 < 'a' ? *cp2 : *cp2 - ('a' - 'A'));
+    	progname[pcnt++] = *cp2;
+    }
+    progname[pcnt] = '\0';
+    printf("\n");
+#ifdef MYATOF
+    printf("	list	mac,nong\n");
+#else
+    printf("	list	mac,nong,nodata\n");
+#endif
+    printf("*\n");
+#ifdef NASA
+    printf("r0	equ	0\n");
+    printf("r1	equ	1\n");
+    printf("r2	equ	2\n");
+    printf("r3	equ	3\n");
+    printf("r4	equ	4\n");
+    printf("r5	equ	5\n");
+    printf("r6	equ	6\n");
+    printf("r7	equ	7\n");
+/*    printf("*\n"); */
+    printf("sp	equ	3\n");
+#else
+    printf("r0	dequ	0\n");
+    printf("r1	dequ	1\n");
+    printf("r2	dequ	2\n");
+    printf("r3	dequ	3\n");
+    printf("r4	dequ	4\n");
+    printf("r5	dequ	5\n");
+    printf("r6	dequ	6\n");
+    printf("r7	dequ	7\n");
+/*    printf("*\n"); */
+    printf("sp	dequ	3\n");
+#endif
+    printf("*\n");
+#ifdef SECTION_FIX
+    if (handopt)
+    	locctr(DATA);
+/*  printf("\tdsect\n"); */
+    else
+    	locctr(PROG);
+/*  printf("\tcsect\n"); */
+/* locctr(PROG); */
+    if (!handopt)
+    	printf("	dataw	x'2243223a'\n");  /* magic number */
+/*    	printf("	slad	r4,3\n	srld	r4,26\n");  /* magic number */
+#endif /* SECTION_FIX */
+}
+@
+
+
+1.13
+log
+@Update for Linux
+@
+text
+@d11 1
+a11 1
+ "$Id: code.c,v 1.12 1996/10/26 22:20:38 jbev Exp $";
+d16 3
+d41 1
+d43 1
+@
+
+
+1.12
+log
+@Fix for alpha port
+@
+text
+@d11 1
+a11 1
+ "$Id: code.c,v 1.11 1996/03/22 16:41:23 jbev Exp jbev $";
+d16 3
+d37 2
+d56 1
+a56 1
+branch(n)
+d95 1
+a95 1
+defalign(n)
+d103 1
+a103 1
+locctr(l)
+d105 1
+a105 1
+    register    temp;
+d218 1
+a218 3
+int
+getloi ( s, lim )                    /*  right from the book.  */
+
+a220 1
+
+d233 1
+a233 1
+deflab(n)
+d254 1
+a254 1
+getlab()
+d263 1
+a263 1
+get2lab()
+d271 1
+a271 1
+extern      calloff, autooff;
+d273 1
+a273 1
+efcode()
+d418 1
+a418 1
+bfcode(a, n) int    a[];
+d425 2
+a426 2
+    register    i;
+    register    temp;
+d596 1
+a596 1
+bccode()
+d631 1
+a631 1
+ejobcode(flag)
+d636 1
+a636 1
+    register isfunct;
+d695 1
+a695 1
+aobeg()
+d700 1
+a700 1
+aocode(p) struct symtab    *p;
+d705 1
+a705 1
+aoend()
+d710 1
+a710 1
+defnam(p) register struct symtab   *p;
+d732 1
+a732 2
+void
+putstring(s,i,ct)
+d763 1
+a763 1
+putabyte(v)
+d800 1
+a800 1
+dumpstr()
+d840 1
+a840 1
+zecode(n)
+d851 1
+a851 1
+fldal(t) unsigned   t;
+d857 1
+a857 1
+fldty(p) struct symtab *p;
+d862 1
+a862 1
+where(c)
+d868 1
+a868 1
+swepilog( p, n )
+d901 1
+a901 1
+main(argc, argv) char  *argv[];
+d913 1
+a913 1
+p1init()
+@
+
+
+1.11
+log
+@Fix during Alpha port.
+@
+text
+@d11 1
+a11 1
+ "$Id: code.c,v 1.10 1996/03/20 21:36:39 jbev Exp jbev $";
+d16 3
+d309 2
+a310 2
+	if (sz % SZINT)
+	    sz += SZINT - (sz % SZINT);
+d906 1
+d908 1
+@
+
+
+1.10
+log
+@Mods for alpha port.
+@
+text
+@d11 1
+a11 1
+ "$Id: code.c,v 1.9 1995/04/28 20:47:45 jbev Exp jbev $";
+d16 3
+d302 1
+d305 4
+@
+
+
+1.9
+log
+@Modifictions for sectioned code.
+@
+text
+@d11 1
+a11 1
+ "$Id: /src/u/nbc/nbccom/RCS/code.c,v 1.8 1995/03/06 19:18:32 jbev Exp jbev $";
+d14 5
+a18 1
+/* $Log: $
+d25 1
+a26 3
+#if !defined(unix) && !defined(i386)
+#include <types.h>
+#else
+a27 8
+#endif
+
+#ifdef i386
+#define u370 1
+#undef i386
+#include <a.out.h>
+#define i386
+#else /* i386 */
+a28 2
+#include "stab.h"
+#endif /* i386 */
+@
+
+
+1.8
+log
+@Malloc tree node table instead of hard coding size.
+Allow XTTval  and X2TTval to set node tree table size.
+Add new option XJ and X2J to inhibit _ being prepended to names.
+Correct XT[DS]val options for setting table sizes.
+@
+text
+@d11 1
+a11 1
+ "@@(#) $Header: /u/nbc/nbccom/RCS/code.c,v 1.7 1995/02/09 01:05:31 jbev Exp jbev $";
+d14 3
+d488 1
+d490 3
+a860 1
+ /* GCOS version */
+d954 1
+d964 2
+@
+
+
+1.7
+log
+@Delete extra space in bu code.
+@
+text
+@d11 1
+a11 1
+ "@@(#) $Header: /u/nbc/nbccom/RCS/code.c,v 1.6 1995/02/07 22:48:30 jbev Exp jbev $";
+d38 1
+d666 4
+a669 1
+    		printf("	ext	%s\n", extfun[i]);
+d919 1
+a919 1
+    printf("	list	mac,nong,nodata\n");
+@
+
+
+1.6
+log
+@Fix ploating point code again.  Correct csect/dsect and label code.
+@
+text
+@d11 1
+a11 1
+ "@@(#) $Header: /u/nbc/nbccom/RCS/code.c,v 1.5 1995/02/05 04:51:29 jbev Exp jbev $";
+d72 1
+a72 1
+     	    printf("	bu 	L%d\n", n);
+@
+
+
+1.5
+log
+@fix csect/dsect cequ/dequ code
+@
+text
+@d11 1
+a11 1
+ "@@(#) $Header: /u/nbc/nbccom/RCS/code.c,v 1.4 1995/02/04 03:55:16 jbev Exp jbev $";
+d92 1
+a92 1
+    if (lastloc != PROG && n > 1)
+d220 3
+a222 3
+ for(i = 0; --lim > 0 && (c =getchar()) != EOF && (s[i++] = c) != '\n';);
+ if ((s[i-1] == '\n') && (i > 1)) {
+  while ((s[i-2] == ' ') && (i > 1)) --i;
+d236 1
+a236 1
+    	printf("L%d 	cequ 	$\n", n);
+d238 1
+a238 1
+    	printf("L%d 	dequ 	$\n", n);
+d276 1
+a276 1
+    int	tsz=0;	/* Used to detect func(s) that return > 2 words */
+d292 1
+a292 1
+	t = p -> stype;
+d302 1
+a302 1
+	sz = tsize(t, p -> dimoff, p -> sizoff) / SZCHAR;
+d317 3
+a319 3
+	l = block(REG, NIL, NIL, PTR | t, p -> dimoff, p -> sizoff);
+	l -> tn.rval = 1;	/* R1 */
+	l -> tn.lval = 0;	/* id cookie */
+d323 3
+a325 3
+	r = block(REG, NIL, NIL, PTR | t, p -> dimoff, p -> sizoff);
+	r -> tn.rval = 0;	/* R0 */
+	r -> tn.lval = 0;
+d329 1
+a329 1
+	l -> in.op = FREE;
+d338 1
+a338 1
+	ecomp(l -> in.left);
+d355 1
+a355 1
+    t = p -> stype;
+d464 1
+a464 1
+    temp = p -> stype;
+d511 1
+a511 1
+	if (n > 0) {
+d538 4
+a541 4
+	if (p -> sclass == REGISTER) {
+	    temp = p -> offset;		/* save register number */
+	    p -> sclass = PARAM;	/* forget that it is a register */
+	    p -> offset = NOOFFSET;
+d549 2
+a550 2
+	    p -> offset = temp;		/* remember register number */
+	    p -> sclass = REGISTER;	/* remember that it is a register */
+d553 2
+a554 2
+	    if (p -> stype == STRTY || p -> stype == UNIONTY) {
+		p -> offset = NOOFFSET;
+d601 1
+a601 1
+    reg_use = (reg_use > regvar ? regvar : reg_use);
+d645 1
+a645 1
+    		    if( stab[i].suse > 0 )
+d649 1
+a649 1
+    		    if( stab[i].suse > 0 )
+d699 1
+a699 1
+    if (p->sclass == STATIC && p->slevel > 1)
+d736 1
+a736 1
+		if(i > 0)	/* not a null string	*/
+@
+
+
+1.4
+log
+@Correct double constant code generation.
+@
+text
+@d10 2
+a11 1
+static char *rcsid = "@@(#) $Header: /u/nbc/nbccom/RCS/code.c,v 1.3 1995/02/02 05:08:30 jbev Exp jbev $";
+d80 1
+a80 1
+int         lastloc = PROG;
+d234 1
+d236 3
+a238 1
+    printf("L%d 	cequ 	$\n", n);
+d668 9
+a676 4
+  if(handopt)
+    printf ("	dsect\n	end\n");
+  else
+    printf ("	csect\n	end\n");
+d701 4
+a705 8
+    {
+	nm = exname(p->sname, p);
+#ifdef NEW_DEF
+/* look at endojob for defs */
+	if (p->sclass == EXTDEF) {
+	    printf("	def	%s\n", nm);
+	}
+#endif /* NEW_DEF */
+d707 1
+a707 1
+	printf("%s cequ  $\n", nm);
+a710 1
+
+d915 1
+a915 1
+    printf("	list	mac,nong\n");
+@
+
+
+1.3
+log
+@Add internal format for floating point values.
+@
+text
+@d10 1
+a10 1
+static char *rcsid = "@@(#) (Gould) $Header: /u/nbc/nbccom/RCS/code.c,v 1.2 1995/01/27 23:11:22 jbev Exp $";
+a62 1
+
+d79 1
+a79 1
+int         lastloc = STAB;
+d98 1
+a98 1
+ /* l is PROG, ADATA, DATA, STRNG, ISTRNG, or STAB */
+a166 1
+#ifdef MPX
+a173 1
+#ifdef MPX
+a205 1
+#endif
+a226 1
+#endif /* MPX */
+a384 1
+#ifdef MPX
+a385 1
+#endif
+a393 1
+#ifdef MPX
+a394 3
+#else
+    printf ("*	.ef	%d\n", i);
+#endif /* MPX */
+a443 3
+#ifdef MAY2792
+    nm = exname (p->sname, p->sflags);
+#else
+a444 1
+#endif
+a457 1
+#ifdef MPX
+a458 1
+#endif
+a617 1
+#ifdef MPX
+a622 1
+#ifdef MPX
+a623 1
+#endif
+a625 1
+#ifdef MPX
+a627 1
+#endif
+a633 3
+#ifdef MAY2792
+    	name = exname (p->sname, p->sflags);
+#else
+a634 1
+#endif
+a640 1
+#ifndef TEST_SEP6
+a642 1
+#endif
+a650 1
+#ifndef NEW_DEF
+a654 1
+#endif
+a662 1
+#endif /* MPX */
+a663 1
+#ifdef MPX
+a667 3
+#else
+    printf ("	csect\n	end\n");
+#endif
+a693 3
+#ifdef MAY2792
+	nm = exname(p->sname, p->sflags);
+#else
+a694 1
+#endif
+a697 1
+#ifdef MPX
+a698 1
+#endif
+a705 1
+#ifdef MPX
+a820 52
+#else /* MPX */
+bycode(t, i)
+{
+#ifdef ASSTRINGS
+    static int  lastoctal = 0;
+#endif
+
+ /* put byte i+1 in a string */
+
+#ifdef ASSTRINGS
+
+    if(sizeofflag) return;
+    i &= 0x3f;
+    if (t < 0) {
+	if (i != 0)
+	    printf("'\n");
+    }
+    else {
+	if (i == 0)
+	    printf("\tdatab\tc'");
+	if (t == '\'')
+	    printf ("''");
+	else
+	    if (t <= 31)
+		printf ("\"%c", t+'@@');
+	    else
+		printf ("%c", t);
+	if (i == 0x3f)
+	    printf("'\n");
+    }
+#else
+
+    i &= 7;
+    if (t < 0) {		/* end of the string */
+	if (i != 0)
+	    printf("\n");
+    }
+
+    else {			/* stash byte t into string */
+	if (i == 0)
+	    printf("	datab	");
+	else
+	    printf(",");
+	printf("x'%x'", t);
+
+	if (i == 7)
+	    printf("\n");
+    }
+#endif
+}
+#endif /* MPX */
+
+d823 1
+a823 1
+ /* n integer words of zeros */
+a892 1
+#ifdef MPX
+a949 6
+#endif /* MPX */
+
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+@
+
+
+1.2
+log
+@Delete -DUAS flag
+@
+text
+@a2 5
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+
+/*
+d10 1
+a10 1
+static char *rcsid = "@@(#) (Gould) $Header: code.c,v 5.5 89/05/12 12:43:16 pcc Rel-3_0 $";
+a13 2
+    C compiler for Gould processors, base register instruction set.
+
+a35 1
+#ifdef MPX
+a36 1
+#endif /* MPX */
+a79 1
+#ifndef TESTING
+a80 3
+#else
+int         lastloc = PROG;
+#endif
+a107 1
+#ifdef MPX
+a119 3
+#else
+		printf("%ccsect\n",ITEXT);
+#endif
+a123 1
+#ifdef MPX
+a128 3
+#else
+	    printf ("%cfardsect\n",IDATA);
+#endif
+a133 1
+#ifdef MPX
+a138 3
+#else
+	    printf("%cdsect\n",IDATA);
+#endif
+a141 1
+#ifdef MPX
+a146 3
+#else
+	    printf("%cfardsect	STRING\n",IDATA);
+#endif
+a149 1
+#ifdef MPX
+a154 3
+#else
+	    printf("%cfardsect	ISTRING\n",IDATA);
+#endif
+a289 1
+#ifdef MPX
+a290 1
+#endif
+a302 1
+#ifdef MPX
+a310 18
+#else
+#ifndef LCOMM
+	printf("	.data\n");
+	printf("	.align	2\n");
+	printf("L%d:	.space	%d\n", i,
+		tsize(t, p -> dimoff, p -> sizoff) / SZCHAR);
+	printf(".text\n");
+
+#else	/* not LCOMM */
+
+	{
+	    int         sz = tsize(t, p -> dimoff, p -> sizoff) / SZCHAR;
+	    if (sz % sizeof(int))
+		sz += sizeof(int) - (sz % sizeof(int));
+	    printf("	.farlcomm	L%d,%d\n", i, sz);
+	}
+#endif	/* LCOMM */
+#endif  /* MPX */
+a314 1
+#ifdef MPX
+a315 3
+#else
+	printf("	movw	#L%d,r1\n", i);
+#endif
+a339 1
+#ifdef MPX
+a340 3
+#else
+	printf("	movw	#L%d,r0\n", i);
+#endif
+a378 4
+#ifdef XXXX
+    printf("*Y.%d	.end %s\n", ftnno, nm);
+    printf("Y.%d equ $\n", ftnno);
+#endif
+d1005 3
+d1009 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a105 1
+#ifdef UAS
+a106 3
+#else
+	printf("	.align	%d\n", n >= 0 && n < LOG2SZ ? log2tab[n] : 0);
+#endif
+a120 1
+#ifdef UAS
+a136 3
+#else
+		printf("%c.text\n",ITEXT);
+#endif
+a140 1
+#ifdef UAS
+a149 3
+#else
+	    printf ("%c.fardata\n",IDATA);
+#endif
+a154 1
+#ifdef UAS
+a163 3
+#else
+	    printf("%c.data\n",IDATA);
+#endif
+a166 1
+#ifdef UAS
+a175 3
+#else
+	    printf("%c.fardata	2\n",IDATA);
+#endif
+a178 1
+#ifdef UAS
+a187 3
+#else
+	    printf("%c.fardata	2\n",IDATA);
+#endif
+a270 1
+#ifdef UAS
+a273 3
+    printf("L%d:\n", n);
+#endif
+#else
+a276 1
+#ifdef UAS
+a278 3
+#else
+    	printf("L%d:\n", n);
+#endif
+a438 1
+#ifdef UAS
+a449 3
+#else
+    printf("	retn\n");
+#endif
+a466 1
+#ifdef UAS
+a471 3
+#else
+    printf ("	.ef	%d\n", i);
+#endif
+a526 1
+#ifdef UAS
+a541 5
+#else
+    locctr(PROG);
+    printf("	.bf\n	.align	2\n");
+    defnam(p);
+#endif
+a542 4
+#ifdef UAS
+#else
+    printf("	.using	b1,%s\n", exname(p -> sname, p -> sflags));
+#endif
+a561 1
+#ifdef UAS
+a569 3
+#else
+   	printf("\tenter LA%d, LRM%d\n", ftnno, ftnno);   /* v2cc change */
+#endif
+a578 1
+#ifdef UAS
+a585 6
+#else
+	printf("\
+	movw	#L%d,r1\n\
+	func 	#0x0,mcount\n\
+	.farlcomm	L%d,4\n", temp, temp);
+#endif
+a760 1
+#ifdef UAS
+a768 1
+#endif
+a802 1
+#ifdef UAS
+a805 3
+#else
+	    printf("	.globl	%s\n", nm);
+#endif
+a807 1
+#ifdef UAS
+a809 3
+#else
+	printf("%s:\n", nm);
+#endif
+a941 1
+#ifdef UAS
+a959 40
+    if (t < 0) {
+	if (i != 0)
+	    printf("\"\n");
+    }
+    else {
+	if (i == 0)
+	    printf("\t.ascii\t\"");
+	if (t == '\\' || t == '"') {
+	    lastoctal = 0;
+	    printf("\\%c", t);
+	}
+ /*
+  *	We escape the colon in strings so that
+  *	c2 will, in its infinite wisdom, interpret
+  *	the characters preceding the colon as a label.
+  *	If we didn't escape the colon, c2 would
+  *	throw away any trailing blanks or tabs after
+  *	the colon, but reconstruct a assembly
+  *	language semantically correct program.
+  *	C2 hasn't been taught about strings.
+  */
+	else
+	    if (t == ':' || t < 0x20 || t >= 0x7f) {
+		lastoctal++;
+		printf("\\%o", t);
+	    }
+	    else
+		if (lastoctal && '0' <= t && t <= '9') {
+		    lastoctal = 0;
+		    printf("\"\n\t.ascii\t\"%c", t);
+		}
+		else {
+		    lastoctal = 0;
+		    putchar(t);
+		}
+	if (i == 0x3f)
+	    printf("\"\n");
+    }
+#endif
+#else
+a968 1
+#ifdef UAS
+a969 3
+#else
+	    printf("	.byte	");
+#endif
+a971 1
+#ifdef UAS
+a972 3
+#else
+	printf("0x%x", t);
+#endif
+a986 1
+#ifdef UAS
+a987 3
+#else
+    printf("	.space	%d\n", (SZINT / SZCHAR) *n);
+#endif
+@

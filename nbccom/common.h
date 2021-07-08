@@ -10,7 +10,7 @@
 #define COMMON_H
 #endif
 
-/* $Header: /bulk2/simhv/nbc-master/nbccom/RCS/common.h,v 1.6 2019/03/13 21:28:19 jbev Exp $  */
+/* $Header: /bulk2/simhv/nbc-master/nbccom/RCS/common.h,v 1.7 2021/06/23 03:20:15 jbev Exp $  */
 
 /* 
     Ported from the 4.1c Berkeley Standard
@@ -69,7 +69,7 @@ extern char *mymalloc();
 	char *rv;
 	char *sp;
 	register int	i;
-	rv = (char *)malloc(amt);
+	rv = (char *)malloc((unsigned int)amt);
     if (rv == NULL)
         return(NULL);
 	for (sp = rv, i=0; i < amt; i++)*sp++ = 0;

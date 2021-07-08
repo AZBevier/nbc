@@ -8,11 +8,14 @@
  */
 
 #ifndef lint
-static char *rcsid = "$Header: /bulk2/simhv/nbc-master/nbccom/RCS/match.c,v 1.7 2019/03/13 21:00:19 jbev Exp jbev $";
+static char *rcsid = "$Header: /bulk2/simhv/nbc-master/nbccom/RCS/match.c,v 1.8 2021/07/01 03:08:31 jbev Exp $";
 #endif
 
 /*
  * $Log: match.c,v $
+ * Revision 1.8  2021/07/01 03:08:31  jbev
+ * Define two pass variable.
+ *
  * Revision 1.7  2019/03/13 21:00:19  jbev
  * Make tdebug external to stop error.
  *

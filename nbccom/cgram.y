@@ -10,12 +10,15 @@
 
 #ifndef lint
 static char *rcsid =
-"$Header: /bulk2/simhv/nbc-master/nbccom/RCS/cgram.y,v 1.8 2019/01/31 21:43:05 jbev Exp jbev $";
+"$Header: /bulk2/simhv/nbc-master/nbccom/RCS/cgram.y,v 1.9 2021/07/01 02:40:38 jbev Exp $";
 #endif
 %}
 
 /*
  * $Log: cgram.y,v $
+ * Revision 1.9  2021/07/01 02:40:38  jbev
+ * Fix lookaround call parameter.
+ *
  * Revision 1.8  2019/01/31 21:43:05  jbev
  * Update for Linux
  *
@@ -448,11 +451,12 @@ init_declarator:   nfdeclarator
 #ifndef mpx
 #ifndef BUG1
 			    if(idebug)
-				lookaround(yystack);
+/*		    lookaround(yystack); */
+				    lookaround(yypvt);
 #endif
 #endif
 			    if( ISARY(p->in.type) )
-				outstab(&stab[p->tn.rval]);
+				    outstab(&stab[p->tn.rval]);
 			}
 		|  fdeclarator
 			={  defid( tymerge($<nodep>0,$1), uclass(curclass) );
@@ -470,7 +474,8 @@ init_declarator:   nfdeclarator
 #ifndef mpx
 #ifndef BUG1
 			    if(idebug)
-				lookaround(yystack);
+/*		    lookaround(yystack); */
+				    lookaround(yypvt);
 #endif
 #endif
 			    if( ISARY(p->in.type) )
@@ -483,7 +488,8 @@ init_declarator:   nfdeclarator
 #ifndef mpx
 #ifndef BUG1
 			    if(idebug)
-				lookaround(yystack);
+/*		    lookaround(yystack); */
+				    lookaround(yypvt);
 #endif
 #endif
 			    if( ISARY(p->in.type) )

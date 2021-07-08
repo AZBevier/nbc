@@ -1,0 +1,726 @@
+head	1.12;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.12
+date	96.03.20.21.48.25;	author jbev;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	95.03.03.16.25.00;	author jbev;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	95.03.02.21.58.38;	author jbev;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	95.02.27.17.39.07;	author jbev;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	95.02.27.17.35.45;	author jbev;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	95.02.27.17.17.50;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	95.02.27.16.55.42;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.02.23.16.20.55;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.02.07.23.01.45;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.02.04.03.56.08;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.01.27.22.50.35;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.20.53.57;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial RCS FIle
+@
+
+
+1.12
+log
+@Mods for alpha port.
+@
+text
+@#
+# Makefile for nbcp1/nbcp2 (2 pass version)
+#
+#ident "$Id: Makefile.2pass,v 1.11 1995/03/03 16:25:00 jbev Exp jbev $"
+#
+
+CC = cc 
+#CFLAGS = -g -O -Di386 -Umpx -Dunix -DNODEBUG -DMPX
+#CFLAGS = -O -Di386 -Umpx -Dunix -DNODEBUG -DMPX -DTWOPASS
+#CFLAGS = -g -O -Di386 -Umpx -Dunix -DMPX -DYYDEBUG=1
+#CFLAGS = -g -O -Di386 -Umpx -Dunix -DMPX
+#DFLAGS = -Di386 -Umpx -Dunix -DMPX #-DIEEE
+#DFLAGS = -Di386 -Umpx -Dunix -DMPX -DMYATOF -DTWOPASS
+#DFLAGS = -Di386 -Umpx -Dunix -DMPX -DTWOPASS
+#DFLAGS = -Di386 -Umpx -Dunix -DMPX -DTWOPASS -DNEWATOF
+DFLAGS = -DMPX -DTWOPASS -DMYATOF
+CFLAGS = -O $(DFLAGS)
+INSTALL = cp
+YACC = yacc
+MAKEFILE = Makefile.2pass
+
+BINDIR = /system/bin
+BIN = /bin
+
+P1OBJ = code.o comm1.o cgram.o fixcall.o local.o optim.o pftn.o \
+ scan.o stab.o trees.o version.o xdefs.o
+
+P2OBJ = allo.o comm2.o local2.o match.o order.o reader.o switch.o \
+	table.o
+
+SRCS = version.c switch.c fixcall.c stab.c code.c comm1.c comm2.c cgram.c \
+ local.c optim.c pftn.c scan.c trees.c xdefs.c allo.c local2.c match.c \
+ order.c reader.c table.c
+
+OBJS = version.o switch.o fixcall.o stab.o code.o comm1.o cgram.o \
+ local.o optim.o pftn.o scan.o trees.o xdefs.o allo.o local2.o match.o \
+ order.o reader.o table.o
+
+FPSRC = float.c myatof.c
+
+FPOBJ = float.o myatof.o
+
+HDRS = caloff.h common.h mac2defs.h macdefs.h manifest.h mfile1.h \
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h \
+	error.h a.out.h float.h
+
+ALLSRC = $(SRCS) $(FPSRC)
+
+#all: nbccom
+all: nbcp1 nbcp2
+
+nbccom: $(FPOBJ) $(OBJS)
+	$(CC) $(CFLAGS) -o nbccom $(FPOBJ) $(OBJS)
+	/bin/chmod 755 nbccom
+	-rm -f version.c
+
+nbcp1: $(FPOBJ) $(P1OBJ)
+	$(CC) $(CFLAGS) -o nbcp1 $(FPOBJ) $(P1OBJ)
+	/bin/chmod 755 nbcp1
+	-rm -f version.c
+
+nbcp2: $(P2OBJ) float.o
+	$(CC) $(CFLAGS) -o nbcp2 $(P2OBJ) float.o
+	/bin/chmod 755 nbcp2
+	-rm -f version.c
+
+#depend: $(SRCS) $(FPSRC) $(HDRS) $(MAKEFILE)
+#	$(BINDIR)/dodep $(DFLAGS) $(MAKEFILE) $(SRCS) $(FPSRC) >dep.out
+#	/bin/mv dep.out $(MAKEFILE)
+
+depend: $(SRCS) $(FPSRC) $(HDRS) $(MAKEFILE)
+	$(BINDIR)/mkdep $(MAKEFILE) >dep.out
+	-for i in $(ALLSRC); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CC) -M $(DFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+version.c: mkvers
+	-rm -f version.c
+	sh mkvers "J B Systems Non-Base C Compiler" > version.c
+
+clean:
+	$(BIN)/rm -f $(P1OBJ) $(P2OBJ)
+#	$(BIN)/rm -f $(OBJS) $(FPOBJ)
+
+clobber: clean
+#	$(BIN)/rm -f nbccom
+	$(BIN)/rm -f nbcp1 nbcp2
+	-rm -f cgram.c version.c
+	-rm -f core
+
+realclean:	clobber
+	$(BIN)/rm -f $(ALLSRC) cgram.y
+	$(BIN)/rm -f $(HDRS)
+
+# Copy the files into bindir
+install: all
+#	$(INSTALL) nbccom $(BINDIR)
+	$(INSTALL) nbcp1 $(BINDIR)
+	$(INSTALL) nbcp2 $(BINDIR)
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.11
+log
+@Update to use MYATOF.
+@
+text
+@d4 1
+a4 1
+#ident "$Id$"
+d16 2
+a17 2
+DFLAGS = -Di386 -Umpx -Dunix -DMPX -DTWOPASS -DMYATOF
+CFLAGS = -g -O $(DFLAGS)
+d26 1
+a26 1
+ scan.o stab.o trees.o version.o xdefs.o #fparith.o
+d33 1
+a33 1
+ order.c reader.c table.c #fparith.c
+d37 1
+a37 1
+ order.o reader.o table.o #fparith.o
+d39 1
+a39 1
+FPSRC = float.c myatof.c #atofn.c
+d41 1
+a41 1
+FPOBJ = float.o myatof.o #atofn.o
+a104 80
+# Source file 'version.c'
+version.o : version.c 
+# Source file 'switch.c'
+switch.o : switch.c /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/libio.h /usr/include/_G_config.h mfile2.h macdefs.h mac2defs.h \
+  manifest.h float.h 
+# Source file 'fixcall.c'
+fixcall.o : fixcall.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+# Source file 'stab.c'
+stab.o : stab.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  /usr/include/sys/types.h /usr/include/linux/types.h /usr/include/asm/types.h \
+  a.out.h 
+# Source file 'code.c'
+code.o : code.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  /usr/include/sys/types.h /usr/include/linux/types.h /usr/include/asm/types.h \
+  /usr/include/a.out.h /usr/include/linux/a.out.h /usr/include/asm/page.h 
+# Source file 'comm1.c'
+comm1.o : comm1.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  common.h error.h treewalk.h opdesc.h caloff.h treemgr.h 
+# Source file 'comm2.c'
+comm2.o : comm2.c mfile2.h macdefs.h mac2defs.h manifest.h /usr/include/stdio.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h common.h error.h treewalk.h opdesc.h caloff.h treemgr.h 
+# Source file 'cgram.c'
+cgram.o : cgram.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+# Source file 'local.c'
+local.o : local.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+# Source file 'optim.c'
+optim.o : optim.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+# Source file 'pftn.c'
+pftn.o : pftn.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+# Source file 'scan.c'
+scan.o : scan.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  /usr/include/a.out.h /usr/include/linux/a.out.h /usr/include/asm/page.h /usr/include/ctype.h 
+# Source file 'trees.c'
+trees.o : trees.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+# Source file 'xdefs.c'
+xdefs.o : xdefs.c mfile1.h macdefs.h manifest.h /usr/include/stdio.h /usr/include/features.h \
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+# Source file 'allo.c'
+allo.o : allo.c mfile2.h macdefs.h mac2defs.h manifest.h /usr/include/stdio.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+# Source file 'local2.c'
+local2.o : local2.c mfile2.h macdefs.h mac2defs.h manifest.h /usr/include/stdio.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h /usr/include/ctype.h /usr/include/a.out.h /usr/include/linux/a.out.h \
+  /usr/include/asm/page.h 
+# Source file 'match.c'
+match.o : match.c mfile2.h macdefs.h mac2defs.h manifest.h /usr/include/stdio.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+# Source file 'order.c'
+order.o : order.c mfile2.h macdefs.h mac2defs.h manifest.h /usr/include/stdio.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+# Source file 'reader.c'
+reader.o : reader.c mfile2.h macdefs.h mac2defs.h manifest.h /usr/include/stdio.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h print.h 
+# Source file 'table.c'
+table.o : table.c mfile2.h macdefs.h mac2defs.h manifest.h /usr/include/stdio.h \
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+# Source file 'float.c'
+float.o : float.c float.h 
+# Source file 'myatof.c'
+myatof.o : myatof.c /usr/include/ctype.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  float.h 
+# End of dependencies
+@
+
+
+1.10
+log
+@Use NEWATOF for now.
+@
+text
+@d4 2
+d15 2
+a16 1
+DFLAGS = -Di386 -Umpx -Dunix -DMPX -DTWOPASS -DNEWATOF
+d39 1
+a39 1
+FPSRC = atofn.c float.c #myatof.c
+d41 1
+a41 1
+FPOBJ = atofn.o float.o #myatof.o
+d62 2
+a63 2
+nbcp2: $(P2OBJ) #float.o
+	$(CC) $(CFLAGS) -o nbcp2 $(P2OBJ) #float.o
+d110 1
+a110 1
+  manifest.h 
+d113 1
+a113 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d116 3
+a118 2
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h /usr/include/sys/types.h \
+  /usr/include/linux/types.h /usr/include/asm/types.h a.out.h 
+d121 3
+a123 3
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h /usr/include/sys/types.h \
+  /usr/include/linux/types.h /usr/include/asm/types.h /usr/include/a.out.h /usr/include/linux/a.out.h \
+  /usr/include/asm/page.h 
+d126 2
+a127 2
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h common.h \
+  error.h treewalk.h opdesc.h caloff.h treemgr.h 
+d131 1
+a131 1
+  common.h error.h treewalk.h opdesc.h caloff.h treemgr.h 
+d134 1
+a134 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d137 1
+a137 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d140 1
+a140 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d143 1
+a143 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d146 2
+a147 2
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h /usr/include/a.out.h \
+  /usr/include/linux/a.out.h /usr/include/asm/page.h /usr/include/ctype.h 
+d150 1
+a150 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d153 1
+a153 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d156 2
+a157 1
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d161 2
+a162 1
+  /usr/include/ctype.h /usr/include/a.out.h /usr/include/linux/a.out.h /usr/include/asm/page.h 
+d165 2
+a166 1
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d169 2
+a170 1
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+d174 1
+a174 1
+  print.h 
+d177 7
+a183 1
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h 
+@
+
+
+1.9
+log
+@Was deleting nbccom instead of nbcp1/nbcp2 on clean.
+@
+text
+@d12 2
+a13 1
+DFLAGS = -Di386 -Umpx -Dunix -DMPX -DTWOPASS
+d23 1
+a23 1
+ scan.o stab.o trees.o version.o xdefs.o #atofn.o #fparith.o
+d30 1
+a30 1
+ order.c reader.c table.c #atofn.c #fparith.c
+d34 1
+a34 1
+ order.o reader.o table.o #atofn.o #fparith.o
+d36 1
+a36 1
+FPSRC = #float.c #myatof.c
+d38 1
+a38 1
+FPOBJ = #float.o #myatof.o
+d42 1
+a42 1
+	error.h a.out.h #float.h
+@
+
+
+1.8
+log
+@Forgot to remove float.o from build.
+@
+text
+@d2 1
+a2 1
+# Makefile for nbccom (2 pass version)
+d85 2
+a86 1
+	$(BIN)/rm -f nbccom
+@
+
+
+1.7
+log
+@Allow make realclean to also delete source.
+@
+text
+@d58 2
+a59 2
+nbcp2: $(P2OBJ) float.o
+	$(CC) $(CFLAGS) -o nbcp2 $(P2OBJ) float.o
+@
+
+
+1.6
+log
+@Use std atof.
+@
+text
+@d40 2
+a41 2
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h float.h \
+	error.h a.out.h
+a85 2
+#	-rm -f $(OBJS)
+	-rm -f $(P1OBJ) $(P2OBJ) nbcp1 nbcp2
+d90 2
+d105 1
+a105 1
+  manifest.h float.h 
+d108 1
+a108 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+d111 2
+a112 3
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  /usr/include/sys/types.h /usr/include/linux/types.h /usr/include/asm/types.h \
+  a.out.h 
+d115 3
+a117 3
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  /usr/include/sys/types.h /usr/include/linux/types.h /usr/include/asm/types.h \
+  /usr/include/a.out.h /usr/include/linux/a.out.h /usr/include/asm/page.h 
+d120 2
+a121 2
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  common.h error.h treewalk.h opdesc.h caloff.h treemgr.h 
+d125 1
+a125 1
+  float.h common.h error.h treewalk.h opdesc.h caloff.h treemgr.h 
+d128 1
+a128 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+d131 1
+a131 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+d134 1
+a134 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+d137 1
+a137 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+d140 2
+a141 2
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h \
+  /usr/include/a.out.h /usr/include/linux/a.out.h /usr/include/asm/page.h /usr/include/ctype.h 
+d144 1
+a144 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+d147 1
+a147 1
+  /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h float.h 
+d150 1
+a150 2
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+d154 1
+a154 2
+  float.h /usr/include/ctype.h /usr/include/a.out.h /usr/include/linux/a.out.h \
+  /usr/include/asm/page.h 
+d157 1
+a157 2
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+d160 1
+a160 2
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+d164 1
+a164 1
+  float.h print.h 
+d167 1
+a167 9
+  /usr/include/features.h /usr/include/sys/cdefs.h /usr/include/libio.h /usr/include/_G_config.h \
+  float.h 
+# Source file 'atofn.c'
+atofn.o : atofn.c 
+# Source file 'float.c'
+float.o : float.c float.h 
+# Source file 'myatof.c'
+myatof.o : myatof.c /usr/include/ctype.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  float.h 
+@
+
+
+1.5
+log
+@Remove atof2.
+@
+text
+@d11 2
+a12 1
+DFLAGS = -Di386 -Umpx -Dunix -DMPX -DMYATOF -DTWOPASS
+d22 1
+a22 1
+ scan.o stab.o trees.o version.o xdefs.o #atof2.o fparith.o
+d29 1
+a29 1
+ order.c reader.c table.c #atof2.c fparith.c
+d33 1
+a33 1
+ order.o reader.o table.o #atof2.o fparith.o
+d35 1
+a35 1
+FPSRC = float.c myatof.c
+d37 1
+a37 1
+FPOBJ = float.o myatof.o
+d41 1
+a41 1
+	fp.h error.h a.out.h
+d51 1
+a51 1
+	-rm -f version.c version.o
+d56 1
+a56 1
+	-rm -f version.o version.c
+d61 1
+a61 1
+	-rm -f version.o version.c
+d174 2
+a175 2
+# Source file 'atof2.c'
+atof2.o : atof2.c 
+@
+
+
+1.4
+log
+@Missed comm2.c from sources.
+@
+text
+@d21 1
+a21 1
+ scan.o stab.o trees.o version.o xdefs.o atof2.o #fparith.o
+d28 1
+a28 1
+ order.c reader.c table.c atof2.c #fparith.c
+d32 1
+a32 1
+ order.o reader.o table.o atof2.o #fparith.o
+@
+
+
+1.3
+log
+@New updates for double precision constants.
+@
+text
+@d26 1
+a26 1
+SRCS = version.c switch.c fixcall.c stab.c code.c comm1.c cgram.c \
+d122 4
+@
+
+
+1.2
+log
+@Delete -UAS requirement
+@
+text
+@d2 1
+a2 1
+# Makefile for nbccom - 2 pass version
+d5 8
+a12 4
+CC = cc -DNULL=0
+CFLAGS = -O -g -Di386 -Umpx -Dunix -DMPX -DTWOPASS
+#CFLAGS = -O -g -Di386 -Umpx -Dunix -DNODEBUG -DMPX -DTWOPASS
+#CFLAGS = -O -Di386 -Umpx -Dunix -DMPX
+d15 1
+d18 1
+d21 1
+a21 1
+ scan.o stab.o trees.o version.o xdefs.o
+d23 6
+a28 1
+P2OBJ = allo.o comm2.o local2.o match.o order.o reader.o switch.o table.o
+d32 11
+a42 1
+ order.o reader.o table.o
+d47 4
+a50 4
+#nbccom: $(OBJS)
+#	$(CC) $(CFLAGS) -o nbccom $(OBJS)
+#	/bin/chmod 755 nbccom
+#	-rm -f version.o
+d52 2
+a53 2
+nbcp1: $(P1OBJ)
+	$(CC) $(CFLAGS) -o nbcp1 $(P1OBJ)
+d55 1
+a55 1
+	-rm -f version.o
+d57 2
+a58 2
+nbcp2: $(P2OBJ)
+	$(CC) $(CFLAGS) -o nbcp2 $(P2OBJ)
+d60 1
+a60 23
+	-rm -f version.o
+
+# Pass1 modules
+
+#atof.o: atof.c
+
+code.o: code.c mfile1.h stab.h
+
+comm1.o: comm1.c mfile1.h common.h
+
+cgram.o: cgram.c
+
+cgram.c: cgram.y mfile1.h
+	$(YACC) cgram.y
+	mv y.tab.c cgram.c
+
+fixcall.o: fixcall.c mfile1.h
+
+local.o: local.c mfile1.h
+
+optim.o: optim.c mfile1.h
+
+pftn.o: pftn.c mfile1.h
+d62 12
+a73 1
+scan.o: scan.c mfile1.h stab.h
+d75 1
+a75 7
+stab.o: stab.c mfile1.h stab.h
+
+trees.o: trees.c mfile1.h
+
+#version.o: version.c
+
+version.o:
+a77 2
+	$(CC) $(CFLAGS) -c version.c
+#	-rm -f version.c
+d79 3
+a81 7
+xdefs.o: xdefs.c
+
+# Pass2 modules
+
+allo.o: allo.c mfile2.h
+
+comm2.o: comm2.c mfile2.h common.h
+d83 4
+a86 15
+local2.o: local2.c mfile2.h stab.h
+
+match.o: match.c mfile2.h
+
+order.o: order.c mfile2.h
+
+reader.o: reader.c mfile2.h print.h
+
+switch.o: switch.c mfile1.h mfile2.h
+
+table.o: table.c mfile2.h
+
+clean:
+#	-rm -f $(OBJS) nbccom nbcp1 nbcp2
+	-rm -f $(P1OBJ) $(P2OBJ)
+d90 1
+a90 2
+realclean:	clean
+	-rm -f nbcp1 nbcp2
+d98 79
+a176 1
+force:
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d6 3
+a8 3
+CFLAGS = -O -g -Di386 -Umpx -Dunix -DUAS -DMPX -DTWOPASS
+#CFLAGS = -O -g -Di386 -Umpx -Dunix -DUAS -DNODEBUG -DMPX -DTWOPASS
+#CFLAGS = -O -Di386 -Umpx -Dunix -DUAS -DMPX
+@

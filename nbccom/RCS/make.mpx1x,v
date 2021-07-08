@@ -1,0 +1,113 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.01.03.24.18;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Add MPX 1X version of make.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for nbccom for running nbccom on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.NBCOM command file.
+#
+CC = nbcc
+BIN = /bin
+SLIB = /system/lib
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+CFLAGS = -C -1 -DMPX -DMPX1X -DMYATOF -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+INSTALL = cp
+MOVE = mv
+YACC = nbyacc
+MAKEFILE = make.mpx1x
+
+SRCS = allo.c cgram.c code.c comm1.c fixcall.c local.c local2.c \
+	match.c optim.c order.c pftn.c reader.c scan.c stab.c switch.c \
+	table.c trees.c version.c xdefs.c fparith.c
+
+OBJS = allo.o cgram.o code.o comm1.o fixcall.o local.o local2.o \
+	match.o optim.o order.o pftn.o reader.o scan.o stab.o switch.o \
+	table.o trees.o version.o xdefs.o fparith.o
+
+FHDRS = float.h
+FSRCS = float.c myatof.c
+FOBJS = float.o myatof.o
+
+HDRS = a.out.h caloff.h common.h error.h fp.h mac2defs.h macdefs.h manifest.h \
+	mfile1.h mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h
+
+ALLHDR = $(FHDRS) $(HDRS)
+ALLSRC = $(FSRCS) $(SRCS)
+ALLOBJ = $(FOBJS) $(OBJS)
+ALLS = $(ALLSRC) $(ALLHDR)
+
+SLD = ld.nbcom1x
+LD = LD.NBCOM
+SMK = mk.nbcom1x
+MK = MK.NBCOM
+
+MAIN = $(ALLOBJ)
+
+#One pass compiler
+all:	$(MAIN)
+	-$(BIN)/echo $(MAIN) objects created
+
+$(MAIN):	$(SLD) $(MAKEFILE) $(ALLHDR) $(ALLSRC)
+	$(CC) $(CFLAGS) $(ALLSRC)
+
+cgram.c: cgram.y
+	$(SYSBIN)/nbyacc cgram.y
+	cp y.tab.c cgram.c
+	$(CC) $(CFLAGS) cgram.c
+
+clean:
+	-rm -f $(ALLOBJ) cgram.c y.tab.c #version.c
+
+clobber: clean          # delete main from current directory
+	@@for n in $(ALLS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
+	@@for n in $(ALLOBJ) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK) $(LBIN)/CGRAM.Y
+
+install: all            # build and then copy main to install directory
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	@@for n in $(ALLOBJ) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		$(MOVE) $$n $(LBIN)/$$nn ; \
+	done
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <cgram.y >$(LBIN)/CGRAM.Y
+	@@for n in $(ALLS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+	-rm -f cgram.c y.tab.c #version.c
+	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD) $(LBIN)/$(MK)
+
+@

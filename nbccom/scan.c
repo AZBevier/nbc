@@ -7,7 +7,7 @@
  */
 
 #ifndef lint
-static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp $";
+static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp jbev $";
 #endif
 
 /*

@@ -1,0 +1,31 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.01.27.22.03.53;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@# /* mkvers */
+# 	(c) Copyright 1986 Gould Inc.
+#  	    All Rights Reserved.
+# 
+#	 @@(#) (Gould) $Header: mkvers,v 5.5 89/05/12 12:44:07 pcc Rel-3_0 $
+
+echo "char version[] = \"@@(#)$* -" `date`"\";"
+@

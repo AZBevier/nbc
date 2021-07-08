@@ -1,46 +1,45 @@
-$DEFM                                                                   0001.000
-$JOB NBCP1                                                              0002.000
-$PAGE 0                                                                 0004.000
-$AS IN TO SYC                                                           0005.000
-$AS OT TO SGO                                                           0006.000
-$@SYSTEM(SYSTEM)COMPRESS                                                0007.000
-C.SRTE.O                                                                0008.000
-FLOAT.O                                                                 0009.000
-MYATOF.O                                                                0010.000
-CGRAM.O                                                                 0011.000
-CODE.O                                                                  0012.000
-COMM1.O                                                                 0013.000
-FIXCALL.O                                                               0014.000
-LOCAL.O                                                                 0014.500
-IO.O                                                                    0015.000
-OPTIM.O                                                                 0015.500
-PFTN.O                                                                  0016.000
-SCAN.O                                                                  0017.000
-STAB.O                                                                  0018.000
-TREES.O                                                                 0019.000
-VERSION.O                                                               0020.000
-XDEFS.O                                                                 0020.500
-$NOTE  END OF COMPRESS                                                  0021.000
-$OPTION 19 25                                                           0022.000
-$AS LIB TO ^(NBLIB)CLB BLOC=N                                           0023.000
-$AS DIR TO ^(NBLIB)CDR BLOC=N                                           0024.000
-$IFT PATH NBCP1MAP SKIP                                                 0025.000
-$CREA NBCP1MAP                                                          0026.000
-$DEFN SKIP                                                              0027.000
-$AS SLO TO NBCP1MAP                                                     0028.000
-$ALLOCATE 27000                                                         0029.000
-$PAGE                                                                   0030.000
-$@SYSTEM(SYSTEM)CATALOG                                                 0031.000
-OPTION LOWER PROMPT                                                     0032.000
-FILES 16                                                                0033.000
-BUFFERS 16                                                              0034.000
-ALLOCATE 1000                                                           0035.000
-ENVIRONMENT ,,SHARE,MAP2048                                             0036.000
-SPACE 16                                                                0037.000
-BUILD NBCP1                                                             0038.000
-$IFF ABORT ENDJOB                                                       0039.000
-$NOTE *** ERROR *** CATALOG OF NBCP1 FAILED                             0040.000
-$DEFN ENDJOB                                                            0041.000
-$PAGE                                                                   0042.000
-$EOJ                                                                    0043.000
-$ENDM                                                                   0044.000
+$DEFM
+$JOB NBCP1
+$PAGE 0
+$AS IN TO SYC
+$AS OT TO SGO
+$@SYSTEM(SYSTEM)COMPRESS
+^(BIN)C.SRTE.O
+FLOAT.O
+MYATOF.O
+CGRAM.O
+CODE.O
+COMM1.O
+FIXCALL.O
+LOCAL.O
+OPTIM.O
+PFTN.O
+SCAN.O
+STAB.O
+TREES.O
+VERSION.O
+XDEFS.O
+$NOTE  END OF COMPRESS
+$OPTION 19 25
+$AS LIB TO ^(NBLIB)CLB BLOC=N
+$AS DIR TO ^(NBLIB)CDR BLOC=N
+$IFT PATH NBCP1MAP SKIP
+$CREA NBCP1MAP
+$DEFN SKIP
+$AS SLO TO NBCP1MAP
+$ALLOCATE 27000
+$PAGE
+$@SYSTEM(SYSTEM)CATALOG
+OPTION LOWER PROMPT
+FILES 16
+BUFFERS 16
+ALLOCATE 1000
+ENVIRONMENT ,,SHARE,MAP2048
+SPACE 16
+BUILD NBCP1
+$IFF ABORT ENDJOB
+$NOTE *** ERROR *** CATALOG OF NBCP1 FAILED
+$DEFN ENDJOB
+$PAGE
+$EOJ
+$ENDM

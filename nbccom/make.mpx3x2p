@@ -44,7 +44,7 @@ SMK = mk.nbcom3x2p
 MK = MK.NBC2P
 
 #Two pass compiler
-all:	$(ALLOBJ)
+all:	$(ALLOBJ) $(SLD1) $(SLD2) $(SMK)
 	-echo $(MAIN) objects created
 
 $(P1OBJ):	$(MAKEFILE) $(ALLHDR) $(P1SRC)
@@ -74,7 +74,7 @@ clobber: clean		# delete main from current directory
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
-	-rm -f $(LBIN)/$(LD1) $(LBIN)/$(LD2) $(LBIN)/$(MK)
+	-rm -f $(LBIN)/$(LD1) $(LBIN)/$(LD2) $(LBIN)/$(MK) $(LBIN)/CGRAM.Y
 
 install: all		# build and then copy main to install directory
 	@if [ -d $(LBIN) ]; then \
@@ -97,6 +97,7 @@ install: all		# build and then copy main to install directory
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
 	mpxblk <$(SLD1) >$(LBIN)/$(LD1)
 	mpxblk <$(SLD2) >$(LBIN)/$(LD2)
+	mpxblk <cgram.y >$(LBIN)/CGRAM.Y
 	-rm -f cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD1) $(LBIN)/$(LD2) $(LBIN)/$(MK)
 

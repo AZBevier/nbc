@@ -1,0 +1,116 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	2019.01.31.21.42.15;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.02.10.20.30.05;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.20.56.20;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS File
+@
+
+
+1.3
+log
+@Update for Linux
+@
+text
+@/* caloff.h */
+
+/*
+ * 	(c) Copyright 1990 J B Systems
+ *	This file contains non-based support modifications
+ *	for operation under MPX.  Derived from Encores' base
+ *	mode C compiler.
+ */
+
+/*
+@@(#) $Header: /bulk2/simhv/nbc-master/nbccom/RCS/caloff.h,v 1.2 1995/02/10 20:30:05 jbev Exp jbev $	       */
+/* 
+	This file contains items removed from common.h for
+	the PCO port.
+*/
+
+unsigned int     offsz;
+
+unsigned int caloff()
+{
+    register    int i;
+    unsigned int    temp;
+    unsigned int    off;
+    temp = 1;
+    i = 0;
+    do {
+	temp <<= 1;
+	++i;
+    } while (temp != 0);
+    off = (unsigned)1 << (i - 1);
+    return(off);
+}
+@
+
+
+1.2
+log
+@Cleanup
+@
+text
+@d11 1
+a11 1
+@@(#) $Header: /u/nbc/nbccom/RCS/caloff.h,v 1.1 1995/01/27 20:56:20 jbev Exp jbev $	       */
+d19 1
+a19 1
+unsigned caloff()
+d21 1
+a21 1
+    register    i;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a1 4
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+d10 2
+a11 2
+/*	@@(#) (Gould) $Header: caloff.h,v 5.5 89/05/12 12:43:01 pcc Rel-3_0 $	       */
+
+a12 1
+
+a14 1
+
+a28 3
+#ifdef DEC07
+    } while (temp > 0);
+#else
+a29 1
+#endif
+a32 5
+
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+@

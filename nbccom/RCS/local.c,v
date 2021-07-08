@@ -1,0 +1,1579 @@
+head	1.17;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.17
+date	2019.01.31.21.50.46;	author jbev;	state Exp;
+branches;
+next	1.16;
+
+1.16
+date	96.03.18.23.55.06;	author jbev;	state Exp;
+branches;
+next	1.15;
+
+1.15
+date	95.08.08.23.21.22;	author jbev;	state Exp;
+branches;
+next	1.14;
+
+1.14
+date	95.03.23.23.02.31;	author jbev;	state Exp;
+branches;
+next	1.13;
+
+1.13
+date	95.03.23.21.51.29;	author jbev;	state Exp;
+branches;
+next	1.12;
+
+1.12
+date	95.03.06.19.18.32;	author jbev;	state Exp;
+branches;
+next	1.11;
+
+1.11
+date	95.03.02.21.57.48;	author jbev;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	95.02.27.17.00.10;	author jbev;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	95.02.24.19.56.28;	author jbev;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	95.02.16.00.23.08;	author jbev;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	95.02.07.22.48.30;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	95.02.04.03.55.16;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.02.02.23.32.30;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.02.02.22.39.35;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.02.02.05.08.30;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.01.27.23.11.22;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.01.27.21.56.20;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS File
+@
+
+
+1.17
+log
+@Update for Linux
+@
+text
+@/* local.c */
+
+/*
+ * 	(c) Copyright 1990 J B Systems
+ *	This file contains non-based support modifications
+ *	for operation under MPX.  Derived from Encores' base
+ *	mode C compiler.
+ */
+
+#ifndef lint
+static char *rcsid =
+"@@(#) $Header: /bulk2/simhv/nbc-master/nbccom/RCS/local.c,v 1.16 1996/03/18 23:55:06 jbev Exp jbev $";
+#endif
+
+/*
+ * $Log: local.c,v $
+ * Revision 1.16  1996/03/18 23:55:06  jbev
+ * Mods for Alpha port.
+ *
+ */
+
+/*
+    Ported from the 4.1c Berkeley Standard
+	Distribution source for a VAX portable C compiler.
+*/
+
+#include "mfile1.h"
+
+/*	this file contains code which is dependent on the target machine */
+
+NODE       *cast(p, t) register NODE   *p;
+TWORD       t;
+{
+ /* cast node p to type t */
+
+    p = buildtree(CAST, block(NAME, NIL, NIL, t, 0, (int) t), p);
+    p->in.left->in.op = FREE;
+    p->in.op = FREE;
+    return(p->in.right);
+}
+
+NODE       *clocal(p) NODE *p;
+{
+
+ /* this is called to do local transformations on an expression tree
+    preparitory to its being written out in intermediate code. */
+
+ /* the major essential job is rewriting the automatic variables 
+    and arguments in terms of REG and [LP]NAME nodes */
+ /* conversion ops which are not necessary are also clobbered here */
+ /* in addition, any special features (such as rewriting exclusive or)
+    are easily handled here as well */
+
+    register struct symtab *q;
+    register NODE  *r;
+    register    int o;
+    register    int m, ml;
+    register	NODE * newtree;		/* points to tree to be returned */
+/*    extern int eprint(); */
+    int icf;
+
+#ifndef BUG2
+    if(edebug) {
+	printf("clocal(%x):\n", p);
+	fwalk(p, eprint, 0);
+    }
+#endif
+
+    switch (o = p->in.op) {
+
+	case NAME: 
+	    if (p->tn.rval < 0) {	/* already processed; ignore... */
+		newtree = p;
+#ifndef BUG2
+	    if(tdebug) {
+		printf("clocal(%x): case NAME, already processed\n", p);
+		prstab(p->tn.rval);
+	    }
+#endif
+		goto out;
+	    }
+#ifndef BUG2
+	    if(tdebug) {
+		printf("clocal(%x): case NAME\n", p);
+		prstab(p->tn.rval);
+	    }
+#endif
+	    q = &stab[p->tn.rval];
+	    switch (q->sclass) {
+
+		case AUTO:
+		case PARAM:
+#ifndef BUG2
+			if(tdebug) {
+			    printf("clocal(AUTO/PARAM)\n");
+			    prstab(q - stab);
+			}
+#endif
+		if( (q->optflags & (IsLNAME|IsPNAME)) != 0) {
+#ifndef BUG2
+			if(edebug) {
+			    printf("clocal(AUTO/PARAM) @@ LNAME/PNAME\n");
+			    prstab(q - stab);
+			}
+#endif
+			/* atomic id - turn this onto an LNAME or a
+			 * PNAME
+			 */
+			p->in.op = ((q->optflags &IsLNAME) != 0)
+				 ? LNAME
+				 : PNAME;
+			r = offcon( q->offset, INCREF(q->stype),
+					q->dimoff,q->sizoff);
+			p->tn.lval = r->tn.lval;
+			r->in.op = FREE;		/* YECH */
+		} else {
+			int	paramsz;
+			r = bcon(0);
+#ifndef BUG2
+			if(tdebug) {
+			    printf("clocal(AUTO/PARAM)op into OREG\n");
+			    prstab(q - stab);
+			}
+#endif
+#ifdef ONEPASS
+			p->in.op = OREG;
+#else /* TWOPASS */
+#ifndef OPTIMIZER
+			p->in.op = OREG;
+#else
+/*XXX*/			p->in.op = REG;
+#endif
+#endif /* ONEPASS */
+			p->tn.lval = 0;
+			if(q->sclass == PARAM)
+				p->tn.rval = ARGREG;
+			else
+				p->tn.rval = STKREG;
+#ifdef TWOPASS
+#ifdef OPTIMIZER
+    			/* (MEY) 27-Jan-87  Make id cookie for PCO */
+			p->tn.lval = p->tn.rval;
+#endif
+#endif /* TWOPASS */
+#ifdef ONEPASS
+			    p = buildtree(UNARY AND, p, 0);
+#else /* TWOPASS */
+#ifndef OPTIMIZER
+			    p = buildtree(UNARY AND, p, 0);
+#else
+/*XXX*/			    p->in.type = INCREF(p->in.type);
+#endif
+#endif /* ONEPASS */
+			p = buildtree(PLUS, p, r);
+			r->tn.lval = q->offset / SZCHAR;
+			newtree = buildtree(UNARY MUL, p, 0);
+			paramsz = tsize(q->stype, q->dimoff, q->sizoff);
+#ifndef BUG2
+			if(edebug) {
+			    printf("clocal(): paramsz=%d\n", paramsz);
+			    prstab(q - stab);
+			}
+#endif
+			if(paramsz > MAXARGSIZE && q->sclass == PARAM) {
+			    /* one more level of indirection */
+			    p->in.type = INCREF(p->in.type);
+			    p->in.left->in.type = p->in.type;
+			    newtree->in.type = INCREF(newtree->in.type);
+			    newtree = 
+				buildtree(UNARY MUL, newtree, 0);
+			}
+			goto out;
+		}
+		break;
+
+		case ULABEL: 
+		case LABEL: 
+		case STATIC: 
+		    if (q->slevel == 0)
+			break;
+		    p->tn.lval = 0;
+		    p->tn.rval = -q->offset;
+		    break;
+
+		case REGISTER: 
+			{
+#ifndef BUG2
+				if(tdebug) {
+				    printf("clocal(REGISTER)op into REG\n");
+				    prstab(q - stab);
+				}
+#endif
+				/* provide id cookie for optimizer */
+				p->tn.lval = IsRegVar(q->offset) ? q->uniqid
+								: q->offset;
+				p->in.op = REG;
+				p->tn.rval = q->offset;
+			}
+			break;
+
+	    }
+	    break;
+
+	case OREG: 
+#ifndef BUG2
+	if(edebug) {
+		printf("clocal(%x) at OREG\n", p);
+		fwalk(p, eprint, 0);
+	}
+#endif
+#ifdef TWOPASS
+#ifdef OPTIMIZER
+	    cerror("OREG not expected in pass 1");
+	    break;
+#endif
+#endif /* TWOPASS */
+#ifndef OPTIMIZER
+	    if (p->tn.lval < 0 || p->tn.lval > 0x80000) {
+		int     off;
+#ifndef BUG2
+		if(tdebug) {
+		    printf("clocal(OREG)op into UNARY MUL\n");
+		    prstab(q - stab);
+		}
+#endif
+
+		off = p->tn.lval;
+		p->tn.lval = 0;
+		r = bcon (0);
+		p = buildtree (UNARY AND, p, 0);
+		p = buildtree (PLUS, p, r);
+		r->tn.lval = off;
+		newtree = buildtree (UNARY MUL, p, 0);
+		goto out;
+	    }
+	    break;
+#endif /* ONEPASS || (TWOPASS && !OPTIMIZER) */
+
+	case PCONV: 
+    /* do pointer conversions for char and longs */
+	    ml = p->in.left->in.type;
+	    if ((ml == CHAR || ml == UCHAR || ml == SHORT || ml == USHORT) && p->in.left->in.op != ICON) {
+		uerror("I strongly object to casting char/shorts into pointers");
+		break;
+	    }
+    /* pointers all have the same representation; the type is inherited */
+
+    inherit: 
+	    p->in.left->in.type = p->in.type;
+	    p->in.left->fn.cdim = p->fn.cdim;
+	    p->in.left->fn.csiz = p->fn.csiz;
+	    p->in.op = FREE;
+	    newtree = p->in.left;
+	    goto out;
+
+	case SCONV: 
+    	    /* look for a cast of a double/float to void and throw away the
+    	     * conversion.  Not used anyway. */
+    	    if (p->in.type == UNDEF && p->in.left->in.type == DOUBLE) {
+    		p->in.op = FREE;
+    		newtree = p->in.left;	/* conversion gets clobbered */
+    		goto out;
+    	    }
+	    m = (p->in.type == FLOAT || p->in.type == DOUBLE);
+	    ml = (p ->in.left->in.type == FLOAT || p->in.left->in.type == DOUBLE);
+	    if (p->in.type == FLOAT && p->in.left->in.op == FCON) {
+		p->in.op = FREE;
+		p = p->in.left;
+		p->in.type = FLOAT;
+#ifdef	MYATOF
+		/* no conversion if using myatof */
+		/* p->fpn.fpnum = FP_DTOFP(p->fpn.fpnum);*/
+		/* p->fpn.fpnum.nf[3] &= 0xf0; */
+		for (icf=4; icf<NF; icf++)
+		    p->fpn.fpnum.nf[icf];
+#else
+		p->fpn.dval = FP_DTOFP(p->fpn.dval);
+#endif
+		newtree = p;
+		goto out;
+	    }
+	    /* new block of code to address "SCONV FCON" to double in
+	       clocal() before the match fails because used in init */
+	    if (p->in.type == DOUBLE && p->in.left->in.op == FCON) {
+		p->in.op = FREE;
+		p = p->in.left;
+		p->in.type = DOUBLE;
+#ifdef	MYATOF
+		/* no conversion if using myatof */
+		/* p->fpn.fpnum = FP_DTOF(p->fpn.fpnum);*/
+		/* p->fpn.fpnum.nf[3] &= 0xf0; */
+		for (icf=4; icf<NF; icf++)
+		    p->fpn.fpnum.nf[icf];
+#else
+		p->fpn.dval = (FP_DOUBLE)(p->fpn.dval);
+#endif
+		newtree = p;
+		goto out;
+	    }
+	    if (m || ml)
+		break;
+
+    /* now, look for conversions downwards */
+
+	    m = p->in.type;
+	    ml = p->in.left->in.type;
+	    if (p->in.left->in.op == NAME &&
+		m == INT && ml == UNSIGNED)
+		goto inherit;
+	    /* simulate the conversion here */
+	    if (p->in.left->in.op == ICON ) {
+		int       val;
+		val = p->in.left->tn.lval;
+		switch (m) {
+		    case CHAR: 
+			if( !onlyuchar){
+			    val &= 0xff;
+			    if( val&0x80 ){
+				val |= ~0xff;
+			    }
+			    p->in.left->tn.lval = val;
+			    break;
+			}
+		    case UCHAR: 
+			p->in.left->tn.lval = val & 0XFF;
+			break;
+		    case USHORT: 
+			p->in.left->tn.lval = val & 0XFFFFL;
+			break;
+		    case SHORT: 
+			val &= 0xffff;
+			if( val&0x8000 ){
+			    val |= ~0xffff;
+			}
+			p->in.left->tn.lval = val;
+			break;
+		    case UNSIGNED: 
+		    case INT: 
+			break;
+		    case LONG:
+			if(ml != UNSIGNED) break;
+			if( ((unsigned)p->in.left->tn.lval >> (SZINT-1)) & 1) {
+				newtree = p;
+				goto out;
+			}
+			break;
+		}
+		p->in.left->in.type = m;
+	    }
+	    else {
+	/* meaningful ones are conversion of int to char, int to short,
+	   and short to char, and unsigned version of them */
+		if (m == CHAR || m == UCHAR) {
+		    if (ml != CHAR && ml != UCHAR)
+			break;
+		}
+		else
+		    if (m == SHORT || m == USHORT) {
+			if (ml != CHAR && ml != UCHAR && ml != SHORT && ml != USHORT)
+			    break;
+		    }
+		    else
+			if (m == LONG || m == INT) {
+			    break;
+			}
+	    }
+
+    /* clobber conversion */
+	    if (tlen(p) == tlen(p->in.left))
+		goto inherit;
+	    p->in.op = FREE;
+	    newtree = p->in.left;	/* conversion gets clobbered */
+	    goto out;
+
+	case PVCONV: 
+	case PMCONV: 
+	    if (p->in.right->in.op != ICON)
+		cerror("bad conversion", 0);
+	    p->in.op = FREE;
+	    newtree = buildtree(o == PMCONV ? MUL : DIV, p->in.left, p->in.right);
+	    goto out;
+
+
+	case FLD: 
+    /* make sure that the second pass does not make the descendant
+       of a FLD operator into a doubly indexed OREG */
+
+	    if (p->in.left->in.op == UNARY MUL
+		    && (r = p->in.left->in.left)->in.op == PCONV)
+		if (r->in.left->in.op == PLUS || r->in.left->in.op == MINUS)
+		    if (ISPTR(r->in.type)) {
+			if (ISUNSIGNED(p->in.left->in.type))
+			    p->in.left->in.type = UCHAR;
+			else
+			    p->in.left->in.type = CHAR;
+		    }
+	    break;
+    }
+
+    newtree = p;
+
+  out:
+#ifndef BUG2
+	if(edebug) {
+		printf("clocal(%x) returning newtree %x\n", p, newtree);
+		fwalk(newtree, eprint, 0);
+	}
+#endif
+
+        return(newtree);
+}
+
+int andable(p) NODE    *p;
+{
+    return(p->in.op == NAME);		/* make all oregs use movea instr */
+}
+
+void cendarg()
+{	/* at the end of the arguments of a ftn, set the automatic offset */
+    autooff = AUTOINIT;
+}
+
+int cisreg(t) TWORD     t;
+{	/* is an automatic variable of type t OK for a register variable */
+
+    /* TRUST_REG_CHAR_AND_REG_SHORT */
+    if (t == INT || t == UNSIGNED || t == LONG || t == ULONG
+	    || t == CHAR || t == UCHAR || t == SHORT
+	    || t == FLOAT
+	    || t == USHORT || ISPTR(t))
+	return(1);
+    return(0);
+}
+
+int CanBeLNAME(t)
+TWORD t;
+{		/* is an automatic variable of type t OK for LNAME or PNAME */
+
+	return( ISPTR(t) || t == CHAR || t == SHORT || t == INT ||
+            t == ENUMTY ||
+	    t == LONG || t == FLOAT || t == DOUBLE || ISUNSIGNED(t) );
+}
+
+NODE       *offcon(off, t, d, s) OFFSZ  off;
+int d, s;
+TWORD       t;
+{
+ /* return a node, for structure references, which is suitable for
+    being added to a pointer of type t, in order to be
+    off bits offset into a structure */
+
+    register NODE  *p;
+ /* t, d, and s are the type, dimension offset, and sizeoffset */
+ /* in general they  are necessary for offcon, but not on H'well */
+
+#ifndef BUG2
+    if(tdebug) {
+	printf("offcon(off = 0x%x):\n", off);
+    }
+#endif
+
+    p = bcon(0);
+    p->tn.lval = off / SZCHAR;
+    return(p);
+
+}
+
+static      int inwd /* current bit offsed in word */ ;
+static      int word /* word being built from fields */ ;
+
+void incode(p, sz) register NODE    *p; int sz;
+{
+
+ /* generate initialization code for assigning a constant c 
+    to a field of width sz */
+ /* we assume that the proper alignment has been obtained */
+ /* inoff is updated to have the proper final value */
+ /* we also assume sz  < SZINT */
+
+    if ((sz + inwd) > SZINT)
+	cerror("incode: field > int");
+    word = (unsigned)word | ((unsigned)(p->tn.lval << (32 - sz))) >> (inwd);
+    inwd += sz;
+    inoff += sz;
+    if (inoff % SZINT == 0) {
+	printf("	dataw	x'%x'\n", word);
+	word = inwd = 0;
+    }
+}
+
+#ifdef MYATOF
+int	ldigits;	/* maximum digits to print */
+
+void putman( f1 ) register FPN *f1; {
+	register	int k;
+
+	k = divsk( f1->nf, NF, 10, 0 );
+	if( isnzs( f1->nf, NF ) ) putman( f1 );
+#ifdef MYASM
+	if (ldigits++ <= 20)
+#else
+	if (ldigits++ < 15)
+#endif
+		putchar( k + '0' );
+	else
+		f1->ne++;
+}
+#endif
+
+#ifdef MYATOF
+void fincode(f1, sz) FPN  *f1; int sz;
+#else
+void fincode(d, sz) FP_DOUBLE   d; int sz;
+#endif
+{
+ /* output code to initialize space of size sz to the value d */
+ /* the proper alignment has been obtained */
+ /* inoff is updated to have the proper final value */
+ /* on the target machine, write it out in octal! */
+
+#ifdef MYATOF
+    if (sz == SZDOUBLE) {
+	printf("	datad	r'");
+    } else {
+	printf("	dataw	e'");
+    }
+	if( isnegf( f1 ) ){
+		putchar( '-' );
+		negf( f1 );
+	}
+	ldigits = 0;
+	putman( f1 );
+	putchar( '.' );
+	putchar( 'e' );
+	if( f1->ne >= 0 ) putchar( '+' );
+	printf("%d'\n",f1->ne);
+
+#else /* MYATOF */
+    if (sz == SZDOUBLE) {
+#if defined(linux) || defined(__alpha)
+	union {
+		double dd;
+		int    n[2];
+	} dd;
+	dd = d;
+	printf("	datad	%sx'%08x%08x'\n", "", dd.n[1], dd.n[0]);
+#else
+	printf("	datad	%sx'%08x%08x'\n", "", d);
+#endif
+    }
+    else {
+#if defined(linux) || defined(__alpha)
+	union {
+		double dd;
+		int    n[2];
+	} dd;
+	dd = d;
+	printf("	dataw	%sx'%x'\n", "", dd.n[1]);
+#else
+	printf("	dataw	%sx'%x'\n", "", d);
+#endif
+    }
+#endif /* MYATOF */
+    inoff += sz;
+}
+
+void cinit(p, sz) NODE  *p; int sz;
+{
+ /* arrange for the initialization of p into a space of size sz */
+ /* the proper alignment has been opbtained */
+ /* inoff is updated to have the proper final value */
+
+        /*
+         * Sun fix - see $w/sunfixes/t1.c
+         * as a favor (?) to people who want to write
+         *     int i = 9600/134.5;
+         * we will, under the proper circumstances, do
+         * a coersion here.
+         */
+        NODE *l;
+
+        switch (p->in.type) {
+        case INT:
+        case UNSIGNED:
+                l = p->in.left;
+                if (l->in.op != SCONV || l->in.left->tn.op != FCON) break;
+                l->in.op = FREE;
+                l = l->in.left;
+#ifdef MYATOF
+                l->tn.lval = FP_DTOL(&l->fpn.fpnum);
+#else
+                l->tn.lval = FP_DTOL(l->fpn.dval);
+#endif /* MYATOF */
+                l->tn.rval = NONAME;
+                l->tn.op = ICON;
+                l->tn.type = INT;
+                p->in.left = l;
+                break;
+        }
+
+    ecode(p);
+    inoff += sz;
+}
+
+/*
+ ** define "n" bits of zeros in a field.
+ */
+void vfdzero (n)
+int n;
+{
+    NODE	zeroinit;
+
+    if (n <= 0)
+	return;
+
+    zeroinit.in.op = ICON;
+    zeroinit.tn.lval = 0;
+/* printf(" vfdzero calling incode(%x, %d):\n", &zeroinit, n); */
+    incode (&zeroinit, n);	/* let initializer do it */
+}
+
+extern int	lastloc;
+extern int	_flag;
+
+char       *exname(p, q)
+char *p;
+struct symtab *q;
+{
+ /* make a name look like an external name in the local machine */
+
+    static char     text[BUFSIZ + 1];
+    register char *tp = text;
+    int sf = q->sflags;
+
+ /* 
+  * For PCO, STAB entries must also be rewritten since they must match
+  * the way they are referenced.
+  */
+
+    if (!_flag)		/* if _flag set, no _ for names */
+        /* if we have a Fortran function, do not prepend with "_" */
+	if (!(ISFTN(q->stype)
+	  && (q->sclass == FORTRAN || q->sclass == UFORTRAN)))
+	    *tp++ = '_';	/* prepend _ */
+    while (*p) {		/* copy rest of name */
+	*tp++ = *p++;
+    }
+
+    *tp = '\0';
+    return(text);
+}
+
+int ctype(type) int type;
+{	/* map types which are not defined on the local machine */
+    extern      int onlyuchar;
+    switch (BTYPE(type)) {
+
+	case CHAR: 
+	    if (onlyuchar) {
+		MODTYPE(type, UCHAR);
+	    }
+	    break;
+
+/*
+*       would let LONGS alone if gram treats
+*	long long var as a real long. otherwise int.
+*/
+	case LONG: 
+	    MODTYPE(type, INT);
+	    break;
+
+	case ULONG: 
+	    MODTYPE(type, UNSIGNED);
+    }
+    return(type);
+}
+
+int noinit()
+{
+/*
+ * curid is a variable which is defined but is not initialized
+ * (and not a function ); This routine returns the storage
+ * class for an uninitialized declaration
+ */
+    return(EXTDEF);
+}
+
+int isitlong(cb, ce) int cb, ce;
+{		/* is lastcon to be long or short */
+ /* cb is the first character of the representation, ce the last */
+
+    if (ce == 'l' || ce == 'L' ||
+	    (unsigned)lastcon >= (unsigned)((unsigned)1L << (SZINT - 1)))
+	return(1);
+    return(0);
+}
+
+int isitfloat(s) char  *s;
+{
+#ifdef MYATOF
+    /* ifpn has floating point number */
+    FP_ATOF(s);
+#else
+    dcon = FP_ATOF(s);
+#endif
+    return(FCON);
+}
+
+#ifdef ONEPASS
+void ecode(p) NODE  *p;
+{
+ /* walk the tree and write out the nodes.. */
+
+    if (nerrors)
+	return;
+    p2tree(p);
+    p2compile(p);
+}
+#else
+void ecode(p) NODE  *p;
+{
+ /* walk the tree and write out the nodes.. */
+
+    if (nerrors)
+	return;
+    printf("%1c%d\t%s\n", EXPR, lineno, ftitle);
+    prtree(p);
+}
+
+int tlen(p) NODE   *p;
+{
+    switch (p->in.type) {
+	case CHAR: 
+	case UCHAR: 
+	    return(1);
+
+	case SHORT: 
+	case USHORT: 
+	    return(2);
+
+	case LONG: 
+	case DOUBLE: 
+	    return(8);
+
+	default: 
+	    return(4);
+    }
+}
+
+void fltprint(p) register NODE *p;
+{
+#ifdef MYATOF
+	int iz;
+#endif
+	/* print the value of a floating point constant to the intermediate
+	 * file.
+	 */
+
+#ifdef MYATOF
+	if(p->in.type == DOUBLE && !isnzs(&p->fpn.fpnum))
+    	    getlab();
+	printf("%x\t", p->fpn.fpnum.ne);
+	for (iz=0; iz<NF; iz++)
+		printf("%x\t", p->fpn.fpnum.nf[iz]);
+#else
+    	if (p->tn.lval == 0 && p->tn.rval == 0 && p->in.type == DOUBLE) 
+    	    getlab();
+	printf("%lx\t%lx\t",p->tn.lval, p->tn.rval);
+#endif
+}
+
+#endif
+
+NODE       *addroreg(l) int l;
+{
+/*
+ * OREG was built in clocal()
+ * for an auto or formal parameter
+ * now its address is being taken
+ * local code must unwind it
+ * back to PLUS/MINUS REG ICON
+ * according to local conventions
+ */
+    cerror("address of OREG taken");
+    return(0);
+}
+@
+
+
+1.16
+log
+@Mods for Alpha port.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /src/u/nbc/nbccom/RCS/local.c,v 1.15 1995/08/08 23:21:22 jbev Exp jbev $";
+d16 4
+a19 1
+ * $Log: $
+d56 2
+a57 2
+    register    o;
+    register    m, ml;
+d59 1
+a59 1
+    extern int eprint();
+d413 1
+a413 1
+andable(p) NODE    *p;
+d418 1
+a418 1
+cendarg()
+d423 1
+a423 1
+cisreg(t) TWORD     t;
+d435 1
+a435 1
+CanBeLNAME(t)
+d445 1
+d468 2
+a469 2
+static      inwd /* current bit offsed in word */ ;
+static      word /* word being built from fields */ ;
+d471 1
+a471 1
+incode(p, sz) register NODE    *p;
+d494 2
+a495 2
+putman( f1 ) register FPN *f1; {
+	register	k;
+d511 1
+a511 1
+fincode(f1, sz) FPN  *f1;
+d513 1
+a513 1
+fincode(d, sz) FP_DOUBLE   d;
+d567 1
+a567 1
+cinit(p, sz) NODE  *p;
+d608 1
+a608 2
+void
+vfdzero (n)
+d653 1
+a653 1
+ctype(type)
+d655 1
+a655 1
+    extern      onlyuchar;
+d678 1
+a678 1
+noinit()
+d688 1
+a688 1
+isitlong(cb, ce)
+d698 1
+a698 1
+isitfloat(s) char  *s;
+d710 1
+a710 1
+ecode(p) NODE  *p;
+d720 1
+a720 1
+ecode(p) NODE  *p;
+d730 1
+a730 1
+tlen(p) NODE   *p;
+d750 1
+a750 1
+fltprint(p) register NODE *p;
+d774 1
+a774 1
+NODE       *addroreg(l)
+@
+
+
+1.15
+log
+@Correct dataw value when running on linux.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /src/u/nbc/nbccom/RCS/local.c,v 1.14 1995/03/23 23:02:31 jbev Exp jbev $";
+d16 4
+d23 1
+d536 1
+a536 1
+#ifdef linux
+d548 1
+a548 1
+#ifdef linux
+@
+
+
+1.14
+log
+@Fix a type.....
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.13 1995/03/23 21:51:29 jbev Exp jbev $";
+d543 8
+d552 1
+@
+
+
+1.13
+log
+@Fix double to float conversion for variable NF value.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.12 1995/03/06 19:18:32 jbev Exp jbev $";
+d266 1
+a266 1
+		for (icf=4; icf<NF; icp++)
+d284 1
+a284 1
+		for (icf=4; icf<NF; icp++)
+@
+
+
+1.12
+log
+@Malloc tree node table instead of hard coding size.
+Allow XTTval  and X2TTval to set node tree table size.
+Add new option XJ and X2J to inhibit _ being prepended to names.
+Correct XT[DS]val options for setting table sizes.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.11 1995/03/02 21:57:48 jbev Exp jbev $";
+d52 1
+d266 2
+a267 4
+		p->fpn.fpnum.nf[4];
+		p->fpn.fpnum.nf[5];
+		p->fpn.fpnum.nf[6];
+		p->fpn.fpnum.nf[7];
+d284 2
+a285 4
+		p->fpn.fpnum.nf[4];
+		p->fpn.fpnum.nf[5];
+		p->fpn.fpnum.nf[6];
+		p->fpn.fpnum.nf[7];
+@
+
+
+1.11
+log
+@Really no change.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.10 1995/02/27 17:00:10 jbev Exp jbev $";
+d608 2
+a609 1
+extern	int      lastloc;
+d626 6
+a631 4
+    /* if we have a Fortran function, do not prepend with "_" */
+    if (!(ISFTN(q->stype) && (q->sclass == FORTRAN || q->sclass == UFORTRAN)))
+    	*tp++ = '_';
+    while (*p) {
+@
+
+
+1.10
+log
+@Correct MYATOF code.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.9 1995/02/24 19:56:28 jbev Exp jbev $";
+d264 1
+d284 1
+@
+
+
+1.9
+log
+@Add double to float code.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.8 1995/02/16 00:23:08 jbev Exp jbev $";
+d532 8
+d541 1
+@
+
+
+1.8
+log
+@Change # of printed digits to 16 for 17.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.7 1995/02/07 22:48:30 jbev Exp jbev $";
+d264 4
+d283 4
+@
+
+
+1.7
+log
+@Fix ploating point code again.  Correct csect/dsect and label code.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.6 1995/02/04 03:55:16 jbev Exp jbev $";
+d486 1
+a486 1
+	if (ldigits++ < 16)
+@
+
+
+1.6
+log
+@Correct double constant code generation.
+@
+text
+@d12 1
+a12 1
+"@@(#) $Header: /u/nbc/nbccom/RCS/local.c,v 1.5 1995/02/02 23:32:30 jbev Exp $";
+d196 6
+d489 2
+d723 2
+a724 1
+    	if (p->tn.lval == 0 && p->tn.rval == 0 && p->in.type == DOUBLE) 
+a725 1
+#ifdef MYATOF
+d730 2
+@
+
+
+1.5
+log
+@Corrections for MPX specific compiler errors
+@
+text
+@d11 2
+a12 1
+static char *rcsid = "@@(#) (Gould) $Header: /u/nbc/nbccom/RCS/local.c,v 1.4 1995/02/02 22:39:35 jbev Exp jbev $";
+a20 4
+#ifdef OPTIMIZER
+/*#undef OPTIMIZER */
+#endif
+
+a241 1
+#ifndef ON23FEB92
+a243 4
+#ifdef OLD
+    	    if (p->in.type == UNDEF && (p->in.left->in.type == DOUBLE) ||
+    		(p->in.left->in.type == FLOAT)) {
+#else
+a244 1
+#endif
+a248 1
+#endif
+a320 4
+#ifdef DEC06_TEST
+			if((unsigned)p->in.left->tn.lval & 
+			  (unsigned)(1<<(SZINT-1)) ) {
+#else
+a321 1
+#endif
+d405 1
+a405 2
+/* #ifdef TRUST_REG_CHAR_AND_REG_SHORT */
+#ifndef MPX_OCT02
+d407 2
+a408 3
+ /* tbl */
+	    || t == CHAR || t == UCHAR || t == SHORT    /* tbl */
+	    || t == FLOAT				/* MPX JCB */
+d410 1
+a410 8
+	return(1);					/* tbl */
+#else
+    if (t == INT || t == UNSIGNED || t == LONG || t == ULONG
+	    || t == FLOAT				/* DJK */
+ /* wnj */
+	    || ISPTR(t))
+	return(1);					/* wnj */
+#endif
+d415 1
+a415 1
+	TWORD t;
+a425 1
+
+a445 77
+#ifndef MPX  /* OCT03 */
+/*
+** Generate initialization code for assigning a constant c to a field
+** of width sz.  We assume that the proper alignment has been obtained.
+** inoff is updated to have the proper final value.
+**
+** The reason for such backflips is that this routine
+** is used to initialize bitfields, as well as 'normal'
+** types. We collect the data
+** in 'word', and when we are at the end of the
+** initialization, or inoff is on a byte boundary, we
+** dump the data. For normal initialization, we dump
+** the data at each call, since inoff will be at least
+** byte aligned. In that case, we only go through the
+** loop one time. For fields, we may collect data over
+** several calls, and then dump the data.
+*/
+static int inwd;  /* curr offset in word */
+static int word;  /* word being built */
+
+void
+incode(p, sz)
+NODE	*p;
+int	sz;
+{
+    int		onecon, tw1, tw2;
+    int		oinoff = inoff;
+    long	tlw;
+
+#ifndef BUG2
+    if( idebug ) {
+	printf("incode(%x, %d):\n", p, sz);
+    }
+#endif
+
+    onecon = 1L;
+    tw1 = p->tn.lval;
+
+    if( (sz/SZCHAR) >= sizeof(word) || inwd == 0)
+	word = tw1;
+    else
+	{
+	/*
+	 ** This is a direct conversion from the line:
+	 ** word = (word << sz) | (p->tn.lval & ((1L<<sz)-1));
+	 */
+	word = (word << sz) | (p->tn.lval & ((1L<<sz)-1));
+    }
+    inwd += sz;
+    inoff += sz;
+    if((inoff % SZCHAR) == 0)        /* on at least a byte boundary */
+	while(inwd >= SZCHAR)           /* and at least a byte to emit */
+	    {
+	    /* dump the word */
+	    if (inwd >= SZINT && (oinoff % SZINT) == 0)
+		{
+		inwd -= SZINT;
+		printf("	dataw	x'%x'\n", word >> inwd);
+		word &= ((1L << inwd) - 1L);
+		}
+	    /* dump a halfword */
+	    else if (inwd >= SZSHORT && (oinoff % SZSHORT) == 0)
+		{
+		inwd -= SZSHORT;
+		printf("	datah	x'%x'\n", (word >> inwd) & 0xffff);
+		word &= ((1L << inwd) - 1L);
+		}
+	    else
+		{
+		inwd -= SZCHAR;         /* remove a byte  */
+		printf("	datab	x'%x'\n", (word >> inwd) & 0xff);
+		word &= ((1L << inwd) - 1L);
+		}
+	}
+}
+#else /* MPX OCT03 */
+
+a459 3
+#ifdef VAX
+    word |= ((unsigned)(p->tn.lval << (32 - sz))) >> (32 - sz - inwd);
+#else
+a460 1
+#endif
+a467 1
+#endif /* MPX OCT03 */
+a562 1
+#ifndef MPX /* OCT03 */
+a579 3
+#else /* MPX OCT03 */
+vfdzero(n)
+{		/* define n bits of zeros in a vfd */
+d581 1
+a581 2
+    if (n <= 0)
+	return;
+a582 14
+    inwd += n;
+    inoff += n;
+    if (inoff % ALINT == 0) {
+	printf("	dataw	x'%x'\n", word);
+	word = inwd = 0;
+    }
+}
+#endif /* MPX OCT03 */
+
+extern	int      lastloc;	/* MPX */
+
+#ifdef MAY2792
+char       *exname(p, sf) char *p;
+#else
+a585 1
+#endif
+a623 1
+#ifndef MAR25_MPX
+a629 1
+#endif /* MPXTEMP */
+a640 1
+#ifdef MPX
+a641 3
+#else
+    return(EXTERN);
+#endif
+a643 27
+#ifdef DEC05_JUNK
+commdec(id)
+{		/* make a common declaration for id, if reasonable */
+    register struct symtab *q;
+    OFFSZ       off, tsize();
+    char *nm;
+
+    q = &stab[id];
+    nm = exname (q->sname, q);
+#ifdef MPX
+#ifdef DEC05
+    if (q->sclass == EXTDEF)
+#else
+    /* added q->slevel >= 1 */
+    if (q->sclass == EXTDEF && q->slevel >= 1)
+#endif
+	printf("	def	%s\n", nm);
+#else
+    printf("%s	common	%s(", nm, nm);
+    off = tsize(q->stype, q->dimoff, q->sizoff) / SZINT;
+    printf(CONFMT, off);
+    printf(")\n");
+#endif /* MPX */
+
+}
+#endif /* DEC05_JUNK */
+
+a653 1
+
+a655 3
+#ifdef FPN_TEST
+    NODE	xx;
+#endif
+a661 6
+#ifdef FPN_TEST
+    printf("(atof)fp num is %s\n", s);
+    xx.fpn.dval = dcon;
+    printf("** (atof)fpn = %lx,%lx\n", xx.tn.lval, xx.tn.rval);
+    printf("** (atof)fpn = %f\n", xx.fpn.dval);
+#endif
+a667 1
+
+a677 1
+
+d708 3
+a714 1
+#ifdef MPX
+d717 5
+a722 2
+#else
+	printf("%ld\t%d\t",p->tn.lval, p->tn.rval);
+@
+
+
+1.4
+log
+@Correct floating point conversions
+@
+text
+@d11 1
+a11 1
+static char *rcsid = "@@(#) (Gould) $Header: /u/nbc/nbccom/RCS/local.c,v 1.3 1995/02/02 05:08:30 jbev Exp jbev $";
+a603 1
+#if defined(linux) && defined(i386)
+a621 12
+	union {
+	    FP_DOUBLE	dd;
+	    int	i[2];
+	} fpn;
+	fpn.dd = d;
+    if (sz == SZDOUBLE) {
+	printf("	datad	%sx'%08x%08x'\n", "", fpn.i[1], fpn.i[0]);
+    } else {
+	printf("	dataw	%sx'%x'\n", "", fpn.i[1]);
+    }
+#endif /* MYATOF */
+#else
+d628 1
+a628 1
+#endif
+@
+
+
+1.3
+log
+@Add internal format for floating point values.
+@
+text
+@d11 1
+a11 1
+static char *rcsid = "@@(#) (Gould) $Header: /u/nbc/nbccom/RCS/local.c,v 1.2 1995/01/27 23:11:22 jbev Exp jbev $";
+d584 1
+d586 3
+d617 1
+a617 1
+/*	putchar( ' ' ); */
+d761 1
+a761 1
+*  DJK: would let LONGS alone if gram treats
+@
+
+
+1.2
+log
+@Delete -DUAS flag
+@
+text
+@a1 4
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+d11 1
+a11 1
+static char *rcsid = "@@(#) (Gould) $Header: local.c,v 5.5 89/05/12 12:43:30 pcc Rel-3_0 $";
+a14 2
+    C compiler for Gould processors, base register instruction set.
+
+a16 1
+
+d265 4
+a268 2
+#ifndef TWOPASS_TEST
+#ifndef i386
+a269 16
+#else
+#define	HUGE_VAL 3.40282346638528860e+38 /*error value returned by Math lib*/
+if (p->fpn.dval >= HUGE_VAL)p->fpn.dval = HUGE_VAL;
+if (p->fpn.dval <= -HUGE_VAL)p->fpn.dval = -HUGE_VAL;
+#endif
+#else
+    	printf("** (float)fpn = %lx,%lx\n", p->stn.stsize, p->stn.stalign);
+    	printf("** (float)fpn = %f\n", p->fpn.dval);
+#ifndef i386
+		p->fpn.dval = (float)(p->fpn.dval);
+#else
+#define	HUGE_VAL 3.40282346638528860e+38 /*error value returned by Math lib*/
+    		if (p->fpn.dval >= HUGE_VAL)p->fpn.dval = HUGE_VAL;
+    	printf("** (float)fpn = %f\n", p->fpn.dval);
+		p->tn.stalign = 0;	/* lop off excess bits */
+#endif
+d280 4
+a283 2
+#ifndef TWOPASS_TEST
+#ifndef FP_EMULATE
+a285 5
+#else
+    	printf("** (double)fpn = %lx,%lx\n", p->tn.lval, p->tn.rval);
+    	printf("** (double)fpn = %f\n", p->fpn.dval);
+		p->fpn.dval = (double)(p->fpn.dval);
+#endif
+a295 1
+#ifdef MPX
+a298 1
+#endif
+d576 16
+d593 1
+d600 17
+d618 1
+a618 1
+#if defined(linux) && defined(i386)
+d626 1
+a626 4
+/*	printf("	datad	%e\n", d); */
+    }
+    else {
+/*	printf("	dataw	%sx'%x'\n", "", d); */
+d629 1
+d663 2
+a664 2
+#ifndef TWOPASS_TEST
+                l->tn.lval = FP_DTOL(l->fpn.dval);
+a665 2
+    	printf("** (long)fpn = %lx,%lx\n", l->tn.lval, l->tn.rval);
+    	printf("** (long)fpn = %f\n", l->fpn.dval);
+d667 1
+a667 1
+#endif
+d826 1
+d828 5
+a832 1
+/*    double atof(); */
+d834 2
+a835 1
+#ifdef TWOPASS_TEST
+a916 5
+
+/*
+ * 	(c) Copyright 1986 Gould Inc.
+ * 	    All Rights Reserved.
+ */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a595 1
+#ifdef UAS
+a596 3
+#else
+	printf("	.word	0x%x\n", word);
+#endif
+a609 1
+#ifdef UAS
+a631 8
+#else /* UAS */
+    if (sz == SZDOUBLE) {
+	printf("	.word	%s0x%x,0x%x\n", "", d);
+    }
+    else {
+	printf("	.word	%s0x%x\n", "", d);
+    }
+#endif
+a702 1
+#ifdef UAS
+a703 3
+#else
+	printf("	.word	0x%x\n", word);
+#endif
+a729 4
+#ifdef UAS
+#ifdef MAY2792
+    *tp++ = '_';
+#else
+a732 7
+#endif
+    while (*p) {
+	*tp++ = *p++;
+    }
+#else /* UAS */
+    if( ! (sf & SABSLABEL) )
+	*tp++ = '_';
+a735 1
+#endif
+a789 4
+#ifdef UAS
+#ifdef MAY2792
+    nm = exname (q->sname, q->sflags);
+#else
+a790 1
+#endif
+a804 6
+#else
+    printf("	.comm	%s,", exname(q->sname, q->sflags));
+    off = tsize(q->stype, q->dimoff, q->sizoff) / SZCHAR;
+    printf(CONFMT, off);
+    printf("\n");
+#endif
+@
