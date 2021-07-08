@@ -1,0 +1,128 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.03.03.20.46.46;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM PGMNAME,LISTING,STACK                                                     
+$JOB %PGMNAME                                                                   
+$IFT %PGMNAME NE HELP MACRO                                                     
+$NOTE                                                                           
+$NOTE       --- HELP ---                                                        
+$NOTE                                                                           
+$NOTE command ::= 'LD'* pgmparm                                                 
+$NOTE                                                                           
+$NOTE pgmparm ::= Pgmname listparm |                                            
+$NOTE             'HELP'*                                                       
+$NOTE                                                                           
+$NOTE listparm ::=     'LIST'* |                                                
+$NOTE              ',' 'PRINT'* |                                               
+$NOTE              ',' 'NULL'* |                                                
+$NOTE              ',' Listpath                                                 
+$NOTE                                                                           
+$NOTE     --- WHERE ---                                                         
+$NOTE                                                                           
+$NOTE LD -> a TSM macro for cataloging a C program.  The program has            
+$NOTE       "OPTION LOWER" and "ENVIRONMENT ,,MULTI" set and is put             
+$NOTE       in the current working directory.                                   
+$NOTE                                                                           
+$NOTE Pgmname -> the name of the load module and, when suffixed by a            
+$NOTE            ".O", the name of the object.                                  
+$NOTE                                                                           
+$NOTE HELP -> a parameter that results in listing this file.                    
+$NOTE                                                                           
+$NOTE LIST -> a parameter that causes all of the text output of                 
+$NOTE         this command to be displayed on the terminal of the               
+$NOTE         user.                                                             
+$NOTE                                                                           
+$NOTE PRINT -> a parameter that causes all of the text output of                
+$NOTE          this command to be placed in a spooling file normally            
+$NOTE          destined for the line printer.                                   
+$NOTE                                                                           
+$NOTE NULL -> a parameter that causes all of the text output of this            
+$NOTE         command to be discarded.                                          
+$NOTE                                                                           
+$NOTE Listpath -> a parameter that causes all of the text output of             
+$NOTE             this command to be placed in the file identified              
+$NOTE             by its pathname.                                              
+$NOTE                                                                           
+$GOTO ENDHELP                                                                   
+$DEFN MACRO                                                                     
+$IFA %PGMNAME;.O ERROR1                                                         
+$PAGE 0                                                                         
+$AS IN TO SYC                                                                   
+$AS OT TO SGO                                                                   
+$^(SYSTEM)COMPRESS                                                              
+^(BIN)C.SRTE.O                                                                  
+MAIN.O                                                                          
+DONAME.O                                                                        
+FILES.O                                                                         
+RULES.O                                                                         
+DOSYS.O                                                                         
+GRAM.O                                                                          
+DYNDEP.O                                                                        
+MISC.O                                                                          
+$NOTE  END OF COMPRESS                                                          
+$OPTION 19 25                                                                   
+$AS LIB TO @@SYSTEM(BIN)CLB BLOC=N                                               
+$AS DIR TO @@SYSTEM(BIN)CDR BLOC=N                                               
+$IFP %LISTING SOMELIST                                                          
+$AS SLO TO DEV=NU                                                               
+$GOTO CATALOG                                                                   
+$DEFN SOMELIST                                                                  
+$IFT %LISTING NE NULL LIST                                                      
+$AS SLO TO DEV=NU                                                               
+$GOTO CATALOG                                                                   
+$DEFN LIST                                                                      
+$IFT %LISTING NE LIST PRINT                                                     
+$AS SLO TO LFC=UT                                                               
+$GOTO CATALOG                                                                   
+$DEFN PRINT                                                                     
+$IFT %LISTING NE PRINT PATHNAME                                                 
+$AS SLO TO SLO                                                                  
+$GOTO CATALOG                                                                   
+$DEFN PATHNAME                                                                  
+$IFT PATH %LISTING SKIP                                                         
+$CREA %LISTING                                                                  
+$DEFN SKIP                                                                      
+$AS SLO TO %LISTING                                                             
+$GOTO CATALOG                                                                   
+$DEFN CATALOG                                                                   
+$IFP %STACK STACKSET                                                            
+$SET %STACK=1000                                                                
+$DEFN STACKSET                                                                  
+$ALLOCATE 1B800                                                                 
+$PAGE                                                                           
+$@@SYSTEM(SYSTEM)CATALOG                                                         
+OPTION LOWER                                                                    
+FILES 10                                                                        
+BUFFERS 10                                                                      
+ENVIRONMENT ,,SHARE,MAP2048                                                     
+BUILD %PGMNAME                                                                  
+$IFT ABORT ERROR2                                                               
+$GOTO END                                                                       
+$DEFN ERROR1                                                                    
+$NOTE *** ERROR ***  NO PROGRAM NAME GIVEN                                      
+$GOTO ENDHELP                                                                   
+$DEFN ERROR2                                                                    
+$NOTE *** ERROR ***  CATALOG FAILED                                             
+$DEFN END                                                                       
+$EOJ                                                                            
+$DEFN ENDHELP                                                                   
+@

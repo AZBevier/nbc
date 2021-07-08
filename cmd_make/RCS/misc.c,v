@@ -1,0 +1,1554 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.6
+date	2021.07.06.21.47.12;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.11.09.00.32.46;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.06.02.15.46.25;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.03.16.20.31.31;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.03.04.00.40.11;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.03.03.20.46.46;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Pun under RCS.
+@
+
+
+1.6
+log
+@Correct warning errors.
+@
+text
+@/*~!misc.c*/
+/* Name:  misc.c Part No.: _______-____r
+ *
+ * Copyright 1995 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"$Id: misc.c,v 1.5 1995/11/09 00:32:46 jbev Exp jbev $"
+
+#include "defs.h"
+#include <ctype.h>
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#endif
+
+void fatal1();
+void fatal();
+int suffix();
+int sindex();
+void callyacc();
+int eqsign();
+int is_sccs();
+void sccstrip();
+void readenv();
+void yyerror();
+void setvar();
+void exitm();
+NAMEBLOCK srchname();
+extern int yyparse();
+void rm_gots();
+int get();
+void msetenv();
+int any();
+int Execvp();
+extern int amatch();
+
+FSTATIC CHARSTAR nextchar=0;
+FSTATIC CHARSTAR lastchar=0;
+
+/*FSTATIC int *nextint=0;*/
+/*FSTATIC int *lastint=0;*/
+
+FSTATIC NAMEBLOCK hashtab [HASHSIZE];
+int nhashed=0;
+
+/* simple linear hash.  hash function is sum of
+characters mod hash table size.
+*/
+int hashloc (s)
+CHARSTAR s;
+{
+  register int i;
+  register int hashval;
+  register CHARSTAR t;
+
+  hashval = 0;
+
+  for (t=s; *t!=CNULL ; ++t)
+    hashval += *t;
+
+  hashval %= HASHSIZE;
+
+  for (i=hashval;
+    hashtab[i]!=0 && !equal(s,hashtab[i]->namep);
+    i = (i+1)%HASHSIZE )
+    ;
+
+  return (i);
+}
+
+NAMEBLOCK srchname (s)
+register CHARSTAR s;
+{
+  return (hashtab [hashloc (s) ]);
+}
+
+NAMEBLOCK makename (s)
+register CHARSTAR s;
+{
+  /* make a name entry; `s' is presumed to already to have been saved */
+
+  register NAMEBLOCK p;
+
+  if (nhashed++ > HASHSIZE-3)
+    fatal ("Hash table overflow");
+
+  p = ALLOC (nameblock);
+  p->nextname = firstname;
+  p->backname = NULL;
+
+  p->namep = s;
+  p->linep = 0;
+  p->done = 0;
+  p->septype = 0;
+  p->rundep = 0;
+  p->modtime = 0;
+
+  firstname = p;
+
+  hashtab [hashloc (s) ] = p;
+
+  return (p);
+}
+
+#define NOTSHORT sizeof (struct nameblock)
+
+#ifndef mpx
+extern CHARSTAR end; /* loader value of end of core */
+#endif
+
+CHARSTAR copys (s)
+register CHARSTAR s;
+{
+  register CHARSTAR t;
+  struct /* was register struct changed 11/17/83 JCB */
+  {
+    int i_i;
+    CHARSTAR i_s;
+  } i;
+
+  i.i_i = strlen (s) + 1;
+  if (i.i_i > NOTSHORT)
+  {
+    i.i_i = (i.i_i + 1) &~1;
+    t = (CHARSTAR) calloc (i.i_i, sizeof (*s));
+    if (t == NULL)
+      goto fat;
+    i.i_s = t;
+    while ((*t++ = *s++))
+      ;
+    return (i.i_s);
+  }
+
+  if (i.i_i >= (lastchar-nextchar))
+  {
+    i.i_i = (i.i_i + 1) &~1;
+    if ((nextchar= (CHARSTAR) calloc (i.i_i, sizeof (*s))) == NULL)
+fat:
+      fatal ("Cannot allocate memory");
+    lastchar = nextchar + i.i_i;
+  }
+
+  t = nextchar;
+  while ((*nextchar++ = *s++));
+  return (t);
+}
+
+CHARSTAR concat (a, b, c) /* c = concatenation of a and b */
+register CHARSTAR a, b;
+register CHARSTAR c;
+{
+  register CHARSTAR t;
+  t = c;
+
+  while ((*t = *a++)) t++;
+  while ((*t++ = *b++));
+  return (c);
+}
+
+int suffix (a, b, p) /* is b the suffix of a?  if so, set p = prefix */
+register CHARSTAR a, b, p;
+{
+  CHARSTAR a0, b0;
+  a0 = a;
+  b0 = b;
+
+  if (!a || !b)
+    return (0);
+
+  while (*a++);
+  while (*b++);
+
+  if ((a-a0) < (b-b0))
+    return (0);
+
+  while (b>b0)
+    if (*--a != *--b)
+      return (0);
+
+  while (a0<a)
+    *p++ = *a0++;
+  *p = CNULL;
+
+  return (1);
+}
+
+int *intalloc (n)
+register int n;
+{
+  register INTSTAR p;
+
+  if ((p = (int *)calloc (1, n)))
+    return (p);
+
+  fatal ("out of memory");
+  return((INTSTAR)-1);		/* keep compiler happy */
+}
+
+/* copy string a into b, substituting for arguments */
+extern NAMEBLOCK cur_name;
+
+CHARSTAR subst (a, b, c)
+register CHARSTAR a, b, c;
+{
+  register CHARSTAR s;
+  static int depth=0;
+  char vname [100];
+  char closer;
+  static CHARSTAR limit;
+
+  if (c)
+    limit = c;
+  if (++depth > 100)
+    fatal ("infinitely recursive macro?");
+  if (a!=0)
+  {
+    while (*a)
+    {
+      if (*a != DOLLAR)
+        *b++ = *a++;
+      else if (*++a==CNULL || *a==DOLLAR)
+        *b++ = *a++;
+      else
+      {
+        s = vname;
+        if (*a==LPAREN || *a==LCURLY)
+        {
+          closer= (*a==LPAREN ? RPAREN : RCURLY);
+          ++a;
+          while (*a == BLANK)
+            ++a;
+          while (*a!=BLANK &&
+            *a!=closer &&
+            *a!=CNULL)
+            *s++ = *a++;
+          while (*a!=closer && *a!=CNULL)
+            ++a;
+          if (*a == closer)
+            ++a;
+        }
+        else
+          *s++ = *a++;
+
+        *s = CNULL;
+        if (amatch (&vname [0], "*:*=*"))
+        {
+          b = colontrans (b, vname);
+        }
+        else if (amatch (vname, "[@@*<%][DF]"))
+        {
+          b = dftrans (b, vname);
+        }
+        else
+        {
+          b = straightrans (b, vname);
+        }
+      }
+      if (b >= limit)
+        fatal ("Substitution produced line too long");
+    }
+  }
+
+  *b = CNULL;
+  --depth;
+  return (b);
+}
+
+/*
+* Translate the $(name:*=*) type things.
+*/
+
+CHARSTAR colontrans (b, vname)
+register CHARSTAR b;
+char vname [];
+{
+  register int i;
+  register CHARSTAR ps1;
+  int fromlen;
+  char from [30], to [70];
+  char dftemp [128];
+  char tmp, nextchr;
+  CHARSTAR psave, pcolon;
+  VARBLOCK vbp;
+
+  /*
+  * Mark off the name (up to colon), the from expression (up to '='),
+  * and the to expresion (up to CNULL).
+  */
+  i = 0;
+  for (ps1 = &vname[0]; *ps1 != KOLON; ps1++)
+    ;
+  pcolon = ps1;
+  *pcolon = CNULL;
+  while (*++ps1 != EQUALS)
+    from [i++] = *ps1;
+  from [i] = CNULL;
+  fromlen = i;
+  i = 0;
+  while (*++ps1)
+    to [i++] = *ps1;
+  to [i] = CNULL;
+
+  /*
+  * Now, tanslate.
+  */
+
+  if (amatch (vname, "[@@*<%][DF]"))
+  {
+    dftrans (dftemp, vname);
+    ps1 = dftemp;
+  }
+  else
+  {
+    if ((vbp = srchvar (vname)) == NULL)
+    {
+      return (b);
+    }
+    ps1 = vbp->varval;
+  }
+  if (ps1 != NULL && *ps1 != CNULL)
+  {
+    psave = ps1;
+    while ((i = sindex (ps1, from)) >= 0)
+    {
+      ps1 = &ps1 [i];
+      tmp = *ps1;
+      *ps1 = CNULL;
+      nextchr = * (ps1+fromlen);
+      if (nextchr == TAB ||
+        nextchr == BLANK ||
+        nextchr == CNULL)
+      {
+        b = copstr (b, psave);
+        b = copstr (b, to);
+        *ps1 = tmp;
+        ps1 += fromlen;
+      }
+      else
+      {
+        b = copstr (b, psave);
+        *b++ = tmp;
+        *ps1 = tmp;
+        ps1++;
+      }
+      psave = ps1;
+    }
+    b = copstr (b, ps1);
+  }
+  *pcolon = KOLON;
+  return (b);
+}
+
+/*
+* Do the $(@@D) type translations.
+*/
+
+CHARSTAR dftrans (b, vname)
+register CHARSTAR b;
+char vname [];
+{
+  char c, c1;
+  CHARSTAR p1, p2;
+  VARBLOCK vbp;
+
+  c1 = vname [1];
+  vname [1] = CNULL;
+  vbp = srchvar (vname);
+  if (vbp != 0 && vbp->varval != 0)
+  {
+    for (p1=p2=vbp->varval;*p1;p1++)
+      if (*p1 == SLASH)
+        p2 = p1;
+    if (*p2 == SLASH)
+    {
+      if (c1 == 'D')
+      {
+        if (p2 == vbp->varval)
+          p2++;
+        c = *p2;
+        *p2 = CNULL;
+        b = copstr (b, vbp->varval);
+        *p2 = c;
+      }
+      else
+      {
+        b = copstr (b, p2+1);
+      }
+    }
+    else
+    {
+      if (c1 == 'D')
+        b = copstr (b, ".");
+      else
+        b = copstr (b, p2);
+    }
+  }
+  vname [1] = c1;
+  return (b);
+}
+
+/*
+* Standard trnaslation, nothing fancy.
+*/
+
+CHARSTAR straightrans (b, vname)
+register CHARSTAR b;
+char vname [];
+{
+  register VARBLOCK vbp;
+  register CHAIN pchain;
+  register NAMEBLOCK pn;
+
+  vbp = srchvar (vname);
+  if (vbp != 0 && vbp->varval != 0)
+  {
+    if (vbp->v_aflg == YES)
+    {
+      pchain = (CHAIN) vbp->varval;
+      for (; pchain; pchain = pchain->nextchain)
+      {
+        pn = (NAMEBLOCK) pchain->datap;
+        if (pn->alias)
+          b=copstr (b, pn->alias);
+        else
+          b=copstr (b, pn->namep);
+        *b++ = BLANK;
+      }
+    }
+    else
+    {
+      b = subst (vbp->varval, b, 0);
+    }
+    vbp->used = YES;
+  }
+  return (b);
+}
+
+/* copy s into t, return the location of the next free character in s */
+CHARSTAR copstr (s, t)
+register CHARSTAR s, t;
+{
+  if (t == 0)
+    return (s);
+  while (*t)
+    *s++ = *t++;
+  *s = CNULL;
+  return (s);
+}
+
+void setvar (v, s)
+register CHARSTAR v, s;
+{
+  register VARBLOCK p;
+
+  p = srchvar (v);
+  if (p == 0) {
+    p = varptr (v);
+  }
+  if (p->noreset == NO) {
+    if (IS_ON (EXPORT))
+      p->envflg = YES;
+    p->varval = s;
+    if (IS_ON (INARGS) || IS_ON (ENVOVER))
+      p->noreset = YES;
+    else
+      p->noreset = NO;
+    if (IS_ON (DBUG))
+	printf ("setvar: %s = %s noreset = %d envflg = %d Mflags = 0%o\n",
+	  v, p->varval, p->noreset, p->envflg, Mflags);
+
+    if (p->used && !amatch (v, "[@@*<?!%]"))
+      if (IS_ON (DBUG))
+        fprintf (stderr, "Warning: %s changed after being used\n", v);
+  }
+}
+
+int eqsign (a)
+register CHARSTAR a;
+{
+  register CHARSTAR p;
+
+  for (p = ":@@;=$\n\t"; *p; p++)
+    if (any (a, *p))
+    {
+      callyacc (a);
+      return (YES);
+    }
+  return (NO);
+}
+
+
+VARBLOCK varptr (v)
+register CHARSTAR v;
+{
+  register VARBLOCK vp;
+
+  if ((vp = srchvar (v)) != 0)
+    return (vp);
+
+  vp = ALLOC (varblock);
+  vp->nextvar = firstvar;
+  firstvar = vp;
+  vp->varname = copys (v);
+  vp->varval = 0;
+  return (vp);
+}
+
+VARBLOCK srchvar (vname)
+register CHARSTAR vname;
+{
+  register VARBLOCK vp;
+
+  for (vp=firstvar; vp != 0 ; vp = vp->nextvar)
+    if (equal (vname, vp->varname))
+      return (vp);
+  return (NO);
+}
+
+
+void fatal1 (s, t)
+CHARSTAR s, t;
+{
+  char buf [100];
+  sprintf (buf, s, t);
+  fatal (buf);
+}
+
+void fatal (s)
+CHARSTAR s;
+{
+  if (s)
+    fprintf (stderr, "Make: %s.  Stop.\n", s);
+  else
+    fprintf (stderr, "\nStop.\n");
+  exitm (1);
+}
+
+void yyerror (s)
+CHARSTAR s;
+{
+  char buf [50];
+  extern int yylineno;
+
+  sprintf (buf, "line %d: %s", yylineno, s);
+  fatal (buf);
+}
+
+CHAIN appendq (head, tail)
+register CHAIN head;
+register CHARSTAR tail;
+{
+  register CHAIN p;
+
+  p = ALLOC (chain);
+  p->datap = tail;
+  while (head->nextchain)
+    head = head->nextchain;
+  head->nextchain = p;
+  return(head);		/* keep compiler happy */
+}
+
+CHARSTAR mkqlist (p)
+register CHAIN p;
+{
+  register CHARSTAR qbufp, s;
+  static char qbuf [OUTMAX];
+
+  qbufp = qbuf;
+
+  for (; p ; p = p->nextchain)
+  {
+    s = p->datap;
+    if (qbufp != qbuf)
+      *qbufp++ = BLANK;
+    if (qbufp+strlen (s) > &qbuf [OUTMAX-3])
+    {
+      fprintf (stderr, "$? list too long\n");
+      break;
+    }
+    while (*s)
+      *qbufp++ = *s++;
+  }
+  *qbufp = CNULL;
+  return (qbuf);
+}
+
+int any (s, c)
+register CHARSTAR s;
+register char c;
+{
+  register char d;
+
+  while ((d = *s++))
+  {
+    if (d==c)
+      return (1);
+  }
+  return (0);
+}
+
+int sindex (s1, s2)
+CHARSTAR s1;
+CHARSTAR s2;
+{
+  register CHARSTAR p1;
+  register CHARSTAR p2;
+  register int flag;
+  int ii;
+
+  p1 = &s1 [0];
+  p2 = &s2 [0];
+  flag = -1;
+  for (ii = 0; ; ii++)
+  {
+    while (*p1 == *p2)
+    {
+      if (flag < 0)
+        flag = ii;
+      if (*p1++ == CNULL)
+        return (flag);
+      p2++;
+    }
+    if (*p2 == CNULL)
+      return (flag);
+    if (flag >= 0)
+    {
+      flag = -1;
+      p2 = &s2 [0];
+    }
+    if (*s1++ == CNULL)
+      return (flag);
+    p1 = s1;
+  }
+}
+
+#include "sys/stat.h"
+
+/*
+* findfl(name)  (like execvp, but does path search and finds files)
+*/
+static char fname [512];
+
+char *execat ();
+
+CHARSTAR findfl (name)
+register CHARSTAR name;
+{
+  register CHARSTAR p;
+  register VARBLOCK cp;
+
+  if (name [0] == SLASH)
+    return (name);
+  cp = varptr ("VPATH");
+  if (cp->varval == 0)
+    p = ":";
+  else
+    p = cp->varval;
+
+  do
+    {
+    p = execat (p, name, fname);
+    if (access (fname, 4) == 0)
+      return (fname);
+  }
+  while (p);
+  return ((CHARSTAR) -1);
+}
+
+CHARSTAR execat (s1, s2, si)
+register CHARSTAR s1, s2;
+CHARSTAR si;
+{
+  register CHARSTAR s;
+
+  s = si;
+  while (*s1 && *s1 != KOLON && *s1 != MINUS)
+    *s++ = *s1++;
+  if (si != s)
+    *s++ = SLASH;
+  while (*s2)
+    *s++ = *s2++;
+  *s = CNULL;
+  return (*s1? ++s1: 0);
+}
+
+/*
+* change xx to s.xx or /x/y/z to /x/y/s.z
+*/
+CHARSTAR trysccs (str)
+register CHARSTAR str;
+{
+  register CHARSTAR sstr;
+#ifdef OLDSCCS
+  register int i = 2;
+#endif
+
+  sstr = str;
+  for (; *str; str++)
+    ;
+#ifdef OLDSCCS
+  str [2] = CNULL;
+  str--;
+  for (;str >= sstr; str--)
+  {
+    if (*str == SLASH)
+      if (i == 2)
+      {
+        i = 0;
+        * (str+2) = DOT;
+        * (str+1) = 's';
+      }
+    * (str+i) = *str;
+  }
+  if (i == 2)
+  {
+    * (str+2) = DOT;
+    * (str+1) = 's';
+  }
+#else
+  /* str points to last file char + 1 */
+#ifdef OLDWAY
+  if ((str[-1] == 'v' || str[-1] == 'V') && str[-2] == ',')
+#else
+  if ((str[-1] == 'v' || str[-1] == 'V') && str[-2] == '_')
+#endif
+    return (sstr);
+#ifdef OLDWAY
+  str[0] = ',';
+#else
+  str[0] = '_';
+#endif
+  str[1] = 'v';
+  str[2] = CNULL;
+#endif
+  return (sstr);
+}
+
+int is_sccs (filename)
+register CHARSTAR filename;
+{
+#ifdef OLDSCCS
+  register CHARSTAR p;
+
+  for (p = filename; *p; p++)
+    if (*p == 's')
+      if (p == filename && p [1] == DOT)
+        return (YES);
+      else if (p [-1] == SLASH && p [1] == DOT)
+        return (YES);
+#else
+  for (; *filename; filename++)
+    ;
+  /* p points to last file char + 1 */
+#ifdef OLDWAY
+  if ((filename[-1] == 'v' || filename[-1] == 'V') && filename[-2] == ',')
+#else
+  if ((filename[-1] == 'v' || filename[-1] == 'V') && filename[-2] == '_')
+#endif
+    return (YES);
+#endif
+  return (NO);
+}
+
+/*
+* change pfx to /xxx/yy/\*zz.* or *zz.*
+*/
+CHARSTAR addstars (pfx)
+register CHARSTAR pfx;
+{
+  register CHARSTAR p1, p2;
+
+  for (p1 = pfx; *p1; p1++)
+    ;
+  p2 = p1 + 3; /* 3 characters, '*', '.', and '*'. */
+  p1--;
+
+  *p2-- = CNULL;
+  *p2-- = STAR;
+  *p2-- = DOT;
+  while (p1 >= pfx)
+  {
+    if (*p1 == SLASH)
+    {
+      *p2 = STAR;
+      return (pfx);
+    }
+    *p2-- = *p1--;
+  }
+  *p2 = STAR;
+  return (p2);
+}
+
+#define NENV  300
+extern CHARSTAR *environ;
+#ifdef mpx
+CHARSTAR *oldenvir = (char **)NULL;
+
+/*
+ * This routine frees the temp environment during exec.
+ */
+
+freenv()
+{
+  char **ep;
+  char *p;
+
+  if (environ == NULL)return;
+  ep = environ;
+  while (p = *ep++)free(p);
+  free (environ);
+  environ = oldenvir;
+  oldenvir = 0;
+
+}
+#endif
+
+/*
+ * This routine is called just before an exec.
+ */
+
+void msetenv ()
+{
+  register CHARSTAR *ea;
+  register int nenv = 0;
+  register CHARSTAR p;
+  CHARSTAR *es;
+  VARBLOCK vp;
+  int length;
+
+  if (firstvar == 0)
+    return;
+
+  es=ea= (CHARSTAR *) calloc (NENV, sizeof *ea);
+  if (es == (CHARSTAR *) -1)
+    fatal ("Cannot alloc mem for envp.");
+
+  for (vp=firstvar; vp != 0; vp=vp->nextvar)
+    if (vp->envflg)
+    {
+      if (++nenv >= NENV)
+        fatal ("Too many env parameters.");
+      length = strlen (vp->varname) + strlen (vp->varval) + 2;
+      if ((*ea = (CHARSTAR) calloc (length, sizeof **ea)) == (CHARSTAR) -1)
+        fatal ("Cannot alloc mem for env.");
+      p = copstr (*ea++, vp->varname);
+      p = copstr (p, "=");
+      p = copstr (p, vp->varval);
+    }
+  *ea = 0;
+  if (nenv > 0)
+#ifndef mpx
+    environ=es;
+#else
+    {
+    oldenvir = environ;
+    environ=es;
+    }
+#endif
+  if (IS_ON (DBUG))
+    printf ("nenv = %d\n", nenv);
+}
+
+/*
+* Called in main
+* If a string like "CC=" occurs then CC is not put in environment.
+* This is because there is no good way to remove a variable
+* from the environment within the shell.
+*/
+
+void readenv ()
+{
+  register CHARSTAR *ea;
+  register CHARSTAR p;
+
+  ea=environ;
+  for (;*ea; ea++)
+  {
+    for (p = *ea; *p && *p != EQUALS; p++)
+      ;
+    if (*p == EQUALS)
+      if (* (p+1))
+        eqsign (*ea);
+  }
+}
+
+void sccstrip (pstr)
+register CHARSTAR pstr;
+{
+  register CHARSTAR p2;
+  register CHARSTAR sstr;
+
+  sstr = pstr;
+  for (; *pstr ; pstr++)
+    if (*pstr == RCURLY)
+    {
+      if (isdigit (pstr [1]))
+        if (pstr != sstr)
+          if (pstr [-1] != DOLLAR)
+          {
+            for (p2 = pstr; *p2 && (*p2 != LCURLY); p2++)
+              ;
+            if (*p2 == CNULL)
+              break;
+            strshift (pstr, - (int) (p2-pstr+1));
+          }
+    }
+}
+
+/*
+* Shift a string `pstr' count places. negative is left, pos is right
+* Negative shifts cause char's at front to be lost.
+* Positive shifts assume enough space!
+*/
+CHARSTAR strshift (pstr, count)
+register CHARSTAR pstr;
+register int count;
+{
+  register CHARSTAR sstr;
+
+  sstr = pstr;
+  if (count < 0)
+  {
+    count = -count;
+    while (pstr [count]) {
+      *pstr = pstr[count];
+      pstr++;
+    }
+    *pstr = 0;
+    return (sstr);
+  }
+  for (; *pstr; pstr++)
+    ;
+  pstr-- [count] = 0;
+  while (pstr != sstr) {
+    pstr [count] = *pstr;
+    pstr--;
+  }
+  pstr [count] = *pstr;
+
+  return (sstr);
+
+}
+
+/*
+* execlp(name, arg,...,0) (like execl, but does path search)
+* execvp(name, argv)  (like execv, but does path search)
+*/
+#include <errno.h>
+#ifndef NULL
+#define NULL  0
+#endif
+
+CHARSTAR execat ();
+extern errno;
+
+#ifdef NOT4NOW
+int execlp (name, argv)
+CHARSTAR name, argv;
+{
+  return (execvp (name, &argv));
+}
+#endif
+
+int Execvp (name, argv)
+CHARSTAR name, *argv;
+{
+  register int etxtbsy = 1;
+  register int eacces = 0;
+  register CHARSTAR cp;
+  CHARSTAR pathstr;
+  CHARSTAR shell;
+  char xfname [128];
+#ifdef mpx
+  int status;
+#endif
+
+  pathstr = varptr ("PATH") ->varval;
+  if (!(pathstr != 0 && *pathstr != CNULL))
+#ifdef mpx
+    pathstr = ":/system/bin:/system/system";
+#else
+    pathstr = ":/bin:/usr/bin";
+#endif
+  shell = varptr ("SHELL") ->varval;
+  if (shell == 0 || *shell == CNULL)
+#ifdef mpx
+    shell = "/system/bin/sh";
+#else
+    shell = "/bin/sh";
+#endif
+  cp = strchr (name, SLASH) ? "": pathstr;
+#ifdef DBUG_NO
+fprintf (stderr, "execvp - pathstr %s\n", pathstr);
+#endif
+
+  do
+    {
+    cp = execat (cp, name, xfname);
+retry:
+#ifndef mpx
+    execv (xfname, argv);
+#else
+#ifdef DBUG_NO
+    if (IS_ON (DBUG))
+    	fprintf (stderr, "execvp - file %s\n", xfname);
+#endif
+    status = vexecv (xfname, argv);
+    if (status == 0)return (0);
+#ifdef DBUG_NO
+    if (IS_ON (DBUG))
+    	fprintf (stderr, "execvp - status %d\n", status);
+    if (IS_ON (DBUG))
+    	fprintf (stderr, "execvp - errno %d\n", errno);
+#endif
+#endif
+    switch (errno)
+    {
+    case ENOEXEC:
+      *argv = xfname;
+      *--argv = "sh";
+#ifndef mpx
+      execv (shell, argv);
+      return (-1);
+#else
+      status = vexecv (shell, argv);
+      if (status == 0)return (0);
+      return(status);
+#endif
+    case ETXTBSY:
+      if (++etxtbsy > 5)
+        return (-1);
+      sleep (etxtbsy);
+      goto retry;
+    case EACCES:
+      eacces++;
+      break;
+    case ENOMEM:
+    case E2BIG:
+      return (-1);
+    }
+  }
+    while (cp);
+  if (eacces)
+    errno = EACCES;
+  return (-1);
+}
+
+/*
+* get() does an SCCS get on the file ssfile.
+* For the get command, get() uses the value of the variable "GET".
+* If ssfile has a slash in it, get() does a "chdir" to the appropriate
+* directory if the cdflag is set to CD. This assures
+* the program finds the ssfile where it belongs when necessary.
+* If the rlse string variable is set, get() uses it in the
+* get command sequence.
+* Thus a possible sequence is:
+*   set -x;
+*   cd ../sys/head;
+*   get -r2.3.4.5 s.stdio.h
+*
+*/
+
+/*
+* The gothead and gotf structures are used to remember
+* the names of the files `make' automatically gets so
+* `make' can remove them upon exit.
+*/
+GOTHEAD gotfiles;
+
+int get (ssfile, cdflag, rlse)
+register CHARSTAR ssfile;
+int cdflag;
+CHARSTAR rlse;
+{
+  register CHARSTAR pr;
+  register CHARSTAR pr1;
+  char gbuf [128];
+  char sfile [128];
+  int retval;
+  GOTF gf;
+#ifdef mpx
+  char *shell = SHELLCOM;
+#endif
+
+  copstr (sfile, ssfile);
+  if (!is_sccs (sfile))
+    trysccs (sfile);
+  if (access (sfile, 4) != 0 && IS_OFF (GET))
+    return (NO);
+
+  pr = gbuf;
+#ifdef OLDSCCS
+  if (IS_OFF (SIL))
+    pr = copstr (pr, "set -x;\n");
+#endif
+
+  if (cdflag == CD)
+    if (any (sfile, SLASH))
+    {
+      pr = copstr (pr, "cd ");
+      for (pr1 = sfile; *pr1; pr1++)
+        ;
+      while (*pr1 != SLASH)
+        pr1--;
+      *pr1 = CNULL;
+      pr = copstr (pr, sfile);
+      pr = copstr (pr, ";\n");
+      *pr1 = SLASH;
+    }
+
+  pr = copstr (pr, varptr ("GET") ->varval);
+  pr = copstr (pr, " ");
+  pr = copstr (pr, varptr ("GFLAGS") ->varval);
+  pr = copstr (pr, " ");
+
+  pr1 = rlse;
+  if (pr1 != NULL && pr1 [0] != CNULL)
+  {
+    if (pr1 [0] != MINUS) /* RELEASE doesn't have '-r' */
+      pr = copstr (pr, "-r");
+    pr = copstr (pr, pr1);
+    pr = copstr (pr, " ");
+  }
+
+  pr = copstr (pr, sfile);
+  /*
+  * exit codes are opposite of error codes so do the following:
+  */
+#ifdef DEBUG
+printf("Call system [%s]\n", gbuf);
+#endif
+#ifndef mpx
+  retval = (system (gbuf) == 0) ? YES : NO ;
+#else
+  doclose();
+  retval = ((vexecl (shell, "sh", "-c", gbuf, 0)) == 0) ? YES : NO ;
+#endif
+  if (retval == YES)
+  {
+    if (gotfiles == 0)
+    {
+      gotfiles = ALLOC (gothead);
+      gf = (GOTF) gotfiles;
+      gotfiles->gnextp = 0;
+      gotfiles->endp = (GOTF) gotfiles;
+    }
+    else
+    {
+      gf = gotfiles->endp;
+      gf->gnextp = ALLOC (gotf);
+      gf = gf->gnextp;
+      gf->gnextp = 0;
+    }
+#ifdef OLDSCCS
+    gf->gnamep = copys (sfile+2); /* `+2' skips `s.' */
+#else
+    gf->gnamep = copys (sfile);		/* remove ,v from name */
+    gf->gnamep[strlen(gf->gnamep) - 2] = CNULL;
+#endif
+    gotfiles->endp = gf;
+  }
+  return (retval);
+}
+
+/*
+* subroutine to actually remove to gotten files.
+*/
+void rm_gots ()
+{
+  register GOTF gf;
+
+#ifdef mpx
+  doclose();
+#endif
+  if (IS_ON (GF_KEEP))
+    return;
+  for (gf = (GOTF)gotfiles; gf ; gf=gf->gnextp)
+    if (gf->gnamep)
+    {
+      if (IS_ON (DBUG)) printf ("rm_got: %s\n", gf->gnamep);
+      unlink (gf->gnamep);
+    }
+}
+
+void callyacc (str)
+register CHARSTAR str;
+{
+  CHARSTAR lines [2];
+  FILE *finsave;
+  CHARSTAR *lpsave;
+
+  finsave = fin;
+  lpsave = linesptr;
+  fin = 0;
+  lines [0] = str;
+  lines [1] = 0;
+  linesptr = lines;
+  yyparse ();
+  fin = finsave;
+  linesptr = lpsave;
+}
+
+/*
+* exit routine for removing the files `make' automatically
+* got.
+*/
+void exitm (arg)
+int arg;
+{
+  rm_gots ();
+  if (IS_ON (MEMMAP))
+  {
+    ;
+  }
+#ifdef mpx
+  exit (arg);
+#else
+  _exit (arg);
+#endif
+}
+@
+
+
+1.5
+log
+@Close all directories before calling co.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id: misc.c,v 1.4 1995/06/02 15:46:25 jbev Exp jbev $"
+d23 25
+d52 2
+a53 2
+FSTATIC int *nextint=0;
+FSTATIC int *lastint=0;
+d61 1
+a61 1
+hashloc (s)
+a94 1
+  register CHARSTAR t;
+d131 1
+a131 2
+  }
+  i;
+d141 2
+a142 1
+    while (*t++ = *s++);
+d156 1
+a156 1
+  while (*nextchar++ = *s++);
+d167 2
+a168 2
+  while (*t = *a++) t++;
+  while (*t++ = *b++);
+d172 1
+a172 1
+suffix (a, b, p) /* is b the suffix of a?  if so, set p = prefix */
+d204 1
+a204 1
+  if (p = (int *) calloc (1, n))
+d218 1
+a218 2
+  register VARBLOCK vbp;
+  static depth=0;
+d462 1
+a462 1
+setvar (v, s)
+d489 1
+a489 1
+eqsign (a)
+d532 1
+a532 1
+fatal1 (s, t)
+d540 1
+a540 1
+fatal (s)
+d550 1
+a550 1
+yyerror (s)
+d599 1
+a599 1
+any (s, c)
+d605 1
+a605 1
+  while (d = *s++)
+d613 1
+a613 1
+sindex (s1, s2)
+d705 1
+d707 1
+d750 1
+a750 1
+is_sccs (filename)
+d753 1
+a755 1
+#ifdef OLDSCCS
+a762 1
+  p = filename;
+d777 1
+a777 1
+* change pfx to /xxx/yy/*zz.* or *zz.*
+d833 1
+a833 1
+setenv ()
+d882 1
+a882 1
+readenv ()
+d898 1
+a898 1
+sccstrip (pstr)
+d936 4
+a939 2
+    while (pstr [count])
+      *pstr = pstr++ [count];
+d946 4
+a949 2
+  while (pstr != sstr)
+    pstr [count] = *pstr--;
+d969 1
+a969 1
+execlp (name, argv)
+d976 1
+a976 1
+Execvp (name, argv)
+d979 2
+a980 2
+  register etxtbsy = 1;
+  register eacces = 0;
+d985 1
+d987 1
+d1082 1
+a1082 1
+get (ssfile, cdflag, rlse)
+d1180 1
+a1180 1
+rm_gots ()
+d1196 2
+a1197 1
+callyacc (str)
+d1219 2
+a1220 1
+exitm (arg)
+@
+
+
+1.4
+log
+@Modes for MPX.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id: misc.c,v 1.3 1995/03/16 20:31:31 jbev Exp $"
+d1117 2
+a1118 1
+  retval = ((vexecl (shell, "sh", gbuf, 0)) == 0) ? YES : NO ;
+d1154 3
+@
+
+
+1.3
+log
+@Correct RCS interface.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id: misc.c,v 1.2 1995/03/04 00:40:11 jbev Exp jbev $"
+d708 1
+d710 3
+d714 1
+d716 3
+d742 1
+d744 3
+@
+
+
+1.2
+log
+@Do linux port.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id$"
+d1062 1
+d1065 1
+d1099 3
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 1
+a4 1
+ * Copyright 1994 - J B Systems, Morrison, CO
+d19 1
+a19 1
+#ident	"@@(#)make:misc.c	1.0"
+a32 1
+
+a57 1
+
+a63 3
+
+
+
+a92 1
+
+a135 1
+
+a174 1
+
+a256 1
+
+d309 1
+a309 1
+  if (ps1 != NULL && *ps1 != NULL)
+a389 1
+
+a426 2
+
+
+d445 1
+a445 2
+  if (p == 0)
+  {
+d448 1
+a448 2
+  if (p->noreset == NO)
+  {
+d456 3
+a458 2
+    if (IS_ON (DBUG)) printf ("setvar: %s = %s noreset = %d envflg = %d Mflags = 0%o\n",
+      v, p->varval, p->noreset, p->envflg, Mflags);
+a465 1
+
+a516 2
+
+
+a523 1
+#ifdef mpx
+a524 7
+#endif
+#ifdef unix
+  exit (1);
+#endif
+#ifdef gcos
+  exit (0);
+#endif
+a526 2
+
+
+a536 2
+
+
+a550 4
+
+
+
+
+a589 1
+
+a624 1
+
+a674 1
+
+d687 1
+d706 8
+a716 1
+
+d722 1
+d729 8
+a768 1
+
+a838 1
+
+a861 1
+
+a915 1
+
+d1118 1
+d1120 4
+a1166 1
+#ifdef mpx
+a1167 3
+#else
+exit (arg)
+#endif
+@

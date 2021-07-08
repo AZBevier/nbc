@@ -1,0 +1,106 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.06.21.51.06;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New makefile for sel32 environment.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for make for running make on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.MAKE command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+SYSBIN = /system/bin
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+OBJS = main.o doname.o files.o rules.o dosys.o gram.o dyndep.o misc.o docd.o
+HDRS = ar.h defs.h
+HD = AR.H DEFS.H
+SRCS = main.c doname.c files.c rules.c dosys.c gram.c dyndep.c misc.c docd.c
+SRC = MAIN.C DONAME.C FILES.C RULES.C DOSYS.C GRAM.C DYNDEP.C MISC.C DOCD.C
+MAIN = $(OBJS)
+SLD = ld.make3x
+LD = LD.MAKE
+SMK = mk.make3x
+MK = MK.MAKE
+SDOC = make.m
+DOC = MAKE.M
+GRAM = gram.c
+
+all:	$(SLD) $(SMK) $(SDOC) $(GRAM) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+$(GRAM):	gram.y
+	$(SYSBIN)/nbyacc gram.y
+	cp y.tab.c gram.c
+	$(SYSBIN)/$(CC) $(CFLAGS) gram.c
+
+clean:
+	-rm -f *.o $(LBIN)/*.O y.tab.c gram.c
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/*.O $(LBIN)/$(DOC) $(LBIN)/$(LD) $(LBIN)/$(MK)
+	-rm -f $(LBIN)/MAIN.C $(LBIN)/DONAME.C $(LBIN)/FILES.C $(LBIN)/MISC.C
+	-rm -f $(LBIN)/RULES.C $(LBIN)/DOSYS.C $(LBIN)/GRAM.C $(LBIN)/GRAM.Y
+	-rm -f $(LBIN)/DYNDEP.C $(LBIN)/DOCD.C
+	-rm -f $(LBIN)/AR.H $(LBIN)/DEFS.H
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <main.c >$(LBIN)/MAIN.C
+	mpxblk <doname.c >$(LBIN)/DONAME.C
+	mpxblk <files.c >$(LBIN)/FILES.C
+	mpxblk <misc.c >$(LBIN)/MISC.C
+	mpxblk <rules.c >$(LBIN)/RULES.C
+	mpxblk <dosys.c >$(LBIN)/DOSYS.C
+	mpxblk <gram.c >$(LBIN)/GRAM.C
+	mpxblk <gram.y >$(LBIN)/GRAM.Y
+	mpxblk <dyndep.c >$(LBIN)/DYNDEP.C
+	mpxblk <docd.c >$(LBIN)/DOCD.C
+#	mpxblk <$(SRCS) >$(LBIN)/$(SRC)
+	mpxblk <ar.h >$(LBIN)/AR.H
+	mpxblk <defs.h >$(LBIN)/DEFS.H
+#	mpxblk <$(HDRS) >$(LBIN)/$(HD)
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	$(MOVE) main.o $(LBIN)/MAIN.O
+	$(MOVE) doname.o $(LBIN)/DONAME.O
+	$(MOVE) files.o $(LBIN)/FILES.O
+	$(MOVE) misc.o $(LBIN)/MISC.O
+	$(MOVE) rules.o $(LBIN)/RULES.O
+	$(MOVE) dosys.o $(LBIN)/DOSYS.O
+	$(MOVE) gram.o $(LBIN)/GRAM.O
+	$(MOVE) dyndep.o $(LBIN)/DYNDEP.O
+	$(MOVE) docd.o $(LBIN)/DOCD.O
+	/bin/chmod 664 $(LBIN)/*.?
+
+@

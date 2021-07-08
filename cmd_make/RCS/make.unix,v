@@ -1,0 +1,364 @@
+head	1.5;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.5
+date	2021.07.06.22.01.32;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2021.07.06.21.57.16;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.03.04.00.43.12;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.03.03.21.05.59;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.03.03.20.46.46;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Put under RCS.
+@
+
+
+1.5
+log
+@Add defs.h to gram.c build.
+@
+text
+@#
+# Makefile for make for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 # -Wall
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = main.o doname.o files.o rules.o dosys.o gram.o dyndep.o misc.o docd.o
+HDRS = ar.h defs.h
+SRCS = main.c doname.c files.c rules.c dosys.c gram.c dyndep.c misc.c docd.c
+MAIN = make
+DOC = make.m
+GRAM = gram.c
+
+all:	$(DOC) $(GRAM) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(HDRS) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+$(GRAM):	gram.y defs.h
+	$(SYSBIN)/nbyacc gram.y
+	cp y.tab.c gram.c
+	$(CC) $(CFLAGS) -c gram.c
+
+clean:
+	-rm -f $(OBJS) y.tab.c gram.c
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(DOC)
+	-rm -f $(LBIN)/main.c $(LBIN)/doname.c $(LBIN)/files.c $(LBIN)/misc.c
+	-rm -f $(LBIN)/rules.c $(LBIN)/dosys.c $(LBIN)/gram.c $(LBIN)/gram.y
+	-rm -f $(LBIN)/dyndep.c $(LBIN)/docd.c $(LBIN)/files.c $(LBIN)/rules.c
+	-rm -f $(LBIN)/ar.h $(LBIN)/defs.h
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	$(INSTALL) $(LBIN)/make $(SYSBIN)
+	$(INSTALL) main.c $(LBIN)/main.c
+	$(INSTALL) doname.c $(LBIN)/doname.c
+	$(INSTALL) files.c $(LBIN)/files.c
+	$(INSTALL) misc.c $(LBIN)/misc.c
+	$(INSTALL) rules.c $(LBIN)/rules.c
+	$(INSTALL) dosys.c $(LBIN)/dosys.c
+	$(INSTALL) gram.c $(LBIN)/gram.c
+	$(INSTALL) gram.y $(LBIN)/gram.y
+	$(INSTALL) dyndep.c $(LBIN)/dyndep.c
+	$(INSTALL) docd.c $(LBIN)/docd.c
+#	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) ar.h $(LBIN)/ar.h
+	$(INSTALL) defs.h $(LBIN)/defs.h
+#	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
+
+
+1.4
+log
+@New build makefile.
+@
+text
+@d25 1
+a25 1
+$(GRAM):	gram.y
+@
+
+
+1.3
+log
+@Do depends.
+@
+text
+@a0 2
+#~!Makefile for make
+# Name:  Makefile Part No.: _______-____r
+d2 1
+a2 1
+# Copyright 1995 - J B Systems, Morrison, CO
+d4 6
+a9 37
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"$Id: make.unix,v 1.2 1995/03/03 21:05:59 jbev Exp jbev $"
+
+# Make parameters when using RCC on UNIX
+# Uncomment if running on UNIX
+
+ROOT = /
+TARGET = /bin
+SOURCE = .
+PREFIX =
+INCLUDE = /usr/include
+SINCLUDE = $(INCLUDE)/sys
+SBIN = /system/bin
+BIN = /bin
+UBIN = /usr/bin
+LIB = /lib
+YBIN = /usr/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M -Umpx
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -O -DNULL=0
+LD = $(UBIN)/$(PREFIX)ld
+LDFLAGS =
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+d12 1
+a12 4
+# Fill in with correct information
+
+OBJECTS = main.o doname.o files.o rules.o dosys.o gram.o dyndep.o misc.o docd.o
+
+d14 1
+a14 3
+
+SRCS = main.c doname.c files.c rules.c dosys.c gram.y dyndep.c misc.c docd.c
+
+d16 2
+d19 1
+a19 10
+ALL:	all
+
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+#	$(BIN)/chmod 755 $(MAIN)
+#	$(BIN)/chgrp bin $(MAIN)
+#	$(BIN)/chown bin $(MAIN)
+d21 8
+a28 1
+CLEAN:  clean
+d31 1
+a31 3
+	$(BIN)/rm -f $(OBJECTS)
+
+CLOBBER: clobber
+d34 5
+a38 12
+	$(BIN)/rm -f $(MAIN)
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+	$(SBIN)/mkdep $(MAKEFILE) >dep.out;
+	@@for i in $(SRCS); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE);
+d41 23
+a63 1
+	$(BIN)/cp $(MAIN) $(SBIN)
+a64 58
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+# Source file 'main.c'
+main.o : main.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/sys/signal.h \
+  /usr/include/signal.h /usr/include/linux/signal.h 
+# Source file 'doname.c'
+doname.o : doname.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'files.c'
+files.o : files.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/sys/stat.h \
+  /usr/include/linux/stat.h /usr/include/sys/a.out.h 
+# Source file 'rules.c'
+rules.o : rules.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'dosys.c'
+dosys.o : dosys.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'gram.y'
+gram.y.o : gram.y defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/ctype.h 
+# Source file 'dyndep.c'
+dyndep.o : dyndep.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'misc.c'
+misc.o : misc.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/ctype.h /usr/include/sys/stat.h \
+  /usr/include/linux/stat.h /usr/include/errno.h /usr/include/linux/errno.h 
+# Source file 'docd.c'
+docd.o : docd.c /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/sys/stat.h /usr/include/features.h /usr/include/linux/stat.h \
+  /usr/include/string.h /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/ctype.h 
+# End of dependencies
+@
+
+
+1.2
+log
+@Ad $Id$.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id$"
+d91 57
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d4 1
+a4 1
+# Copyright 1994 - J B Systems, Morrison, CO
+d19 1
+a19 1
+#ident	"@@(#)Make:make/Makefile	1.0"
+a90 57
+# Source file 'main.c'
+main.o : main.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/sys/signal.h \
+  /usr/include/signal.h /usr/include/linux/signal.h 
+# Source file 'doname.c'
+doname.o : doname.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'files.c'
+files.o : files.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/sys/stat.h \
+  /usr/include/linux/stat.h /usr/include/sys/a.out.h 
+# Source file 'rules.c'
+rules.o : rules.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'dosys.c'
+dosys.o : dosys.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'gram.y'
+gram.y.o : gram.y defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/ctype.h 
+# Source file 'dyndep.c'
+dyndep.o : dyndep.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h 
+# Source file 'misc.c'
+misc.o : misc.c defs.h /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/dirent.h /usr/include/features.h /usr/include/gnu/types.h \
+  /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/linux/limits.h \
+  /usr/include/linux/dirent.h /usr/include/posix1_lim.h /usr/include/ctype.h /usr/include/sys/stat.h \
+  /usr/include/linux/stat.h /usr/include/errno.h /usr/include/linux/errno.h 
+# Source file 'docd.c'
+docd.o : docd.c /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/types.h /usr/include/linux/types.h \
+  /usr/include/asm/types.h /usr/include/sys/stat.h /usr/include/features.h /usr/include/linux/stat.h \
+  /usr/include/string.h /usr/lib/gcc-lib/i486-linux/2.5.8/include/stddef.h /usr/include/ctype.h 
+# End of dependencies
+@

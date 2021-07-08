@@ -1,0 +1,291 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.6
+date	95.10.13.23.13.00;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	95.10.06.22.26.37;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	95.03.04.00.56.21;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	95.03.04.00.43.12;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.03.03.21.03.23;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.03.03.20.46.46;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Put under RCS.
+@
+
+
+1.6
+log
+@remove unix dependencies.
+@
+text
+@#~!Makefile for make
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1994 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"$Id: makefile,v 1.5 1995/10/06 22:26:37 jbev Exp jbev $"
+
+# Make parameters when running on MPX
+
+ROOT = /system/system
+TARGET = /system/system
+SOURCE = .
+PREFIX = nb
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/system
+BIN = /system/bin
+UBIN = /system/bin
+LIB = /system/bin
+YBIN = /system/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -DMPX #-N 
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS = -Ymakemap
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+MAKEFILE = makefile
+
+# Fill in with correct information
+
+OBJECTS = main.o doname.o files.o rules.o dosys.o gram.o dyndep.o misc.o docd.o
+
+HDRS = defs.h
+
+SRCS = main.c doname.c files.c rules.c dosys.c gram.y dyndep.c misc.c docd.c
+
+MAIN = make
+
+ALL:	all
+
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+	$(BIN)/chmod 775 $(MAIN)
+	$(BIN)/chgrp system $(MAIN)
+	$(BIN)/chown system $(MAIN)
+
+CLEAN:  clean
+
+clean:
+	$(BIN)/rm -f $(OBJECTS)
+
+CLOBBER: clobber
+
+clobber: clean
+	$(BIN)/rm -f $(MAIN)
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	@@for i in $(SRCS); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+INSTALL: install
+
+install: all
+	$(BIN)/cp $(MAIN) $(BIN)/$(MAIN)
+	$(BIN)/cp $(MAIN) $(ROOT)/$(MAIN)
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.5
+log
+@delete ar.h reference.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id: makefile,v 1.4 1995/03/04 00:56:21 jbev Exp jbev $"
+a92 66
+# Source file 'main.c'
+main.o: main.c
+main.o: defs.h
+main.o: /system/nbinclude/stdio.h
+main.o: /system/nbinclude/sys/types.h
+main.o: /system/nbinclude/dirent.h
+main.o: /system/nbinclude/sys/signal.h
+# Source file 'doname.c'
+doname.o: doname.c
+doname.o: defs.h
+doname.o: /system/nbinclude/stdio.h
+doname.o: /system/nbinclude/sys/types.h
+doname.o: /system/nbinclude/dirent.h
+# Source file 'files.c'
+files.o: files.c
+files.o: defs.h
+files.o: /system/nbinclude/stdio.h
+files.o: /system/nbinclude/sys/types.h
+files.o: /system/nbinclude/dirent.h
+files.o: /system/nbinclude/sys/stat.h
+files.o: /system/nbinclude/types.h
+files.o: /system/nbinclude/sys/a.out.h
+# Source file 'rules.c'
+rules.o: rules.c
+rules.o: defs.h
+rules.o: /system/nbinclude/stdio.h
+rules.o: /system/nbinclude/sys/types.h
+rules.o: /system/nbinclude/dirent.h
+# Source file 'dosys.c'
+dosys.o: dosys.c
+dosys.o: defs.h
+dosys.o: /system/nbinclude/stdio.h
+dosys.o: /system/nbinclude/sys/types.h
+dosys.o: /system/nbinclude/dirent.h
+# Source file 'gram.y'
+gram.o: gram.y
+gram.o: defs.h
+gram.o: /system/nbinclude/stdio.h
+gram.o: /system/nbinclude/sys/types.h
+gram.o: /system/nbinclude/dirent.h
+gram.o: /system/nbinclude/ctype.h
+# Source file 'dyndep.c'
+dyndep.o: dyndep.c
+dyndep.o: defs.h
+dyndep.o: /system/nbinclude/stdio.h
+dyndep.o: /system/nbinclude/sys/types.h
+dyndep.o: /system/nbinclude/dirent.h
+# Source file 'misc.c'
+misc.o: misc.c
+misc.o: defs.h
+misc.o: /system/nbinclude/stdio.h
+misc.o: /system/nbinclude/sys/types.h
+misc.o: /system/nbinclude/dirent.h
+misc.o: /system/nbinclude/ctype.h
+misc.o: /system/nbinclude/sys/stat.h
+misc.o: /system/nbinclude/types.h
+misc.o: /system/nbinclude/errno.h
+# Source file 'docd.c'
+docd.o: docd.c
+docd.o: /system/nbinclude/stdio.h
+docd.o: /system/nbinclude/sys/types.h
+docd.o: /system/nbinclude/sys/stat.h
+docd.o: /system/nbinclude/types.h
+docd.o: /system/nbinclude/string.h
+docd.o: /system/nbinclude/ctype.h
+# End of dependencies
+@
+
+
+1.4
+log
+@Fixe depends.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id: makefile,v 1.3 1995/03/04 00:43:12 jbev Exp jbev $"
+d48 1
+a48 1
+HDRS = ar.h defs.h
+@
+
+
+1.3
+log
+@Do depends.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id: makefile,v 1.2 1995/03/03 21:03:23 jbev Exp jbev $"
+d95 1
+a95 1
+main.o: ./defs.h
+d102 1
+a102 1
+doname.o: ./defs.h
+d108 1
+a108 1
+files.o: ./defs.h
+d117 1
+a117 1
+rules.o: ./defs.h
+d123 1
+a123 1
+dosys.o: ./defs.h
+d129 1
+a129 1
+gram.o: ./defs.h
+d136 1
+a136 1
+dyndep.o: ./defs.h
+d142 1
+a142 1
+misc.o: ./defs.h
+@
+
+
+1.2
+log
+@Add $Id$.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id$"
+d93 66
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d19 1
+a19 1
+#ident	"@@(#)Make:make/Makefile	1.0"
+@

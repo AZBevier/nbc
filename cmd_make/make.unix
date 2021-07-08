@@ -1,0 +1,64 @@
+#
+# Makefile for make for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 # -Wall
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = main.o doname.o files.o rules.o dosys.o gram.o dyndep.o misc.o docd.o
+HDRS = ar.h defs.h
+SRCS = main.c doname.c files.c rules.c dosys.c gram.c dyndep.c misc.c docd.c
+MAIN = make
+DOC = make.m
+GRAM = gram.c
+
+all:	$(DOC) $(GRAM) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(HDRS) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+$(GRAM):	gram.y defs.h
+	$(SYSBIN)/nbyacc gram.y
+	cp y.tab.c gram.c
+	$(CC) $(CFLAGS) -c gram.c
+
+clean:
+	-rm -f $(OBJS) y.tab.c gram.c
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(DOC)
+	-rm -f $(LBIN)/main.c $(LBIN)/doname.c $(LBIN)/files.c $(LBIN)/misc.c
+	-rm -f $(LBIN)/rules.c $(LBIN)/dosys.c $(LBIN)/gram.c $(LBIN)/gram.y
+	-rm -f $(LBIN)/dyndep.c $(LBIN)/docd.c $(LBIN)/files.c $(LBIN)/rules.c
+	-rm -f $(LBIN)/ar.h $(LBIN)/defs.h
+
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	$(INSTALL) $(LBIN)/make $(SYSBIN)
+	$(INSTALL) main.c $(LBIN)/main.c
+	$(INSTALL) doname.c $(LBIN)/doname.c
+	$(INSTALL) files.c $(LBIN)/files.c
+	$(INSTALL) misc.c $(LBIN)/misc.c
+	$(INSTALL) rules.c $(LBIN)/rules.c
+	$(INSTALL) dosys.c $(LBIN)/dosys.c
+	$(INSTALL) gram.c $(LBIN)/gram.c
+	$(INSTALL) gram.y $(LBIN)/gram.y
+	$(INSTALL) dyndep.c $(LBIN)/dyndep.c
+	$(INSTALL) docd.c $(LBIN)/docd.c
+#	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) ar.h $(LBIN)/ar.h
+	$(INSTALL) defs.h $(LBIN)/defs.h
+#	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+

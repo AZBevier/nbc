@@ -1,0 +1,178 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.03.03.20.46.46;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Put under RCS.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#~!Makefile for make
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1994 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"@@(#)Make:make/Makefile	1.0"
+
+# Make parameters when using NBC on UNIX
+# Uncomment if running on UNIX
+
+ROOT = /
+TARGET = /u/bin
+SOURCE = .
+PREFIX = nb
+INCLUDE = /u/cinclude
+SINCLUDE = $(INCLUDE)/sys
+SBIN = /bin
+BIN = /bin
+UBIN = /u/bin
+LIB = /u/bin
+YBIN = /u/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -N -DMPX
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS =
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+MAKEFILE = make.nbc
+
+# Fill in with correct information
+
+OBJECTS = main.o doname.o files.o rules.o dosys.o gram.o dyndep.o misc.o docd.o
+
+HDRS = ar.h defs.h
+
+SRCS = main.c doname.c files.c rules.c dosys.c gram.y dyndep.c misc.c docd.c
+
+MAIN = make
+
+ALL:	all
+
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+#	$(BIN)/chmod 755 $(MAIN)
+#	$(BIN)/chgrp bin $(MAIN)
+#	$(BIN)/chown bin $(MAIN)
+	$(BIN)/touch $(MAIN)
+
+CLEAN:  clean
+
+clean:
+	$(BIN)/rm -f $(OBJECTS)
+
+CLOBBER: clobber
+
+clobber: clean
+	$(BIN)/rm -f $(MAIN)
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/mkdep $(MAKEFILE) >dep.out;
+	@@for i in $(SRCS); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE);
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+# Source file 'main.c'
+main.o: main.c
+main.o: ./defs.h
+main.o: /u/cinclude/stdio.h
+main.o: /u/cinclude/sys/types.h
+main.o: /u/cinclude/dirent.h
+main.o: /u/cinclude/sys/signal.h
+# Source file 'doname.c'
+doname.o: doname.c
+doname.o: ./defs.h
+doname.o: /u/cinclude/stdio.h
+doname.o: /u/cinclude/sys/types.h
+doname.o: /u/cinclude/dirent.h
+# Source file 'files.c'
+files.o: files.c
+files.o: ./defs.h
+files.o: /u/cinclude/stdio.h
+files.o: /u/cinclude/sys/types.h
+files.o: /u/cinclude/dirent.h
+files.o: /u/cinclude/sys/stat.h
+files.o: /u/cinclude/types.h
+files.o: /u/cinclude/sys/a.out.h
+# Source file 'rules.c'
+rules.o: rules.c
+rules.o: ./defs.h
+rules.o: /u/cinclude/stdio.h
+rules.o: /u/cinclude/sys/types.h
+rules.o: /u/cinclude/dirent.h
+# Source file 'dosys.c'
+dosys.o: dosys.c
+dosys.o: ./defs.h
+dosys.o: /u/cinclude/stdio.h
+dosys.o: /u/cinclude/sys/types.h
+dosys.o: /u/cinclude/dirent.h
+# Source file 'gram.y'
+gram.o: gram.y
+gram.o: ./defs.h
+gram.o: /u/cinclude/stdio.h
+gram.o: /u/cinclude/sys/types.h
+gram.o: /u/cinclude/dirent.h
+gram.o: /u/cinclude/ctype.h
+# Source file 'dyndep.c'
+dyndep.o: dyndep.c
+dyndep.o: ./defs.h
+dyndep.o: /u/cinclude/stdio.h
+dyndep.o: /u/cinclude/sys/types.h
+dyndep.o: /u/cinclude/dirent.h
+# Source file 'misc.c'
+misc.o: misc.c
+misc.o: ./defs.h
+misc.o: /u/cinclude/stdio.h
+misc.o: /u/cinclude/sys/types.h
+misc.o: /u/cinclude/dirent.h
+misc.o: /u/cinclude/ctype.h
+misc.o: /u/cinclude/sys/stat.h
+misc.o: /u/cinclude/types.h
+misc.o: /u/cinclude/errno.h
+# Source file 'docd.c'
+docd.o: docd.c
+docd.o: /u/cinclude/stdio.h
+docd.o: /u/cinclude/sys/types.h
+docd.o: /u/cinclude/sys/stat.h
+docd.o: /u/cinclude/types.h
+docd.o: /u/cinclude/string.h
+docd.o: /u/cinclude/ctype.h
+# End of dependencies
+@

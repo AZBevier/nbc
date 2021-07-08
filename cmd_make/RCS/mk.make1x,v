@@ -1,0 +1,63 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.06.22.35.26;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.06.21.49.24;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New make.
+@
+
+
+1.2
+log
+@Correct defines.
+@
+text
+@$DEFM
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) MAIN.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) DONAME.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) FILES.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) MISC.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) RULES.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) DOSYS.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) DYNDEP.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) DOCD.C
+$NBYACC GRAM.Y
+$CP Y.TAB.C CGRAM.C
+$NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) GRAM.C
+$ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 8
+a9 8
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) MAIN.C
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) DONAME.C
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) FILES.C
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) MISC.C
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) RULES.C
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) DOSYS.C
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) DYNDEP.C
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) DOCD.C
+d12 1
+a12 1
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) GRAM.C
+@

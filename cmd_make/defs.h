@@ -1,0 +1,268 @@
+/*~!defs.h*/
+/* Name:  defs.h Part No.: _______-____r
+ *
+ * Copyright 1995 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"$Id: defs.h,v 1.3 2021/07/06 21:47:46 jbev Exp $"
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <string.h>
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#endif
+
+#define NEWLINE '\n'
+#define CNULL '\0'
+#define BLANK ' '
+#define TAB '\t'
+#define DOT '.'
+#define WIGGLE  '~'
+#define AT  '@'
+#define MINUS '-'
+#define EQUALS  '='
+#define SLASH '/'
+#define STAR  '*'
+#define LCURLY  '{'
+#define RCURLY  '}'
+#define LPAREN  '('
+#define RPAREN  ')'
+#define LSQUAR  '['
+#define RSQUAR  ']'
+#define QUESTN  '?'
+#define KOLON ':'
+#define SKOLON  ';'
+#define DOLLAR  '$'
+#define GREATR  '>'
+#define POUND '#'
+#define BACKSLASH '\\'
+
+/*
+* Flags
+*/
+
+#define ALLOC(x) (struct x *) intalloc(sizeof(struct x))
+
+#define TURNON(a) (Mflags |= (a))
+#define TURNOFF(a)  (Mflags &= (~(a)))
+#define IS_ON(a)  (Mflags&(a))
+#define IS_OFF(a) (!(IS_ON(a)))
+
+#define DBUG  0000001   /* debug flag */
+#define ENVOVER 0000002   /* environ overides file defines */
+#define EXPORT  0000004   /* put current variable in environ */
+#define PRTR  0000010   /* set `-p' flag */
+#define SIL 0000020   /* set `-s' flag */
+#define NOEX  0000040   /* set `-n' flag */
+#define INTRULE 0000100   /* use internal rules */
+#define TOUCH 0000200   /* set `-t' flag */
+#define GET 0000400   /* do a $(GET) if file not found */
+#define QUEST 0001000   /* set `-q' flag */
+#define INARGS  0002000   /* currently reading cmd args */
+#define IGNERR  0004000   /* set `-i' flag */
+#define KEEPGO  0010000   /* set `-k' flag */
+#define GF_KEEP 0020000   /* keep auto get files */
+#define MH_DEP  0040000   /* use old question about whether cmd exists */
+#define MEMMAP  0100000   /* print memory map */
+
+typedef char *CHARSTAR;
+typedef int *INTSTAR;
+typedef long int TIMETYPE;
+typedef struct gothead *GOTHEAD;
+typedef struct gotf *GOTF;
+typedef struct chain *CHAIN;
+typedef struct dirll *DIRLL;
+typedef struct pattern *PATTERN;
+typedef struct varblock *VARBLOCK;
+typedef struct shblock *SHBLOCK;
+typedef struct depblock *DEPBLOCK;
+typedef struct lineblock *LINEBLOCK;
+typedef struct nameblock *NAMEBLOCK;
+
+extern CHARSTAR *environ;
+extern int Mflags;
+extern FILE *fin;
+extern CHARSTAR *linesptr;
+/*
+* flags for get()
+*/
+#define CD  0
+#define NOCD  1
+
+#define max(a,b)  ((a)>(b)?(a):(b))
+#ifdef mpx
+#define SHELLCOM "/system/bin/sh"
+#else
+#define SHELLCOM "/bin/sh"
+#endif
+
+#ifndef mpx
+/*  to install metering, add a statement like */
+/*******
+#define METERFILE "/usr/sif/make/Meter"
+******/
+/* to turn metering on, set external variable meteron to 1 */
+#endif
+
+/* define FSTATIC to be static on systems with C compilers
+supporting file-static; otherwise define it to be null
+*/
+#define FSTATIC static
+
+#define NO 0
+#define YES 1
+
+#define equal(a,b)  (a[0] == b[0] ? !strcmp((a),(b)) : NO )
+#define HASHSIZE 809
+#define NLEFTS 100
+#define NCHARS 500
+#define NINTS  250
+#define INMAX 5200   /* let exec be the limiting factor */
+#define OUTMAX 5200
+
+#define ALLDEPS  1
+#define SOMEDEPS 2
+
+#define META 01
+#define TERMINAL 02
+extern char funny [128];
+
+extern int sigivalue;
+extern int sigqvalue;
+extern int mywaitpid;
+extern int ndocoms;
+extern int okdel;
+extern CHARSTAR prompt;
+extern char junkname [ ];
+extern char RELEASE [];
+
+struct nameblock
+  {
+  NAMEBLOCK nextname; /* pointer to next nameblock */
+  NAMEBLOCK backname; /* pointer to predecessor */
+  CHARSTAR namep; /* ASCII name string */
+  CHARSTAR alias; /* ASCII alias (when namep translates to another
+  * pathstring.
+  */
+  LINEBLOCK linep; /* pointer to dependents */
+  unsigned int done: 3;	   /* flag used to tell when finished */
+  unsigned int septype: 3; /* distinguishes between single and double : */
+  unsigned int rundep: 1;  /* flag indicating runtime translation done */
+  TIMETYPE modtime; /* set by exists() */
+  };
+
+extern NAMEBLOCK mainname ;
+extern NAMEBLOCK firstname;
+
+struct lineblock {
+  LINEBLOCK nextline;
+  DEPBLOCK depp;
+  SHBLOCK shp;
+  };
+
+extern LINEBLOCK sufflist;
+
+struct depblock {
+  DEPBLOCK nextdep;
+  NAMEBLOCK depname;
+  };
+
+struct shblock {
+  SHBLOCK nextsh;
+  CHARSTAR shbp;
+  };
+
+struct varblock {
+  VARBLOCK nextvar;
+  CHARSTAR varname;
+  CHARSTAR varval;
+  unsigned int noreset: 1;
+  unsigned int used: 1;
+  unsigned int envflg: 1;
+  unsigned int v_aflg: 1;
+  };
+
+extern VARBLOCK firstvar;
+
+struct pattern
+  {
+  PATTERN nextpattern;
+  CHARSTAR patval;
+  };
+
+extern PATTERN firstpat;
+
+struct dirll
+  {
+  DIRLL nextopendir;
+  DIR *dirfc;
+  CHARSTAR dirn;
+  };
+extern DIRLL firstod;
+
+
+struct chain
+  {
+  CHAIN nextchain;
+  CHARSTAR datap;
+  };
+
+/*
+* The following two structures are used to cleanup after
+* `make' does an automatic get of a file. See get() and
+* cleanup().
+*/
+struct gotf /* list of files */
+{
+  GOTF gnextp;
+  CHARSTAR gnamep;
+  };
+
+struct gothead /* first member of list of files */
+{
+  GOTF gnextp;
+  CHARSTAR gnamep;
+  GOTF endp;
+  };
+
+/* INIT set in main.c */
+#ifdef INIT
+char Nullstr [] = "";
+CHARSTAR badptr = (CHARSTAR) -1;
+#else
+extern char Nullstr [];
+extern CHARSTAR badptr;
+#endif
+
+CHARSTAR copys ();
+CHARSTAR copstr ();
+CHARSTAR concat ();
+CHARSTAR colontrans ();
+CHARSTAR dftrans ();
+CHARSTAR straightrans ();
+CHARSTAR mkqlist ();
+CHARSTAR findfl ();
+CHARSTAR addstars ();
+CHARSTAR strshift ();
+INTSTAR intalloc ();
+VARBLOCK varptr ();
+VARBLOCK srchvar ();
+TIMETYPE prestime (), exists ();
+DEPBLOCK srchdir ();
+NAMEBLOCK srchname (), makename ();
+LINEBLOCK runtime ();
