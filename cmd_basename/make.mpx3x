@@ -1,0 +1,50 @@
+#
+# Makefile for basename for running basename on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.BN command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+SYSBIN = /system/bin
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+OBJS = basename.o
+HDRS =
+SRCS= basename.c
+MAIN = $(OBJS)
+SLD = ld.bn3x
+LD = LD.BN
+SMK = mk.bn3x
+MK = MK.BN
+SDOC = basename.m
+DOC = BASENAME.M
+
+all:	$(SLD) $(SDOC) $(SMK) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/BASENAME.O $(LBIN)/BASENAME.C
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK) $(LBIN)/$(DOC)
+
+install: all
+	@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <basename.c >$(LBIN)/BASENAME.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	$(MOVE) basename.o $(LBIN)/BASENAME.O
+	/bin/chmod 664 $(LBIN)/*.?
+
