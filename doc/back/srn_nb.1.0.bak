@@ -1,0 +1,880 @@
+
+                        MPX-32 C Compiler
+                         Revision 1.0.0
+
+
+                READ BEFORE USING REVISION 1.0.0
+
+
+  These Software Release Notes contain specific information to this 
+  release, including usage information that is not included in the 
+  online documentation set.
+
+
+  September 1992
+
+
+
+
+
+
+
+  324-008150-000
+
+
+  This manual is supplied without representation or warranty of any kind. 
+  Encore Computer Corporation assumes no responsibility and shall have 
+  no liability of any kind arising from supply or use of this publication 
+  or any material contained herein.
+
+  The information contained herein is proprietary to Encore Computer 
+  Corporation and/or its vendors, and its use or disclosure is subject to 
+  the restrictions stated in the standard Encore Computer Corporation 
+  License terms and conditions or the appropriate third-party sublicense 
+  agreement.
+
+  Use, duplication or disclosure by the Government is subject to 
+  restrictions as set forth in subdivision (c) (1) (ii) of the Rights in 
+  Technical Data and Computer Software clause at 252.227.7013.
+  
+
+
+
+
+
+
+
+
+
+
+
+  MPX-32 is a trademark of Encore Computer Corporation.
+
+  CONCEPT/32 is a registered trademark of Encore Computer Corporation.
+
+  UNIX is a registered trademark of Unix Systems Laboratories, Inc.
+
+
+  Encore Computer Corporation
+  6901 West Sunrise Boulevard
+  Fort Lauderdale, Florida 33313
+
+  Copyright 1992 by Encore Computer Corporation and J B Systems
+  ALL RIGHTS RESERVED
+  Printed in U.S.A.
+  
+  
+Contents
+-------------------------------------------------------------
+  
+  1  Overview	
+  
+     INTRODUCTION
+     DOCUMENTATION CONVENTIONS
+  
+  2  Contents of this Revision
+  
+     INTRODUCTION
+     BINARY DISTRIBUTION
+       Model Numbers
+       Revision Date
+     PREREQUISITE
+     DOCUMENTATION DELIVERED WITH THIS PRODUCT
+     RELATED DOCUMENTATION
+  
+  3  Product Information
+  
+     PRODUCT DESCRIPTION
+     RELEASE HISTORY
+     PACKAGE FORMAT
+     BINARY PACKAGE DISK SPACE REQUIREMENTS
+     BINARY TAPE FORMAT
+     INSTALLATION ENVIRONMENT REQUIREMENTS
+  
+  4  Installation and Configuration
+  
+     BINARY INSTALLATION INSTRUCTIONS
+     SOFTWARE CONFIGURATION
+  
+  5  Product Hints
+  
+     GENERAL HINTS
+  
+  A  Binary Tape Contents
+  
+  
+1  Overview
+-------------------------------------------------------------
+  
+INTRODUCTION      
+  
+  This document is provided to customers purchasing MPX-32 C Compiler 
+  Revision 1.0.0 for use with the MPX-32 Operating System Revision 3.0 or 
+  later.  It describes the MPX-32 C Compiler as well as providing other 
+  revision-specific information.
+  
+  IMPORTANT:  Read the Software Release Notes before attempting to install 
+  or use the Revision 1.0.0 software.  Besides providing an overview of 
+  the revision, this document contains critical, late-breaking information 
+  about the product that is not documented elsewhere.
+  
+  This information appears on the product tape as SRN_NBC_1.0.0.  This 
+  upper/lowercase file can be printed from TSM or examined online. Note 
+  that the hardcopy and installation-tape versions may differ because of 
+  last minute changes.
+  
+DOCUMENTATION CONVENTIONS     
+  
+  The following typographic conventions apply only to the hardcopy version 
+  of this document.   
+  
+  boldface   In command lines, boldface words are literals that must be 
+             entered exactly as shown.  For example: 
+  
+              TSM> OPCOM LIST
+  
+  Non-Proportional Type
+             In file entries, information in non-proportional type must be 
+             entered exactly as shown. For example:
+  
+              struct dqe *dqeptr;
+  
+             In messages, information in non-proportional type is text 
+             written by the system. For example:
+  
+              NBC: Compiler error
+  
+  italics    In file entries and command syntax, information you provide 
+             is printed in italics.
+  
+             Example file entry:
+  
+              TSM>$USERNAME name
+  
+             Example command syntax:
+  
+              from file
+  
+             In system messages, variable information is printed in italics. 
+             For example:
+  
+              UNABLE TO DELETE FILE - VMxx
+  
+             Note:  In text, italics are used for emphasis.
+  
+  braces     When braces surround parameters that are separated by a 
+             vertical bar(s), only one parameter is required. For example:
+  
+              $ASSIGN {LO | ER} TO pathname
+  
+  Brackets
+             In command syntax, parameters inside brackets are optional. 
+             For example:
+  
+              from [file]
+  
+  Horizontal Ellipses
+             In text and messages, horizontal ellipses indicate that similar 
+             information has been omitted. For example:
+  
+              RPAR? [1,2,...,22]
+  
+  Vertical Ellipses
+             Vertical ellipses in command syntax, file entries, and messages 
+             indicate that similar lines have been omitted. For example:
+  
+              PAD: RPAR 2:v
+                .
+                .
+                .
+              PAD: RPAR 22:v
+  
+  Control Characters
+             A circumflex (^) immediately followed by a capital letter 
+             indicates a control-character sequence. To enter a 
+             control-character sequence, press and hold the control key 
+             (labeled Ctrl or CTRL) while typing the specified character.  
+             For example:
+  
+              ^X
+  
+  
+2   Contents of this Revision
+-------------------------------------------------------------
+  
+INTRODUCTION     
+  
+  Information on various MPX-32 C Compiler distribution components is 
+  given in this chapter, as are model numbers.  The following are the 
+  components of the distribution:
+  
+   o Binary tape
+
+   o Documentation
+  
+BINARY DISTRIBUTION     
+  
+Model Numbers    
+  
+  The following model numbers apply to the binary distribution.
+  
+   Tape                   Model Number     System
+  
+   Binary Single System    1012-3303       32/27, 32/67, SelCONNECTION
+                                           running MPX-32 3.x
+  
+   Binary Single System    1012-4303       32/87, 32/97
+                                           running MPX-32 3.x
+  
+   Binary Single System    1012-5303       32/2030, 32/2040
+                                           running MPX-32 3.x
+  
+   Binary Single System    1012-6303       32/2050, RSX
+                                           running MPX-32 3.x
+  
+Revision Date    
+  
+   September 1992
+  
+PREREQUISITE     
+  
+  Encore Proprietary Software License Form.
+  
+  Also see the installation requirements in Chapter 3.
+  
+DOCUMENTATION DELIVERED WITH THIS PRODUCT     
+
+  One set of the following documentation is supplied with Model No. 
+  1012-(3/4/5/6)303.  Additional copies of this document can be 
+  ordered by part number.
+
+  Part No.	   Description
+
+  DS-1012-3        MPX-32 C Compiler for MPX-32 Revision 3.x
+                   Documentation Set which includes:
+
+  324-008150-000   MPX-32 C Compiler Revision 1.0.0 
+                   Software Release Notes
+
+  Online documentation for the MPX-32 C Compiler Revision 1.0.0 is 
+  provided on the product tape.
+
+RELATED DOCUMENTATION      
+
+  The C Programming Language by Kernighan & Ritchie.
+
+  MPX-32 Revision 3.x Reference Manual Volumes I through IV, 
+  323-00155(1/2/3/4)
+
+  MPX-32 Revision 3.x Technical Manual Volumes I and II, 322-00155(1/2)
+
+
+3  Product Information
+-------------------------------------------------------------
+
+PRODUCT DESCRIPTION     
+
+  The MPX-32 C Compiler operates in one or two pass mode.  It generates 
+  assembler language instructions which can optionally have the source 
+  C code intermixed as comments.  Compile time options allow support for 
+  register to register floating point instructions or only register to 
+  memory instructions to support 32/27 systems.  The debug option allows 
+  symbols to be passed through to the Cataloger for display with the 
+  task debugger.
+
+  The C runtime library provides an emulated UNIX System V interface to 
+  MPX-32.  Most of the standard library functions are provided where 
+  emulation was possible without O/S modifications.  Functions are also 
+  provided to directly access MPX-32 SVCs where UNIX compatibility is not 
+  desired.  MPX-32 SVCs can also be called as in-line assembler 
+  instructions. An additional option also allows nonsectioned code to be 
+  generated.  This allows functions written in C to be SYSGENed into the 
+  MPX-32 operating system.
+
+RELEASE HISTORY     
+    
+      Description        Level              Date
+  
+      Original Release   Revision 1.0.0     September 1992
+  
+PACKAGE FORMAT     
+
+  The MPX-32 C Compiler Revision 1.0.0 tape is a standard 1/2" 9-track 
+  magnetic reel recorded at 1600 bpi.
+
+BINARY PACKAGE DISK SPACE REQUIREMENTS     
+
+  To use this binary installation package, adequate disk space must be 
+  available on the system. A minimum of approximately 10700 blocks of 
+  available disk space are required for this installation. (Space for 
+  temporary and SLO files is not included.)
+  
+BINARY TAPE FORMAT     
+
+  The binary tape contains 359 files in eight Volume Manager save images. 
+  Refer to Appendix A of this document for a complete list of the images 
+  and files contained on the binary tape.
+
+INSTALLATION ENVIRONMENT REQUIREMENTS     
+
+  The following are physical requirements for installation.
+
+  o One compatible input device for the distribution medium:
+
+          1/2" 9-track tape drive
+
+  o One compatible auxiliary input device for batch processing:
+
+          One TSM terminal (with lowercase capability)
+
+  o Adequate disk space (see Disk Space section).
+
+  The following software must be installed:
+
+  o The following operating system:
+
+          1401 MPX-32 Operating System Revision 3.0 or later
+
+  o The following product installed on that system:
+
+          1407 MPX-32 Utilities Revision 1.3 or later or
+               the minimum revision supported on the revision
+               of the operating system in use
+
+4  Installation and Configuration
+-------------------------------------------------------------
+
+BINARY INSTALLATION INSTRUCTIONS     
+
+  To install the MPX-32 C Compiler Revision 1.0.0 binary tape
+  on your system, perform the following procedures:
+
+  1.  Mount the installation tape on the appropriate unit.
+
+        TSM>AS TAP TO DEV=devmnc BLOC=N
+
+  2.  Invoke the Volume Manager and ensure that the tape is positioned 
+      by rewinding the tape.
+
+        TSM>VOLMGR
+        VOL>REWIND
+
+  3.  Skip the first image which contains this SRN file.
+
+        VOL>SKIP I
+
+  4.  Restore the system programs and command files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  5.  Restore the compiler programs, utilities and command files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  6.  Restore the include files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  7.  Restore the C runtime library.
+
+        VOL>RESTORE VOLUME=SYSTEM
+  
+  8.  Restore the skeleton parser driver.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  9.  Optionally, restore the sample C code and programs. 
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+      If this image is not desired, skip to the next image.
+
+        VOL>SKIP I
+
+  10. Optionally, restore the online documentation files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  11. Rewind the tape and exit the Volume Manager.
+
+        VOL>REWIND
+        VOL>EXIT
+  
+SOFTWARE CONFIGURATION     
+
+  The MPX-32 C Compiler is ready to run after installation is complete.  
+  The documentation files (in the DOC directory) may be viewed by the 
+  following:
+
+      TSM>^(bin)dcat <^(DOC)xxxx.m
+
+          or
+
+      TSM>^(bin)dcat /system/doc/xxxx.m
+
+  This displays the selected documentation file.
+
+  The SAMPLE directory and the source code for the sample programs 
+  should be reviewed to see some of the capabilities of the MPX-32 
+  C Compiler.  The TSM macro MAK.SAMP should be run to see if the 
+  compiler operates properly on your system.  The programs DCAT and 
+  FIXER can be cataloged using the TSM macro NBLD as follows:
+
+      TSM>NBLD dcat dcatmap
+
+  This builds the program DCAT in the local directory.
+
+      TSM>NBLD fixer fixermap
+
+  This builds the program FIXER in the local directory.
+
+
+5  Product Hints
+-------------------------------------------------------------
+
+GENERAL HINTS      
+
+  The NBLD macro should be modified when several programs are to be 
+  combined to form a load module.  Add the names of the object files 
+  that are to be included after the COMPRESS directive.  This 
+  combines all of the non-runtime library objects for cataloging.
+
+  The default startup code is C.SRTE.O.  It allocates the stack and 
+  I/O area in extended memory starting at 0x80000. The program 
+  starts in extended mode.  If it is desirable to run in nonextended 
+  mode, the object module C.SRT.O should be included to allow the 
+  program to startup in nonextended mode.  This would usually be the 
+  case when interfacing with FORTRAN subroutines.
+
+  The source code for C.SRT.C and C.SRTE.C are included. These are the 
+  nonextended and extended mode versions of the startup code.  They 
+  assume a 12KW stack.  If a larger or smaller stack is desired, modify 
+  these programs for your specific needs.
+
+  The source code for FCALL.S is also included. Due to variations in 
+  FORTRAN calling conventions, it may be necessary to modify this 
+  interface subroutine.
+
+  The C runtime library is implemented using the UNIX System V interface.  
+  Consult any System V reference manual for calling conventions.  Also, 
+  review the include files in the NBINCLUDE directory.
+
+  The preprocessor, NBCPP, searches both the NBINCLUDE and CINCLUDE 
+  directories for include files (other versions of the MPX-32 C Compiler 
+  use the CINCLUDE directory for include files).  Make sure the 
+  CINCLUDE directory is empty or does not contain any outdated 
+  include files.  See NBCPP.M in the DOC directory.
+
+  The load module, NBYACC, is included with the MPX-32 C Compiler as an 
+  unsupported utility.  It may or may not be removed in future releases 
+  of this product.  No System Problem Reports (SPRs) will be accepted 
+  for this utility.
+
+  The MPX-32 C Compiler and runtime library are compatible with T-XPM.  
+  They run as T-XPM tasks without any problems.
+
+  The one pass version of the MPX-32 C Compiler, NBCCOM, is quite large 
+  and may not run on systems with limited task execution space.  If this 
+  is the case, use the -2 option to NBCC to invoke the two pass version 
+  of the compiler.
+
+  NBCAS is compatible with MPX-32 Utilities Revision 3.2.
+
+
+A  Binary Tape Contents
+-------------------------------------------------------------
+
+  The eight Volume Manager save images are as follows:
+
+  o Image 1 contains this SRN
+  o Image 2 contains system programs and command files 
+  o Image 3 contains compiler programs, utilities and command files
+  o Image 4 contains include files
+  o Image 5 contains the C runtime library
+  o Image 6 contains the skeleton parser driver
+  o Image 7 contains sample C code and programs
+  o Image 8 contains online documentation files
+
+  Following is the truncated VOLMGR output of the contents
+  of the binary tape.  
+
+
+-                      *** V O L U M E   M A N A G E R  3.5U01.01 ***
+ SAVE             @ADAM5           (DOC             )SRN_NBC_1.0.0
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @ADAM5           (SYSTEM          )NBCC           
+ SAVE             @ADAM5           (SYSTEM          )NBLD          
+ SAVE             @ADAM5           (SYSTEM          )NBYACC       
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @ADAM5           (BIN             )C.SRT.O     
+ SAVE             @ADAM5           (BIN             )C.SRTE.O   
+ SAVE             @ADAM5           (BIN             )CDR       
+ SAVE             @ADAM5           (BIN             )CLB      
+ SAVE             @ADAM5           (BIN             )DCAT     
+ SAVE             @ADAM5           (BIN             )FIXER   
+ SAVE             @ADAM5           (BIN             )NBCAS  
+ SAVE             @ADAM5           (BIN             )NBCC  
+ SAVE             @ADAM5           (BIN             )NBCCOM    
+ SAVE             @ADAM5           (BIN             )NBCP1    
+ SAVE             @ADAM5           (BIN             )NBCP2   
+ SAVE             @ADAM5           (BIN             )NBCPP  
+ SAVE             @ADAM5           (BIN             )NBLD  
+ SAVE             @ADAM5           (BIN             )NBYACC     
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @ADAM5           (NBINCLUDE       )A.OUT.H   
+ SAVE             @ADAM5           (NBINCLUDE       )ART.H    
+ SAVE             @ADAM5           (NBINCLUDE       )ASSERT.H
+ SAVE             @ADAM5           (NBINCLUDE       )CDOTS.H           
+ SAVE             @ADAM5           (NBINCLUDE       )CTYPE.H          
+ SAVE             @ADAM5           (NBINCLUDE       )DCA.H           
+ SAVE             @ADAM5           (NBINCLUDE       )DIR.H       
+ SAVE             @ADAM5           (NBINCLUDE       )DIRENT.H       
+ SAVE             @ADAM5           (NBINCLUDE       )DQE.H         
+ SAVE             @ADAM5           (NBINCLUDE       )ERRNO.H      
+ SAVE             @ADAM5           (NBINCLUDE       )FAT.H       
+ SAVE             @ADAM5           (NBINCLUDE       )FCB.H      
+ SAVE             @ADAM5           (NBINCLUDE       )FCNTL.H   
+ SAVE             @ADAM5           (NBINCLUDE       )FINFO.H  
+ SAVE             @ADAM5           (NBINCLUDE       )IDENT.H 
+ SAVE             @ADAM5           (NBINCLUDE       )IOQ.H  
+ SAVE             @ADAM5           (NBINCLUDE       )LIMITS.H  
+ SAVE             @ADAM5           (NBINCLUDE       )MATH.H   
+ SAVE             @ADAM5           (NBINCLUDE       )MOSDE.H 
+ SAVE             @ADAM5           (NBINCLUDE       )MPXDEF.H      
+ SAVE             @ADAM5           (NBINCLUDE       )MPXSVC.H      
+ SAVE             @ADAM5           (NBINCLUDE       )NAN.H        
+ SAVE             @ADAM5           (NBINCLUDE       )PARAM.H     
+ SAVE             @ADAM5           (NBINCLUDE       )PRB.H      
+ SAVE             @ADAM5           (NBINCLUDE       )PSB.H     
+ SAVE             @ADAM5           (NBINCLUDE       )RXB.H    
+ SAVE             @ADAM5           (NBINCLUDE       )SEARCH.H
+ SAVE             @ADAM5           (NBINCLUDE       )SETJMP.H        
+ SAVE             @ADAM5           (NBINCLUDE       )SIGNAL.H       
+ SAVE             @ADAM5           (NBINCLUDE       )SMT.H         
+ SAVE             @ADAM5           (NBINCLUDE       )STAB.H       
+ SAVE             @ADAM5           (NBINCLUDE       )STAT.H      
+ SAVE             @ADAM5           (NBINCLUDE       )STDIO.H    
+ SAVE             @ADAM5           (NBINCLUDE       )STRING.H  
+ SAVE             @ADAM5           (NBINCLUDE       )TERMIO.H 
+ SAVE             @ADAM5           (NBINCLUDE       )TIME.H  
+ SAVE             @ADAM5           (NBINCLUDE       )TIMEB.H
+ SAVE             @ADAM5           (NBINCLUDE       )TIMES.H       
+ SAVE             @ADAM5           (NBINCLUDE       )TSA.H        
+ SAVE             @ADAM5           (NBINCLUDE       )TYPES.H     
+ SAVE             @ADAM5           (NBINCLUDE       )UDT.H      
+ SAVE             @ADAM5           (NBINCLUDE       )UNIXIO.H  
+ SAVE             @ADAM5           (NBINCLUDE       )UTMP.H    
+ SAVE             @ADAM5           (NBINCLUDE       )VALUES.H 
+ SAVE             @ADAM5           (NBINCLUDE       )VARARGS.H     
+ SAVE             @ADAM5           (NBINCLUDE       )VERSION.H    
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @ADAM5           (NBLIB           )C.SRT.O     
+ SAVE             @ADAM5           (NBLIB           )C.SRT.S    
+ SAVE             @ADAM5           (NBLIB           )C.SRTE.O  
+ SAVE             @ADAM5           (NBLIB           )C.SRTE.S 
+ SAVE             @ADAM5           (NBLIB           )CDR     
+ SAVE             @ADAM5           (NBLIB           )CLB    
+ SAVE             @ADAM5           (NBLIB           )FCALL.S     
+ SAVE             @ADAM5           (NBLIB           )FPS.C      
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @ADAM5           (LIB             )YACCPAR         
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @ADAM5           (SAMPLE          )DCAT         
+ SAVE             @ADAM5           (SAMPLE          )DCAT.C      
+ SAVE             @ADAM5           (SAMPLE          )DCAT.L     
+ SAVE             @ADAM5           (SAMPLE          )DCAT.O   
+ SAVE             @ADAM5           (SAMPLE          )DCATMAP  
+ SAVE             @ADAM5           (SAMPLE          )FIXER   
+ SAVE             @ADAM5           (SAMPLE          )FIXER.C
+ SAVE             @ADAM5           (SAMPLE          )FIXER.L    
+ SAVE             @ADAM5           (SAMPLE          )FIXER.O   
+ SAVE             @ADAM5           (SAMPLE          )FIXERMAP 
+ SAVE             @ADAM5           (SAMPLE          )FORT.C  
+ SAVE             @ADAM5           (SAMPLE          )FORT.L 
+ SAVE             @ADAM5           (SAMPLE          )FORT.O
+ SAVE             @ADAM5           (SAMPLE          )KILL.C        
+ SAVE             @ADAM5           (SAMPLE          )KILL.L       
+ SAVE             @ADAM5           (SAMPLE          )KILL.O      
+ SAVE             @ADAM5           (SAMPLE          )MAK.SAMP   
+ SAVE             @ADAM5           (SAMPLE          )NBLD     
+ SAVE             @ADAM5           (SAMPLE          )PRTINC.C
+ SAVE             @ADAM5           (SAMPLE          )PRTINC.L     
+ SAVE             @ADAM5           (SAMPLE          )PRTINC.O    
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @ADAM5           (DOC             )A64L.M    
+ SAVE             @ADAM5           (DOC             )ABORT.M  
+ SAVE             @ADAM5           (DOC             )ABS.M   
+ SAVE             @ADAM5           (DOC             )ACCESS.M
+ SAVE             @ADAM5           (DOC             )ACOS.M 
+ SAVE             @ADAM5           (DOC             )ALARM.M        
+ SAVE             @ADAM5           (DOC             )ASCTIME.M     
+ SAVE             @ADAM5           (DOC             )ASIN.M       
+ SAVE             @ADAM5           (DOC             )ASSERT.M    
+ SAVE             @ADAM5           (DOC             )ATAN.M     
+ SAVE             @ADAM5           (DOC             )ATAN2.M   
+ SAVE             @ADAM5           (DOC             )ATOF.M   
+ SAVE             @ADAM5           (DOC             )ATOI.M  
+ SAVE             @ADAM5           (DOC             )ATOL.M 
+ SAVE             @ADAM5           (DOC             )BCMP.M
+ SAVE             @ADAM5           (DOC             )BCOPY.M      
+ SAVE             @ADAM5           (DOC             )BESSEL.M    
+ SAVE             @ADAM5           (DOC             )BRK.M      
+ SAVE             @ADAM5           (DOC             )BSEARCH.M 
+ SAVE             @ADAM5           (DOC             )CALLOC.M 
+ SAVE             @ADAM5           (DOC             )CEIL.M  
+ SAVE             @ADAM5           (DOC             )CHDIR.M
+ SAVE             @ADAM5           (DOC             )CHMOD.M          
+ SAVE             @ADAM5           (DOC             )CHOWN.M         
+ SAVE             @ADAM5           (DOC             )CHROOT.M       
+ SAVE             @ADAM5           (DOC             )CLEARERR.M    
+ SAVE             @ADAM5           (DOC             )CLOCK.M      
+ SAVE             @ADAM5           (DOC             )CLOSE.M     
+ SAVE             @ADAM5           (DOC             )CLOSEDIR.M 
+ SAVE             @ADAM5           (DOC             )CONV.M    
+ SAVE             @ADAM5           (DOC             )COS.M    
+ SAVE             @ADAM5           (DOC             )COSH.M  
+ SAVE             @ADAM5           (DOC             )CREAT.M
+ SAVE             @ADAM5           (DOC             )CREATD.M      
+ SAVE             @ADAM5           (DOC             )CTIME.M      
+ SAVE             @ADAM5           (DOC             )CTYPE.M     
+ SAVE             @ADAM5           (DOC             )DELETE.M   
+ SAVE             @ADAM5           (DOC             )DIRECTORY.M
+ SAVE             @ADAM5           (DOC             )DRAND48.M 
+ SAVE             @ADAM5           (DOC             )DUP.M    
+ SAVE             @ADAM5           (DOC             )ECVT.M  
+ SAVE             @ADAM5           (DOC             )ERAND48.M 
+ SAVE             @ADAM5           (DOC             )ERF.M    
+ SAVE             @ADAM5           (DOC             )ERFC.M  
+ SAVE             @ADAM5           (DOC             )ERRNO.M
+ SAVE             @ADAM5           (DOC             )EXEC.M        
+ SAVE             @ADAM5           (DOC             )EXECL.M      
+ SAVE             @ADAM5           (DOC             )EXECLE.M    
+ SAVE             @ADAM5           (DOC             )EXECLP.M   
+ SAVE             @ADAM5           (DOC             )EXECV.M   
+ SAVE             @ADAM5           (DOC             )EXECVE.M 
+ SAVE             @ADAM5           (DOC             )EXECVP.M
+ SAVE             @ADAM5           (DOC             )EXIT.M         
+ SAVE             @ADAM5           (DOC             )EXP.M         
+ SAVE             @ADAM5           (DOC             )FABS.M       
+ SAVE             @ADAM5           (DOC             )FCBADR.M    
+ SAVE             @ADAM5           (DOC             )FCLOSE.M   
+ SAVE             @ADAM5           (DOC             )FCVT.M    
+ SAVE             @ADAM5           (DOC             )FDOPEN.M 
+ SAVE             @ADAM5           (DOC             )FEOF.M        
+ SAVE             @ADAM5           (DOC             )FERROR.M     
+ SAVE             @ADAM5           (DOC             )FFLUSH.M    
+ SAVE             @ADAM5           (DOC             )FGETC.M    
+ SAVE             @ADAM5           (DOC             )FGETS.M   
+ SAVE             @ADAM5           (DOC             )FILENO.M 
+ SAVE             @ADAM5           (DOC             )FLOOR.M       
+ SAVE             @ADAM5           (DOC             )FMOD.M       
+ SAVE             @ADAM5           (DOC             )FOPEN.M     
+ SAVE             @ADAM5           (DOC             )FORK.M     
+ SAVE             @ADAM5           (DOC             )FPRINTF.M 
+ SAVE             @ADAM5           (DOC             )FPUTC.M  
+ SAVE             @ADAM5           (DOC             )FPUTS.M 
+ SAVE             @ADAM5           (DOC             )FREAD.M
+ SAVE             @ADAM5           (DOC             )FREE.M        
+ SAVE             @ADAM5           (DOC             )FREOPEN.M    
+ SAVE             @ADAM5           (DOC             )FREXP.M     
+ SAVE             @ADAM5           (DOC             )FSCANF.M        
+ SAVE             @ADAM5           (DOC             )FSEEK.M     
+ SAVE             @ADAM5           (DOC             )FSTAT.M    
+ SAVE             @ADAM5           (DOC             )FTELL.M   
+ SAVE             @ADAM5           (DOC             )FWRITE.M 
+ SAVE             @ADAM5           (DOC             )GAMMA.M 
+ SAVE             @ADAM5           (DOC             )GCVT.M 
+ SAVE             @ADAM5           (DOC             )GETACC.M         
+ SAVE             @ADAM5           (DOC             )GETC.M          
+ SAVE             @ADAM5           (DOC             )GETCHAR.M      
+ SAVE             @ADAM5           (DOC             )GETCWD.M      
+ SAVE             @ADAM5           (DOC             )GETENV.M     
+ SAVE             @ADAM5           (DOC             )GETGID.M    
+ SAVE             @ADAM5           (DOC             )GETOPT.M   
+ SAVE             @ADAM5           (DOC             )GETPGRP.M 
+ SAVE             @ADAM5           (DOC             )GETPID.M 
+ SAVE             @ADAM5           (DOC             )GETPPID.M       
+ SAVE             @ADAM5           (DOC             )GETS.M         
+ SAVE             @ADAM5           (DOC             )GETUID.M      
+ SAVE             @ADAM5           (DOC             )GETW.M       
+ SAVE             @ADAM5           (DOC             )GMTIME.M    
+ SAVE             @ADAM5           (DOC             )HCREATE.M  
+ SAVE             @ADAM5           (DOC             )HDESTROY.M
+ SAVE             @ADAM5           (DOC             )HSEARCH.M        
+ SAVE             @ADAM5           (DOC             )HYPOT.M         
+ SAVE             @ADAM5           (DOC             )IOCTL.M        
+ SAVE             @ADAM5           (DOC             )ISALNUM.M     
+ SAVE             @ADAM5           (DOC             )ISALPHA.M    
+ SAVE             @ADAM5           (DOC             )ISASCII.M   
+ SAVE             @ADAM5           (DOC             )ISATTY.M   
+ SAVE             @ADAM5           (DOC             )ISCNTRL.M 
+ SAVE             @ADAM5           (DOC             )ISDIGIT.M
+ SAVE             @ADAM5           (DOC             )ISGRAPH.M       
+ SAVE             @ADAM5           (DOC             )ISLOWER.M      
+ SAVE             @ADAM5           (DOC             )ISPRINT.M     
+ SAVE             @ADAM5           (DOC             )ISPUNCT.M    
+ SAVE             @ADAM5           (DOC             )ISSPACE.M   
+ SAVE             @ADAM5           (DOC             )ISUPPER.M  
+ SAVE             @ADAM5           (DOC             )ISXDIGIT.M
+ SAVE             @ADAM5           (DOC             )J0.M     
+ SAVE             @ADAM5           (DOC             )J1.M    
+ SAVE             @ADAM5           (DOC             )JN.M   
+ SAVE             @ADAM5           (DOC             )JRAND48.M          
+ SAVE             @ADAM5           (DOC             )KILL.M            
+ SAVE             @ADAM5           (DOC             )L3TOL.M          
+ SAVE             @ADAM5           (DOC             )L64A.M          
+ SAVE             @ADAM5           (DOC             )LCONG48.M      
+ SAVE             @ADAM5           (DOC             )LDEXP.M       
+ SAVE             @ADAM5           (DOC             )LINK.M       
+ SAVE             @ADAM5           (DOC             )LOCALTIME.M 
+ SAVE             @ADAM5           (DOC             )LOG.M      
+ SAVE             @ADAM5           (DOC             )LOG10.M   
+ SAVE             @ADAM5           (DOC             )LONGJMP.M
+ SAVE             @ADAM5           (DOC             )LRAND48.M      
+ SAVE             @ADAM5           (DOC             )LSEARCH.M     
+ SAVE             @ADAM5           (DOC             )LSEEK.M      
+ SAVE             @ADAM5           (DOC             )LTOL3.M     
+ SAVE             @ADAM5           (DOC             )MALLOC.M   
+ SAVE             @ADAM5           (DOC             )MATH.M    
+ SAVE             @ADAM5           (DOC             )MATHERR.M
+ SAVE             @ADAM5           (DOC             )MEMCCPY.M       
+ SAVE             @ADAM5           (DOC             )MEMCHR.M       
+ SAVE             @ADAM5           (DOC             )MEMCMP.M      
+ SAVE             @ADAM5           (DOC             )MEMCPY.M     
+ SAVE             @ADAM5           (DOC             )MEMORY.M    
+ SAVE             @ADAM5           (DOC             )MEMSET.M   
+ SAVE             @ADAM5           (DOC             )MKDIR.M   
+ SAVE             @ADAM5           (DOC             )MKTEMP.M 
+ SAVE             @ADAM5           (DOC             )MODF.M  
+ SAVE             @ADAM5           (DOC             )MPXCCSET.M       
+ SAVE             @ADAM5           (DOC             )MPXSVC.M        
+ SAVE             @ADAM5           (DOC             )MRAND48.M      
+ SAVE             @ADAM5           (DOC             )NBCAS.M       
+ SAVE             @ADAM5           (DOC             )NBCC.M       
+ SAVE             @ADAM5           (DOC             )NBCCOM.M    
+ SAVE             @ADAM5           (DOC             )NBCPP.M    
+ SAVE             @ADAM5           (DOC             )NBYACC.M  
+ SAVE             @ADAM5           (DOC             )NICE.M   
+ SAVE             @ADAM5           (DOC             )NRAND48.M         
+ SAVE             @ADAM5           (DOC             )OPEN.M           
+ SAVE             @ADAM5           (DOC             )OPENDIR.M       
+ SAVE             @ADAM5           (DOC             )PAUSE.M        
+ SAVE             @ADAM5           (DOC             )PERROR.M      
+ SAVE             @ADAM5           (DOC             )PIPE.M       
+ SAVE             @ADAM5           (DOC             )POW.M       
+ SAVE             @ADAM5           (DOC             )PRINTF.M   
+ SAVE             @ADAM5           (DOC             )PUTC.M    
+ SAVE             @ADAM5           (DOC             )PUTCHAR.M
+ SAVE             @ADAM5           (DOC             )PUTENV.M
+ SAVE             @ADAM5           (DOC             )PUTS.M 
+ SAVE             @ADAM5           (DOC             )PUTW.M
+ SAVE             @ADAM5           (DOC             )QSORT.M          
+ SAVE             @ADAM5           (DOC             )RAND.M          
+ SAVE             @ADAM5           (DOC             )READ.M         
+ SAVE             @ADAM5           (DOC             )READ1LN.M     
+ SAVE             @ADAM5           (DOC             )READDIR.M    
+ SAVE             @ADAM5           (DOC             )READMDIR.M  
+ SAVE             @ADAM5           (DOC             )READRAW.M  
+ SAVE             @ADAM5           (DOC             )REALLOC.M 
+ SAVE             @ADAM5           (DOC             )REWIND.M 
+ SAVE             @ADAM5           (DOC             )REWINDDIR.M    
+ SAVE             @ADAM5           (DOC             )RMDIR.M       
+ SAVE             @ADAM5           (DOC             )SBRK.M       
+ SAVE             @ADAM5           (DOC             )SCANF.M     
+ SAVE             @ADAM5           (DOC             )SEED48.M   
+ SAVE             @ADAM5           (DOC             )SEEK.M    
+ SAVE             @ADAM5           (DOC             )SEEKDIR.M
+ SAVE             @ADAM5           (DOC             )SETACC.M
+ SAVE             @ADAM5           (DOC             )SETBUF.M      
+ SAVE             @ADAM5           (DOC             )SETGID.M     
+ SAVE             @ADAM5           (DOC             )SETJMP.M    
+ SAVE             @ADAM5           (DOC             )SETPGRP.M  
+ SAVE             @ADAM5           (DOC             )SETSIZ.M  
+ SAVE             @ADAM5           (DOC             )SETUID.M 
+ SAVE             @ADAM5           (DOC             )SETVBUF.M       
+ SAVE             @ADAM5           (DOC             )SIGNAL.M       
+ SAVE             @ADAM5           (DOC             )SIN.M         
+ SAVE             @ADAM5           (DOC             )SINH.M       
+ SAVE             @ADAM5           (DOC             )SLEEP.M     
+ SAVE             @ADAM5           (DOC             )SPRINTF.M  
+ SAVE             @ADAM5           (DOC             )SQRT.M    
+ SAVE             @ADAM5           (DOC             )SRAND.M  
+ SAVE             @ADAM5           (DOC             )SRAND48.M      
+ SAVE             @ADAM5           (DOC             )SRN_NBC_1.0.0    
+ SAVE             @ADAM5           (DOC             )SSCANF.M        
+ SAVE             @ADAM5           (DOC             )STACK.M        
+ SAVE             @ADAM5           (DOC             )STAT.M        
+ SAVE             @ADAM5           (DOC             )STAT1X.M     
+ SAVE             @ADAM5           (DOC             )STATS.M     
+ SAVE             @ADAM5           (DOC             )STDIO.M    
+ SAVE             @ADAM5           (DOC             )STIME.M   
+ SAVE             @ADAM5           (DOC             )STRCAT.M 
+ SAVE             @ADAM5           (DOC             )STRCHR.M
+ SAVE             @ADAM5           (DOC             )STRCMP.M       
+ SAVE             @ADAM5           (DOC             )STRCPY.M      
+ SAVE             @ADAM5           (DOC             )STRCSPN.M    
+ SAVE             @ADAM5           (DOC             )STRING.M    
+ SAVE             @ADAM5           (DOC             )STRINGS.M  
+ SAVE             @ADAM5           (DOC             )STRLEN.M  
+ SAVE             @ADAM5           (DOC             )STRNCAT.M
+ SAVE             @ADAM5           (DOC             )STRNCMP.M      
+ SAVE             @ADAM5           (DOC             )STRNCPY.M     
+ SAVE             @ADAM5           (DOC             )STRPBRK.M    
+ SAVE             @ADAM5           (DOC             )STRRCHR.M   
+ SAVE             @ADAM5           (DOC             )STRSPN.M   
+ SAVE             @ADAM5           (DOC             )STRTOD.M  
+ SAVE             @ADAM5           (DOC             )STRTOK.M 
+ SAVE             @ADAM5           (DOC             )STRTOL.M
+ SAVE             @ADAM5           (DOC             )SWAB.M         
+ SAVE             @ADAM5           (DOC             )SYNC.M        
+ SAVE             @ADAM5           (DOC             )SYS_ERRLIST.M
+ SAVE             @ADAM5           (DOC             )SYS_NERR.M  
+ SAVE             @ADAM5           (DOC             )TAN.M      
+ SAVE             @ADAM5           (DOC             )TANH.M    
+ SAVE             @ADAM5           (DOC             )TDELETE.M
+ SAVE             @ADAM5           (DOC             )TELLDIR.M     
+ SAVE             @ADAM5           (DOC             )TEMPNAM.M    
+ SAVE             @ADAM5           (DOC             )TFIND.M     
+ SAVE             @ADAM5           (DOC             )TIME.M     
+ SAVE             @ADAM5           (DOC             )TIMES.M   
+ SAVE             @ADAM5           (DOC             )TMPFILE.M
+ SAVE             @ADAM5           (DOC             )TMPNAM.M
+ SAVE             @ADAM5           (DOC             )TOASCII.M      
+ SAVE             @ADAM5           (DOC             )TOLOWER.M     
+ SAVE             @ADAM5           (DOC             )TOUPPER.M    
+ SAVE             @ADAM5           (DOC             )TRIG.M      
+ SAVE             @ADAM5           (DOC             )TSEARCH.M  
+ SAVE             @ADAM5           (DOC             )TWALK.M   
+ SAVE             @ADAM5           (DOC             )TYPES.M  
+ SAVE             @ADAM5           (DOC             )TZSET.M 
+ SAVE             @ADAM5           (DOC             )UMASK.M      
+ SAVE             @ADAM5           (DOC             )UNGETC.M    
+ SAVE             @ADAM5           (DOC             )UNIX2MPX.M 
+ SAVE             @ADAM5           (DOC             )UNIXIO.M  
+ SAVE             @ADAM5           (DOC             )UNLINK.M 
+ SAVE             @ADAM5           (DOC             )UTIME.M 
+ SAVE             @ADAM5           (DOC             )VALUES.M        
+ SAVE             @ADAM5           (DOC             )VARARGS.M      
+ SAVE             @ADAM5           (DOC             )VEXECL.M      
+ SAVE             @ADAM5           (DOC             )VEXECV.M     
+ SAVE             @ADAM5           (DOC             )VFPRINTF.M  
+ SAVE             @ADAM5           (DOC             )VPRINTF.M  
+ SAVE             @ADAM5           (DOC             )VSPRINTF.M
+ SAVE             @ADAM5           (DOC             )WAIT.M   
+ SAVE             @ADAM5           (DOC             )WRITE.M 
+ SAVE             @ADAM5           (DOC             )WRITRAW.M       
+ SAVE             @ADAM5           (DOC             )Y0.M           
+ SAVE             @ADAM5           (DOC             )Y1.M          
+ SAVE             @ADAM5           (DOC             )YN.M         
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ REWIND         (TAP)
+ *****  BOT  *****
+

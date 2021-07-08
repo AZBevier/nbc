@@ -1,0 +1,903 @@
+           
+           
+           
+                            MPX-32 C COMPILER
+                                           
+                             Revision 1.0.0
+
+                           Software Release Notes
+           
+                                June 1992
+
+                         READ BEFORE USING REVISION
+           
+           
+    These Software Release Notes contain specific information to this
+    release, including usage information that is not included in the
+    online documentation set.
+           
+
+324-008150-000
+
+
+
+LIMITED RIGHTS
+_________________________________________________________
+
+This manual is supplied without representation or
+warranty of any kind.  Encore Computer Corporation
+therefore assumes no responsibility and shall have no
+liability of any kind arising from supply or use of this
+publication or any material contained herein.
+
+
+PROPRIETARY INFORMATION
+
+The information contained herein is proprietary to Encore
+Computer Corporation and/or its vendors, and its use,
+disclosure or duplication is subject to the restrictions
+stated in the standard Encore Computer Corporation
+License terms and conditions or the appropriate third-
+party sublicense agreement.
+
+
+RESTRICTED RIGHTS
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subdivision (c)
+(1) (ii) of the Rights in Technical Data and Computer
+Software clause at 252.227.7013.
+
+Encore Computer Corporation
+6901 West Sunrise Boulevard
+Fort Lauderdale, Florida  33313
+
+
+
+MPX-32 is a trademark of Encore Computer Corporation.
+
+Concept/32 is a registered trademark of Encore Computer
+Corporation.
+
+UNIX is a registered trademark of AT&T Bell Laboratories.
+
+
+
+Copyright 1992 by Encore Computer Corporation and J B Systems
+All Rights Reserved
+Printed in the U.S.A.
+
+
+
+
+Contents
+____________________________________________________________
+
+
+1 OVERVIEW
+
+  Summary of Contents
+  Documentation
+    MPX-32 C Compiler Documentation
+    Documentation Conventions
+      Bold Type
+      Non-Proportional Type
+      Italic Type
+      Braces
+      Brackets
+      Horizontal Ellipses
+      Vertical Ellipses
+      Control Characters
+
+2 CONTENTS OF THIS RELEASE
+
+  Product Name
+  Model Number
+  Software Revision Number
+  Revision Date
+  Model Number(s) to Purchase Subscription Service Programs 
+  Revision History
+  Prerequisites
+  Package Contents
+  Package Formats
+  Documentation Delivered With This Product
+  Related Documentation
+
+3 PRODUCT INFORMATION
+
+  About the MPX-32 C Compiler
+
+4 REQUIREMENTS
+
+  Introduction
+  Disk Space Requirements
+  Physical Requirements
+  Software Requirements
+
+5 INSTALLATION INSTRUCTIONS
+
+  Binary Installation
+    Installation Procedure
+      Restore the Files to Disk
+
+6 PRODUCT HINTS
+
+  General Hints
+
+7 KNOWN PROBLEMS
+
+  Introduction
+
+8 PROBLEM REPORT SUMMARY
+
+  Introduction
+  Online Viewing of Problem Reports
+  Problem Reporting
+    By Telephone
+    With PR Forms
+
+
+
+
+1 Overview
+____________________________________________________________
+
+
+INTRODUCTION
+
+
+    This document, the MPX-32 C Compiler Release Notes, is provided
+    to customers purchasing Revision 1.0.0.  It describes the MPX-32
+    C Compiler as well as revision-specific information.
+
+    IMPORTANT:  Read the Release Notes before attempting to install
+    or use the Revision 1.0.0 software.  Besides providing an overview
+    of the revision, this document contains critical, late-breaking
+    information about the product that is not documented elsewhere.
+
+
+SUMMARY OF CONTENTS
+
+    These Software Release Notes (SRN) provide information
+    on using Revision 1.0.0 of the MPX-32 C Compiler with
+    the MPX-32 Operating System, version 3.0 or later.
+
+    The file on the installation tape containing the SRN
+    (SRN_NBC_1.0) may be printed from the TSM> prompt. The
+    file may also be examined online. It was included to
+    provide users with the latest information about Revision
+    1.0.0.  Note that the hardcopy and installation-tape versions
+    may differ because of last minute changes.
+
+    The topics contained in this SRN are in the following order:
+
+
+    + Overview
+
+    + Contents of this Revision
+
+    + Product Information
+
+    + Requirements
+
+    + Installation Instructions
+
+    + Product Hints
+
+    + Known Problems
+
+    + Problem Report Summary
+
+
+
+Documentation
+
+
+MPX-32 C Compiler Documentation
+
+
+    The documentation for Revision 1.0 of the MPX-32 C Compiler
+    consists of the following :
+
+    MPX-32 C Compiler Software Release Notes (324-008150-000)
+
+    Online Documentation for MPX-32 C Compiler, Revision 1.0.0.
+
+Documentation Conventions
+
+
+    The following typographic conventions used throughout
+    this document are intended to increase the document's
+    readability and enhance your understanding of its contents.
+
+Bold Type
+
+
+    In command lines, boldfaced information must be entered
+    exactly as shown.
+
+    Example
+
+      TSM> OPCOM LIST
+
+
+Non-Proportional Type
+
+
+    In file entries, information in non-proportional type
+    must be entered exactly as shown.
+
+    Example
+
+      struct dqe *dqeptr;
+
+    In messages, information in non-proportional type is
+    text written by the system.
+
+    Example
+
+      NBC: Compiler error
+
+
+Italic Type
+
+    In file entries and command syntax, information you provide
+    is printed in italics.
+
+    Example File entry.
+
+      TSM> $USERNAME name
+
+    Example Command syntax.
+
+      from file
+
+    In system messages, variable information is printed in italics.
+
+    Example
+
+      UNABLE TO DELETE FILE - VMxx
+
+    Note:  In text, italics are used for emphasis.
+
+Braces
+
+
+    When braces surround parameters that are separated by a
+    vertical bar(s), only one parameter is required.
+
+    Example
+
+      $ASSIGN {LO | ER} TO {pathname}
+
+
+Brackets
+
+    In command syntax, parameters inside brackets are optional.
+
+    Example
+
+      from [file]
+
+
+Horizontal Ellipses
+
+    In text and messages, horizontal ellipses indicate that
+    similar information has been omitted.
+
+    Example
+
+      RPAR? [1,2,...,22]
+
+
+Vertical Ellipses
+
+    Vertical ellipses in command syntax, file entries, and
+    messages indicate that similar lines have been omitted.
+
+    Example
+
+      PAD: RPAR 2:v
+            .
+            .
+            .
+      PAD: RPAR 22:v
+
+
+Control Characters
+
+    A circumflex (^) followed immediately by a capital
+    letter indicates a control-character sequence. To enter
+    a control character, press and hold the control key
+    (Ctrl or CTRL) while typing the specified control character.
+
+    Example
+
+      ^X
+
+
+
+2 Contents of this Release
+____________________________________________________________
+
+
+Product Name
+
+    MPX-32 C Compiler
+
+
+Model Number
+
+    1012-3303 Binary Single System (CONCEPT 32/27, 32/67 &
+              SelCONNECTION running MPX-32 Revision 3.X).
+
+    1012-4303 Binary Single System (CONCEPT 32/87 & 32/97
+              running MPX-32 Revision 3.X).
+
+    1012-5303 Binary Single System (CONCEPT 32/2030 & 32/2040
+              running MPX-32 Revision 3.X).
+
+    1012-6303 Binary Single System (CONCEPT 32/2050 & RSX
+              running MPX-32 Revision 3.X).
+
+
+Software Revision Number
+
+    1.0.0
+
+
+Revision Date
+
+    June 1992
+
+
+Model Number(s) to Purchase Subscription Service Programs
+
+    FP-1012-(3/6)303   Premier Support Service
+
+    FS-1012-(3/6)303   Standard Support Service
+
+    FU-1012-(3/6)303   Software Update Service
+
+
+    Please contact your local Encore sales service representative
+    for complete information on the Service Programs.
+
+
+Revision History
+
+    Description           Level             Date
+    -------------------   -------------     --------------
+    Original Release      Revision 1.0.0    June 1992
+
+
+Prerequisites
+
+    Encore Proprietary Software License Form 620-28
+
+    Also see the minimum requirements in chapter 4.
+
+
+Package Contents
+
+    Eight Volume Manager (VOLMGR) save images.
+
+
+    Image 1 This SRN
+
+    Image 2 Online Documentation Files
+
+    Image 3 System Programs and Command Files
+
+    Image 4 Compiler Programs, Utilities and Command Files
+
+    Image 5 Include Files
+
+    Image 6 C Runtime Library
+
+    Image 7 Skeleton Parser Driver
+
+    Image 8 Sample C Code and Programs
+
+
+Package Formats
+
+    Eight Volume Manager (VOLMGR) save images as follows:
+
+
+   Save Image 1
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (DOC)SRN_NBC_1.0       This SRN
+
+   Save Image 2
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (DOC)NBCAS.M           Assembler Documentation
+      2      (DOC)NBCC.M            Compiler Driver Documentation
+      3      (DOC)NBCCOM.M          Compiler Documentation
+      4      (DOC)NBCPP.M           Preprocessor Documentation
+      5      (DOC)NBYACC.M          YACC Documentation
+      6      (DOC)SRN_NBC_1.0       This SRN
+
+   Save Image 3
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (SYSTEM)NBCC           C Compiler Driver
+      2      (SYSTEM)NBLD           TSM Macro to Catalog C Programs
+      3      (SYSTEM)NBYACC         YACC Load Module
+
+   Save Image 4
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (BIN)C.SRT.O           Non-extended Startup object code
+      2      (BIN)C.SRTE.O          Extended Startup object code
+      3      (BIN)CAT               Demo Utility from Sample Directory
+      4      (BIN)CDR               C Runtime Library Directory
+      5      (BIN)CLB               C Runtime Library
+      6      (BIN)FIXER             Demo Utility from Sample Directory
+      7      (BIN)NBCAS             Modified MPX-32 Assembler
+      8      (BIN)NBCC              C Compiler Driver
+      9      (BIN)NBCCOM            Combined Compiler and Code Generator
+     10      (BIN)NBCP1             Pass one of Two Pass Compiler
+     11      (BIN)NBCP2             Pass two of Two Pass Compiler
+     12      (BIN)NBCPP             C Preprocessor
+     13      (BIN)NBLD              TSM Macro to Catalog C Programs
+     14      (BIN)NBYACC            Yet Another Compiler Compiler
+
+   Save Image 5
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (NBINCLUDE)A.OUT.H     C Include Files
+      2      (NBINCLUDE)ART.H           
+      3      (NBINCLUDE)ASSERT.H        
+      4      (NBINCLUDE)CDOTS.H         
+      5      (NBINCLUDE)CTYPE.H         
+      6      (NBINCLUDE)DCA.H           
+      7      (NBINCLUDE)DIR.H           
+      8      (NBINCLUDE)DIRENT.H        
+      9      (NBINCLUDE)DQE.H           
+     10      (NBINCLUDE)ERRNO.H         
+     11      (NBINCLUDE)FAT.H           
+     12      (NBINCLUDE)FCB.H           
+     13      (NBINCLUDE)FCNTL.H         
+     14      (NBINCLUDE)FINFO.H         
+     15      (NBINCLUDE)IDENT.H         
+     16      (NBINCLUDE)IOQ.H           
+     17      (NBINCLUDE)LIMITS.H        
+     18      (NBINCLUDE)MATH.H          
+     19      (NBINCLUDE)MOSDE.H         
+     20      (NBINCLUDE)MPXDEF.H        
+     21      (NBINCLUDE)MPXSVC.H        
+     22      (NBINCLUDE)NAN.H           
+     23      (NBINCLUDE)PARAM.H         
+     24      (NBINCLUDE)PRB.H           
+     25      (NBINCLUDE)PSB.H           
+     26      (NBINCLUDE)RXB.H           
+     27      (NBINCLUDE)SEARCH.H        
+     28      (NBINCLUDE)SETJMP.H        
+     29      (NBINCLUDE)SIGNAL.H        
+     30      (NBINCLUDE)SMT.H           
+     31      (NBINCLUDE)STAB.H          
+     32      (NBINCLUDE)STAT.H          
+     33      (NBINCLUDE)STDIO.H         
+     34      (NBINCLUDE)STRING.H        
+     35      (NBINCLUDE)TERMIO.H        
+     36      (NBINCLUDE)TIME.H          
+     37      (NBINCLUDE)TIMEB.H         
+     38      (NBINCLUDE)TIMES.H         
+     39      (NBINCLUDE)TSA.H           
+     40      (NBINCLUDE)TYPES.H         
+     41      (NBINCLUDE)UDT.H           
+     42      (NBINCLUDE)UNIXIO.H        
+     43      (NBINCLUDE)UTMP.H          
+     44      (NBINCLUDE)VALUES.H        
+     45      (NBINCLUDE)VARARGS.H       
+     46      (NBINCLUDE)VERSION.H       
+
+   Save Image 6
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (NBLIB)C.SRT.O         Non-extended startup object code
+      2      (NBLIB)C.SRT.S         Non-extended startup source code
+      3      (NBLIB)C.SRTE.O        Extended startup object code
+      4      (NBLIB)C.SRTE.S        Extended startup source code
+      5      (NBLIB)CDR             C Runtime Library Directory
+      6      (NBLIB)CLB             C Runtime Library
+      7      (NBLIB)FCALL.S         C Interface to Fortran Subroutines
+      8      (NBLIB)FPS.C           Floating point conversion source
+
+   Save Image 7
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (LIB)YACCPAR           YACC Skeleton Parser Driver
+
+   Save Image 8
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (SAMPLE)CAT            Demo Utility Program
+      2      (SAMPLE)CAT.C          Source code for CAT
+      3      (SAMPLE)CAT.L          Assembler output listing for CAT
+      4      (SAMPLE)CAT.O          Object code for CAT
+      5      (SAMPLE)CATMAP         Catalog loadmap for CAT
+      6      (SAMPLE)FIXER          Demo Utility Program
+      7      (SAMPLE)FIXER.C        Source code for FIXER
+      8      (SAMPLE)FIXER.L        Assembler output listing for FIXER
+      9      (SAMPLE)FIXER.O        Object code for FIXER
+     10      (SAMPLE)FIXERMAP       Catalog loadmap for FIXER
+     11      (SAMPLE)FORT.C         Fortran subroutine calling example
+     12      (SAMPLE)FORT.L         Assembler output listing of FORT.C
+     13      (SAMPLE)FORT.O         Object code for FORT.C
+     14      (SAMPLE)KILL.C         MPX-32 SVC calling example
+     15      (SAMPLE)KILL.L         Assembler output listing of KILL.C
+     16      (SAMPLE)KILL.O         Object code for KILL.C
+     17      (SAMPLE)MAK.SAMP       TSM Macro to compile sample programs
+     18      (SAMPLE)PRTINC.C       Subroutine to include memory partition
+     19      (SAMPLE)PRTINC.L       Assembler output listing of PRTINC.C
+     20      (SAMPLE)PRTINC.O       Object code for PRTINC.C
+
+
+Documentation Delivered With This Product
+
+    MPX-32 C Compiler Software Release Notes (324-008150-000)
+
+    Online Documentation for MPX-32 C Compiler, Revision 1.0.0.
+
+Related Documentation
+
+    "The C Programming Language" by Kernighan & Ritchie.
+
+    MPX-32 Reference Manual*
+
+    MPX-32 Technical Manual*
+
+    * For current publication numbers, contact your Encore
+      representative.
+
+
+3 PRODUCT INFORMATION
+____________________________________________________________
+
+
+About the MPX-32 C Compiler
+
+    The MPX-32 Non-base C compiler operates in one or two pass
+    mode.  It generates assembler language instructions which can
+    optionally have the source C code intermixed as comments.
+    Compile time options allow support for register to register 
+    floating point instructions or only register to memory 
+    instructions to support 32/7X and 32/27 systems.  The debug
+    option allows symbols to be passed through to the Cataloger
+    for display with the task debugger.
+
+    The C run-time library provides an emulated UNIX System V
+    interface to MPX-32.  Most of the standard library functions
+    are provided where emulation was possible without O/S
+    modifications.  Functions are also provided to directly access
+    MPX-32 SVC's where UNIX compatibility is not desired.  MPX-32
+    SVC's can also be called as in-line assembler instructions.
+    An additional option also allows non-sectioned code to be
+    generated.  This allows functions written in C to be SYSGENed
+    into the MPX-32 operating system.
+
+    The MPX-32 Non-base C compiler executes on Encore's SERIES 32/7X,
+    CONCEPT32, and RSX computers.  MPX-32 Operating System Version
+    1.X (1.4 and later, including EPX 1.X), MPX-32 Version 2.x, and 
+    MPX-32 Version 3.x are supported.
+
+4 REQUIREMENTS
+____________________________________________________________
+
+
+Introduction
+
+    This chapter contains the system requirements for MPX-32
+    C Compiler, Revision 1.0.0.
+
+
+Disk Space Requirements
+
+    To use this binary installation package, adequate disk
+    space must be available on the system. 6100 blocks of
+    available space are needed for this installation.
+    (Space for temporary and SLO files is not included.)
+
+
+Physical Requirements
+
+    Physical requirements for binary installation package processing:
+
+
+    1. One compatible input device for the distribution medium:
+
+              1/2" 9-Track tape drive
+
+    2. One compatible auxiliary input device for batch processing:
+
+              One TSM terminal (with lower-case capability).
+
+    3. Adequate disk space (see Disk Space section).
+
+
+
+Software Requirements
+
+
+    One of the following operating systems:
+
+          1401 MPX-32 Operating System Revision 3.0 or above.
+
+    The following product installed on that system:
+
+          1407 MPX-32 Utilities Revision 1.0 or above.
+
+    The following processors are used during the installation or
+    execution of the MPX-32 C Compiler:
+
+      VOLMGR
+      COMPRESS
+      LIBED
+      CATALOG
+
+
+5 INSTALLATION INSTRUCTIONS
+____________________________________________________________
+
+
+Binary Installation
+
+    To install the MPX-32 C Compiler, Revision 1.0.0 binary
+    installation media on your system, perform the following
+    procedures:
+
+
+    Restore the Files to Disk
+
+    + Mount the installation medium on the appropriate unit.
+
+      TSM>AS TAP TO DEV=DEVMNC BLOC=N
+
+    + Invoke the Volume Manager and ensure that the tape is
+      positioned by rewinding the tape.
+
+      TSM>VOLMGR
+      VOL>REWIND
+
+    + Skip the first image which contains this SRN file.
+
+      VOL>SKIP I
+
+    + Restore the Online Documentation Files
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + Restore the System Programs and Command Files
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + Restore the Compiler Programs, Utilities and Command Files
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + Restore the Include Files
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + Restore the C Runtime Library
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + Restore the Skeleton Parser Driver
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + Optionally, Restore the Sample C Code and Programs
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + Rewind the tape and exit the Volume Manager.
+
+      VOL>REWIND
+      VOL>EXIT
+
+
+Software Configuration
+
+    The MPX-32 C Compiler is ready to run after installation
+    is complete.  The documentation files (in the DOC directory)
+    may be viewed by the following:
+
+    TSM>^(bin)cat <^(DOC)xxxx.m
+      or
+    TSM>^(bin)cat /system/doc/xxx.m
+
+    This will display the selected documentation file.
+
+    The SAMPLE directory should be reviewed and the source
+    code for the sample programs reviewed to see some of
+    the capabilities of the MPX-32 C Compiler.  The mak.samp
+    TSM macro should be run to see if the compiler operates
+    properly on your system.  The programs CAT and FIXER
+    can be cataloged using the TSM macro NBLD as follows:
+
+    TSM>NBLD cat catmap
+
+    This will build the program CAT in the local directory.
+
+    TSM>NBLD fixer fixermap
+
+    This will build the program FIXER in the local directory.
+
+
+6 PRODUCT HINTS
+____________________________________________________________
+
+
+General Hints
+
+    The NBLD macro should be modified when several programs
+    are to be combined to form a load module.  Add the names
+    of the object files that are to include after the COMPRESS
+    directive.  This will combine all of the non-runtime
+    library objects for cataloging.
+
+    The default startup code is C.SRTE.O.  It allocates the
+    stack and I/O area in extended memory starting at 0x80000.
+    The program will be started in extended mode.  If it is
+    desirable to run in non-extended mode, the object module
+    C.SRT.O should be included to allow the program to startup
+    in non-extended mode.  This would usually be the case when
+    interfacing to Fortran subroutines.
+
+    The source code for C.SRT.C and C.SRTE.C are included.
+    These are the non-extended and extended mode versions of
+    the startup code.  They assume a 12KW stack.  If a larger
+    or smaller stack is desired, modify these programs for
+    your specific needs.
+
+    The source code for FCALL.S is also included.  Due to
+    variations in Fortran calling conventions, it may be
+    necessary to modify this interface subroutine.
+
+    The C runtime library is implemented using the UNIX System
+    V interface.  Consult any System V reference manual for
+    calling conventions.  Also, review the include files in
+    the NBINCLUDE directory.
+
+    The preprocessor, NBCPP, searches both the NBINCLUDE and
+    CINCLUDE directories for include files.  If an earlier
+    version of the MPX-32 C Compiler has been installed, it
+    used the CINCLUDE directory for include files.  Make
+    sure the CINCLUDE directory is empty or does not contain
+    any old outdated include files.  See NBCPP.M in the DOC
+    directory.
+
+    The load module, NBYACC, is include with the C Compiler
+    as an unsupported utility.  It may or may not be removed
+    in future releases of this product.  No Problem Reports
+    (PR's) will be accepted for this utility.
+
+    The MPX-32 C Compiler and Runtime library are compatible
+    with TXPM.  They will run as TXPM tasks with any problems.
+
+
+7 KNOWN PROBLEMS
+____________________________________________________________
+
+
+List of Current Problems
+
+    The one pass version of the MPX-32 C Compiler, NBCCOM, is
+    quite large and may not run on systems with limited task
+    execution space.  If this is the case, use the -2 option
+    to NBCC to invoke the two pass version of the compiler.
+
+    There is minimal documentation.
+
+8 PROBLEM REPORT SUMMARY
+____________________________________________________________
+
+
+Introduction
+
+    You can check on the status of any MPX-32 software Problem
+    Report (PR) by logging on to a system at Encore Computer
+    Corporation in Fort Lauderdale. This procedure is discussed
+    in the section, ONLINE VIEWING OF PRs.
+
+    To learn how to report new problems with the MPX-32 C 
+    Compiler, Revision 1.0.0, software and documents, refer to
+    the section, PROBLEM REPORTING.
+
+    There are no outstanding PRs for the Revision 1.0.0 of
+    the MPX-32 C Compiler.
+
+
+Online Viewing of Problem Reports
+
+    Encore Computer Corporation Customer Services maintains
+    an problem-report database for Service Program customers.
+    If you are a Service Program customer, use a modem to
+    log on to a UTX/32 system at Encore Computer Corporation
+    in Fort Lauderdale. Dial (305) 797-5837 and log in as cstspr.
+    Be sure the modem is set to:
+
+    + 1200 baud
+
+    + Full duplex
+
+    + 8-bit characters
+
+    + One stop bit
+
+    + No parity
+
+
+    Call 1-800-TECHAID to report any difficulties with the
+    online database.
+
+
+Problem Reporting
+
+    There are two ways to report problems with the MPX-32 C
+    Compiler, Revision 1.0.0, software and documentation.
+
+    + call the toll-free telephone number
+
+    + fill out a PR form.
+
+
+    The following sections give more information on the use
+    of these methods.
+
+By Telephone
+
+    To report a software or documentation problem by telephone,
+    within the USA., call a customer service representative at
+    1-800-TECHAID. You will be asked to provide the following
+    information:
+
+    + The call number (if this is a follow-up call)
+
+    + Your name
+
+    + Company name
+
+    + Contract number
+
+    + System number
+
+    + Telephone number
+
+    + Machine type
+
+    + Operating system and revision number
+
+    + Product and revision number
+
+    + Problem description
+
+
+    If possible, have an auto-answer modem connected to the
+    appropriate MPX/32 system. Customer Services personnel
+    should then be able to provide remote hardware or
+    software support.
+
+
+With PR Forms
+
+    A software or documentation problem can be reported by
+    filling out a PR form and sending the form with the
+    appropriate supplemental information to the address
+    indicated on the form.  Forms may be obtained from your
+    local Encore Computer Corporation office.
+
+

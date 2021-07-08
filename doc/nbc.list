@@ -1,0 +1,109 @@
+-                      *** V O L U M E   M A N A G E R  3.5U01.01 ***
+ LOG IMAGE        @MPX35N          (DOC             )SRN_NBC_1.0     
+ SKIP IMAGE     (TAP)
+ LOG IMAGE        @MPX35N          (DOC             )NBCAS.M         
+ LOG IMAGE        @MPX35N          (DOC             )NBCC.M          
+ LOG IMAGE        @MPX35N          (DOC             )NBCCOM.M        
+ LOG IMAGE        @MPX35N          (DOC             )NBCPP.M         
+ LOG IMAGE        @MPX35N          (DOC             )NBYACC.M        
+ LOG IMAGE        @MPX35N          (DOC             )SRN_NBC_1.0     
+ SKIP IMAGE     (TAP)
+ LOG IMAGE        @MPX35N          (SYSTEM          )NBCC            
+ LOG IMAGE        @MPX35N          (SYSTEM          )NBLD            
+ LOG IMAGE        @MPX35N          (SYSTEM          )NBYACC          
+ SKIP IMAGE     (TAP)
+ LOG IMAGE        @MPX35N          (BIN             )C.SRT.O         
+ LOG IMAGE        @MPX35N          (BIN             )C.SRTE.O        
+ LOG IMAGE        @MPX35N          (BIN             )CAT             
+ LOG IMAGE        @MPX35N          (BIN             )CDR             
+ LOG IMAGE        @MPX35N          (BIN             )CLB             
+ LOG IMAGE        @MPX35N          (BIN             )FIXER           
+ LOG IMAGE        @MPX35N          (BIN             )NBCAS           
+ LOG IMAGE        @MPX35N          (BIN             )NBCC            
+ LOG IMAGE        @MPX35N          (BIN             )NBCCOM          
+ LOG IMAGE        @MPX35N          (BIN             )NBCP1           
+ LOG IMAGE        @MPX35N          (BIN             )NBCP2           
+ LOG IMAGE        @MPX35N          (BIN             )NBCPP           
+ LOG IMAGE        @MPX35N          (BIN             )NBLD            
+ LOG IMAGE        @MPX35N          (BIN             )NBYACC          
+ SKIP IMAGE     (TAP)
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )A.OUT.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )ART.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )ASSERT.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )CDOTS.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )CTYPE.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )DCA.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )DIR.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )DIRENT.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )DQE.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )ERRNO.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )FAT.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )FCB.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )FCNTL.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )FINFO.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )IDENT.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )IOQ.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )LIMITS.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )MATH.H          
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )MOSDE.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )MPXDEF.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )MPXSVC.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )NAN.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )PARAM.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )PRB.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )PSB.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )RXB.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )SEARCH.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )SETJMP.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )SIGNAL.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )SMT.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )STAB.H          
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )STAT.H          
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )STDIO.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )STRING.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )TERMIO.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )TIME.H          
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )TIMEB.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )TIMES.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )TSA.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )TYPES.H         
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )UDT.H           
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )UNIXIO.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )UTMP.H          
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )VALUES.H        
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )VARARGS.H       
+ LOG IMAGE        @MPX35N          (NBINCLUDE       )VERSION.H       
+ SKIP IMAGE     (TAP)
+ LOG IMAGE        @MPX35N          (NBLIB           )C.SRT.O         
+ LOG IMAGE        @MPX35N          (NBLIB           )C.SRT.S         
+ LOG IMAGE        @MPX35N          (NBLIB           )C.SRTE.O        
+ LOG IMAGE        @MPX35N          (NBLIB           )C.SRTE.S        
+ LOG IMAGE        @MPX35N          (NBLIB           )CDR             
+ LOG IMAGE        @MPX35N          (NBLIB           )CLB             
+ LOG IMAGE        @MPX35N          (NBLIB           )FCALL.S         
+ LOG IMAGE        @MPX35N          (NBLIB           )FPS.C           
+ SKIP IMAGE     (TAP)
+ LOG IMAGE        @MPX35N          (LIB             )YACCPAR         
+ SKIP IMAGE     (TAP)
+ LOG IMAGE        @MPX35N          (SAMPLE          )CAT             
+ LOG IMAGE        @MPX35N          (SAMPLE          )CAT.C           
+ LOG IMAGE        @MPX35N          (SAMPLE          )CAT.L           
+ LOG IMAGE        @MPX35N          (SAMPLE          )CAT.O           
+ LOG IMAGE        @MPX35N          (SAMPLE          )CATMAP          
+ LOG IMAGE        @MPX35N          (SAMPLE          )FIXER           
+ LOG IMAGE        @MPX35N          (SAMPLE          )FIXER.C         
+ LOG IMAGE        @MPX35N          (SAMPLE          )FIXER.L         
+ LOG IMAGE        @MPX35N          (SAMPLE          )FIXER.O         
+ LOG IMAGE        @MPX35N          (SAMPLE          )FIXERMAP        
+ LOG IMAGE        @MPX35N          (SAMPLE          )FORT.C          
+ LOG IMAGE        @MPX35N          (SAMPLE          )FORT.L          
+ LOG IMAGE        @MPX35N          (SAMPLE          )FORT.O          
+ LOG IMAGE        @MPX35N          (SAMPLE          )KILL.C          
+ LOG IMAGE        @MPX35N          (SAMPLE          )KILL.L          
+ LOG IMAGE        @MPX35N          (SAMPLE          )KILL.O          
+ LOG IMAGE        @MPX35N          (SAMPLE          )MAK.SAMP        
+ LOG IMAGE        @MPX35N          (SAMPLE          )PRTINC.C        
+ LOG IMAGE        @MPX35N          (SAMPLE          )PRTINC.L        
+ LOG IMAGE        @MPX35N          (SAMPLE          )PRTINC.O        
+ REWIND         (TAP)
+ *****  BOT  *****

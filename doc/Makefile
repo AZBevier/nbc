@@ -1,0 +1,89 @@
+# Makefile for NBC /system/doc directory
+
+SHELL = /bin/sh
+
+ROOT = /system
+D = $(ROOT)/doc
+
+##CFLAGS = -O -I$I # -m32
+#CFLAGS= -O -I$I -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE #-m32
+
+DOC1 =	a64l.m abort.m abs.m access.m acos.m alarm.m asctime.m \
+		asin.m assert.m atan2.m atan.m atof.m atoi.m atol.m \
+		bcmp.m bcopy.m bessel.m brk.m bsearch.m calloc.m ceil.m \
+		chdir.m chmod.m chown.m chownm.m chroot.m chtype.m clearerr.m \
+		clock.m closedir.m close.m conv.m cosh.m cos.m creatd.m \
+		creat.m ctime.m ctype.m delete.m directory.m drand48.m dup.m \
+		ecvt.m erand48.m erfc.m erf.m errno.m execle.m execl.m
+
+DOC2 =	execlp.m exec.m execve.m execv.m execvp.m _exit.m exit.m \
+		_exitmpx.m exp.m fabs.m fcbadr.m fclose.m fcvt.m fdopen.m \
+		feof.m ferror.m fflush.m fgetc.m fgets.m fileno.m floor.m \
+		fmod.m fopen.m fork.m fprintf.m fputc.m fputs.m fread.m \
+		free.m freopen.m frexp.m fscanf.m fseek.m fstat.m ftell.m \
+		fwrite.m gamma.m gcvt.m getacc.m getchar.m getc.m getcwd.m \
+		getenv.m getgid.m getopt.m getpgrp.m getpid.m getppid.m gets.m
+
+DOC3 =	getuid.m getw.m gmtime.m hcreate.m hdestroy.m hsearch.m hypot.m \
+		ieeelib.m ioctl.m isalnum.m isalpha.m isascii.m isatty.m \
+		iscntrl.m isdigit.m isgraph.m islower.m isprint.m ispunct.m isspace.m \
+		isupper.m isxdigit.m j0.m j1.m jn.m jrand48.m kill.m \
+		l3tol.m l64a.m lcong48.m ldexp.m link.m localtime.m log10.m \
+		log.m longjmp.m lrand48.m lsearch.m lseek.m ltol3.m malloc.m \
+		matherr.m math.m memccpy.m memchr.m memcmp.m memcpy.m memory.m
+
+DOC4 =	memset.m mkdir.m mktemp.m modf.m moelib.m molib.m mpxccset.m \
+		mpxsvc.m mrand48.m nbcas.m nbcat.m nbcc.m nbccom.m nbcpp.m \
+		nblex.m nbyacc.m nice.m nrand48.m opendir.m open.m pause.m \
+		perror.m pipe.m pow.m printf.m putchar.m putc.m putenv.m \
+		puts.m putw.m qsort.m rand.m read1ln.m readdir.m read.m \
+		readmdir.m readraw.m realloc.m rewinddir.m rewind.m rmdir.m sbrk.m \
+		scanf.m seed48.m seekdir.m seek.m setacc.m setbuf.m setdft.m
+
+DOC5 = 	setgid.m setjmp.m setpgrp.m setsiz.m setuid.m setvbuf.m signal.m \
+		sinh.m sin.m sleep.m sprintf.m sqrt.m srand48.m srand.m \
+		sscanf.m stack.m stat1x.m stat.m stats.m stdio.m stime.m \
+		str2lc.m str2up.m stradd.m strcasecmp.m strcat.m strccpy.m strchr.m \
+		strcmp.m strcpy.m strcspn.m strdup.m strecnt.m strecpy.m stricmp.m \
+		string.m strlen.m strncasecmp.m strncat.m strncmp.m strncpy.m strnlen.m \
+		strpbrk.m strpos.m strrchr.m strrpos.m strspn.m strtod.m strtok.m \
+
+DOC6 =	strtol.m swab.m sync.m sys_errlist.m sys_nerr.m tanh.m tan.m \
+		tdelete.m telldir.m tempnam.m tfind.m time.m times.m tmpfile.m \
+		tmpnam.m toascii.m _tolower.m tolower.m _toupper.m toupper.m trig.m \
+		tsearch.m twalk.m types.m tzset.m umask.m ungetc.m unix2mpx.m \
+		unixio.m unlink.m utime.m values.m varargs.m vexecl.m vexecv.m \
+		vfprintf.m vprintf.m vsprintf.m wait.m write.m writraw.m y0.m \
+		y1.m yn.m
+
+SRN =	srn_nbc_1.3.0 # srnnbc1x
+
+DOC = $(DOC1) $(DOC2) $(DOC3) $(DOC4) $(DOC5) $(DOC6) $(SRN)
+
+install	: dir $(DOC)
+		@-cp $(DOC1) $(D)
+		@-cp $(DOC2) $(D)
+		@-cp $(DOC3) $(D)
+		@-cp $(DOC4) $(D)
+		@-cp $(DOC5) $(D)
+		@-cp $(DOC6) $(D)
+		@-cp $(SRN)  $(D)
+		@-echo "Documentation installation complete"
+
+dir:
+		@if [ ! -d $(D) ]; then \
+			mkdir $(D); \
+			echo "$(D) created"; \
+		fi;
+#		@if [ -d $(D) ]; then \
+#			echo "$(D) created"; \
+#		else \
+#			mkdir $(D); \
+#		fi;
+
+remake	:	clobber
+	@make ROOT=$(ROOT)
+
+clean	:
+clobber	:	clean
+	@-rm -fr $(D)

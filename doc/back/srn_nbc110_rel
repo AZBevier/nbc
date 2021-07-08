@@ -1,0 +1,955 @@
+
+Received: from iscden.jbsys.com by iscden.jbsys.com id aa08968;
+          13 May 94 12:40 MDT
+Received: from ns.encore.COM by ico.isc.com (5.61/1.35)
+	id AA28999; Fri, 13 May 94 12:20:42 -0600
+Received: from maxis.encore.com by ns.encore.com with SMTP
+	  id AA01751 (5.59/UK-2.1-940113); Fri, 13 May 94 14:21:51 EDT
+Received: by maxis.encore.com id AA27588 (5.59/UK-2.1-921104);
+	  Fri, 13 May 94 14:21:09 EDT
+From: Walter Stright <wstright@encore.UUCP>
+Date: Fri, 13 May 94 14:21:09 EDT
+Message-Id: <27588.9405131821@maxis.encore.com>
+To: jbev@jbsys.com
+Subject: MPX C 1.1.0 SRN
+Cc: ccusmano@encore.UUCP, gbeerman@encore.UUCP, wstright@encore.UUCP
+Status: RO
+
+
+Jim,    
+
+Attached is the SRN for the MPX-32 C Compiler (Rev. 1.1.0).
+
+Wally
+
+
+
+
+                        MPX-32 C Compiler
+                         Revision 1.1.0
+
+
+                READ BEFORE USING REVISION 1.1.0
+
+
+  These Software Release Notes contain specific information to this 
+  release, including usage information that is not included in the 
+  online documentation set.
+
+
+  November 1993
+
+
+
+
+
+
+
+  324-008150-100
+
+
+  This manual is supplied without representation or warranty of any kind. 
+  Encore Computer Corporation assumes no responsibility and shall have 
+  no liability of any kind arising from supply or use of this publication 
+  or any material contained herein.
+
+  The information contained herein is proprietary to Encore Computer 
+  Corporation and/or its vendors, and its use or disclosure is subject to 
+  the restrictions stated in the standard Encore Computer Corporation 
+  License terms and conditions or the appropriate third-party sublicense 
+  agreement.
+
+  Use, duplication or disclosure by the Government is subject to 
+  restrictions as set forth in subdivision (c) (1) (ii) of the Rights in 
+  Technical Data and Computer Software clause at 252.227.7013.
+  
+
+
+
+
+
+
+
+
+
+
+
+  MPX-32 is a trademark of Encore Computer Corporation.
+
+  CONCEPT/32 is a registered trademark of Encore Computer Corporation.
+
+  UNIX is a registered trademark of Unix Systems Laboratories, Inc.
+
+
+  Encore Computer Corporation
+  6901 West Sunrise Boulevard
+  Fort Lauderdale, Florida 33313
+
+  Copyright 1992-1993 by Encore Computer Corporation and J B Systems
+  ALL RIGHTS RESERVED
+  Printed in U.S.A.
+  
+  
+Contents
+_________________________________________________________________________
+  
+  1  Overview	
+  
+     INTRODUCTION
+     DOCUMENTATION CONVENTIONS
+  
+  2  Contents of this Revision
+  
+     INTRODUCTION
+     BINARY DISTRIBUTION
+       Model Numbers
+       Revision Date
+     PREREQUISITE
+     DOCUMENTATION DELIVERED WITH THIS PRODUCT
+     RELATED DOCUMENTATION
+  
+  3  Product Information
+  
+     PRODUCT DESCRIPTION
+     RELEASE HISTORY
+     BINARY PACKAGE DISK SPACE REQUIREMENTS
+     BINARY TAPE FORMAT
+     INSTALLATION ENVIRONMENT REQUIREMENTS
+  
+  4  Installation and Configuration
+  
+     BINARY INSTALLATION INSTRUCTIONS
+     SOFTWARE CONFIGURATION
+  
+  5  Product Hints
+  
+     GENERAL HINTS
+  
+  6  Known Problems
+  
+     INTRODUCTION
+  
+  7  Problem Report Summary
+  
+     INTRODUCTION
+  
+  8  Binary Tape Contents
+  
+  
+1  Overview
+_________________________________________________________________________
+  
+INTRODUCTION      
+  
+  This document is provided to customers purchasing MPX-32 C Compiler 
+  Revision 1.1.0 for use with the MPX-32 Operating System Revision 3.0 or 
+  later.  It describes the MPX-32 C Compiler as well as providing other 
+  revision-specific information.
+  
+  IMPORTANT:  Read the Software Release Notes before attempting to install 
+  or use the Revision 1.1.0 software.  Besides providing an overview of 
+  the revision, this document contains critical, late-breaking information 
+  about the product that is not documented elsewhere.
+  
+  This information appears on the product tape as SRN_NBC_1.1.0.  This 
+  upper/lowercase file can be printed from TSM or examined online. Note 
+  that the hardcopy and installation-tape versions may differ because of 
+  last minute changes.
+  
+DOCUMENTATION CONVENTIONS     
+  
+  The following typographic conventions apply only to the hardcopy version 
+  of this document.   
+  
+  boldface   In command lines, boldface words are literals that must be 
+             entered exactly as shown.  For example: 
+  
+              TSM> VOLMGR  
+  
+
+2   Contents of this Revision
+_________________________________________________________________________
+  
+INTRODUCTION     
+  
+  Information on various MPX-32 C Compiler distribution components is 
+  given in this chapter, as are model numbers.  The following are the 
+  components of the distribution:
+  
+   o Binary tape
+
+   o Documentation
+  
+BINARY DISTRIBUTION     
+  
+Model Numbers    
+  
+  The following model numbers apply to the binary distribution.
+  
+   Tape                   Model Number     System
+  
+   Binary Single System    1012-330(3/7)   32/27*, 32/67, SelCONNECTION
+                                           running MPX-32 3.x
+  
+   Binary Single System    1012-430(3/7)   32/87*, 32/97
+                                           running MPX-32 3.x
+  
+   Binary Single System    1012-530(3/7)   32/2030, 32/2040
+                                           running MPX-32 3.x
+  
+   Binary Single System    1012-630(3/7)   32/2050, RSX
+                                           running MPX-32 3.x
+
+   NOTES:  Media Type of 3 = 9 track/1600 bpi Magnetic Tape
+           Media Type of 7 = 1/4" Cartridge Tape (only available for 
+                                                  Rel. 3.6.0 and later
+                                                  of MPX-32 OS)
+
+           *  =  1/4" Cartridge Tape is not supported on the CONCEPT 32/27
+                 or CONCEPT 32/87.
+  
+Revision Date    
+  
+   November 1993
+  
+PREREQUISITE     
+  
+  Encore Proprietary Software License.
+  
+  Also see the installation requirements in Chapter 3.
+  
+DOCUMENTATION DELIVERED WITH THIS PRODUCT     
+
+  One set of the following documentation is supplied with Model No. 
+  1012-(3/4/5/6)30(3/7).  Additional copies of this document can be 
+  ordered by part number.
+
+  Part No.	   Description
+
+  DS-1012-3        MPX-32 C Compiler for MPX-32 Revision 3.x
+                   Documentation Set which includes:
+
+  324-008150-100   MPX-32 C Compiler Revision 1.1.0 
+                   Software Release Notes
+
+  Online documentation for the MPX-32 C Compiler Revision 1.1.0 is 
+  provided on the product tape.
+
+RELATED DOCUMENTATION      
+
+  The C Programming Language by Kernighan & Ritchie.
+
+  MPX-32 Revision 3.x Reference Manual Volumes I through IV, 
+  323-00155(1/2/3/4)
+
+  MPX-32 Revision 3.x Technical Manual Volumes I and II, 322-00155(1/2)
+
+
+3  Product Information
+_________________________________________________________________________
+
+PRODUCT DESCRIPTION     
+
+  The MPX-32 C Compiler operates in one or two pass mode.  It generates 
+  assembler language instructions which can optionally have the source 
+  C code intermixed as comments.  Compile time options allow support for 
+  register to register floating point instructions or only register to 
+  memory instructions to support 32/27 systems.  The debug option allows 
+  symbols to be passed through to the cataloger for display with the 
+  task debugger or Aid for C source debugger.
+
+  The C runtime library provides an emulated UNIX System V interface to 
+  MPX-32.  Most of the standard library functions are provided where 
+  emulation was possible without O/S modifications.  Functions are also 
+  provided to directly access MPX-32 SVCs where UNIX compatibility is not 
+  desired.  MPX-32 SVCs can also be called as in-line assembler 
+  instructions. An additional option also allows nonsectioned code to be 
+  generated.  This allows functions written in C to be SYSGENed into the 
+  MPX-32 operating system.
+
+RELEASE HISTORY     
+    
+      Description        Level              Date
+  
+      Original Release   Revision 1.0.0     September 1992
+      Aid for C Support  Revision 1.1.0     November  1993
+  
+BINARY PACKAGE DISK SPACE REQUIREMENTS     
+
+  To use this binary installation package, adequate disk space must be 
+  available on the system. A minimum of approximately 17,000 blocks of 
+  available disk space are required for this installation. (Space for 
+  temporary and SLO files is not included.)
+  
+BINARY TAPE FORMAT     
+
+  The binary tape contains 390 files in eight Volume Manager save images. 
+  Refer to Appendix A of this document for a complete list of the images 
+  and files contained on the binary tape.
+
+INSTALLATION ENVIRONMENT REQUIREMENTS     
+
+  The following are physical requirements for installation.
+
+  o One compatible input device for the distribution medium:
+
+          1/2" 9-track Magnetic Tape drive
+          -or-
+          1/4" Cartridge Tape drive (for Rel. 3.6.0 and later of MPX-32 OS)
+
+  o One compatible auxiliary input device for batch processing:
+
+          One TSM terminal (with lowercase capability)
+
+  o Adequate disk space (see Disk Space section).
+
+  The following software must be installed:
+
+  o The following operating system:
+
+          1401 MPX-32 Operating System Revision 3.0 or later
+
+  o The following product installed on that system:
+
+          1407 MPX-32 Utilities Revision 1.3 or later or
+               the minimum revision supported on the revision
+               of the operating system in use
+
+
+4  Installation and Configuration
+_________________________________________________________________________
+
+BINARY INSTALLATION INSTRUCTIONS     
+
+  To install the MPX-32 C Compiler Revision 1.1.0 binary tape
+  on your system, perform the following procedures:
+
+  1.  Mount the installation tape on the appropriate unit.
+
+        TSM>AS TAP TO DEV=devmnc BLOC=N
+
+  2.  Invoke the Volume Manager and ensure that the tape is positioned 
+      by rewinding the tape.
+
+        TSM>VOLMGR
+        VOL>REWIND
+
+  3.  Skip the first image which contains this SRN file.
+
+        VOL>SKIP I
+
+  4.  Restore the system programs and command files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  5.  Restore the compiler programs, utilities and command files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  6.  Restore the include files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  7.  Restore the C runtime library.
+
+        VOL>RESTORE VOLUME=SYSTEM
+  
+  8.  Restore the skeleton parser driver.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  9.  Optionally, restore the sample C code and programs. 
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+      If this image is not desired, skip to the next image.
+
+        VOL>SKIP I
+
+  10. Optionally, restore the online documentation files.
+
+        VOL>RESTORE VOLUME=SYSTEM
+
+  11. Rewind the tape and exit the Volume Manager.
+
+        VOL>REWIND
+        VOL>EXIT
+
+  
+SOFTWARE CONFIGURATION     
+
+  The MPX-32 C Compiler is ready to run after installation is complete.  
+  The documentation files (in the DOC directory) may be viewed by the 
+  following:
+
+      TSM>^(bin)dcat <^(DOC)xxxx.m
+
+          or
+
+      TSM>^(bin)dcat /system/doc/xxxx.m
+
+  This displays the selected documentation file.
+
+  The SAMPLE directory and the source code for the sample programs 
+  should be reviewed to see some of the capabilities of the MPX-32 
+  C Compiler.  The TSM macro MAK.SAMP should be run to see if the 
+  compiler operates properly on your system.  The TSM macro LD.SAMP
+  should be run to see if the sample programs will catalog correctly.
+  The programs CAID, DCAT, FIXER, OBD, SUMMER, and UCAT are built by
+  the LD.SAMP macro or can be cataloged one at a time using the TSM
+  macro NBLD as follows:
+
+      TSM>NBLD caid caidmap
+
+  This builds the program CAID in the local directory.
+
+      TSM>NBLD dcat dcatmap
+
+  This builds the program DCAT in the local directory.
+
+      TSM>NBLD fixer fixermap
+
+  This builds the program FIXER in the local directory.
+
+      TSM>NBLD obd obdmap
+
+  This builds the program OBD in the local directory.
+
+      TSM>NBLD summer summermap
+
+  This builds the program SUMMER in the local directory.
+
+      TSM>NBLD ucat ucatmap
+
+  This builds the program UCAT in the local directory.
+
+
+5  Product Hints
+_________________________________________________________________________
+
+GENERAL HINTS      
+
+  The NBLD macro should be modified when several programs are to be 
+  combined to form a load module.  Add the names of the object files 
+  that are to be included after the COMPRESS directive.  This 
+  combines all of the non-runtime library objects for cataloging.
+
+  The default startup code is C.SRTE.O.  It allocates the stack and 
+  I/O area in extended memory starting at 0x80000. The program 
+  starts in extended mode.  If it is desirable to run in nonextended 
+  mode, the object module C.SRT.O should be included to allow the 
+  program to startup in nonextended mode.  This would usually be the 
+  case when interfacing with FORTRAN subroutines.
+
+  The source code for C.SRT.C and C.SRTE.C are included. These are the 
+  nonextended and extended mode versions of the startup code.  They 
+  assume a 12KW stack.  If a larger or smaller stack is desired, modify 
+  these programs for your specific needs.
+
+  The source code for FCALL.S is also included. Due to variations in 
+  FORTRAN calling conventions, it may be necessary to modify this 
+  interface subroutine.
+
+  The C runtime library is implemented using the UNIX System V interface.  
+  Consult any System V reference manual for calling conventions.  Also, 
+  review the include files in the NBINCLUDE directory.
+
+  The preprocessor, NBCPP, searches both the NBINCLUDE and CINCLUDE 
+  directories for include files (other versions of the MPX-32 C Compiler 
+  use the CINCLUDE directory for include files).  Make sure the 
+  CINCLUDE directory is empty or does not contain any outdated 
+  include files.  See NBCPP.M in the DOC directory.
+
+  The load module, NBYACC, is included with the MPX-32 C Compiler as an 
+  unsupported utility.  It may or may not be removed in future releases 
+  of this product.  No System Problem Reports (SPRs) will be accepted 
+  for this utility.
+
+  Object code generated by the MPX-32 C Compiler Release 1.1.0 has not
+  been tested with the Instruction Scheduler.  Therefore, C object is 
+  not supported by the Instruction Scheduler as input to be scheduled
+  and optimized.
+
+  The one pass version of the MPX-32 C Compiler, NBCCOM, is quite large 
+  and may not run on systems with limited task execution space.  If this 
+  is the case, use the -2 option to NBCC to invoke the two pass version 
+  of the compiler.
+
+  NBCAT must be used when the -G option (Debug option) is used.  It
+  contains support for generating symbolic debug information for the AID
+  for C debugger (Revision 1.1.0).  NBCAT is compatible with Revision
+  3.4 of the MPX-32 Utilities and can be used inplace of the standard
+  CATALOGer.
+
+  NBCAS is compatible with MPX-32 Utilities Revision 3.4.
+
+  NBCAT is compatible with MPX-32 Utilities Revision 3.4.
+
+
+6  Known Problems
+_________________________________________________________________________
+
+INTRODUCTION      
+
+  There are no known problems with Revision 1.1.0 of the Non-Based C
+  Compiler.
+
+
+7  Problem Report Summary
+_________________________________________________________________________
+
+INTRODUCTION      
+
+  The following SPR's have been addressed in Revision 1.1.0 of the
+  Non-Based C Compiler:
+
+
+  SPR #    SHORT TITLE
+  ------  -------------------------------------------------------------
+
+  93000026 The MPX-32 C Compiler has no available revision information.  
+	
+  93000027 MPX-32 C Compiler reports errors differently interactively vs 
+	   batch. 
+
+  93000109 OPENDIR runtime routine ALWAYS returns an error  
+
+  93000157 Calls to time, or ftime, is not correctly returning the local 
+           time.      
+
+
+8  Binary Tape Contents
+_________________________________________________________________________
+
+  The eight Volume Manager save images are as follows:
+
+  o Image 1 contains this SRN
+  o Image 2 contains system programs and command files 
+  o Image 3 contains compiler programs, utilities and command files
+  o Image 4 contains include files
+  o Image 5 contains the C runtime library
+  o Image 6 contains the skeleton parser driver
+  o Image 7 contains sample C code and programs
+  o Image 8 contains online documentation files
+
+  Following is the truncated VOLMGR output of the contents
+  of the binary tape.  
+
+
+-                      *** V O L U M E   M A N A G E R  3.5U01.01 ***
+ SAVE             @MARKSYS           (SYSTEM          )SRN_NBC_1.1.0
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @MARKSYS           (SYSTEM          )NBCC           
+ SAVE             @MARKSYS           (SYSTEM          )NBLD          
+ SAVE             @MARKSYS           (SYSTEM          )NBCAT
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @MARKSYS           (BIN             )C.SRT.O     
+ SAVE             @MARKSYS           (BIN             )C.SRTE.O   
+ SAVE             @MARKSYS           (BIN             )CDR       
+ SAVE             @MARKSYS           (BIN             )CLB      
+ SAVE             @MARKSYS           (BIN             )DCAT     
+ SAVE             @MARKSYS           (BIN             )FIXER   
+ SAVE             @MARKSYS           (BIN             )NBCAS  
+ SAVE             @MARKSYS           (BIN             )NBCAT
+ SAVE             @MARKSYS           (BIN             )NBCC  
+ SAVE             @MARKSYS           (BIN             )NBCCOM    
+ SAVE             @MARKSYS           (BIN             )NBCP1    
+ SAVE             @MARKSYS           (BIN             )NBCP2   
+ SAVE             @MARKSYS           (BIN             )NBCPP  
+ SAVE             @MARKSYS           (BIN             )NBLD  
+ SAVE             @MARKSYS           (BIN             )NBYACC     
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @MARKSYS           (NBINCLUDE       )A.OUT.H   
+ SAVE             @MARKSYS           (NBINCLUDE       )ART.H    
+ SAVE             @MARKSYS           (NBINCLUDE       )ASSERT.H
+ SAVE             @MARKSYS           (NBINCLUDE       )CDOTS.H           
+ SAVE             @MARKSYS           (NBINCLUDE       )CTYPE.H          
+ SAVE             @MARKSYS           (NBINCLUDE       )DCA.H           
+ SAVE             @MARKSYS           (NBINCLUDE       )DIR.H       
+ SAVE             @MARKSYS           (NBINCLUDE       )DIRENT.H       
+ SAVE             @MARKSYS           (NBINCLUDE       )DQE.H         
+ SAVE             @MARKSYS           (NBINCLUDE       )ERRNO.H      
+ SAVE             @MARKSYS           (NBINCLUDE       )FAT.H       
+ SAVE             @MARKSYS           (NBINCLUDE       )FCB.H      
+ SAVE             @MARKSYS           (NBINCLUDE       )FCNTL.H   
+ SAVE             @MARKSYS           (NBINCLUDE       )FINFO.H  
+ SAVE             @MARKSYS           (NBINCLUDE       )IDENT.H 
+ SAVE             @MARKSYS           (NBINCLUDE       )IOQ.H  
+ SAVE             @MARKSYS           (NBINCLUDE       )LIMITS.H  
+ SAVE             @MARKSYS           (NBINCLUDE       )MATH.H   
+ SAVE             @MARKSYS           (NBINCLUDE       )MOSDE.H 
+ SAVE             @MARKSYS           (NBINCLUDE       )MPXDEF.H      
+ SAVE             @MARKSYS           (NBINCLUDE       )MPXSVC.H      
+ SAVE             @MARKSYS           (NBINCLUDE       )NAN.H        
+ SAVE             @MARKSYS           (NBINCLUDE       )PARAM.H     
+ SAVE             @MARKSYS           (NBINCLUDE       )PRB.H      
+ SAVE             @MARKSYS           (NBINCLUDE       )PSB.H     
+ SAVE             @MARKSYS           (NBINCLUDE       )RXB.H    
+ SAVE             @MARKSYS           (NBINCLUDE       )SEARCH.H
+ SAVE             @MARKSYS           (NBINCLUDE       )SETJMP.H        
+ SAVE             @MARKSYS           (NBINCLUDE       )SIGNAL.H       
+ SAVE             @MARKSYS           (NBINCLUDE       )SMT.H         
+ SAVE             @MARKSYS           (NBINCLUDE       )STAB.H       
+ SAVE             @MARKSYS           (NBINCLUDE       )STAT.H      
+ SAVE             @MARKSYS           (NBINCLUDE       )STDIO.H    
+ SAVE             @MARKSYS           (NBINCLUDE       )STRING.H  
+ SAVE             @MARKSYS           (NBINCLUDE       )TERMIO.H 
+ SAVE             @MARKSYS           (NBINCLUDE       )TIME.H  
+ SAVE             @MARKSYS           (NBINCLUDE       )TIMEB.H
+ SAVE             @MARKSYS           (NBINCLUDE       )TIMES.H       
+ SAVE             @MARKSYS           (NBINCLUDE       )TSA.H        
+ SAVE             @MARKSYS           (NBINCLUDE       )TYPES.H     
+ SAVE             @MARKSYS           (NBINCLUDE       )UDT.H      
+ SAVE             @MARKSYS           (NBINCLUDE       )UNIXIO.H  
+ SAVE             @MARKSYS           (NBINCLUDE       )UTMP.H    
+ SAVE             @MARKSYS           (NBINCLUDE       )VALUES.H 
+ SAVE             @MARKSYS           (NBINCLUDE       )VARARGS.H     
+ SAVE             @MARKSYS           (NBINCLUDE       )VERSION.H    
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @MARKSYS           (NBLIB           )C.SRT.O     
+ SAVE             @MARKSYS           (NBLIB           )C.SRT.S    
+ SAVE             @MARKSYS           (NBLIB           )C.SRTE.O  
+ SAVE             @MARKSYS           (NBLIB           )C.SRTE.S 
+ SAVE             @MARKSYS           (NBLIB           )CDR     
+ SAVE             @MARKSYS           (NBLIB           )CLB    
+ SAVE             @MARKSYS           (NBLIB           )FCALL.S     
+ SAVE             @MARKSYS           (NBLIB           )FPS.C      
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @MARKSYS           (LIB             )YACCPAR         
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @MARKSYS           (SAMPLE          )CAID         
+ SAVE             @MARKSYS           (SAMPLE          )CAID.C         
+ SAVE             @MARKSYS           (SAMPLE          )CAID.H         
+ SAVE             @MARKSYS           (SAMPLE          )CAID.L         
+ SAVE             @MARKSYS           (SAMPLE          )CAID.O         
+ SAVE             @MARKSYS           (SAMPLE          )CAIDMAP  
+ SAVE             @MARKSYS           (SAMPLE          )DCAT         
+ SAVE             @MARKSYS           (SAMPLE          )DCAT.C      
+ SAVE             @MARKSYS           (SAMPLE          )DCAT.L     
+ SAVE             @MARKSYS           (SAMPLE          )DCAT.O   
+ SAVE             @MARKSYS           (SAMPLE          )DCATMAP  
+ SAVE             @MARKSYS           (SAMPLE          )FIXER   
+ SAVE             @MARKSYS           (SAMPLE          )FIXER.C
+ SAVE             @MARKSYS           (SAMPLE          )FIXER.L    
+ SAVE             @MARKSYS           (SAMPLE          )FIXER.O   
+ SAVE             @MARKSYS           (SAMPLE          )FIXERMAP 
+ SAVE             @MARKSYS           (SAMPLE          )FORT.C  
+ SAVE             @MARKSYS           (SAMPLE          )FORT.L 
+ SAVE             @MARKSYS           (SAMPLE          )FORT.O
+ SAVE             @MARKSYS           (SAMPLE          )KILL.C        
+ SAVE             @MARKSYS           (SAMPLE          )KILL.L       
+ SAVE             @MARKSYS           (SAMPLE          )KILL.O      
+ SAVE             @MARKSYS           (SAMPLE          )LD.SAMP   
+ SAVE             @MARKSYS           (SAMPLE          )MAK.SAMP   
+ SAVE             @MARKSYS           (SAMPLE          )NBLD     
+ SAVE             @MARKSYS           (SAMPLE          )OBD         
+ SAVE             @MARKSYS           (SAMPLE          )OBD.C      
+ SAVE             @MARKSYS           (SAMPLE          )OBD.L     
+ SAVE             @MARKSYS           (SAMPLE          )OBD.O   
+ SAVE             @MARKSYS           (SAMPLE          )OBDMAP  
+ SAVE             @MARKSYS           (SAMPLE          )OSCODE.C        
+ SAVE             @MARKSYS           (SAMPLE          )OSCODE.L       
+ SAVE             @MARKSYS           (SAMPLE          )OSCODE.O      
+ SAVE             @MARKSYS           (SAMPLE          )RECMSG.C        
+ SAVE             @MARKSYS           (SAMPLE          )RECMSG.L       
+ SAVE             @MARKSYS           (SAMPLE          )RECMSG.O      
+ SAVE             @MARKSYS           (SAMPLE          )SNDMSG.C        
+ SAVE             @MARKSYS           (SAMPLE          )SNDMSG.L       
+ SAVE             @MARKSYS           (SAMPLE          )SNDMSG.O      
+ SAVE             @MARKSYS           (SAMPLE          )PRTINC.C
+ SAVE             @MARKSYS           (SAMPLE          )PRTINC.L     
+ SAVE             @MARKSYS           (SAMPLE          )PRTINC.O    
+ SAVE             @MARKSYS           (SAMPLE          )SUMMER         
+ SAVE             @MARKSYS           (SAMPLE          )SUMMER.C      
+ SAVE             @MARKSYS           (SAMPLE          )SUMMER.L     
+ SAVE             @MARKSYS           (SAMPLE          )SUMMER.O   
+ SAVE             @MARKSYS           (SAMPLE          )SUMMERMAP  
+ SAVE             @MARKSYS           (SAMPLE          )UCAT         
+ SAVE             @MARKSYS           (SAMPLE          )UCAT.C      
+ SAVE             @MARKSYS           (SAMPLE          )UCAT.L     
+ SAVE             @MARKSYS           (SAMPLE          )UCAT.O   
+ SAVE             @MARKSYS           (SAMPLE          )UCATMAP  
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @MARKSYS           (DOC             )A64L.M    
+ SAVE             @MARKSYS           (DOC             )ABORT.M  
+ SAVE             @MARKSYS           (DOC             )ABS.M   
+ SAVE             @MARKSYS           (DOC             )ACCESS.M
+ SAVE             @MARKSYS           (DOC             )ACOS.M 
+ SAVE             @MARKSYS           (DOC             )ALARM.M        
+ SAVE             @MARKSYS           (DOC             )ASCTIME.M     
+ SAVE             @MARKSYS           (DOC             )ASIN.M       
+ SAVE             @MARKSYS           (DOC             )ASSERT.M    
+ SAVE             @MARKSYS           (DOC             )ATAN.M     
+ SAVE             @MARKSYS           (DOC             )ATAN2.M   
+ SAVE             @MARKSYS           (DOC             )ATOF.M   
+ SAVE             @MARKSYS           (DOC             )ATOI.M  
+ SAVE             @MARKSYS           (DOC             )ATOL.M 
+ SAVE             @MARKSYS           (DOC             )BCMP.M
+ SAVE             @MARKSYS           (DOC             )BCOPY.M      
+ SAVE             @MARKSYS           (DOC             )BESSEL.M    
+ SAVE             @MARKSYS           (DOC             )BRK.M      
+ SAVE             @MARKSYS           (DOC             )BSEARCH.M 
+ SAVE             @MARKSYS           (DOC             )CALLOC.M 
+ SAVE             @MARKSYS           (DOC             )CEIL.M  
+ SAVE             @MARKSYS           (DOC             )CHDIR.M
+ SAVE             @MARKSYS           (DOC             )CHMOD.M          
+ SAVE             @MARKSYS           (DOC             )CHOWN.M         
+ SAVE             @MARKSYS           (DOC             )CHROOT.M       
+ SAVE             @MARKSYS           (DOC             )CLEARERR.M    
+ SAVE             @MARKSYS           (DOC             )CLOCK.M      
+ SAVE             @MARKSYS           (DOC             )CLOSE.M     
+ SAVE             @MARKSYS           (DOC             )CLOSEDIR.M 
+ SAVE             @MARKSYS           (DOC             )CONV.M    
+ SAVE             @MARKSYS           (DOC             )COS.M    
+ SAVE             @MARKSYS           (DOC             )COSH.M  
+ SAVE             @MARKSYS           (DOC             )CREAT.M
+ SAVE             @MARKSYS           (DOC             )CREATD.M      
+ SAVE             @MARKSYS           (DOC             )CTIME.M      
+ SAVE             @MARKSYS           (DOC             )CTYPE.M     
+ SAVE             @MARKSYS           (DOC             )DELETE.M   
+ SAVE             @MARKSYS           (DOC             )DIRECTORY.M
+ SAVE             @MARKSYS           (DOC             )DRAND48.M 
+ SAVE             @MARKSYS           (DOC             )DUP.M    
+ SAVE             @MARKSYS           (DOC             )ECVT.M  
+ SAVE             @MARKSYS           (DOC             )ERAND48.M 
+ SAVE             @MARKSYS           (DOC             )ERF.M    
+ SAVE             @MARKSYS           (DOC             )ERFC.M  
+ SAVE             @MARKSYS           (DOC             )ERRNO.M
+ SAVE             @MARKSYS           (DOC             )EXEC.M        
+ SAVE             @MARKSYS           (DOC             )EXECL.M      
+ SAVE             @MARKSYS           (DOC             )EXECLE.M    
+ SAVE             @MARKSYS           (DOC             )EXECLP.M   
+ SAVE             @MARKSYS           (DOC             )EXECV.M   
+ SAVE             @MARKSYS           (DOC             )EXECVE.M 
+ SAVE             @MARKSYS           (DOC             )EXECVP.M
+ SAVE             @MARKSYS           (DOC             )EXIT.M         
+ SAVE             @MARKSYS           (DOC             )EXP.M         
+ SAVE             @MARKSYS           (DOC             )FABS.M       
+ SAVE             @MARKSYS           (DOC             )FCBADR.M    
+ SAVE             @MARKSYS           (DOC             )FCLOSE.M   
+ SAVE             @MARKSYS           (DOC             )FCVT.M    
+ SAVE             @MARKSYS           (DOC             )FDOPEN.M 
+ SAVE             @MARKSYS           (DOC             )FEOF.M        
+ SAVE             @MARKSYS           (DOC             )FERROR.M     
+ SAVE             @MARKSYS           (DOC             )FFLUSH.M    
+ SAVE             @MARKSYS           (DOC             )FGETC.M    
+ SAVE             @MARKSYS           (DOC             )FGETS.M   
+ SAVE             @MARKSYS           (DOC             )FILENO.M 
+ SAVE             @MARKSYS           (DOC             )FLOOR.M       
+ SAVE             @MARKSYS           (DOC             )FMOD.M       
+ SAVE             @MARKSYS           (DOC             )FOPEN.M     
+ SAVE             @MARKSYS           (DOC             )FORK.M     
+ SAVE             @MARKSYS           (DOC             )FPRINTF.M 
+ SAVE             @MARKSYS           (DOC             )FPUTC.M  
+ SAVE             @MARKSYS           (DOC             )FPUTS.M 
+ SAVE             @MARKSYS           (DOC             )FREAD.M
+ SAVE             @MARKSYS           (DOC             )FREE.M        
+ SAVE             @MARKSYS           (DOC             )FREOPEN.M    
+ SAVE             @MARKSYS           (DOC             )FREXP.M     
+ SAVE             @MARKSYS           (DOC             )FSCANF.M        
+ SAVE             @MARKSYS           (DOC             )FSEEK.M     
+ SAVE             @MARKSYS           (DOC             )FSTAT.M    
+ SAVE             @MARKSYS           (DOC             )FTELL.M   
+ SAVE             @MARKSYS           (DOC             )FWRITE.M 
+ SAVE             @MARKSYS           (DOC             )GAMMA.M 
+ SAVE             @MARKSYS           (DOC             )GCVT.M 
+ SAVE             @MARKSYS           (DOC             )GETACC.M         
+ SAVE             @MARKSYS           (DOC             )GETC.M          
+ SAVE             @MARKSYS           (DOC             )GETCHAR.M      
+ SAVE             @MARKSYS           (DOC             )GETCWD.M      
+ SAVE             @MARKSYS           (DOC             )GETENV.M     
+ SAVE             @MARKSYS           (DOC             )GETGID.M    
+ SAVE             @MARKSYS           (DOC             )GETOPT.M   
+ SAVE             @MARKSYS           (DOC             )GETPGRP.M 
+ SAVE             @MARKSYS           (DOC             )GETPID.M 
+ SAVE             @MARKSYS           (DOC             )GETPPID.M       
+ SAVE             @MARKSYS           (DOC             )GETS.M         
+ SAVE             @MARKSYS           (DOC             )GETUID.M      
+ SAVE             @MARKSYS           (DOC             )GETW.M       
+ SAVE             @MARKSYS           (DOC             )GMTIME.M    
+ SAVE             @MARKSYS           (DOC             )HCREATE.M  
+ SAVE             @MARKSYS           (DOC             )HDESTROY.M
+ SAVE             @MARKSYS           (DOC             )HSEARCH.M        
+ SAVE             @MARKSYS           (DOC             )HYPOT.M         
+ SAVE             @MARKSYS           (DOC             )IOCTL.M        
+ SAVE             @MARKSYS           (DOC             )ISALNUM.M     
+ SAVE             @MARKSYS           (DOC             )ISALPHA.M    
+ SAVE             @MARKSYS           (DOC             )ISASCII.M   
+ SAVE             @MARKSYS           (DOC             )ISATTY.M   
+ SAVE             @MARKSYS           (DOC             )ISCNTRL.M 
+ SAVE             @MARKSYS           (DOC             )ISDIGIT.M
+ SAVE             @MARKSYS           (DOC             )ISGRAPH.M       
+ SAVE             @MARKSYS           (DOC             )ISLOWER.M      
+ SAVE             @MARKSYS           (DOC             )ISPRINT.M     
+ SAVE             @MARKSYS           (DOC             )ISPUNCT.M    
+ SAVE             @MARKSYS           (DOC             )ISSPACE.M   
+ SAVE             @MARKSYS           (DOC             )ISUPPER.M  
+ SAVE             @MARKSYS           (DOC             )ISXDIGIT.M
+ SAVE             @MARKSYS           (DOC             )J0.M     
+ SAVE             @MARKSYS           (DOC             )J1.M    
+ SAVE             @MARKSYS           (DOC             )JN.M   
+ SAVE             @MARKSYS           (DOC             )JRAND48.M          
+ SAVE             @MARKSYS           (DOC             )KILL.M            
+ SAVE             @MARKSYS           (DOC             )L3TOL.M          
+ SAVE             @MARKSYS           (DOC             )L64A.M          
+ SAVE             @MARKSYS           (DOC             )LCONG48.M      
+ SAVE             @MARKSYS           (DOC             )LDEXP.M       
+ SAVE             @MARKSYS           (DOC             )LINK.M       
+ SAVE             @MARKSYS           (DOC             )LOCALTIME.M 
+ SAVE             @MARKSYS           (DOC             )LOG.M      
+ SAVE             @MARKSYS           (DOC             )LOG10.M   
+ SAVE             @MARKSYS           (DOC             )LONGJMP.M
+ SAVE             @MARKSYS           (DOC             )LRAND48.M      
+ SAVE             @MARKSYS           (DOC             )LSEARCH.M     
+ SAVE             @MARKSYS           (DOC             )LSEEK.M      
+ SAVE             @MARKSYS           (DOC             )LTOL3.M     
+ SAVE             @MARKSYS           (DOC             )MALLOC.M   
+ SAVE             @MARKSYS           (DOC             )MATH.M    
+ SAVE             @MARKSYS           (DOC             )MATHERR.M
+ SAVE             @MARKSYS           (DOC             )MEMCCPY.M       
+ SAVE             @MARKSYS           (DOC             )MEMCHR.M       
+ SAVE             @MARKSYS           (DOC             )MEMCMP.M      
+ SAVE             @MARKSYS           (DOC             )MEMCPY.M     
+ SAVE             @MARKSYS           (DOC             )MEMORY.M    
+ SAVE             @MARKSYS           (DOC             )MEMSET.M   
+ SAVE             @MARKSYS           (DOC             )MKDIR.M   
+ SAVE             @MARKSYS           (DOC             )MKTEMP.M 
+ SAVE             @MARKSYS           (DOC             )MODF.M  
+ SAVE             @MARKSYS           (DOC             )MPXCCSET.M       
+ SAVE             @MARKSYS           (DOC             )MPXSVC.M        
+ SAVE             @MARKSYS           (DOC             )MRAND48.M      
+ SAVE             @MARKSYS           (DOC             )NBCAS.M       
+ SAVE             @MARKSYS           (DOC             )NBCC.M       
+ SAVE             @MARKSYS           (DOC             )NBCCOM.M    
+ SAVE             @MARKSYS           (DOC             )NBCPP.M    
+ SAVE             @MARKSYS           (DOC             )NBYACC.M  
+ SAVE             @MARKSYS           (DOC             )NICE.M   
+ SAVE             @MARKSYS           (DOC             )NRAND48.M         
+ SAVE             @MARKSYS           (DOC             )OPEN.M           
+ SAVE             @MARKSYS           (DOC             )OPENDIR.M       
+ SAVE             @MARKSYS           (DOC             )PAUSE.M        
+ SAVE             @MARKSYS           (DOC             )PERROR.M      
+ SAVE             @MARKSYS           (DOC             )PIPE.M       
+ SAVE             @MARKSYS           (DOC             )POW.M       
+ SAVE             @MARKSYS           (DOC             )PRINTF.M   
+ SAVE             @MARKSYS           (DOC             )PUTC.M    
+ SAVE             @MARKSYS           (DOC             )PUTCHAR.M
+ SAVE             @MARKSYS           (DOC             )PUTENV.M
+ SAVE             @MARKSYS           (DOC             )PUTS.M 
+ SAVE             @MARKSYS           (DOC             )PUTW.M
+ SAVE             @MARKSYS           (DOC             )QSORT.M          
+ SAVE             @MARKSYS           (DOC             )RAND.M          
+ SAVE             @MARKSYS           (DOC             )READ.M         
+ SAVE             @MARKSYS           (DOC             )READ1LN.M     
+ SAVE             @MARKSYS           (DOC             )READDIR.M    
+ SAVE             @MARKSYS           (DOC             )READMDIR.M  
+ SAVE             @MARKSYS           (DOC             )READRAW.M  
+ SAVE             @MARKSYS           (DOC             )REALLOC.M 
+ SAVE             @MARKSYS           (DOC             )REWIND.M 
+ SAVE             @MARKSYS           (DOC             )REWINDDIR.M    
+ SAVE             @MARKSYS           (DOC             )RMDIR.M       
+ SAVE             @MARKSYS           (DOC             )SBRK.M       
+ SAVE             @MARKSYS           (DOC             )SCANF.M     
+ SAVE             @MARKSYS           (DOC             )SEED48.M   
+ SAVE             @MARKSYS           (DOC             )SEEK.M    
+ SAVE             @MARKSYS           (DOC             )SEEKDIR.M
+ SAVE             @MARKSYS           (DOC             )SETACC.M
+ SAVE             @MARKSYS           (DOC             )SETBUF.M      
+ SAVE             @MARKSYS           (DOC             )SETGID.M     
+ SAVE             @MARKSYS           (DOC             )SETJMP.M    
+ SAVE             @MARKSYS           (DOC             )SETPGRP.M  
+ SAVE             @MARKSYS           (DOC             )SETSIZ.M  
+ SAVE             @MARKSYS           (DOC             )SETUID.M 
+ SAVE             @MARKSYS           (DOC             )SETVBUF.M       
+ SAVE             @MARKSYS           (DOC             )SIGNAL.M       
+ SAVE             @MARKSYS           (DOC             )SIN.M         
+ SAVE             @MARKSYS           (DOC             )SINH.M       
+ SAVE             @MARKSYS           (DOC             )SLEEP.M     
+ SAVE             @MARKSYS           (DOC             )SPRINTF.M  
+ SAVE             @MARKSYS           (DOC             )SQRT.M    
+ SAVE             @MARKSYS           (DOC             )SRAND.M  
+ SAVE             @MARKSYS           (DOC             )SRAND48.M      
+ SAVE             @MARKSYS           (DOC             )SSCANF.M        
+ SAVE             @MARKSYS           (DOC             )STACK.M        
+ SAVE             @MARKSYS           (DOC             )STAT.M        
+ SAVE             @MARKSYS           (DOC             )STAT1X.M     
+ SAVE             @MARKSYS           (DOC             )STATS.M     
+ SAVE             @MARKSYS           (DOC             )STDIO.M    
+ SAVE             @MARKSYS           (DOC             )STIME.M   
+ SAVE             @MARKSYS           (DOC             )STRCAT.M 
+ SAVE             @MARKSYS           (DOC             )STRCHR.M
+ SAVE             @MARKSYS           (DOC             )STRCMP.M       
+ SAVE             @MARKSYS           (DOC             )STRCPY.M      
+ SAVE             @MARKSYS           (DOC             )STRCSPN.M    
+ SAVE             @MARKSYS           (DOC             )STRING.M    
+ SAVE             @MARKSYS           (DOC             )STRINGS.M  
+ SAVE             @MARKSYS           (DOC             )STRLEN.M  
+ SAVE             @MARKSYS           (DOC             )STRNCAT.M
+ SAVE             @MARKSYS           (DOC             )STRNCMP.M      
+ SAVE             @MARKSYS           (DOC             )STRNCPY.M     
+ SAVE             @MARKSYS           (DOC             )STRPBRK.M    
+ SAVE             @MARKSYS           (DOC             )STRRCHR.M   
+ SAVE             @MARKSYS           (DOC             )STRSPN.M   
+ SAVE             @MARKSYS           (DOC             )STRTOD.M  
+ SAVE             @MARKSYS           (DOC             )STRTOK.M 
+ SAVE             @MARKSYS           (DOC             )STRTOL.M
+ SAVE             @MARKSYS           (DOC             )SWAB.M         
+ SAVE             @MARKSYS           (DOC             )SYNC.M        
+ SAVE             @MARKSYS           (DOC             )SYS_ERRLIST.M
+ SAVE             @MARKSYS           (DOC             )SYS_NERR.M  
+ SAVE             @MARKSYS           (DOC             )TAN.M      
+ SAVE             @MARKSYS           (DOC             )TANH.M    
+ SAVE             @MARKSYS           (DOC             )TDELETE.M
+ SAVE             @MARKSYS           (DOC             )TELLDIR.M     
+ SAVE             @MARKSYS           (DOC             )TEMPNAM.M    
+ SAVE             @MARKSYS           (DOC             )TFIND.M     
+ SAVE             @MARKSYS           (DOC             )TIME.M     
+ SAVE             @MARKSYS           (DOC             )TIMES.M   
+ SAVE             @MARKSYS           (DOC             )TMPFILE.M
+ SAVE             @MARKSYS           (DOC             )TMPNAM.M
+ SAVE             @MARKSYS           (DOC             )TOASCII.M      
+ SAVE             @MARKSYS           (DOC             )TOLOWER.M     
+ SAVE             @MARKSYS           (DOC             )TOUPPER.M    
+ SAVE             @MARKSYS           (DOC             )TRIG.M      
+ SAVE             @MARKSYS           (DOC             )TSEARCH.M  
+ SAVE             @MARKSYS           (DOC             )TWALK.M   
+ SAVE             @MARKSYS           (DOC             )TYPES.M  
+ SAVE             @MARKSYS           (DOC             )TZSET.M 
+ SAVE             @MARKSYS           (DOC             )UMASK.M      
+ SAVE             @MARKSYS           (DOC             )UNGETC.M    
+ SAVE             @MARKSYS           (DOC             )UNIX2MPX.M 
+ SAVE             @MARKSYS           (DOC             )UNIXIO.M  
+ SAVE             @MARKSYS           (DOC             )UNLINK.M 
+ SAVE             @MARKSYS           (DOC             )UTIME.M 
+ SAVE             @MARKSYS           (DOC             )VALUES.M        
+ SAVE             @MARKSYS           (DOC             )VARARGS.M      
+ SAVE             @MARKSYS           (DOC             )VEXECL.M      
+ SAVE             @MARKSYS           (DOC             )VEXECV.M     
+ SAVE             @MARKSYS           (DOC             )VFPRINTF.M  
+ SAVE             @MARKSYS           (DOC             )VPRINTF.M  
+ SAVE             @MARKSYS           (DOC             )VSPRINTF.M
+ SAVE             @MARKSYS           (DOC             )WAIT.M   
+ SAVE             @MARKSYS           (DOC             )WRITE.M 
+ SAVE             @MARKSYS           (DOC             )WRITRAW.M       
+ SAVE             @MARKSYS           (DOC             )Y0.M           
+ SAVE             @MARKSYS           (DOC             )Y1.M          
+ SAVE             @MARKSYS           (DOC             )YN.M         
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ REWIND         (TAP)
+ *****  BOT  *****
+
+
+
+
+
+
+
+
