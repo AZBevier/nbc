@@ -1,0 +1,341 @@
+head	1.2;
+access;
+symbols;
+locks
+	jbev:1.2; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.06.00.37.56;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.06.30.20.32.33;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS revision.
+@
+
+
+1.2
+log
+@Add make4mpx programs.
+@
+text
+@#########
+#
+#         THIS MAKEFILE IS FOR UNIX INSTALLS ON NBC ENVIRONMENT
+#
+#########
+
+######### INSTALLATION INSTRUCTIONS ########
+#
+# ROOT is the parent of the directory where you want the binary files to go.
+# On Linux (Unix) it is the /system directory, then the binares will go into
+# /system/bin, the libs into /system/lib, the includes into /system/include,
+# and the documentation into /system/doc.  These directores must be world
+# readable and writable by the installer.  You most likely will need root
+# provledges tp create the top level directory.  To allow access to these
+# directories you should add the following two lines to your .bashrc file
+# in your home directory:
+# PATH=$PATH:/system/bin
+# export PATH
+#
+ROOT = /system
+#
+# OPTC is the optimization flag for your C compiler (-O for most)
+OPTC = '-C -1 -N'
+#
+#******  END INPUT--BUT KEEP READING!! THERE IS MORE TO DO!! ******#
+
+#########
+#
+# Beware!  This makefile is experimental.  It may well require some
+#          intervention by a user willing to modify the makefiles
+#          for a specific computer/operating system.
+#
+#    To install NBC, adjust ROOT, OPTC as indicated above and run
+#	"make -f mk.unix install"
+#    to compile and install the executables.
+#
+######## THANKS.
+
+# Some convenient abbreviations
+B =	$(ROOT)/bin1x
+D =	$(ROOT)/doc1x
+#J = $(ROOT)/jcl
+I =	$(ROOT)/cinclude
+L =	$(ROOT)/lib1x
+S = $(ROOT)/sample  
+
+# To protect against an idle "make" to "see what happens"
+donothing:
+	@@echo "This is a dangerous makefile--so the default is do_nothing"
+
+install: mkdirs compile
+
+# Make the SW binary directories if not already there
+mkdirs:
+	@@echo ""
+	@@echo "Creating binary directories (if not already there) ..."
+	@@if [ -d $(ROOT) ]; then \
+		echo "$(ROOT) already exits"; \
+	else \
+		mkdir $(ROOT); \
+	fi;
+	@@if [ -d $(B) ]; then \
+		echo "$(B) already exits"; \
+	else \
+		mkdir $(B); \
+	fi;
+	@@if [ -d $(D) ]; then \
+		echo "$(D) already exits"; \
+	else \
+		mkdir $(D); \
+	fi;
+	@@if [ -d $(S) ]; then \
+		echo "$(S) already exits"; \
+	else \
+		mkdir $(S); \
+	fi;
+	@@if [ -d $(L) ]; then \
+		echo "$(L) already exits"; \
+	else \
+		mkdir $(L); \
+	fi;
+	@@if [ -d $(I) ]; then \
+		echo "$(I) already exits"; \
+	else \
+		mkdir $(I); \
+	fi;
+#	-mkdir $B $S $L $I
+
+compile	:
+	cd include   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) install
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_ar    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_basename ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_cd    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_chgrp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_chmod ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_chown ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_chtyp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_cmprs ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_cp    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_date  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_dodep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_echo  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_expr  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_false ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_grep  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_ln    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_ls    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_mkdep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_mkdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_mkfile; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_sum   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_touch ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_true  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_uniq  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+
+remake	: mkdirs
+	cd include   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) remake
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_ar    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_basename ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_cd    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_chgrp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_chmod ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_chown ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_chtyp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_cmprs ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_cp    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_date  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_dodep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_echo  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_expr  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_false ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_grep  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_ln    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_ls    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_mkdep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_mkdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_mkfile; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_sum   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_touch ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_true  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_uniq  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+
+clean	:
+	cd include   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) clean
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_ar    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_basename ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_cd    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_chgrp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_chmod ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_chown ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_chtyp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_cmprs ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_cp    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_date  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_dodep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_echo  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_expr  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_false ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_grep  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_ln    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_ls    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_mkdep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_mkdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_mkfile; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_sum   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_touch ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_true  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_uniq  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+
+clobber	:
+	cd include   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd doc1x     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbyacc    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nblex     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbar      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbcc      ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbcpp     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbcas     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbasm     ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbccom    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd nbccom    ; $(MAKE) -f make.mpx1x2p ROOT=$(ROOT) clobber
+	cd nblib1x   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd sample    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_ar    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_basename ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_cd    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_chgrp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_chmod ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_chown ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_chtyp ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_cmprs ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_cp    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_date  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_dodep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_echo  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_expr  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_false ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_grep  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_ln    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_ls    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_mkdep ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_mkdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_mkfile; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_sum   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_touch ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_true  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_uniq  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+#	cd jcl       ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	@@if [ -d $(D) ]; then \
+		rmdir --ignore-fail-on-non-empty $D; \
+	fi;
+	@@if [ -d $(B) ]; then \
+		rmdir --ignore-fail-on-non-empty $B; \
+	fi;
+	@@if [ -d $(S) ]; then \
+		rmdir --ignore-fail-on-non-empty $S; \
+	fi;
+	@@if [ -d $(L) ]; then \
+		rmdir --ignore-fail-on-non-empty $L; \
+	fi;
+	@@if [ -d $(I) ]; then \
+		rmdir --ignore-fail-on-non-empty $I; \
+	fi;
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d90 1
+a90 1
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+d103 30
+d136 1
+a136 1
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+d149 30
+d182 1
+a182 1
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+d195 30
+d228 1
+a228 1
+	cd cinclude  ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+d241 30
+@
