@@ -1,4 +1,32 @@
-DEFM
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.02.07.16.59.11;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.02.06.21.45.04;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build macro
+@
+
+
+1.2
+log
+@Correct directives
+@
+text
+@DEFM
 IFT PATH=OBJ.O SKIP
 CREA OBJ.O
 %SKIP
@@ -44,3 +72,19 @@ $NOTE *** ERROR *** CATALOG OF NBASM FAILED
 PAGE
 EOJ
 ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d29 2
+a30 2
+$OPTION 19 25
+$ALLOCATE 1B800
+d39 3
+a41 1
+$IFF ABORT ENDJOB
+@

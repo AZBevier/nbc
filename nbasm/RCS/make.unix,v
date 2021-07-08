@@ -1,4 +1,38 @@
-#
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2021.06.24.21.02.43;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.02.06.01.34.14;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.02.06.00.02.40;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move objects instead of copy
+@
+
+
+1.3
+log
+@Change options to remove -DMPX add optional -Wall.
+Change yacc to be /system/bin/nbyacc.
+@
+text
+@#
 # /* makefile for nbasm when running on Linux */
 # 			Makefile for NBASM
 # 	    (c) Copyright 1990 J B Systems, Morrison, CO
@@ -6,7 +40,7 @@
 #
 CC = cc
 #CFLAGS = -O -DMPX -m32
-CFLAGS = -L -O -m32 -Wall -DMYATOF
+CFLAGS = -O -m32 # -Wall
 SYSBIN = /system/bin
 SYSLIB = /system/lib
 LBIN = ./linux
@@ -28,7 +62,7 @@ all:	$(MAIN)
 	-/bin/echo $(MAIN) is up to date.
 
 $(MAIN):	$(HDRS) $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+	$(CC) $(CFLAGS) -o $@@ $(OBJS)
 	/bin/chmod 755 $(MAIN)
 
 xref.o:	xref.c defs.h
@@ -63,7 +97,7 @@ clobber:	clean
 	-rm -f $(LBIN)/parse.c $(LBIN)/pseudo.c $(LBIN)/symbol.c $(LBIN)/defs.h
 
 install:	all
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
@@ -74,3 +108,29 @@ install:	all
 	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.2
+log
+@correct object removal
+@
+text
+@d8 2
+a9 1
+CFLAGS = -O -DMPX -m32
+d15 2
+a16 1
+YACC = yacc
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d55 1
+a55 1
+	-rm -f $(OBJS) $(LBIN)/$(OBJS)
+@

@@ -1,0 +1,1372 @@
+head	1.5;
+access;
+symbols;
+locks
+	jbev:1.5; strict;
+comment	@ * @;
+
+
+1.5
+date	2018.10.12.19.57.09;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2016.01.28.04.06.07;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.05.07.20.48.11;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.03.22.20.41.11;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.5
+log
+@Add string.h and stdlib.h to includes
+@
+text
+@/*
+ * xref processing
+ */
+
+#include "defs.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#ifdef DOS
+#include <io.h>
+#include <malloc.h>
+#endif
+
+/* #define DEBUG */
+
+#define XRBUFSIZE 300*768
+static int32	xrefmode;	/* xref mode */
+static int32	reccnt;		/* number of records */
+static int32 	xrbufp;		/* next buffer entry */
+static int32 	segments;	/* number of buffer segments written */
+
+int mycmp();		/* qsort function */
+
+/*
+ * xnegate - routine to negate 8 char name for for macro lookup
+ * input - 8 char name pointer
+ * output - point to 8 char negated name
+ */
+
+static char negname[8];		/* the negated name returned */
+
+char * xsnegate (name)
+register char * name;
+{
+	register int	i;
+	register char * rname = negname;
+
+	for (i=0; i<8; i++)
+	  rname[i] = (char)(-(int)(name[i]));
+	return (negname);	/* return negated name pointer */
+}
+
+/*
+ * function to report symbol references or definitions
+ */
+
+void reptr(name, info, val)
+unsigned char *name;		/* symbol name */
+struct tval *info;	/* symbol description */
+int32 val;		/* sort value */
+{
+	int sval = val & 0x007fffff;	/* clear garbage */
+	if(xrefmode & NOXREF)	/* xref required */
+	    return;		/* no xref */
+	if(xrefmode & PASS2)	/* in pass 2 */
+	    return;		/* no reporting in pass 2 */
+	if(info->type >= TYMACREQ)
+	    return;		/* just macro check, return */
+#ifdef YTRY
+	if(info->flags & CSDS) {
+	    goto report;	/* must be final value */
+	}
+#endif
+	if(sval > 0x0001869f)
+	    goto report;	/* must be final data value */
+	if(info->type < TYPL)
+	    sval |= SREF;	/* symbol reference */
+	sval |= SUORD;		/* symbol reference or definition */
+report:
+	sval |= ((int)info->type << 24);	/* set type */
+	if (!(val & SSORT)) {	/* not ss call for reference */
+	    sval &= ~SUORD;	/* turn off flag */
+	    if (info->flags & ABSREL)
+		sval |= (0x800000);	/* set ABS/REL flag */
+	}
+#ifdef DEBUG
+if(info->type == TYPL)
+printf("REPTR name [%0.2x%0.2x%0.2x%0.2x] flags %x type %x sval %x\n",
+#ifdef mpx
+name[4], name[5], name[6], name[7],
+#else
+name[7], name[6], name[5], name[4],
+#endif
+info->flags, info->type, sval);
+else if(info->type == TYMACDEF)
+printf("REPTR name [%0.8s] flags %x type %x sval %x\n",
+    xsnegate(name), info->flags, info->type, sval);
+else
+printf("REPTR name [%0.8s] flags %x type %x value %x sval %x\n",
+    name, info->flags, info->type, info->value, sval);
+#endif /* DEBUG */
+
+	memcpy(xrbuf+xrbufp, name, 8);	/* copy in the name */
+#ifndef mpx
+	xrbuf[xrbufp+8] = (sval) & 0xff;
+	xrbuf[xrbufp+9] = (sval >> 8) & 0xff;
+	xrbuf[xrbufp+10] = (sval >> 16) & 0xff;
+	xrbuf[xrbufp+11] = (sval >> 24) & 0xff;
+#else
+	memcpy(xrbuf+xrbufp+8, (char *)&sval, 4);
+#endif
+	xrbuf[xrbufp+12] = (char)info->type;
+	xrbuf[xrbufp+13] = (char)info->flags;
+	xrbuf[xrbufp+14] = '\0';
+	xrbuf[xrbufp+15] = '\0';
+/*	memcpy(xrbuf+xrbufp+12, (char *)&info->value, 4); */
+	xrbufp += 16;		/* bump pointer */
+	if(xrbufp >= XRBUFSIZE) {
+	    /* sort the buffer before we write it out */
+printf("OVERFLOW xrbuf %x %x\n", xrbuf, xrbufp);
+fflush(stdout);
+	    qsort(xrbuf, XRBUFSIZE/16, 16, mycmp);
+	    segments++;
+#ifdef NO_XREF_WRITES
+	    if (fwrite(xrbuf, 1, xrbufp, ut2fd) < 0)
+		xrer();		/* no return */
+#endif
+	    xrbufp = 0;		/* reset pointer */
+	}
+	reccnt++;
+	return;			/* we done */
+}
+
+/*
+ * compare function for qsort
+ */
+
+int mycmp(p1, p2)
+#ifdef mpx
+char *p1;
+char *p2;
+#else
+void *p1;
+void *p2;
+#endif
+{
+	int i;
+#ifdef JUNK
+	unsigned char *e1 = (unsigned char *)p1;
+	unsigned char *e2 = (unsigned char *)p2;
+	for (i=0; i<12; i++) {
+	    if (e1[i] < e2[i])return(-1);
+	    if (e1[i] > e2[i])return(1);
+	}
+#else
+	int *e1 = (int *)p1;
+	int *e2 = (int *)p2;
+	unsigned char *f1 = (unsigned char *)p1;
+	unsigned char *f2 = (unsigned char *)p2;
+	for (i=0; i<8; i++) {
+	    if (f1[i] < f2[i])return(-1);
+	    if (f1[i] > f2[i])return(1);
+	}
+	for (i=2; i<3; i++) {
+	    if (e1[i] < e2[i])return(-1);
+	    if (e1[i] > e2[i])return(1);
+	}
+#endif
+	return(0);
+}
+
+/*
+ * send command to xref
+ *
+ *	0x1	PASS1		Starting pass 1
+ *	0x2	PASS2		Starting pass 2
+ *	0x4	DOXREF		User wants xref
+ *	0x8	NOXREF		User doesn't want xref
+ */
+
+void xref_cmd(cmd)
+int cmd;			/* type of command */
+{
+	switch (cmd) {
+	    case DOXREF:
+		xrefmode = cmd;	/* save current mode */
+#ifndef NOT_IN_MAIN
+#ifdef DOS
+		xrbuf = (char *)_fmalloc(XRBUFSIZE);
+#else
+		/* enought for 12800 symbol references */
+		xrbuf = (char *)malloc(XRBUFSIZE);
+#endif
+		if (!xrbuf)		/* if no memory terminate assemble */
+		    abortm("** UNABLE TO ALLOCATE MEMORY FOR XREF STORAGE **");
+#endif
+		return;		/* xref cnd done */
+	    case NOXREF:
+		xrefmode = cmd;	/* save current mode */
+		return;		/* xref cnd done */
+	    case PASS1:
+		xrefmode &= ~PASS2;	/* not pass 2 */
+		xrefmode |= PASS1;	/* now pass 1 */
+		if(xrefmode & NOXREF)	/* xref required */
+		    return;		/* no xref */
+		/* it is start of pass1 and doing xref */
+		reccnt = 0;		/* no entries */
+		xrbufp = 0;		/* nothing in buffer */
+		segments = 0;		/* nothing written */
+#ifdef NO_XREF_WRITES
+		fseek (ut2fd, (longp)0, 0);	/* rewind ut2 file */
+#endif
+		return;		/* xref cnd done */
+	    case PASS2:
+		xrefmode &= ~PASS1;	/* not pass 1 */
+		xrefmode |= PASS2;	/* now pass 2 */
+		if(xrefmode & NOXREF)	/* xref required */
+		    return;		/* no xref */
+		if (xrbufp) {		/* any records in buffer */
+		    int32 modcnt = xrbufp % 768;
+		    int32 remcnt = 768 - modcnt;
+		    memset(xrbuf+xrbufp, '\0', remcnt);
+		    /* sort the buffer before we write it out */
+		    qsort(xrbuf, xrbufp/16, 16, mycmp);
+#ifdef NO_XREF_WRITES
+		    if (fwrite(xrbuf, 1, xrbufp+remcnt, ut2fd) < 0)
+			xrer();		/* no return */
+		    fseek (ut2fd, (longp)0, 0);	/* rewind ut2 file */
+#endif
+		}
+		return;			/* xref cnd done */
+	}
+}
+
+static char prmt[132];
+
+/*
+ * function to output cross reference information
+ */
+
+void writerep(length)
+int length;
+{
+	int pp;
+	unsigned char oldname[8];
+	char xx[12];
+	char *til = TCWTITL;
+	char *ep;
+	int i;
+	unsigned char name[8];
+	int value, literal;
+	char flags, type;
+
+/*
+printf("*****PASS2***** %d segments %d entries, %d sectors\n",
+ segments, reccnt, reccnt/768+1);
+*/
+	/* only handle 1 segment for now */
+	if (segments > 1)	/* can't handle more than one */
+	    return;
+	/* data for one segment is in xrbuf */
+	if (!reccnt)
+	    return;		/* no data */
+	/* do the heading */
+	memset(TCWTITL, ' ',TCWTTLE-TCWTITL);	/* clear title buffer */
+	memcpy(TCWTITL, "CROSS REFERENCE", 15);	/* set title buffer */
+	pagp();			/* do page eject */
+	memset(prmt, ' ', length);	/* clear print line */
+	memset(oldname, '\0', 8);	/* clear old name */
+	pp = 0;				/* clear print pointer */
+	/* process the buffer */
+	for (i = 0; i < reccnt; i++) {
+	    struct tval tt;
+	    int sval = 0;
+
+	    ep = &xrbuf[i*16];
+	    memcpy(name, ep, 8);	/* copy in the name */
+#ifndef mpx
+	    sval |= (*(ep+8) & 0xff);
+	    sval |= (*(ep+9) & 0xff) << 8;
+	    sval |= (*(ep+10) & 0xff) << 16;
+	    sval |= (*(ep+11) & 0xff) << 24;
+#else
+	    memcpy((char *)&sval, ep+8, 4);
+#endif
+	    type = *(ep+12);
+	    flags = *(ep+13);
+/*	    memcpy((char *)&value, ep+12, 4); */
+
+#ifdef DEBUG
+if(type == TYPL)
+printf("WRITR name [%2.2x%2.2x%2.2x%2.2x] flags %x type %x sval %x\n",
+name[4], name[5], name[6], name[7],
+flags, type, sval);
+else if(type == TYMACDEF)
+printf("WRITR name [%0.8s] flags %x type %x sval %x\n",
+    xsnegate(name), flags, type, sval);
+else
+printf("WRITR name [%0.8s] flags %x type %x sval %x\n",
+    name, flags, type, sval);
+#endif /* DEBUG */
+
+	    /* see if same name */
+	    if (memCmp(name, oldname, 8) != 0) {
+		memcpy(oldname, name, 8);	/* copy the name */
+		if((prmt[12] & 0xff) == 0xff)	/* see if internal symbol */
+		    prmt[12] = '!';	/* yes, replace 1st char */
+		if(prmt[12] == ')')	/* is it common */
+		    if(prmt[2] == 'D')	/* typed common? */
+			prmt[2] = 'S';	/* its SSECT, change type */
+		/* see if a ref to the symbol, if not delete */
+		if(prmt[2] != 'L') {
+		    if(pp > 8)			/* used, print */
+			goto doline;
+		    if(prmt[12] == ' ' && prmt[13] == ' ')
+			goto doline;		/* must be 2nd line */
+		    /* else ignore line */
+/* printf("ignore type %d name %0.8s\n", type, name);  */
+		} else 
+		{
+	doline:
+		    /* print the line */
+		    ppp(length, prmt, 0);	/* print the line */
+		}
+		/* clear print buffer */
+		memset(prmt, ' ', length);	/* clear print line */
+		pp = 0;
+		/* format the location counter */
+/*		tt.value = value; */
+/*		tt.value = sval & 0x7fffff; */
+		tt.value = sval & 0xffffff;
+	        if (tt.flags & ABSREL)
+		    sval &= ~0x800000;		/* reset ABS/REL flag */
+		tt.flags = flags;
+/*		tt.type = type; */
+		tt.type = (sval & 0x0f000000) >> 24;
+/*
+printf("type %d ttype %d\n", type, tt.type);
+*/
+		type = tt.type;
+		loch(&tt, 0, prmt);		/* set 5 chars */
+		if(type == TYPL) { 		/* literal */
+#ifndef alpha_fix
+		    literal = (int)(name[4] & 0xff) << 24;
+		    literal |= (int)(name[5] & 0xff) << 16;
+		    literal |= (int)(name[6] & 0xff) << 8;
+		    literal |= (int)(name[7] & 0xff);
+#else
+	    	    memcpy((char *)&literal, &name[4], 4);
+#endif
+		    /* store 8 hex chars */
+		    sprintf(xx, "%0.8X", literal);
+		    memcpy(&prmt[12], xx, 8);
+		    continue;
+		} else if (type < TYMACDEF) {
+		    /* most everything else */
+		    memcpy(&prmt[12], name, 8);	/* copy the name */
+		    continue;
+		} else if (type == TYPDP) {
+		    /* datapool item */
+/*		    if((value >> 16) & 0xff == 0xff) { */
+		    if(((sval >> 16) & 0xff) == 0xff) {
+			prmt[3] = '0';
+			prmt[2] = 'S';	/* ssect */
+		    } else {
+			prmt[2] = 'A';	/* datapool */
+		    }
+		    memcpy(&prmt[12], name, 8);	/* copy the name */
+		    continue;
+		} else if(type < 20) {
+		    /* copy the negated macro/form name */
+		    memcpy(&prmt[12], xsnegate(name), 8);
+		    continue;
+		} else {
+		    sprintf(xx, "%0.8X", literal);
+/*
+printf("fixup type %d name %0.8s\n", type, name);
+*/
+		    /* unknown, fix it up */
+		    memcpy(&prmt[12], name, 8);	/* copy the name */
+		    memset(prmt, ' ', 8);	/* blank prog cntr */
+		}
+	    } /* end new name */
+	    /* process another reference to the same name */
+	    if((pp+36) > length) {
+		if((prmt[12] & 0xff) == 0xff)	/* see if internal symbol */
+		    prmt[12] = '!';	/* yes, replace 1st char */
+		ppp(length, prmt, 0);	/* print filled line */
+		/* clear print buffer */
+		memset(prmt, ' ', length);	/* clear print line */
+		pp = 0;
+	    }
+	    sval &= ~SUORD;		/* clear flag */
+	    if (!(sval & SREF)) {	/* symbol reference */
+		prmt[pp + 22] = '*';	/* a definition, set * */
+		sval &= ~SREF;		/* clear flag */
+	    }
+	    sval &= 0x7fffff;
+	    /* store 5 dec chars */
+/*	    sprintf(xx, "%0.5d", value); */
+	    sprintf(xx, "%0.5d", sval);
+	    memcpy(&prmt[pp + 23], xx, 5);
+	    pp += 8;			/* next print position */
+	    continue;
+	}
+	/* we is done */
+	ppp(length, prmt, 0);	/* print last line */
+	return;
+}
+@
+
+
+1.4
+log
+@chang buffers from 200 to 300
+@
+text
+@d7 2
+a10 1
+#include <string.h>
+@
+
+
+1.3
+log
+@Fixes for Alpha port.
+Fix gen statement for big fields
+@
+text
+@d15 1
+a15 1
+#define XRBUFSIZE 200*768
+d49 1
+a49 1
+int val;		/* sort value */
+d109 2
+d128 4
+d134 1
+d176 10
+d200 1
+a200 1
+		fseek (ut2fd, (int32)0, 0);	/* rewind ut2 file */
+d217 1
+a217 1
+		    fseek (ut2fd, (int32)0, 0);	/* rewind ut2 file */
+d351 1
+a351 1
+		    if((sval >> 16) & 0xff == 0xff) {
+@
+
+
+1.2
+log
+@Add cross reference support.
+Add mods for alpha port.
+@
+text
+@a264 1
+#ifdef mpx
+a265 3
+#else
+name[7], name[6], name[5], name[4],
+#endif
+d315 6
+d322 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 3
+a3 861
+         TITLE     REPORT CAPTURE PART OF DISC BASED XREF
+*    MPX-32 MACRO ASSEMBLER DISC-BASED CROSS-REFERENCE  XREF 12NOV80
+************************************************************************
+*                                                                      *
+*        REPORT CAPTURE PART OF DISC BASED XREF                        *
+*                                                                      *
+************************************************************************
+         SPACE     3
+*        REFERENCE REPORTER FOR LATER SYMBOL CONCORDANCE
+REPTR    CEQU      $                                            ESCT-32
+*        COMMAND INPUT IN R3: C0=Y,E0=N,80=2,A0=1 IN BITS 0-7 OF R3
+         TBM       0,REPTYPE       COMMAND OR SYMBOL REPORT ???
+         BS        REPTRC          IT IS A COMMAND.
+         CAMW      1,REPTMCK       IS THIS A MACRO NAME CHECK
+         BGE       REPTRRET     IT IS JUST A MACRO DATA REQUEST
+         TBM       02,REPTRCBP
+         BNS       REPTRRET     DONT REPORT DURING PASS 2
+         STW       1,REPTRS1       SAVE THE USERS X1
+         TBR       3,0             DSECT/CSECT FLAG SET ???
+         BS        REPTM1          YES - MUST BE FINAL DATA VALUE
+         CAMW      3,=X'0001869F'      IS THIS THE FINAL DATA VALUE?
+         BGT       REPTM1       YES--WE DONT SEGREGATE IT FURTHER
+         ZBR       1,0             CLEAR DSECT/CSECT FLAG
+         CAMW      1,REPTDCK       CHECK WHETHER DATA REQUEST OR DEF.
+         BGE       $+1W+1H      IT IS A DEFINITION
+         SBR       3,3             INDICATE A USAGE REFERENCE (REQUEST)
+         SBR       3,2             INDICATE EITHER USAGE OR DEFINITION
+REPTM1   CEQU      $                                            ESCT-32
+         LW        1,XRBUFP        GET THE POINTER TO THE RECORD
+         BNZ       REPTM2          NOT START OF THE RECORD
+         LW        1,XRBUFP        POINTER IN THE BUFFER
+REPTM2   CEQU      $                                            ESCT-32
+*        REPORT ONE REFERENCE
+*        WORDS ARE PLACED INTO UT2 RECORDS IN FOLLWING ORDER:
+*        I0 WD3,I0 WD2,I0 WD1,I1 WD3,I1 WD2,I1 WD1,I2 WD3,I2 WD2,I2 WD1,
+*        ETC
+         STW       4,XRBUF+0W,1    1ST 4 CHARS
+         STW       5,XRBUF+1W,1    2ND 4 CHARS
+         SLC       3,1             ROTATE SIGN BIT TO BIT 31 (FOR SORT)
+         STW       3,XRBUF+2W,1    KEY DATA AND FLAG
+         SRC       3,1             RESTORE ORIGINAL R3
+         ABM       31,RECCOUN      COUNT NUMBER OF ELEMENTS     S880752
+         LW        1,XRBUFP         CHECK IF BUFFER OVER THE END
+         ADI       1,3W            BUMP POINTER                 S880752
+         STW       1,XRBUFP        AND RESTORE                  S880752
+         CI        R1,XRSECSIZ     CHECK END OF BUFFER          S880752
+         BLT       REPTM4        NOT DONE WITH THIS RECORD
+         LA        1,FCBXR         FILLED THE BUFFER-NWO WRITE IT
+         SVC       1,X'32'         ON UT2 IN THE NO WAIT MODE
+         TBM       6,FCBXR+3W      TEST FOR EOM   AS17
+         BS        XRER         ERROR IF EOF ON WRITE.
+         ZMW       XRBUFP          NEW RECORDS START AT THE FRONT
+REPTM4   LW        1,REPTRS1       UNSV THE USERS X1
+REPTRRET CEQU      $               LOTS OF PEOPLE RETURN THRU   ESCT-32
+         TRSW      0               RETURN
+REPTRC   CEQU      $                                            ESCT-32
+         TBR       3,1             WHAT TYPE OF COMMAND
+         BNS       REPTRCP      PASS REPORT
+         STW       3,REPTRCBO      SAVE XREF OPTION INDICATOR
+         ZMW       REPTRCBP        AND HOLD OFF REPORTING
+         BU        REPTRRET        RETURN TO CALLER
+REPTRCP  CEQU      $                                            ESCT-32
+         TBM       02,REPTRCBO     IS THE XREF OPTION ON
+         BS        REPTRRET     NO--DONT OPEN THE FILES
+         LW        4,REPTRCBO      GET THE OPTION DESCRIPTION WORD
+         TRC       4,4             NOW  0011 MEANS YES, 0001 MEANS NO
+         ANR       3,4             WE WILL REPORT DURING PASS 1 ONLY
+         STW       4,REPTRCBP      SO BIT 2 ON MEANS ALLOW REPORTING
+         TBR       3,2             THIS BIT TELLS US WHICH PASS
+         BNS       REPTRCP2     PASS 2--ENTER QUIESCENT PERIOD
+*        INITIALIZE REPORT FILE
+         LI        R1,4            UPDATE MODE INDICATOR
+         STB       R1,MCNP+2W      SET IN CNP
+         STW       R7,REPTRS7      SAVE R7 FOR OPEN CALL
+         IFT       UNIXF,SKIP                                   *JCB*
+         LA        R1,UT2RRS       RRS DEF FOR UT2              *JCB*
+         ZR        R7              NO CNP                       *JCB*
+         SVC       2,X'52'         ASSIGN RESOURCE              *JCB*
+SKIP     ANOP                                                   *JCB*
+         LA        1,FCBXR         UT2 FCB ADDR
+         LA        R7,MCNP         CNP ADDRWRITE.
+         SVC       2,X'42'         OPEN UT2 UPDATE MODE UNBLOCKED
+         LW        R7,REPTRS7      RESTORE R7
+         LI        R1,1            READ ONLY MODE
+         STB       R1,MCNP+2W      RESTORE CNP TO RE AD ONLY
+         ZBM       4,FCBXR+2W      SET SEQUENTIAL DISC ACCESS   S880752
+         LI        R1,XRSECSIZ     SET BUFFER SIZE              S880752
+         STW       R1,FCBXR+FCB.EQTY   INTO FCB                 S880752
+         ZMW       RECCOUN         THIS WILL HOLDS THE NUMBER OF RECORDS
+         ZMW       XRBUFP          NEW RECORDS START AT THE FRONT
+         LA        1,FCBXR         BASE ADDRESS OF THE FCB FOR UT2
+         SVC       1,X'37'         REWIND UT2
+         BU        REPTRRET        RETURN TO CALLER
+         SPACE     2
+REPTRCP2 CEQU      $               PASS 2                       ESCT-32
+*        END THE REPORT
+         LW        1,XRBUFP        ANYTHING LEFT IN THE BUFFER?
+         BEQ       REPTRCP4     NO-SKIP LAST WRITE
+         TRR       R1,R5           COPY COUNT                   S880752
+         DVI       R4,768          MOD 768                      S880752
+         LI        R5,768                                       S880752
+         SUR       R4,R5                                        S880752
+         TRN       R5,R4           NEGATE REMAINDER             S880752
+         ZMW       XRBUF,X1        ZAP BALANCE OF BUFFER        S880752
+         ADI       R1,1W           BUMP POINTER                 S880752
+         BIW       R4,$-2W         AND LOOP                     S880752
+         STW       R1,FCBXR+FCB.EQTY    AND SAY HOW MUCH        S880752
+         LA        1,FCBXR
+         SVC       1,X'32'         WRITE LAST RECORD
+         TBM       6,FCBXR+3W      TEST FOR EOM   AS17
+         BS        XRER         ERROR IF EOF ON WRITE.
+REPTRCP4 CEQU      $                                            ESCT-32
+         BU        REPTRRET        RETURN TO CALLER
+*
+         IFT       UNIXF,SKIP                                   *JCB*
+UT2RRS   DATAW     G'UT2'          LFC                          *JCB*
+         DATAW     X'02040190'     TYPE 2, 4 WDS, 400 SECTS     *JCB*
+         DATAW     0,X'04000000'   DEFAULT ACCS & OPTS (UNBLK'D)*JCB*
+SKIP     ANOP                                                   *JCB*
+REPTYPE  RES       1W
+REPTRCBP RES       1W              PASS INDICATOR 00=N, 80=28 A0=1
+REPTRCBO RES       1W              XREF INDICATOR C0=Y, E0=N
+REPTRS1  RES       1W
+REPTRS7  RES       1W              R7 SAVE AREA
+REPTMCK  GEN       8/A(TYMACREQ),24/0     BOUNDARY FOR MACRO TABLE SEARC
+REPTDCK  GEN       8/A(TYPL),24/0  BOUNDARY BETWEEN USAGE AND DEFINITION
+RECCOUN  RES       1W              THIS WILL HOLDS THE NUMBER OF RECO-D
+*
+         TITLE     WRITERPT - XREF REPORT WRITER                S880752
+*                                                               S880752
+*  THE ALGORITHM USED TO PRODUCE THE CROSS REFERENCE LISTING IS S880752
+* TO PARTITION THE DATA FILE INTO ONE OR MORE SUB-FILES. EACH   S880752
+* SUB-FILE IS SORTED IN MEMORY AND INDEXED BY A 8 WORD HEADER   S880752
+* BLOCK. THE RUNS THAT ARE PRODUCED ARE THEN MERGED INTO THE    S880752
+* FINAL REPORT. THE SIZE OF EACH SUB-FILE IS CONTROLLED BY THE  S880752
+* AMOUNT OF MEMORY AVAILABLE TO HOLD THE SORT STRINGS           S880752
+* (3W/ELEMENT) AND THE SUB-FILE INDEX BLOCK (8W/SUB-FILE).      S880752
+*  THE SUB-FILE INDEX BLOCKS AND THE SORT BUFFER OVERLAY THE    S880752
+* MEMORY USED TO HOLD THE MACRO PROTOTYPES AND THE SYMBOL TABLE.S880752
+* THIS MEMORY IS ITERATIVELY DIVIDED INTO THE SUB-FILE INDEX    S880752
+* TABLE AQT THE BEGINNING, FOLLOWED BY A SINGLE INTEGRAL SECTOR S880752
+* SIZE SORT TABLE. THE LATTER ESTABLISHING THE SIZE, AND HENCE  S880752
+* THE NUMBER OF SUB-FILES.                                      S880752
+*                                                               S880752
+****************************************************************S880752
+IT.SIZE  EQU       8W                                           S880752
+IT.BGSCT EQU       0W              BEGINNING SECT. NUM. OF RUN  S880752
+IT.RNSCT EQU       1W              NUMBER OF SECTORS IN RUN     S880752
+IT.BFSCT EQU       2W              NUMBER OF SECTORS IN BUFFER  S880752
+IT.INSCT EQU       3W              1ST SECTOR IN BUFFER         S880752
+IT.BFBGN EQU       4W              START ADDR OF BUFFER         S880752
+IT.BFEND EQU       5W              END ADDR OF BUFFER           S880752
+IT.BFPOS EQU       6W              CURRENT BUFFER POSITION      S880752
+IT.NMELS EQU       7W              NUMBER OF ELEMENTS IN RUN    S880752
+*                                                               S880752
+WRTR.RET DATAW     0               RETURN ADDRESS               S880752
+NUMRECS  DATAW     0               HOLDS NUMBER OF ELEMENTS     S880752
+MEMSTRT  DATAW     0               HOLDS START OF MEM AREA-LOW  S880752
+MEMENDR  DATAW     0               HOLDS END OF MEM AREA - HIGH S880752
+MEMSIZ.B DATAW     0               HOLDS MEM AREA SIZE IN BYTES S880752
+DSCSIZ.S DATAW     0               HOLDS DISC FILE SIZE-SECTORS S880752
+DSCSIZ.B DATAW     0               HOLDS DISC FILE SIZE-BYTES   S880752
+NUMRUNS  DATAW     0               HOLDS NUM. OF RUNS TO MERGE  S880752
+SRTSIZ.S DATAW     0               SIZE OF SORT RUNS IN SECTORS S880752
+BUFSTRT  DATAW     0               ADDR OF SORT BUFFER          S880752
+HEDSIZ.B DATAW     0               SIZE OF INDEX BLOCK AREA     S880752
+BUFSIZ.B DATAW     0          BALANCE OF MEM AREA (-HEDSIZE.B)  S880752
+BUFSIZ.S DATAW     0          BUFSIZ.B DIVIDED BY SECTOR SIZE   S880752
+ELESLFT  DATAW     0               NUM OF UNPROCESSED ELEMENTS  S880752
+*                                                               S880752
+INQBUF   RES       8W                                           S880752
+*                                                               S880752
+WRITEREP CEQU      $                                            ESCT-32
+         STW       R0,WRTR.RET     SAVE RETURN                  S880752
+         LW        R5,RECCOUN                                   S880752
+         BZ        XRM.XIT         SKIP IF NO SYMBOLS           S880752
+         STW       R5,NUMRECS      INIT RECORD COUNT            S880752
+WREP.1   CEQU      $               LOOP TOP                     C010-32
+         LW        R5,LOW                                       S880752
+         STW       R5,MEMSTRT      INIT MEMORY BUFFER START     S880752
+         LW        R5,HIGH                                      S880752
+         STW       R5,MEMENDR      INIT MEMORY BUFFER END       S880752
+         SUMW      R5,LOW          COMPUTE SIZE OF BUFFER       C010-32
+         CAMW      R5,=X'8000'     IS IT AT LEAST 4 MAP BLOCKS  C010-32
+         BGE       WREP.2          CONTINUE IF IT IS            C010-32
+         SVC       1,X'69'         ELSE GET ANOTHER             C010-32
+         TRR       R3,R3           SET CC'S                     C010-32
+         BZ        XRM.XIT         FORGET XREF IF WE CAN'T      C010-32
+         STW       R4,HIGH         SAVE TOP                     C010-32
+         BU        WREP.1          AND TRY AGAIN                C010-32
+WREP.2   CEQU      $               CONTINUE                     C010-32
+*                                                               S880752
+*        COMPUTE THE DISC FILE STATISTICS FROM THE RECORD COUNT S880752
+*                                                               S880752
+         LW        R5,NUMRECS                                   S880752
+         ES        R4                                           S880752
+         DVI       R4,64           64 RECORDS PER SECTOR        S880752
+         TRR       R4,R4           SET CC'S                     S880752
+         BZ        $+2W            SKIP IF NO REMAINDER         S880752
+         ADI       R5,1            ELSE BUMP SECTOR COUNT       S880752
+         STW       R5,DSCSIZ.S     AND SAVE                     S880752
+         ES        R4                                           S880752
+         MPI       R4,768          COMPUTE SECT BOUNDED BYTE CT S880752
+         STW       R5,DSCSIZ.B     AND SAVE                     S880752
+*                                                               S880752
+*        COMPUTE SUB-FILE LENGTH                                S880752
+*                                                               S880752
+         LW        R5,MEMENDR                                   S880752
+         SUMW      R5,MEMSTRT                                   S880752
+         STW       R5,MEMSIZ.B                                  S880752
+*                                                               S880752
+         LW        R5,DSCSIZ.B     GET DISC SIZE IN BYTES       S880752
+         ES        R4              PREPARE FOR DIVIDE           S880752
+         DVMW      R4,MEMSIZ.B     COMPUTE NUMBER OF RUNS       S880752
+         TRR       R4,R4           SET CC'S                     S880752
+         BZ        $+2W            SKIP                         S880752
+XRS.1    CEQU      $               FROM RUN SIZE EVALUATOR      ESCT-32
+         ADI       R5,1            ELSE ROUND (OR BUMP)         S880752
+         STW       R5,NUMRUNS      AND SAVE                     S880752
+         ES        R4                                           S880752
+         MPI       R4,IT.SIZE      COMPUTE MEM FOR INDEX TABLE  S880752
+         STW       R5,HEDSIZ.B     AND SAVE                     S880752
+         ADMW      R5,MEMSTRT      ADD START ADDRESS OF MEMORY  S880752
+         STW       R5,BUFSTRT      AND SAVE                     S880752
+         LW        R6,MEMENDR      GET END OF MEMORY VALUE      S880752
+         SUR       R5,R6           COMPUTE SORT BUFFER SIZE     S880752
+         STW       R6,BUFSIZ.B     AND SAVE SIZE                S880752
+         TRR       R6,R5                                        S880752
+         ES        R4              SET UP                       S880752
+         DVI       R4,768          DIVIDE BY SECTOR SIZE        S880752
+         STW       R5,BUFSIZ.S     SAVE SIZE (IN SECTORS)       S880752
+         TRR       R5,R6           SAVE BUF SIZE FOR LATER      S880752
+         LW        R5,DSCSIZ.S     GET SIZE OF DATA SET         S880752
+         ES        R4                                           S880752
+         DVMW      R4,NUMRUNS      COMPUTE RUN SIZE             S880752
+         TRR       R4,R4           ANY REMAINDER                S880752
+         BZ        $+1W            SKIP IF NOT                  S880752
+         ADI       R5,1            ELSE ROUND UP                S880752
+         STW       R5,SRTSIZ.S     SAVE FOR LATER               S880752
+         CAR       R5,R6           DOES RUN SIZE FIT IN MEM     S880752
+         BGE       XRS.2           CONTINUE IF ALL COVERED      S880752
+         LW        R5,NUMRUNS      ELSE RECOVER NUMBER OF RUNS  S880752
+         BU        XRS.1           AND LOOP TO CONVERGE         S880752
+XRS.2    CEQU      $                                            ESCT-32
+*                                                               S880752
+*        PRODUCE THE RUNS                                       S880752
+*                                                               S880752
+         LW        R5,NUMRECS                                   S880752
+         STW       R5,ELESLFT                                   S880752
+         LW        R5,BUFSTRT      GET ADDR OF SORT BUFFER      S880752
+         STW       R5,FCBXR+FCB.ERWA                            S880752
+*                                                               S880752
+         LW        R5,SRTSIZ.S     GET SUB-FILE SIZE            S880752
+         ES        R4                                           S880752
+         MPI       R4,768          CONVERT TO BYTES             S880752
+         STW       R5,FCBXR+FCB.EQTY                            S880752
+         ZMW       FCBXR+FCB.ERAA                               S880752
+         SBM       4,FCBXR+FCB.GCFG     SET RANDOM MODE         S880752
+         LNW       R7,NUMRUNS      SET UP LOOP COUNT            S880752
+         LW        R3,MEMSTRT      INIT INDEX TABLE POINTER     S880752
+*                                                               S880752
+XRS.3    CEQU      $               TOP OF SUB-FILE PROC. LOOP   ESCT-32
+         M.READ    FCBXR                                        S880752
+         LB        R4,FCBXR+FCB.SFLG                            S880752
+         BNZ       IOERUT2         REPORT I/O ERROR             S880752
+         LW        R5,FCBXR+FCB.RECL    GET AMOUNT READ         S880752
+         ES        R4                                           S880752
+         DVI       R4,12           COMPUTE NUMBER OF ELEMENTS   S880752
+         CAMW      R5,ELESLFT      COMPARE TO OUTSTANDING COUNT S880752
+         BLE       XRS.4                                        S880752
+         LW        R5,ELESLFT                                   S880752
+         ZMW       ELESLFT                                      S880752
+         BU        XRS.5                                        S880752
+XRS.4    CEQU      $                                            ESCT-32
+         LW        R4,ELESLFT                                   S880752
+         SUR       R5,R4                                        S880752
+         STW       R4,ELESLFT                                   S880752
+XRS.5    CEQU      $                                            ESCT-32
+         STW       R5,IT.NMELS,X3  SAVE ELEMENT CNT FOR SUB-FIL S880752
+         ES        R4                                           S880752
+         MPI       R4,12           CONVERT ELEMENT CNT TO BYTES S880752
+         DVI       R4,768          COMPUTE # SECTORS IN SUB-FIL S880752
+         TRR       R4,R4           SET CC'S                     S880752
+         BZ        $+2W            SKIP IF NO REMAINDER         S880752
+         ADI       R5,1            ELSE BUMP SUBFILE LENGTH     S880752
+         STW       R5,IT.RNSCT,X3  AND SET INTO INDEX TABLE     S880752
+         LW        R1,BUFSTRT      GET ADDR OF BUFFER           S880752
+         LW        R5,IT.NMELS,X3  RECOVER NUMBER OF ELEMENTS   S880752
+         BL        ISORT                                        S880752
+XRS.TSTP CEQU      $                                            ESCT-32
+         M.WRIT    FCBXR                                        S880752
+         LW        R5,FCBXR+FCB.ERAA   GET FILE POINTER         S880752
+         STW       R5,IT.BGSCT,X3  SAVE INDEX IN TABLE          S880752
+         LW        R5,SRTSIZ.S     GET SIZE OF SUB-FILE         S880752
+         ARMW      R5,FCBXR+FCB.ERAA    ADD TO FILE POINTER     S880752
+         ADI       R3,IT.SIZE      BUMP INDEX TABLE POINTER     S880752
+         BIB       R7,XRS.3        LOOP FOR ALL SUBFILES        S880752
+*                                                               S880752
+*        NOW MERGE THE RUNS                                     S880752
+*                                                               S880752
+*        COMPUTE SIZE OF EACH RUN BUFFER                        S880752
+*                                                               S880752
+XMERGE   CEQU      $                                            ESCT-32
+         LW        R7,BUFSIZ.S     GET SIZE OF SORT BUFF - SECT S880752
+         ES        R6                                           S880752
+         DVMW      R6,NUMRUNS      COMPUTE SIZE OF EACH RUN BUF S880752
+         TRR       R7,R4           HOLD SIZE IN SECTORS         S880752
+         ES        R6                                           S880752
+         MPI       R6,768          CONVERT TO BYTES             S880752
+         TRR       R4,R6           SIZE IN SECTORS TO R6        S880752
+         LNW       R0,NUMRUNS      SET LOOP COUNT               S880752
+         LW        R3,MEMSTRT      AND INDEX TABLE POINTER      S880752
+         LW        R2,BUFSTRT      SET UP BEGINNING OF 1ST BUFF S880752
+*                                                               S880752
+* R0=-LOOPCOUNT, R2=BUFFPNTR, R3=IT. PNTR, R6=BUFSCT, R7=BUFBYT S880752
+*                                                               S880752
+XRM.1    CEQU      $                                            ESCT-32
+         LI        R4,-1                                        S880752
+         STW       R4,IT.INSCT,X3  SHOW RUN BUFFER NOT INITED   S880752
+         CAMW      R2,MEMENDR      IS BUFF IN BOUNDS            S880752
+         BGT       XMRG.ER         REPORT ERR IF NOT            S880752
+         STW       R2,IT.BFBGN,X3  SET START ADDR THIS BUFFER   S880752
+* SELECT MAXIMUM BUFFER SIZE OR RUN SIZE INTO R4,R5             S880752
+         LW        R5,IT.NMELS,X3  GET NUMBER OF ELEMENTS       S880752
+         ES        R4                                           S880752
+         MPI       R4,12           CONVERT TO BYTES             S880752
+         CAR       R7,R5           COMPARE TO MAX BUFF SIZE     S880752
+         BLT       XRM.2                                        S880752
+         TRR       R7,R5           USE MAX SIZE                 S880752
+         TRR       R6,R4           USE MAX SCT ALSO             S880752
+         BU        XRM.3           AND CONTINUE                 S880752
+XRM.2    CEQU      $               ELSE USE COMPUTED REQUIREME  ESCT-32
+         STW       R5,XRM.T1       SAVE                         S880752
+         ES        R4                                           S880752
+         DVI       R4,768          CONVERT TO SECTORS           S880752
+         TRR       R4,R4           SET CC'S                     S880752
+         BZ        $+2W            SKIP IF ZERO                 S880752
+         ADI       R5,1            ELSE ROUND UP                S880752
+         TRR       R5,R4           COPY SECTOR REQUIREMENT      S880752
+         LW        R5,XRM.T1       AND RESTORE BYTE REQUIREMENT S880752
+* R0=-LOOP, R2=BUFADDR, R3=I.T.PNTR, R4,R5=SELECTED,R6,R7=BUFF  S880752
+XRM.3    CEQU      $                                            ESCT-32
+         TRR       R5,R1           COPY SIZE IN BYTES           S880752
+         ADR       R2,R1           ADD BUFFER START             S880752
+         SUI       R1,1            COMPUTE TRIAL END ADDR       S880752
+         CAMW      R1,MEMENDR      AND SEE IF IT FITS           S880752
+         BLE       XRM.4           CONTINUE IF IT DOES          S880752
+         SUI       R5,768          ELSE DECREMENT SIZE(BYTES)   S880752
+         SUI       R4,1            AND SIZE(SECTORS)            S880752
+         BZ        XMRG.ER                                      S880752
+         BU        XRM.3           AND LOOP TILL IT DOES.       S880752
+XRM.4    CEQU      $                                            ESCT-32
+         STW       R1,IT.BFEND,X3  SAVE BUFFER END VALUE        S880752
+         STW       R1,IT.BFPOS,X3       AND SHOW BUFFER EMPTY   S880752
+         STW       R4,IT.BFSCT,X3  SAVE BUFF LENGTH IN SECTORS  S880752
+         ADR       R5,R2           ADVANCE BUFF START LOCATION  S880752
+         ADI       R3,IT.SIZE      BUMP TABLE POINTER           S880752
+         BIB       R0,XRM.1                                     S880752
+*                                                               S880752
+         ZMW       XRBUFP          INIT LINE ASSEMBLY POINTER   S880752
+         LI        R2,-30W         LINE LENGTH                  S880752
+         LW        R6,=C'    '     GET SOME BLANKS              S880752
+         STW       R6,PRMT+30W,X2  AND BLANK THE LINE           S880752
+         BIW       R2,$-1W         TO ITS END                   S880752
+         LI        R6,-1           SET INIT VALUE               S880752
+         STW       R6,XRCNAME      INTO XRCNAME                 S880752
+         STW       R6,XRCNAME+1W                                S880752
+         LW        R2,MEMSTRT                                   S880752
+XRM.5    CEQU      $      LOOP TO PERFORM THE MERGE             ESCT-32
+         BL        XR.NWAY                                      S880752
+         BS        XRM.XIT         FINISHED WHEN CC1 SET        S880752
+         LW        R6,0W,X3        GET ELEMENT                  S880752
+         LW        R7,1W,X3                                     S880752
+         LW        R5,2W,X3                                     S880752
+         SRC       R5,1            REPPOSITION DATA             S880752
+         STD       R6,XRBUF                                     S880752
+         STW       R5,XRBUF+2W                                  S880752
+         BL        XRPRNT                                       S880752
+         BU        XRM.5                                        S880752
+XRM.XIT  LW        R1,QAFCBLO1     LENGTH AND ADDR OF PRINT BUF S880752
+         IFT       UNIXF,SKIP                                   *JCB*
+         ZR        R7              SIGNALS PPP NO ERRORS EXITS  *JCB*
+*                                  FOR THIS LINE.               *JCB*
+SKIP     ANOP                                                   *JCB*
+         BL        PPP             PRINT THE LAST XREF LINE     S880752
+         BU        *WRTR.RET       RETURN TO CALLER             S880752
+XMRG.ER  CEQU      $                                            ESCT-32
+         M.BORT    XR01                                         S880752
+XR01     DATAW     C'XR01'                                      S880752
+XRM.T1   DATAW     0               TEMP FOR R5                  S880752
+*---------------------------------------------------------------S880752
+         TITLE     XR.NWAY - PERFORM N-WAY MERGE OF RUNS        S880752
+*                                                               S880752
+*     IN   R2= ADDR OF INDEX TABLE                              S880752
+*          NUMRUNS = NUMBER OF RUNS PRODUCED BY SORT            S880752
+*                                                               S880752
+*    OUT   R3 = ADDR OF SELECTED (LOWEST) ENTRY                 S880752
+*          CC1 SET IF ALL DONE WITH MERGE                       S880752
+*---------------------------------------------------------------S880752
+*                                                               S880752
+XR.NWAY  CEQU      $                                            ESCT-32
+         ZBR       R0,1            RESET ALL DONE FLAG          S880752
+         STF       R0,XRNW.RSV     SAVE CALLER REGS             S880752
+XRNW.1   CEQU      $               LOOP TOP                     ESCT-32
+         LW        R4,IT.NMELS,X2  ANY DATA LEFT THIS RUN       S880752
+         BNZ       XRNW.11         CONTINUE IF THERE IS         S880752
+         ADI       R2,IT.SIZE      ELSE BUMP TO NEXT I.TABLE IF S880752
+         CAMW      R2,BUFSTRT      ARE ALL RUNS EMPTY?          S880752
+         BLT       XRNW.1          CONTINUE IF NOT              S880752
+         SBM       1,XRNW.RSV      ELSE INDICATE ALL DONE       S880752
+         BU        XRNW.XIT        AND RETURN                   S880752
+XRNW.11  CEQU      $                                            ESCT-32
+         LW        R4,IT.BFPOS,X2  GET CURR POSITION IN 1ST BYT S880752
+         CAMW      R4,IT.BFEND,X2  IS THERE UNPROCESSED DATA    S880752
+         BLT       XRNW.2          CONTINUE IF THERE IS         S880752
+         BL        XRNW.RD1        ELSE REFILL THE BUFFER       S880752
+         BNS       XRNW.11         RETRY IF READ OK             S880752
+         BU        XRNW.1          ELSE KEEP LOOKING            S880752
+XRNW.2   CEQU      $               CONTINUE                     ESCT-32
+         TRR       R2,R3           COPY INDEX TABLE ADDR OF 1ST S880752
+XRNW.3   CEQU      $                                            ESCT-32
+         ADI       R3,IT.SIZE      AND BUMP R2 TO SECOND ENTRY  S880752
+         CAMW      R3,BUFSTRT      IS THIS A VALID I.TABLE ENTRYS880752
+         BLT       XRNW.31         CONTINUE IF IT IS            S880752
+         STW       R4,XRNW.RSV+3W  ELSE ONLY ONE RUN REMAINS    S880752
+         LI        R7,3W           BUMP BY ONE ENTRY            S880752
+         ARMW      R7,IT.BFPOS,X2  AND UPDATE ELEMENT POINTER   S880752
+         LI        R7,-1                                        S880752
+         ARMW      R7,IT.NMELS,X2  DECREMENT REMAINING COUNT    S880752
+         BU        XRNW.XIT        SO USE IT AND RETURN         S880752
+XRNW.31  CEQU      $                                            ESCT-32
+         LW        R5,IT.NMELS,X3  ANY DATA IN THIS RUN         S880752
+         BZ        XRNW.3          TRY NEXT IF NOT              S880752
+         LW        R5,IT.BFPOS,X3  GET CURRENT POSITION IN NEXT S880752
+         CAMW      R5,IT.BFEND,X3  IS THERE UNPROCESSED DATA    S880752
+         BLT       XRNW.4          CONTINUE IF THERE IS         S880752
+         BL        XRNW.RD2        FILL SECOND BUFFER           S880752
+         BNS       XRNW.31         RETRY IF READ IS OK          S880752
+         BU        XRNW.3          AND RETRY                    S880752
+XRNW.4   CEQU      $                                            ESCT-32
+         XCR       R2,R4           SET UP X2 TO POINT TO BUF 1  S880752
+         XCR       R3,R5           SET UP X3 TO POINT TO BUF 2  S880752
+*>>>>                                                           S880752
+         LW        R7,0W,X2                                     S880752
+         EOMW      R7,0W,X3        CHECK SIGN OF 1ST WORD       S880752
+         BGE       XRNW.41         BR, IF THE SAME              S880752
+         TBM       0,0,X2          TEST SIGN OF 1ST BUFFER WORD S880752
+         BS        XRNW.6          TREAT AS GREATER             S880752
+         BU        XRNW.5          ELSE ITS LESS                S880752
+XRNW.41  CEQU      $                                            ESCT-32
+         LW        R7,0W,X2        GET 1ST WORD OF BUF 1 ENTRY  S880752
+         CAMW      R7,0W,X3        COMPARE TO 1ST WORD OF BUF 2 S880752
+         BLT       XRNW.5          PROCESS BUF1 < BUF2          S880752
+         BGT       XRNW.6          PROCESS BUF2 < BUF1          S880752
+*>>>>                                                           S880752
+         LW        R7,1W,X2                                     S880752
+         EOMW      R7,1W,X3        CHECK SIGN OF 2ND WORD       S880752
+         BGE       XRNW.42         BR, IF THE SAME              S880752
+         TBM       0,1W,X2         TEST SIGN OF 2ND BUFFER WORD S880752
+         BS        XRNW.6          TREAT AS GREATER             S880752
+         BU        XRNW.5          ELSE ITS LESS                S880752
+XRNW.42  CEQU      $                                            ESCT-32
+         LW        R7,1W,X2        ELSE CONTINUE TEST           S880752
+         CAMW      R7,1W,X3        WITH SECOND WORD OF ENTRY    S880752
+         BLT       XRNW.5          PROCESS BUF1 < BUF2          S880752
+         BGT       XRNW.6          PROCESS BUF2 < BUF1          S880752
+*>>>>                                                           S880752
+         LW        R7,2W,X2                                     S880752
+         EOMW      R7,2W,X3        CHECK SIGN OF 3RD WORD       S880752
+         BGE       XRNW.43         BR, IF THE SAME              S880752
+         TBM       0,2W,X2         TEST SIGN OF 3RD BUFFER WORD S880752
+         BS        XRNW.6          TREAT AS GREATER             S880752
+         BU        XRNW.5          ELSE ITS LESS                S880752
+XRNW.43  CEQU      $                                            ESCT-32
+         LW        R7,2W,X2        ESLE CONTINUE TEST           S880752
+         CAMW      R7,2W,X3                                     S880752
+         BGT       XRNW.6          PROCESS BUF2 < BUF1          S880752
+*>>>>                                                           S880752
+XRNW.5   CEQU      $               (R2,R4) IS </=               ESCT-32
+         XCR       R2,R4                                        S880752
+         XCR       R3,R5                                        S880752
+         BU        XRNW.3                                       S880752
+XRNW.6   CEQU      $               (R3,R5) IS </=               ESCT-32
+         XCR       R2,R4                                        S880752
+         XCR       R3,R5                                        S880752
+         TRR       R3,R2                                        S880752
+         TRR       R5,R4           SELECT (R3,R5)               S880752
+         BU        XRNW.3                                       S880752
+XRNW.XIT CEQU      $               RETURN TO CALLER             ESCT-32
+         LF        R0,XRNW.RSV                                  S880752
+         TRSW      R0                                           S880752
+         NOP                                                    S880752
+*                                                               S880752
+XRNW.RSV RES       8W                                           S880752
+*                                                               S880752
+*---------------------------------------------------------------S880752
+         TITLE     XRNW.RD2- READ SUB-FILE INTO RUN BUFFER      S880752
+*                                                               S880752
+*  IN   R3= ADDR OF IT. ENTRY DESCRIBING BUFFER TO FILL         S880752
+*                                                               S880752
+*  OUT  CC1 SET IF REQUESTED RUN HAS BEEN COMPLETELY READ       S880752
+*                                                               S880752
+*---------------------------------------------------------------S880752
+XRNW.RD2 ZBR       R0,1            RESET END INDICATOR          S880752
+         STW       R0,XRD2.RSV                                  S880752
+         XCR       R2,R3           INVERT POINTERS              S880752
+         BL        XRNW.RD1        AND DO READ                  S880752
+         BNS       $+2W            SKIP IF OK                   S880752
+         SBM       1,XRD2.RSV     ELSE INDICATE END TO CALLER   S880752
+         XCR       R2,R3           PUT POINTERS BACK            S880752
+         LW        R0,XRD2.RSV                                  S880752
+         TRSW      R0              RETURN                       S880752
+*                                                               S880752
+XRD2.RSV DATAW     0                                            S880752
+*                                                               S880752
+*---------------------------------------------------------------S880752
+         TITLE     XRNW.RD1- READ SUB-FILE INTO RUN BUFFER      S880752
+*                                                               S880752
+*  IN   R2= ADDR OF IT. ENTRY DESCRIBING BUFFER TO FILL         S880752
+*                                                               S880752
+*  OUT  CC1 SET IF REQUESTED RUN HAS BEEN COMPLETELY READ       S880752
+*                                                               S880752
+*---------------------------------------------------------------S880752
+*                                                               S880752
+XRNW.RD1 CEQU      $                                            ESCT-32
+         ZBR       R0,1              RESET RUN COMPLETE FLAG    S880752
+         STD       R0,XRRD.RSV                                  S880752
+         LW        R1,IT.INSCT,X2  GET CURRENT BUFFER STATE     S880752
+         BN        XRRD.1          PROCESS 1ST TIME LOAD        S880752
+         ADMW      R1,IT.BFSCT,X2  ELSE COMPUTE SECTOR TO READ  S880752
+         STW       R1,IT.INSCT,X2  UPDATE SECTOR POINTER IN IT. S880752
+         STW       R1,FCBXR+FCB.ERAA AND IN FCB                 S880752
+         BU        XRRD.2          MERGE WITH COMMON CODE       S880752
+XRRD.1   CEQU      $               FIRST TIME                   ESCT-32
+         LW        R1,IT.BGSCT,X2  GET ADDR OF FIRST SECT IN R1 S880752
+         STW       R1,IT.INSCT,X2  INTO IT. ENTRY               S880752
+         STW       R1,FCBXR+FCB.ERAA AND INTO FCB               S880752
+XRRD.2   CEQU      $               MERGE POINT                  ESCT-32
+         LW        R1,IT.RNSCT,X2  GET SIZE OF THIS RUN         S880752
+         BZ        XRRD.EXT        RETURN CC1 IF RUN ALL READ   S880752
+         SUMW      R1,IT.BFSCT,X2  DECREMENT BY BUFF SIZE       S880752
+         BGE       XRRD.3          CONTINUE IF REMAINING RUN >= S880752
+         LW        R0,IT.RNSCT,X2  ELSE GET REMAINING LENGTH    S880752
+         ZMW       IT.RNSCT,X2     AND SHOW RUN COMPLETE        S880752
+         BU        XRRD.4          NOW MERGE UP                 S880752
+XRRD.3   CEQU      $                                            ESCT-32
+         STW       R1,IT.RNSCT,X2  AND RESTORE IN IT. ENTRY     S880752
+         LW        R0,IT.BFSCT,X2  GET BUFFER SIZE IN SECTORS   S880752
+XRRD.4   CEQU      $                                            ESCT-32
+         TRR       R0,R1           MOVE XFER LENGTH             S880752
+         ES        R0                                           S880752
+         MPI       R0,768          COPMUTE SIZE IN BYTES        S880752
+         STW       R1,FCBXR+FCB.EQTY AND SAVE IN FCB            S880752
+         LW        R1,IT.BFBGN,X2  GET BUFFER ADDR              S880752
+         STW       R1,IT.BFPOS,X2  RESET BUFFER POSITION        S880752
+         STW       R1,FCBXR+FCB.ERWA AND SET INTO FCB           S880752
+         M.READ    FCBXR                                        S880752
+         LB        R1,FCBXR+FCB.SFLG GET STATUS BYTE            S880752
+         BNZ       XRRD.ERR        DO ERR EXIT                  S880752
+XRRD.XIT CEQU      $                                            ESCT-32
+         LD        R0,XRRD.RSV                                  S880752
+         TRSW      R0                                           S880752
+         NOP                                                    S880752
+XRRD.EXT CEQU      $                                            ESCT-32
+         SBM       1,XRRD.RSV                                   S880752
+         BU        XRRD.XIT                                     S880752
+*                                                               S880752
+XRRD.ERR CEQU      $                                            ESCT-32
+         TRR       R1,R5                                        S880752
+         M.CONBAD                                               S880752
+         STB       R7,XRRD.MST+1B                               S880752
+         SRL       R7,8                                         S880752
+         STB       R7,XRRD.MST                                  S880752
+         LD        R2,XRRD.MSG                                  S880752
+         LW        R5,XRRD.ABC                                  S880752
+         ZR        R6                                           S880752
+         ZR        R7                                           S880752
+         SVC       1,X'62'                                      S880752
+         BOUND     1D                                           S880752
+XRRD.MSG DATAB     C'T2 ST='                                    S880752
+XRRD.MST DATAB     0,0                                          S880752
+XRRD.ABC DATAW     C'RD U'                                      S880752
+XRRD.RSV DATAD     0                                            S880752
+*                                                               S880752
+*---------------------------------------------------------------S880752
+         TITLE     ISORT - INTERNAL SORT OF SUB-FILE            S880752
+*                                                               S880752
+****************************************************************S880752
+*                                                               S880752
+*        D.L. SHELL'S SORT                                      S880752
+*                                                               S880752
+****************************************************************S880752
+*                                                               S880752
+*        R1        BASE ADDRESS OF THE TABLE TO BE SORTED       S880752
+*        R5        NUMBER OF ITEMS TO BE SORTED                 S880752
+*                                                               S880752
+****************************************************************S880752
+         BOUND     1W                                           S880752
+ISORT    CEQU      $                                            ESCT-32
+         STF       R0,ISRT.RSV                                  S880752
+*                                                               S880752
+         LI        R2,-ISRT.INL    GET LENGTH OF INCREMENT TABLES880752
+ISRT.01  CEQU      $                                            ESCT-32
+         CAMW      R5,ISRT.INC+ISRT.INL,X2                      S880752
+         BLT       ISRT.02                                      S880752
+         BIW       R2,ISRT.01                                   S880752
+ISRT.02  CEQU      $                                            ESCT-32
+         LI        R0,ISRT.INL                                  S880752
+         ADR       R2,R0           INCREMENT                    S880752
+         SUI       R0,2W                                        S880752
+         CI        R0,4                                         S880752
+         BGE       $+2W                                         S880752
+         LI        R0,4                                         S880752
+*                                                               S880752
+         MPI       R4,3W           COMPUTE ARRAY SIZE IN BYTES  S880752
+         STW       5,SORTN         AND SAVE                     S880752
+         ADR       R1,R5           ADD IN BASE                  S880752
+         STW       R5,SORT.LIM                                  S880752
+*                                                               S880752
+* OUTER LOOP                                                    S880752
+SORT20   CEQU      $                                            ESCT-32
+         TRR       R0,R2                                        S880752
+         LW        R5,ISRT.INC,X2  GET INCREMENT                S880752
+         BZ        SORT40          FINISHED                     S880752
+         SUI       R0,1W           DECREMENT POINTER            S880752
+*                                                               S880752
+         MPI       R4,3W           COMPUTE INCREMENT IN BYTES   S880752
+         TRN       R5,R6                                        S880752
+         STW       5,SORTM         M=M/2                        S880752
+         ADMW      6,SORTN         N-M                          S880752
+         STW       6,SORTK         K=N-M                        S880752
+*                                                               S880752
+         LI        5,0W                                         S880752
+         STW       5,SORTJ         J=0                          S880752
+SORT41   STW       5,SORTI         I=J                          S880752
+*                                                               S880752
+SORT49   CEQU      $                                            ESCT-32
+         LW        R1,SORTB        GET ARRAY BASE               S880752
+         ADMW      R1,SORTI        ADD IN "I" INDEX             S880752
+         TRR       R1,R2           COPY FOR "L" INDEX           S880752
+         ADMW      R2,SORTM        ADD IN INCREMENT             S880752
+         CAMW      R2,SORT.LIM     STILL IN RANGE               S880752
+         BGE       SORT20          STEP OUTER LOOP IF NOT       S880752
+         LI        3,-3W           NUMBER OF WORDS TO BE COMPARES880752
+COMPP    CEQU      $                                            ESCT-32
+         CAMW      R1,SORT.LIM                                  S880752
+         BGE       WHOOPS                                       S880752
+         CAMW      R2,SORT.LIM                                  S880752
+         BGE       WHOOPS                                       S880752
+         LW        7,0,1           A(I)                         S880752
+         EOMW      7,0,2           A(L)                         S880752
+         BGE       COMPQ           SIGNS ARE THE SAME           S880752
+         TBM       0,0,1           CHECK SIGN OF A(I)           S880752
+         BS        SORT50          A(I).GT.A(L)                 S880752
+         BU        SORT60          A(I).LT.A(L)                 S880752
+COMPQ    LW        7,0,1           A(I)                         S880752
+         CAMW      7,0,2           A(L)                         S880752
+         BLT       SORT60          A(I) .LT. A(L)               S880752
+         BGT       SORT50          A(I) .GT. A(L)               S880752
+         ABR       1,29            ADVANCE ADDRESS BY DISTANCE BS880752
+         ABR       2,29            WORDS OF THE SAME ITEM       S880752
+         BIW       3,COMPP         COMPARE EACH WORD            S880752
+         BU        SORT60          A(I) .EQ. A(I+M)             S880752
+WHOOPS   BU        WHOOPS                                       S880752
+*                                                               S880752
+SORT50   LW        4,0,1                                        S880752
+         LW        7,0,2                                        S880752
+         STW       4,0,2                                        S880752
+         STW       7,0,1           INTERCHANGE OF ONE WORD COMPLS880752
+         ABR       1,29            GET ADDRESS FOR NEXT WORD OF S880752
+         ABR       2,29            GET ADDRESS FOR NEXT WORD OF S880752
+         BIW       3,SORT50        MORE WORDS TO EXCHANGE       S880752
+*                                                               S880752
+         LW        7,SORTI                                      S880752
+         SUMW      7,SORTM                                      S880752
+         STW       7,SORTI         I=I-M                        S880752
+         BGE       SORT49          BUBBLE BACK THROUGH EARLY INCS880752
+*                                                               S880752
+SORT60   CEQU      $                                            ESCT-32
+         LW        5,SORTJ                                      S880752
+         ADI       R5,3W           BUMP J                       S880752
+         STW       R5,SORTJ        AND SAVE                     S880752
+         CAMW      5,SORTK                                      S880752
+         BLE       SORT41          IF(J-K)41,41,20              S880752
+         BU        SORT20                                       S880752
+SORTME   DATAW     0               SAVE INCREMENT IN ELEMENTS   S880752
+SORTN    RES       1W              NUMBER OF ITEMS IN BYTES     S880752
+SORTI    RES       1W                                           S880752
+SORTM    RES       1W                                           S880752
+SORTJ    RES       1W                                           S880752
+SORTK    RES       1W                                           S880752
+SORT.LIM DATAW     0                                            S880752
+SORT40   CEQU      $                                            ESCT-32
+         LF        R0,ISRT.RSV                                  S880752
+         TRSW      R0              RETURN                       S880752
+*                                                               S880752
+ISRT.RSV DATAW     0                                            S880752
+SORTB    DATAW     0               HOLDS BASE ADDR OF ARRAY     S880752
+         DATAW     0                                            S880752
+         DATAW     0                                            S880752
+         DATAW     0                                            S880752
+         DATAW     0               HOLDS NUMBER OF ELEMENTS     S880752
+         DATAW     0                                            S880752
+         DATAW     0                                            S880752
+ISRT.INC DATAW     0,1,4,13,40,121,364,1093,3280,9841,29524     S880752
+         DATAW     88573,265720,797161,2391484,7174453          S880752
+ISRT.INL DEQU      $-ISRT.INC                                   ESCT-32
+*                                                               S880752
+*---------------------------------------------------------------S880752
+         TITLE     XRPRNT - FORMAT ENTRY INTO LINE              S880752
+*                                                               S880752
+*  INPUT:  XRBUF,XRBUF+1W,XRBUF+2W = SYMBOL+CONTROL WORD        S880752
+*                                                               S880752
+*---------------------------------------------------------------S880752
+*                                                               S880752
+XRPRNT   CEQU      $                                            ESCT-32
+         STF       R0,XRP.RSV                                   S880752
+         LW        6,XRBUF+0W      CHARS 1-4 OF THE SYMBOL
+         LW        7,XRBUF+1W      CHARS 5-8 OF THE SYMBOL
+         CAMD      6,XRCNAME       IS THIS SAME AS PRECEEDING SYMBOL?
+         BEQ       XRPS7        YES
+         STD       6,XRCNAME       THE NEW SYMBOL
+         LW        1,QAFCBLO1      LENGTH AND ADR OF PRINT BUFFER
+         LB        2,PRMT+3W       FIRST CHAR OF NAME.
+         CAMB      2,=X'FF'        IS IT AN INTERNAL SYMBOL?
+         BCF       EQ,$+3W         NO.
+         LI        2,X'21'         INT SYM LEAD CHAR.
+         STB       2,PRMT+3W       REPLACE X'FF' IN BUFFER WITH X'21'
+         CI        2,G')'          IT MAY BE A COMMON BLOCK
+         BNE       XRGETI9         NO
+         LB        2,PRMT+2B       GET TYPE CODE
+         CI        2,G'D'          CHECK IF A COMMON BLOCK
+         BNE       XRGETI9
+         LI        2,G'S'          ITS AN SSECT CHANGE SYMBOL
+         STB       2,PRMT+2B       SAVE IT
+XRGETI9  CEQU      $                                            ESCT-32
+         TBM       22,OPTION       DOES USER WANT ALL SYMBOLS  AS17
+         BS        XRPS1           BR IF HE DOES  AS17
+         LB        R2,PRMT+2B      GET TYPE CHAR AS17
+         CI        R2,G'L'         IS IT LITERAL AS17
+         BEQ       XRPS1           PRINT IT ANYWAY AS17
+         LW        R2,XRBUFP       GET BUFFER POINTER AS17
+         CI        R2,8            TEST IF MORE THAN DEF IN LINE AS17
+         BGT       XRPS1           PRINT IF SYMBOL USED AS17
+         LW        R2,PRMT+3W      GET SYMBOL AS17
+         CAMW      R2,=C'    '     IS IT BLANK    AS17
+         BEQ       XRPS1           MUST BE 2ND LINE, PRINT IT AS17
+         BU        XRPS8           IGNOR THIS LINE  AS17
+         IFT       UNIXF,SKIP                                   *JCB*
+XRPS1    ZR        R7              SIGNALS PPP NO ERRORS EXITS  *JCB*
+*                                  FOR THIS LINE.               *JCB*
+         BL        PPP            PRINT THE PRESENTLY FORMED LN *JCB*
+SKIP     ANOP                                                   *JCB*
+XRPS8    LI        2,-30W         SET UP TO CLEAR 120 BYTES     AS17
+         LW        6,=C'    '      ASCII SPACES
+         STW       6,PRMT+30W,2    SPACES TO BUFFER
+         BIW       2,$-1W
+         ZMW       XRBUFP
+         LA        3,PRMT          WHERE TO PLACE THE SYMBOL'S VALUE
+         LA        2,XRCDATA       WHERE CODED VALUE IS
+         ZBR       R2,0            INDICATE PROGRAM CNTR PROC.  EINS-31
+         BL        LOCH
+         LD        6,XRCNAME
+         LB        5,XRCDATA       THE TYPE OF THE SYMBOL
+         ZBR       5,24            CLEAR DSECT/CSECT FLAG
+         CI        5,TYPL          WAS TYPE LITERAL
+         BEQ       XRPS4        YES
+         CI        5,TYMACDEF      IS IT A MACRO OR A FORM
+         BLT       XRPS5        NO
+         CI        5,12            WAS TYPE A DATAPOOL?
+         BCF       EQ,XRPS3.1      NO
+         LI        5,G'A'          YES, USE DATAPOOL DESCRIPTOR
+         LB        2,XRCDATA+1B    GET DATAPOOL NUMBER
+         CI        2,X'FF'         IS IT SSECT
+         BNE       XRPS3.0         NO
+         LI        5,G'0'
+         STB       5,PRMT+3B
+         LI        5,G'S'
+XRPS3.0  CEQU      $                                            ESCT-32
+         STB       5,PRMT+2B       PUT IN PRINT BUFFER
+         BU        XRPS5           GO PUT IN PRBUF
+XRPS3.1  CEQU      $               NOT A DATAPOOL ITEM          ESCT-32
+         CI        5,20            IS IT OTHER THAN VALUE?
+         BGT       XRPS6        YES THEN TAKE RESTORATIVE MEASURES.
+         LND       6,XRCNAME       MACRO/FORM NAMES ARE CODED
+         BU        XRPS5           GO PLACE INTO BUFFER
+XRPS4    CEQU      $                                            ESCT-32
+         TRR       7,5             THE LITERAL VALUE
+         BL        BTX             CONVERT TO ASCII CODED HEX
+XRPS5    CEQU      $                                            ESCT-32
+         STW       6,PRMT+3W       PLACE INTO PRINT BUFFER
+         STW       7,PRMT+4W
+         BU        XRP.XIT         RETURN                       S880752
+XRPS6    CEQU      $                                            ESCT-32
+         STW       6,PRMT+3W
+         STW       7,PRMT+4W
+         LW        6,=C'    '
+         STW       6,PRMT+0W
+         STW       6,PRMT+1W
+XRPS7    CEQU      $                                            ESCT-32
+         LW        1,XRBUFP
+         ADI       1,9W            ALLOW FOR MARGINS ON THE PRINTER
+         CAMW      1,XRLINELIM     CHECK AGAINST MAX LINE SIZE
+         BCT       LE,XRPS9        MORE SPACE ON THE LINE
+         LW        1,QAFCBLO1      LENGTH AND ADR OF PRINT BUFFER
+         LB        2,PRMT+3W       FIRST CHAR OF NAME.
+         CAMB      2,=X'FF'        IS IT AN INTERNAL SYMBOL?
+         BCF       EQ,$+3W         NO.
+         LI        2,X'21'         INT SYM LEAD CHAR.
+         STB       2,PRMT+3W       REPLACE X'FF' IN BUFFER WITH X'21'
+         IFT       UNIXF,SKIP                                   *JCB*
+         ZR        R7              SIGNALS PPP NO ERRORS EXITS  *JCB*
+*                                  FOR THIS LINE.               *JCB*
+         BL        PPP            PRINT THE FORMED LINE         *JCB*
+SKIP     ANOP                                                   *JCB*
+         LI        2,-30W
+         LW        6,=C'    '      ASCII SPACES
+         STW       6,PRMT+30W,2    SPACES TO BUFFER
+         BIW       2,$-1W
+         ZMW       XRBUFP
+XRPS9    CEQU      $                                            ESCT-32
+         LW        5,XRCDATA       THE SYMBOL ITEM KEY
+         LW        1,XRBUFP
+         LI        7,G'*'          REFERENCE FLAG
+         ZBR       5,2
+         ZBR       5,3             CHECK DEFINITION/REFERENCE FLAG
+         BS        $+2W         JUST A USAGE OR REFERENCE
+         STB       7,PRMT+5W+2B,1   IT WAS A DEFINITION--PLANT A *.
+         BL        CONBAD         CONVERT TO PRINTABLE ASCII CODING
+         LW        1,XRBUFP
+         STB       6,PRMT+5W+3B,1    PLACE ASCII LINE
+         STW       7,PRMT+6W,1       NUMBER INTO PRINT BUFFER.
+         ABM       28,XRBUFP       INCREMENT PRINT BUFFER POINTER
+XRP.XIT  CEQU      $                                            ESCT-32
+         LF        R0,XRP.RSV                                   S880752
+         TRSW      R0                                           S880752
+*                                                               S880752
+XRP.RSV  RES       8W                                           S880752
+XRCNAME  RES       1D              HOLDS NAME OF THE NEW ITEM FOR OUTPUT
+QAFCBLO1 GEN       12/120,20/B(PRMT)   PRMT QTY AND ADR OF PRINT BUFFER
+XRLINELI DATAW     120B    HOLDS NUMBER OF CHARS ON ONE PRINTER S880752
+XRCDATA  EQU       XRBUF+2W        THE SYMBOL ITEM KEY
+PRMT     EQU       XRBUF+10W       OVERLAY PRINT BUFFER OVER OLD DISC BU
+*
+XRER     CEQU      $                                            ESCT-32
+         LW        5,AS05          ABORT CODE TO R5 .
+         BU        ABORT
+IOERUT2  CEQU      $                                            ESCT-32
+         LW        5,AS16          ABORT CODE TO R5
+         TBM       2,3W,1          BLOCKING ERROR FLAG
+         BNS       $+2W         BRANCH IF NOT SET-I/O ERROR
+         LW        5,AS24          ABORT CODE
+         BU        ABORT
+         SPACE     3
+         BOUND     1W
+AS05     DATAW     C'AS05'         EOF ON UT2 DURING WRITE.
+AS16     DATAW     C'AS16'         UNRECOVERABLE I/O ERROR UT2
+AS24     DATAW     C'AS24'         INVALID BLOCKING BUFF CTRL PTR  UT2.
+ABORT    CEQU      $                                            ESCT-32
+         ZR        1
+         BL        ABORTM
+d5 374
+@

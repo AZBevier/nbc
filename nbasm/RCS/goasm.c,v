@@ -1,4 +1,78 @@
-/* goasm.c */
+head	1.11;
+access;
+symbols;
+locks
+	jbev:1.11; strict;
+comment	@ * @;
+
+
+1.11
+date	2021.06.28.21.46.21;	author jbev;	state Exp;
+branches;
+next	1.10;
+
+1.10
+date	2018.10.15.20.08.13;	author jbev;	state Exp;
+branches;
+next	1.9;
+
+1.9
+date	2018.10.12.22.17.25;	author jbev;	state Exp;
+branches;
+next	1.8;
+
+1.8
+date	2016.01.28.03.14.56;	author jbev;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2016.01.28.02.56.24;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2016.01.28.00.07.09;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	96.05.07.20.48.11;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.03.22.20.41.11;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.02.23.19.57.42;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.13.23.06.06;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.11
+log
+@Use uint8 for unsigned char definition.
+@
+text
+@/* goasm.c */
 
 #include "defs.h"
 /* #define DEBUG */
@@ -78,7 +152,7 @@ void	vfdo(int32, int);
 
 char	bacflag;		/* biased address flags */
     				/* 1 - BACX read */
-    				/* 2 - CSECT address */
+    				/* 2 - CSECT address
     				/* 4 - EXTERNAL address */
     				/* 64 - REZ/RES being processed */
 char	extflg;			/* external stringback control flag */
@@ -90,7 +164,7 @@ char	fpflag;			/* IEEE flags */
 char	dpflags;		/* datapool flags */
 char	endflag;		/* non zero when end card read */
 char	end2flag;		/* non zero when pass2 end processed */
-char	usname[MAXCHARS];	/* contains 24 chars of ascii name that was */
+uint8	usname[MAXCHARS];	/* contains 24 chars of ascii name that was */
 				/* last unstrung by main unstringer routine */
 char	prnt[41];		/* printf buffer */
 uint8	in[81];		/* input line buffer */
@@ -112,7 +186,7 @@ char	hbstac[4];		/* left to right terminator list */
 short	macstate;		/* macro expansion flags */
 char	label[9];		/* 8 char label if any */
 short	bits;			/* misc bits for print control */
-uint8   hbavar;			/* holds addr variant to be used */
+char	hbavar;			/* holds addr variant to be used */
 char	hbbn;			/* common block/section number */
 char	hbbbfb;			/* 0 means no data bytes output */
 char	hbbbct;			/* NUMBER OF BYTES GENERATED FOR THIS  */
@@ -124,10 +198,10 @@ unsigned char	hbbs[120];	/* binary output stack and count */
 unsigned char	hbbs[80];	/* binary output stack and count */
 				/* first byte is count, then data */
 #endif
-uint8   pcmode;			/* current program mode */
+char	pcmode;			/* current program mode */
 int32	lict;			/* current line counter */
 int32	bits2;			/* holds some misc flags */
-/* char	bits4;	*/		/* uninitialized flags */
+/* char	bits4;			/* uninitialized flags */
 char	lablscan[8];		/* label we are scanning for */
 char	csname[] = "**CSECT*";
 char	dsname[] = "**DSECT*";
@@ -143,8 +217,8 @@ char	mpbuf[80];		/* macro expansion buffer */
 short	inptstat;		/* macro states for inpt */
 int32	inttag;			/* internal tag number */
 char	*hwmsp;			/* macro definition area */
-/* char	*hwmsb;	*/		/* holds base of macro area */
-uint8   hwmspbuf;		/* count of chars in print buffer */
+/* char	*hwmsb;			/* holds base of macro area */
+char	hwmspbuf;		/* count of chars in print buffer */
 int32	hwerrf;			/* error flags */
 int32	hwcmpb[2];		/* bounding for dsect/csect */
 
@@ -161,8 +235,8 @@ short	hbccct;			/* common block count 0-255 */
 struct	tval	inag;		/* augend type and value */
 struct	tval	inac;		/* accumuland type and value */
 struct	tval	accum;		/* 2nd accumuland type and value */
-uint8   inagbn;			/* block # for common */
-uint8	inacbn;			/* block # for common */
+char	inagbn;			/* block # for common */
+char	inacbn;			/* block # for common */
 
 int32	hwcmsize[256];		/* save area for common pc's */
 
@@ -170,28 +244,28 @@ extern struct tval max;		/* defined in io.c */
 
 /* address masks for f & cc bit generation */
 int32	ager [] = {
-	0x0007FFFF,		    /* byte address mask */
-	0x0107FFFE,		    /* halfword adr mask and error mask */
-	0x0307FFFC,		    /* word addr mask and error mask */
-	0x0707FFFC,		    /* doublword adr mask and error mask */
-	0x0007FFFF,		    /* full range adr mask */
-	0x000FFFFF,		    /* adr mask to leave adr as is */
-	0x0307FFFC,		    /* base reg mode mask */
-	0x0007FFFF,		    /* full range for suabr */
-	0x0007FFFF		    /* full range for labr */
+	0x0007FFFFL,		/* byte address mask */
+	0x0107FFFEL,		/* halfword adr mask and error mask */
+	0x0307FFFCL,		/* word addr mask and error mask */
+	0x0707FFFCL,		/* doublword adr mask and error mask */
+	0x0007FFFFL,		/* full range adr mask */
+	0x000FFFFFL,		/* adr mask to leave adr as is */
+	0x0307FFFCL,		/* base reg mode mask */
+	0x0007FFFFL,		/* full range for suabr */
+	0x0007FFFFL		/* full range for labr */
 };
 
 /* address masks for f & cc bit generation */
 int32	ages [] = {
-	0x00080000,		/* byte f and cc bits */
-	1,			/* halfword f and cc bits */
-	0,			/* word f and cc bits */
-	2,			/* double word f and cc bits */
-	0,			/* a type f and cc bits (pseudos only) */
-	0,			/* leave f and cc bits as they are */
-	0x00080000,		/* base reg mode needs f bit */
-	0,			/* suabr doesn't need f bit */
-	0x00080000		/* labr does need f bit */
+	0x00080000L,		/* byte f and cc bits */
+	1L,			/* halfword f and cc bits */
+	0L,			/* word f and cc bits */
+	2L,			/* double word f and cc bits */
+	0L,			/* a type f and cc bits (pseudos only) */
+	0L,			/* leave f and cc bits as they are */
+	0x00080000L,		/* base reg mode needs f bit */
+	0L,			/* suabr doesn't need f bit */
+	0x00080000L		/* labr does need f bit */
 };
 
 /*
@@ -274,115 +348,116 @@ void	cd2f();		/*      80    Entry 80 - cvt dbl to flt		*/
  * opcode switcher table
  *
  */
+
 struct swdata switcher[] = {
 
-    {aerr},	/*	00    ENTRY  0 - ERROR			*/
-    {nss},	/*	01    ENTRY  1 - NOP,HALT,WAIT		*/
-    {aerr},	/*	02    ENTRY    - SPARE			*/
-    {aerr},	/*      03    ENTRY    - SPARE 			*/
+	aerr,	/*	00    ENTRY  0 - ERROR			*/
+	nss,	/*	01    ENTRY  1 - NOP,HALT,WAIT		*/
+	aerr,	/*	02    ENTRY    - SPARE			*/
+	aerr,	/*      03    ENTRY    - SPARE 			*/
 
 #define	KINTL1	4	/* no auto operand stripping lower boundry */
 
-    {calm},	/*	04    ENTRY  2 - CALL MONITOR 		*/
-    {bm},	/*	05    ENTRY  3 - SBM,ZBM,ABM,TBM	*/
-    {rro},	/*	06    ENTRY  4 - REG-TO-REG OPS 	*/
-    {ler},	/*	07    ENTRY  5 - LCS,ES,RND		*/
-    {trsw},	/*	08    ENTRY  6 - TRSW 			*/
-    {rtb},	/*	09    ENTRY  7 - SBR,TBR,ABR,ZBR 	*/
-		    /*			 ZBDMS,SBDMS       	*/
-    {shf},	/*	10    ENTRY  8 - SHIFTS 		*/
-    {nords},	/*	11    ENTRY  9 - NOR,NORD,SCZ		*/
-    {zrx},	/*	12    ENTRY 10 - ZR 			*/
-    {bu},	/*	13    ENTRY 11 - AC? (TREAT AS BU) 	*/
-    {trip},	/*	14    ENTRY 12 - TRP,TPR		*/
-    {agen},	/*	15    ENTRY 13 - MOST MEMORY REFS. 	*/
-    {bu},	/*	16    ENTRY 14 - BU,BFT,ZM ,EXM, 	*/
-    {bi},	/*	17    ENTRY 15 - BIB,BIW,BIH,BID 	*/
-    {fpp},	/*	18    ENTRY 16 - FLOATING PNT. OPS 	*/
-    {imop},	/*	19    ENTRY 17 - IMMEDIATE OPS 		*/
-    {exr},	/*	20    ENTRY 18 - EXR,EXRR,LMAP 		*/
-    {cdl},	/*	21    ENTRY 19 - CDL SEMI-PSEUDO	*/
-    {io},	/*	22    ENTRY 20 - CD,TD,EI,DI,RI,AI,DAI 	*/
-    {bacx},	/*	23    ENTRY 21 - BACH, BACW		*/
-    {zmx},	/*	24    ENTRY 22 - ZMB,ZMH,ZMW,ZMD	*/
-	{aerr},	/*	25    ENTRY    - SPARE			*/
-    {aerr},	/*	26    ENTRY    - SPARE			*/
-    {aerr},	/*	27    ENTRY    - SPARE			*/
-    {aerr},	/*	28    ENTRY    - SPARE			*/
+	calm,	/*	04    ENTRY  2 - CALL MONITOR 		*/
+	bm,	/*	05    ENTRY  3 - SBM,ZBM,ABM,TBM	*/
+	rro,	/*	06    ENTRY  4 - REG-TO-REG OPS 	*/
+	ler,	/*	07    ENTRY  5 - LCS,ES,RND		*/
+	trsw,	/*	08    ENTRY  6 - TRSW 			*/
+	rtb,	/*	09    ENTRY  7 - SBR,TBR,ABR,ZBR 	*/
+		/*			 ZBDMS,SBDMS       	*/
+	shf,	/*	10    ENTRY  8 - SHIFTS 		*/
+	nords,	/*	11    ENTRY  9 - NOR,NORD,SCZ		*/
+	zrx,	/*	12    ENTRY 10 - ZR 			*/
+	bu,	/*	13    ENTRY 11 - AC? (TREAT AS BU) 	*/
+	trip,	/*	14    ENTRY 12 - TRP,TPR		*/
+	agen,	/*	15    ENTRY 13 - MOST MEMORY REFS. 	*/
+	bu,	/*	16    ENTRY 14 - BU,BFT,ZM ,EXM, 	*/
+	bi,	/*	17    ENTRY 15 - BIB,BIW,BIH,BID 	*/
+	fpp,	/*	18    ENTRY 16 - FLOATING PNT. OPS 	*/
+	imop,	/*	19    ENTRY 17 - IMMEDIATE OPS 		*/
+	exr,	/*	20    ENTRY 18 - EXR,EXRR,LMAP 		*/
+	cdl,	/*	21    ENTRY 19 - CDL SEMI-PSEUDO	*/
+	io,	/*	22    ENTRY 20 - CD,TD,EI,DI,RI,AI,DAI 	*/
+	bacx,	/*	23    ENTRY 21 - BACH, BACW		*/
+	zmx,	/*	24    ENTRY 22 - ZMB,ZMH,ZMW,ZMD	*/
+	aerr,	/*	25    ENTRY    - SPARE			*/
+	aerr,	/*	26    ENTRY    - SPARE			*/
+	aerr,	/*	27    ENTRY    - SPARE			*/
+	aerr,	/*	28    ENTRY    - SPARE			*/
 
 #define KINTL2	29	/* no auto operand stripping upper boundry */
 
-    {data},	/*	29    ENTRY 22 - DATA,DATA{B,H,W,D}	*/
-    {vfd},	/*	30    ENTRY 23 - GEN PSEUDO		*/
-    {aerr},	/*	31    ENTRY    - SPARE			*/
-    {aerr},	/*	32    ENTRY    - SPARE			*/
+	data,	/*	29    ENTRY 22 - DATA,DATA{B,H,W,D}	*/
+	vfd,	/*	30    ENTRY 23 - GEN PSEUDO		*/
+	aerr,	/*	31    ENTRY    - SPARE			*/
+	aerr,	/*	32    ENTRY    - SPARE			*/
 
 #define KINTL3	33	/* bounding checks lower boundry */
 
-    {rseis},	/*	33    ENTRY 24 - REIS/SEIS IN NON- BASE	*/
-    {pend},	/*	34    ENTRY 25 - END			*/
-    {prog},	/*	35    ENTRY 26 - PROGRAM		*/
-    {ref},	/*	36    ENTRY 27 - EXT, DEF, SDEF		*/
-    {org},	/*	37    ENTRY 28 - ORG			*/
-    {arel},	/*	38    ENTRY 29 - ABS, REL, DSECT, CSECT	*/
-    {bound},	/*	39    ENTRY 30 - BOUND			*/
-    {equ},	/*	40    ENTRY 31 - EQU			*/
-    {res},	/*	41    ENTRY 32 - RES			*/
-    {ccp1},	/*	42    ENTRY 33 - COMMON			*/
-    {titl},	/*	43    ENTRY 34 - TITLE			*/
-    {pagp},	/*	44    ENTRY 35 - PAGE			*/
-    {list},	/*	45    ENTRY 36 - LIST			*/
-    {space},	/*	46    ENTRY 37 - SPACE			*/
-    {sdirs},	/*	47    ENTRY 38 - S DIRECTIVES		*/
+	rseis,	/*	33    ENTRY 24 - REIS/SEIS IN NON- BASE	*/
+	pend,	/*	34    ENTRY 25 - END			*/
+	prog,	/*	35    ENTRY 26 - PROGRAM		*/
+	ref,	/*	36    ENTRY 27 - EXT, DEF, SDEF		*/
+	org,	/*	37    ENTRY 28 - ORG			*/
+	arel,	/*	38    ENTRY 29 - ABS, REL, DSECT, CSECT	*/
+	bound,	/*	39    ENTRY 30 - BOUND			*/
+	equ,	/*	40    ENTRY 31 - EQU			*/
+	res,	/*	41    ENTRY 32 - RES			*/
+	ccp1,	/*	42    ENTRY 33 - COMMON			*/
+	titl,	/*	43    ENTRY 34 - TITLE			*/
+	pagp,	/*	44    ENTRY 35 - PAGE			*/
+	list,	/*	45    ENTRY 36 - LIST			*/
+	space,	/*	46    ENTRY 37 - SPACE			*/
+	sdirs,	/*	47    ENTRY 38 - S DIRECTIVES		*/
 
 #define KINTLN1	48	/* lower boundry of nong supressed entries */	
 
-    {next},	/*	48    ENTRY 39 - ANOP, SEIS/REIS BASE	*/
-    {ifpro},	/*	49    ENTRY 40 - IFT,IFF,IFP,IFA	*/
-    {defmpro},/*	50    ENTRY 41 - DEFM			*/
-    {endmpro},/*	51    ENTRY 42 - ENDM 			*/
-    {setpro},	/*	52    ENTRY 43 - SET,SETF,SETT, 	*/
+	next,	/*	48    ENTRY 39 - ANOP, SEIS/REIS BASE	*/
+	ifpro,	/*	49    ENTRY 40 - IFT,IFF,IFP,IFA	*/
+	defmpro,/*	50    ENTRY 41 - DEFM			*/
+	endmpro,/*	51    ENTRY 42 - ENDM 			*/
+	setpro,	/*	52    ENTRY 43 - SET,SETF,SETT, 	*/
 		/*			 OPTS,OPTR,OPTT		*/
-    {gotop},	/*	53    ENTRY 44 - GOTO			*/
-    {endrp},	/*	54    ENTRY 45 - ENDR			*/
-    {reptp},	/*	55    ENTRY 46 - REPT			*/
-    {exitmp},	/*	56    ENTRY 47 - EXITM			*/
-    {formp},	/*	57    ENTRY 48 - FORM			*/
-    {aerr},	/*	58    ENTRY 58 - SPARE			*/
-    {aerr},	/*	59    ENTRY 59 - SPARE			*/
+	gotop,	/*	53    ENTRY 44 - GOTO			*/
+	endrp,	/*	54    ENTRY 45 - ENDR			*/
+	reptp,	/*	55    ENTRY 46 - REPT			*/
+	exitmp,	/*	56    ENTRY 47 - EXITM			*/
+	formp,	/*	57    ENTRY 48 - FORM			*/
+	aerr,	/*	58    ENTRY 58 - SPARE			*/
+	aerr,	/*	59    ENTRY 59 - SPARE			*/
 
 #define KINTLN2	59	/* upper boundry of nong supressed entries */
 
-    {aerr},	/*	60    ENTRY 60 - SPARE			*/
+	aerr,	/*	60    ENTRY 60 - SPARE			*/
 #ifndef CAID
-    {stab},	/*	61    ENTRY 61 - .STAB			*/
+	stab,	/*	61    ENTRY 61 - .STAB			*/
 #else
-    {aerr},	/*	61    ENTRY 61 - SPARE			*/
+	aerr,	/*	61    ENTRY 61 - SPARE			*/
 #endif
-    {dtonly},	/*	62    ENTRY 62 - DATAONLY		*/
-    {enddt},	/*	63    ENTRY 63 - ENDDATA		*/
-    {lpop},	/*	64    ENTRY 64 - LPOOL			*/
-    {rez},	/*	65    ENTRY 65 - REZ			*/
-    {equ},	/*	66    ENTRY 66 - DEQU			*/
-    {org},	/*	67    ENTRY 67 - DORG			*/
-    {equ},	/*	68    ENTRY 68 - CEQU			*/
-    {org},	/*	69    ENTRY 69 - CORG			*/
-    {aerr},	/*	70    ENTRY 70 - SPARE			*/
+	dtonly,	/*	62    ENTRY 62 - DATAONLY		*/
+	enddt,	/*	63    ENTRY 63 - ENDDATA		*/
+	lpop,	/*	64    ENTRY 64 - LPOOL			*/
+	rez,	/*	65    ENTRY 65 - REZ			*/
+	equ,	/*	66    ENTRY 66 - DEQU			*/
+	org,	/*	67    ENTRY 67 - DORG			*/
+	equ,	/*	68    ENTRY 68 - CEQU			*/
+	org,	/*	69    ENTRY 69 - CORG			*/
+	aerr,	/*	70    ENTRY 70 - SPARE			*/
 
 #define KINTL4	71	/* end of the operation processes */
 
-    {setcpu},	/*	71    ENTRY 51 - SETCPU,RDSTS, 		*/
+	setcpu,	/*	71    ENTRY 51 - SETCPU,RDSTS, 		*/
 		/*			 RPSWT,SMC,CMC		*/
-    {svc},	/*	72    ENTRY 52 - SVC			*/
-    {trap},	/*	73    ENTRY 53 - TC			*/
-    {extio},	/*	74    ENTRY 54 - EXTIO			*/
-    {rsc1},	/*	75    ENTRY 55 - RISC STYLE F.P.	*/
-    {rsc2},	/*	76    ENTRY 56 - RISC WAITS		*/
-    {revrro}, /*	77    ENTRY 57 - RISC REG-TO-REG	*/
-    {fpctx}, 	/*	78    ENTRY 58 - RISC F.P. CONTEXT	*/
-/*	{aerr}, *//*	79    ENTRY    - SPARE			*/
-    {cf2d},	/* 	79    Entry 79 - cvt flt to dbl		*/
-    {cd2f},	/*      80    Entry 80 - cvt dbl to flt		*/
+	svc,	/*	72    ENTRY 52 - SVC			*/
+	trap,	/*	73    ENTRY 53 - TC			*/
+	extio,	/*	74    ENTRY 54 - EXTIO			*/
+	rsc1,	/*	75    ENTRY 55 - RISC STYLE F.P.	*/
+	rsc2,	/*	76    ENTRY 56 - RISC WAITS		*/
+	revrro, /*	77    ENTRY 57 - RISC REG-TO-REG	*/
+	fpctx, 	/*	78    ENTRY 58 - RISC F.P. CONTEXT	*/
+/*	aerr, *//*	79    ENTRY    - SPARE			*/
+	cf2d,	/* 	79    Entry 79 - cvt flt to dbl		*/
+	cd2f,	/*      80    Entry 80 - cvt dbl to flt		*/
 };
 
 static	struct	tval	macr = {	/* macro request entry */
@@ -450,6 +525,7 @@ char	cpass;
 	struct optab *ops;		/* opcode table entry pointer */
 	struct symbol FAR *stp;	/* symbol table entry pointer */
 	int	tvar;				/* just a temp */
+	unsigned short *Sptr;	/* stack pointer */
 	char	nusname[9];		/* negative of label value for macros/forms */
 
 #ifdef DBUG
@@ -547,7 +623,7 @@ printf("goasm: returning from ss 2, macro = %0.8s, stp = %x, value = %x\n", usna
 	    continue;			/* continue with next line */
 	  }
 	  /* not a macro, see if opcode */
-	  if ((ops = opscan(usname))) {	/* check for a valid opcode */
+	  if (ops = opscan(usname)) {	/* check for a valid opcode */
 #ifdef MACD
 printf("goasm: returning from opscan, ops = %x, opcode = %s, opproc = %d, currpc = %x\n",
  ops, ops->opcode, ops->opproc, currpc.value);
@@ -562,7 +638,7 @@ printf("goasm: returning from opscan, ops = %x, opcode = %s, opproc = %d, currpc
 		ops->subaug << 8 | ops->opproc;
 #else
 	    hwact = (int32)(((int32*)curops)[3]); /* get all of opcode descr */
-/*	    hwact = (int32)*((int*)curops->binop); */ /* get all of opcode descr */
+/*	    hwact = (int32)*((int*)curops->binop);  /* get all of opcode descr */
 #endif
 	    hbavar = ops->varcode;	/* set address variant code */
 	    tvar = ops->opproc;		/* get processor number for opcode */
@@ -701,8 +777,8 @@ char *s;
 struct tval *dvp;
 {
 extern	char *prtyp[];
-printf("%s: val = %x, typ = %s, tmp = %x, flags = %s,%s\n",
- s, (uint32)dvp->value, prtyp[dvp->type], dvp->tmp,
+printf("%s: val = %lx, typ = %s, tmp = %x, flags = %s,%s\n",
+ s, dvp->value, prtyp[dvp->type], dvp->tmp,
  (dvp->flags & CSDS ? "CSECT" : "DSECT"),
  (dvp->flags & ABSREL ? "REL" : "ABS"));
 }
@@ -744,7 +820,7 @@ void	aerr()
 	    macd.flags = mep->desc.flags;	/* parameter count */
 /* may need to fix for macros */
 		lnegate(usname, nusname);		/* negate name */
-/*	    stp = ss (&macd, csnegate(usname)); */ /* put in sym tab */
+//	    stp = ss (&macd, csnegate(usname)); /* put in sym tab */
 	    stp = ss (&macd, nusname);		/* put in sym tab */
 	    dmstp = (struct symbol FAR *)stp->desc.value; /* ptr to macss ptr */
 #ifdef MACD
@@ -768,7 +844,7 @@ printf("goasm: return from macexp\n");
 		curops->subaug << 8 | curops->opproc;
 #else
 	  hwact = (int32)(((int32*)curops)[3]); /* get all of opcode descr */
-/*	  hwact = (int32)*((int*)curops->binop);  */ /* get all of opcode descr */
+/*	  hwact = (int32)*((int*)curops->binop);  /* get all of opcode descr */
 #endif
 	  nss();			/* go generate the nop */
 	  return;			/* go do next line */
@@ -825,7 +901,7 @@ char	pass;
 	memset (mpbuf, ' ', 80);	/* clear macro expansion area */
 	macstate = 0;			/* clear macro status flag */
 	inptstat = 0;			/* clear macro status flags */
-/*	inttag = ((int32)(MACIU << 5) << 24); */ 	/* unasm int sym entry type */
+//	inttag = ((int32)(MACIU << 5) << 24);	/* unasm int sym entry type */
 	inttag = ((int32)(3 << 5) << 24);	/* unasm int sym entry type */
 	hwmspbuf = 0;			/* clear store ptr for macro print */
 	if (!(PASS & 1)) {		/* are we in pass 2 */
@@ -1027,9 +1103,9 @@ dodsect:
 	    break;		/* exit switch */
 	}	/* end switch */
 
-	/* if no bound flag, return; */
+	/* if no bound flag, return;
 	if(!(ASCTBND & asctflg)) return;
-	asctflg &= ~ASCTBND;		/* reset bound flag */
+	asctflg &= ~ASCTBND;		/* reset bound flag
 	bouc((int32)asctbvl.value);	/* bound new PC */
 	memcpy (asctslb, label, 8);	/* save current label */
 	asctslc = lict;			/* save current line number */
@@ -1665,7 +1741,7 @@ void	bacx()
 {
 	int32	newadr;
 
-    	if (!(option & ASECT)) {	/* see if autosectioning */
+    	if ((!option & ASECT)) {	/* see if autosectioning */
     	  /* do ach/acw if not */	
     	  bu();				/* just use bu code */
     	  return;
@@ -1767,6 +1843,7 @@ void	trip()
 void	exr()
 {
 	int32	newadr;
+	int	xr;
 
 	newadr = curops->varcode;		/* exr exrr desiginator */
 	newadr |= (int32)(curops->aug << 16);	/* merge in aug */
@@ -1783,6 +1860,7 @@ void	exr()
 void	imop()
 {
 	int32	newadr;
+	int	xr;
 
 /* printf("entered imop v1 = %x, v2 = %x\n", expr[0].value, expr[1].value); */
 	if (curops->aug == 0xa) {		/* is this a rintv instr */
@@ -2229,13 +2307,14 @@ prtval("pass 1 hwltct", &hwltct);
 	    bits |= LPOOL31;		/* indicate 31 lpools processed */
 	  hwltct.value &= 0xff0000L;	/* zero literal count */
 #ifdef DEBUG
-prtval("pass 1 hwltct @ return", &hwltct);
+prtval("pass 1 hwltct @@ return", &hwltct);
 #endif
 	  return;			/* get out */
 	}
 	else {
 	  struct symbol FAR *stp = symtab;	/* address of 1st symbol */
-	  uint8	lpn;
+	  int32	tpc;
+	  char	lpn;
 
 	  bits &= ~IMIN;		/* no buffer image ready */
 /*
@@ -2248,7 +2327,7 @@ prtval("pass 1 hwltct @ return", &hwltct);
  */
 #ifdef DEBUG
 prtval("pass2 prlit entered", &hwltct);
-/* prtsymt();	*/	/* dump the symbol table */
+/* prtsymt();				/* dump the symbol table */
 #endif
 	hwendl = hwltct.value & 0xff0000L;	/* get lpoop # and lit # 0 */
 	while (stp) {
@@ -2354,6 +2433,7 @@ void	end2()
 {
 	struct	symbol FAR *stp = symtab;	/* start of symbol table */
 	struct	strback FAR *sbp;		/* stringback pointer */
+	int	i, j;
 	int32	temp;
 
 #ifdef DEBUG
@@ -2553,7 +2633,7 @@ fflush(stdout);
 	{
 	  char errmsg[32];
 
-	  sprintf(errmsg, "*  %.4d  ERRORS IN %.8s ", hwerct, TCWPROG);
+	  sprintf(errmsg, "*  %0.4ld  ERRORS IN %.8s ", hwerct, TCWPROG);
 /* printf("program name %.8s, errmsg = %.28s\n", TCWPROG, errmsg); */
 	  ppp (28, errmsg, hwerct);	/* print the line */
 	}
@@ -2569,7 +2649,7 @@ fflush(stdout);
 	  stp = symtab;
 	  while(stp) {				/* look at all symbols */
 	    if (stp->desc.type == TYPU) {	/* is it undefined */
-	      sprintf (udmsg,"UNDEFINED      %.8s", stp->sym);
+	      sprintf (udmsg,"UNDEFINED      %.8ls", stp->sym);
 	       ppp (23, udmsg, 0);		/* print the line */
 	    }
 	    stp = stp->flink;			/* next symbol */
@@ -2887,3 +2967,561 @@ vfdc:
 	  seterr ('R');			/* set relocation error */
 	goto vfdf;			/* dump the data after error */
 }
+@
+
+
+1.10
+log
+@Correct form suppoert code, was failing
+@
+text
+@d93 1
+a93 1
+char	usname[MAXCHARS];	/* contains 24 chars of ascii name that was */
+d96 1
+a96 1
+unsigned char	in[81];		/* input line buffer */
+d98 1
+a98 1
+unsigned char	hwbyte[4];	/* this word contains the generated code */
+d772 1
+a773 1
+	    hwact = (int32)(((int32*)curops)[3]); /* get all of opcode descr */
+@
+
+
+1.9
+log
+@fix inttag ininitalzation error
+@
+text
+@d11 1
+a11 1
+int	goasm(char);
+d18 2
+a19 1
+char * csnegate (char *);
+d24 1
+a24 1
+int	yeanay();
+d398 1
+a398 1
+DumpStk(sp, n)
+d424 16
+d452 8
+a459 3
+	struct symbol FAR *stp;		/* symbol table entry pointer */
+	int	tvar;			/* just a temp */
+	unsigned short *Sptr;		/* stack pointer */
+d473 1
+a473 2
+printf("returning to main from goasm, got end\n");
+fflush(stdout);
+a480 1
+fflush(stdout);
+d490 3
+a492 1
+printf("%x |%.80s\n",currpc.value, in);
+d515 1
+a515 2
+printf("returning from runst usname = %0.8s, currpc.value = %x\n",
+ usname, currpc.value);
+d524 1
+a524 2
+printf("returning from unst usname = %0.8s, currpc = %x\n",
+ usname, currpc.value);
+d527 2
+a528 1
+	  stp = ss (&macr, csnegate(usname));  /* go lookup macro name */
+d530 6
+a535 1
+printf("returning from ss, stp = %x, value = %d\n", stp, (stp ? stp->desc.value : -1));
+d539 2
+a540 2
+printf("switcher: macro found\n");
+printf("returning from ss, macro = %0.8s, stp = %x, value = %d\n", usname, stp, (stp ? stp->desc.value : -1));
+d553 2
+a554 2
+#ifdef MACP
+printf("returning from opscan, ops = %x, opcode = %s, opproc = %d, currpc = %x\n",
+d586 1
+a586 2
+printf("calling tall from main with label %0.8s, pcmode = %x\n",label, pcmode);
+fflush(stdout);
+d597 3
+a599 1
+printf("main switching to function %d\n", tvar);
+d605 3
+a607 1
+printf("main returning from function %d\n", tvar);
+d614 1
+a614 1
+printf ("opcode not found %0.8s, ops = %x\n", usname, ops);
+d618 1
+a618 1
+printf ("main return from aerr()\n");
+a655 1
+extern	char *prtyp[];
+d661 1
+a661 1
+/*
+d664 1
+a664 1
+*/
+d667 1
+a667 1
+/*
+d670 1
+a670 1
+*/
+d673 4
+a676 2
+/*
+prtval("tall pass2", &ud);
+d678 3
+a680 2
+*/
+	stp = ss (&ud, label);		/* check label against symbol tbl */
+d685 7
+a691 7
+/*
+printf("tall X error\n");
+prtval("tall pass2 ud", &ud);
+prtval("tall pass2 stp", &stp->desc);
+printf("tall pass2: label = %0.8s, pcmode = %d\n", label, pcmode);
+prtval("tall pass2 currpc", &currpc);
+*/
+d736 1
+d748 3
+a750 1
+	    stp = ss (&macd, csnegate(usname)); /* put in sym tab */
+d2138 1
+a2138 1
+printf("END1 \n");
+d2366 1
+d2773 3
+d2788 1
+a2788 1
+		break;			/* exit while with count */
+d2812 3
+a2814 3
+/*
+printf("gen: hhvfgb = %d, hhvfs = %d, hhvfo = %d\n", hhvfgb, hhvfs, hhvfo);
+*/
+d2816 3
+a2818 3
+/*
+printf("gen1: hhvfgb = %d, hhvfs = %d, hhvfo = %d\n", hhvfgb, hhvfs, hhvfo);
+*/
+d2820 1
+a2820 1
+/*
+d2822 1
+a2822 1
+*/
+d2827 1
+a2827 1
+/*
+d2829 1
+a2829 1
+*/
+d2832 3
+d2851 1
+a2851 1
+/*
+d2853 1
+a2853 1
+*/
+d2879 1
+a2879 1
+/*
+d2882 1
+a2882 1
+*/
+@
+
+
+1.8
+log
+@fix casting to int32
+@
+text
+@d796 2
+a797 1
+	inttag = ((int32)(MACIU << 5) << 24);	/* unasm int sym entry type */
+@
+
+
+1.7
+log
+@correct pointer warning error
+@
+text
+@d1555 2
+a1556 1
+	  if (hwact == 0xee01230fL || hwact == 0xf201230fL) {
+@
+
+
+1.6
+log
+@Add alpha support
+correct some typing errors
+@
+text
+@d540 2
+a541 3
+/*	    hwact = (int32)(((int32*)curops)[3]); /* get all of opcode descr */
+	    hwact = (int32)*((int*)curops->binop);  /* get all of opcode descr */
+/*	 hwact = (int32)*((int*)curops->binop); /* get all of opcode descr */
+d738 2
+a739 1
+	  hwact = (int32)*((int*)curops->binop);  /* get all of opcode descr */
+@
+
+
+1.5
+log
+@Fixes for Alpha port.
+Fix gen statement for big fields
+@
+text
+@a151 2
+short	hhodp;			/* MASTER VARIABLE FOR OUTPUT INFO */
+/* short	hhodpa;			/* ALTERNATE FOR HHODP */
+d535 7
+a541 1
+	    hwact = (int32)(((int32*)curops)[3]); /* get all of opcode descr */
+d543 1
+d713 1
+a713 1
+	    macd.value = (int32)dmstp;	/* the pointer to macss entry */
+d733 6
+d740 1
+d845 1
+a845 1
+	      sbp->dsdesc.value = (unsigned int32)0;
+d847 1
+a847 1
+	      sbp->csdesc.value = (unsigned int32)0;
+d857 1
+a857 1
+	      reptr(p->sym, &p->desc, p->desc.value & 0x7fffff);
+d1000 1
+a1000 1
+	bouc(asctbvl.value);		/* bound new PC */
+d1118 2
+a1119 1
+	gen16((expr[0].value > 1) & 0x7, (expr[0].value >> 4) & 0x7 , paug);
+d1142 1
+a1142 1
+	gen16(expr[0].value, expr[1].value & 0x7, preg);
+d1156 1
+a1156 1
+	gen16(0, expr[0].value, curops->aug);		/* gen 16 bit opcode */
+d1181 2
+a1182 2
+	gen16(((expr[0].value & 0x700) >> 4),
+	  ((expr[0].value & 0x380) >> 7), expr[0].value & 0xf);
+d1198 2
+a1199 2
+	    gen16a(0x09, expr[0].value, 0x00, 0x0e);	/* TRFW SR */
+	    gen16a(0x29, expr[0].value, 0x02, 0x0f);	/* TDPR SR */
+d1201 2
+a1202 1
+	    gen16a(0x0d, expr[0].value+1, expr[0].value+1, 0x00); /* ZR SR+1 */
+d1218 2
+a1219 2
+	    gen16a(0x09, expr[0].value, 0x00, 0x0f);	/* TRFD SR */
+	    gen16a(0x29, expr[0].value, 0x02, 0x0d);	/* TSPR DR */
+d1233 1
+a1233 1
+	gen16(expr[0].value, curops->varcode, curops->aug);
+d1259 1
+a1259 1
+	gen16(expr[1].value, expr[0].value, curops->aug);
+d1280 1
+a1280 1
+	gen32(expr[1].value, xr, fakeaddr);
+d1295 1
+a1295 1
+	  gen16(0, expr[0].value, 0);		/* gen 16 bit opcode */
+d1299 1
+a1299 1
+	  gen16(0, expr[0].value, 0);		/* gen 16 bit opcode */
+d1318 1
+a1318 1
+	gen16(preg, expr[0].value, expr[1].value & 0x0f);
+d1345 1
+a1345 1
+	gen16(0, expr[0].value, curops->aug);		/* gen 16 bit opcode */
+d1360 1
+a1360 1
+	gen16(expr[0].value, expr[0].value, curops->aug);
+d1374 1
+a1374 1
+	gen16(expr[1].value, expr[0].value, curops->aug);
+d1385 1
+a1385 1
+	gen16(0, expr[0].value, curops->aug);		/* gen 16 bit opcode */
+d1398 1
+a1398 1
+	gen16(expr[0].value, expr[1].value, curops->aug);
+d1471 1
+a1471 1
+	newadr = ageq (expr[1].value, expr[1].type);
+d1619 1
+a1619 1
+	newadr = ageq (expr[1].value, expr[1].type);
+d1653 1
+a1653 1
+	newadr = ageq (expr[1].value, expr[1].type);
+d1695 1
+a1695 1
+	newadr = ageq (expr[1].value, expr[1].type);
+d1777 4
+a1780 1
+
+d1786 1
+a1786 1
+	gr = (expr[0].value & 0x7) >> 4;	/* gr is last 3 bits of dev */
+d2032 1
+a2032 1
+	val (0);			/* indicate nothing unstrung */
+d2046 1
+a2046 1
+	  reptr(dsname, &sectpc[PCDS], sectpc[PCDS].value);
+d2049 1
+a2049 1
+	  reptr(csname, &sectpc[PCCS], sectpc[PCCS].value);
+d2085 1
+a2085 1
+	  bfa0 (dsize.value);		/* dsect size */
+d2095 1
+a2095 1
+	  bfa0 (csize.value);		/* csect size */
+d2347 1
+a2347 1
+		bfa (stp->desc.value << 3); /* sym addr left shifted 3 bits */
+d2361 1
+a2361 1
+		bfw (stp->desc.value << 3); /* sym addr left shifted 3 bits */
+d2476 1
+a2476 1
+	      bfa0 (hweval.value);	/* put transfer addr on binary stack */
+d2479 1
+a2479 1
+	      bfa (hweval.value);	/* put transfer addr on binary stack */
+d2483 1
+a2483 1
+	    bfa (hweval.value);		/* put transfer addr on binary stack */
+d2498 2
+@
+
+
+1.4
+log
+@Add cross reference support.
+Add mods for alpha port.
+@
+text
+@d1478 6
+a1483 1
+	if ((argmax[i] - grpw) == 0) {	/* if max args, xr was specified */
+d1500 3
+d1901 3
+d1906 3
+d1955 3
+d1960 3
+d2211 13
+d2226 1
+d2247 1
+d2249 1
+d2258 3
+d2262 1
+d2266 3
+d2270 1
+d2753 3
+a2755 1
+/* printf("gen: hhvfgb = %d, hhvfs = %d, hhvfo = %d\n", hhvfgb, hhvfs, hhvfo); */
+d2757 3
+a2759 1
+/* printf("gen1: hhvfgb = %d, hhvfs = %d, hhvfo = %d\n", hhvfgb, hhvfs, hhvfo); */
+d2761 3
+a2763 1
+/* printf("gen2: hhvfgb = %d, hhvfs = %d, hhvfo = %d\n", hhvfgb, hhvfs, hhvfo); */
+d2768 4
+a2771 2
+/* printf("gen3: hhvfgb = %d, hhvfs = %d, hhvfo = %d\n", hhvfgb, hhvfs, hhvfo); */
+	vfdo ((int32)0, 7);		/* push out1 bit less than byte */
+d2789 3
+a2791 2
+
+/* printf("vfdo: data=%x bcnt=%d\n", data1, bcnt); */
+d2800 1
+a2800 1
+	if (hhvfs > hhvfgb)		/* are we at end of gen */
+@
+
+
+1.3
+log
+@Correct debug code generation
+@
+text
+@a147 1
+int	reptype;		/* report type for report writer */
+d495 1
+a495 1
+printf("returning from runst usname = %.8s, currpc.value = %x\n",
+d505 1
+a505 1
+printf("returning from unst usname = %.8s, currpc = %x\n",
+d556 1
+a556 1
+printf("calling tall from main with label %.8s, pcmode = %x\n",label, pcmode);
+d624 1
+a624 4
+/*
+printf("tall called with label %s, currpc = %x, flags = %d\n",
+  label, currpc, currflg);
+*/
+d631 1
+a631 1
+printf("tall pass1: label = %0.8s, pcmode = %d\n", label, pcmode);
+d643 1
+a643 1
+printf("tall pass2: label = %0.8s, pcmode = %d\n", label, pcmode);
+a821 1
+	  reptype = 0;			/* tell reporter this is xref symbol */
+d823 1
+d825 2
+a826 1
+	      reptr(reptype, p);	/* give the symbol to xref'er */
+d828 1
+d840 6
+d847 1
+d850 4
+a853 2
+	reptype |= 0x8000000L;		/* tell reporter it is command */
+	reptr(reptype, PASS);		/* tell reporter end of pass */
+a861 1
+/*	  macp = 0;		/* clear macro pointer */
+a871 7
+#ifdef XREF_JUNK
+RSET2    CEQU      $                                            ESCT-32
+         LW        R6,BUFFADD      GET XRBUF ADDR               S880752
+         STW       R6,FCBXR+8W     PUT INTO FCB                 S880752
+         LW        R6,BUFFADD+1W   GET BUFFER LENGTH            S880752
+         STW       R6,FCBXR+9W     PUT INTO FCB                 S880752
+#endif
+d2007 6
+a2012 10
+#ifdef XREF_JUNK
+	  r4 = dsname;			/* data section name */
+	  r3 = sectpc[PCDS];		/* data section size */
+         ZR        1               CLEAR R1 FOR XREF
+         ZMW       REPTYPE         INDICATE SYMBOL REPORT TO XREF
+         BL        REPTR          CROSS REF THE DATA SECTION SIZE
+	  r4 = csname;			/* control section name */
+	  r3 = sectpc[PCCS];		/* control section size */
+         BL        REPTR          CROSS REF THE CONTROL SECTION SIZE
+#endif
+d2064 4
+d2084 1
+a2084 45
+	  } else			/* not common */
+
+#ifdef TRY_IN_PASS_2
+	  if (stp->desc.type == TYPP) {	/* is symbol type local */
+	    /* process local symbol definition */
+	    if (option & DBG) {		/* are debug symbols wanted */
+	      /* publish local symbols for debugger */
+#ifdef OLD_BAD_WAY
+	      if (!(stp->desc.flags & ABSREL)) { /* is symbol absolute */
+#else
+	      if (stp->desc.flags & ABSREL) {	/* is symbol relocatable */
+#endif
+		/* symbol is not absolute output it */
+		*hbbs = 0;		/* reset binary output stack count */
+#ifdef OLD_DEBUG
+		temp = 0x0b1200L;	/* first 3 bytes of debugger obj rec */
+		if (stp->desc.flags & CSDS)	/* is symbol in csect */
+		  temp |= 1;		/* yes, set csect flag */
+		bfa (temp);		/* put 3 bytes in stack */
+		bfb (LFCDBUG);		/* set symbol type to statement */
+		bfa (stp->desc.value << 3); /* sym addr left shifted 3 bits */
+		bfb (0);		/* left hand byte length */
+		bfb (4);		/* right hand byte length */
+	        memCpy (usname, stp->sym, 8);	/* move 8 bytes of sym name */
+	        bfn0a ();		/* output 8 bytes from usname */
+	        pb (hbbs, EXPFUNC, 0);	/* put common block def on bo */
+#else
+		temp = 0x0e1400L;	/* first 3 bytes of debugger obj rec */
+		if (stp->desc.flags & CSDS)	/* is symbol in csect */
+		  temp |= 1;		/* yes, set csect flag */
+		bfa (temp);		/* put 3 bytes in stack */
+		bfb (LFCDBUG);		/* set symbol type to statement */
+    		bfb (0);		/* reserved byte of zero */
+		bfh (4);		/* size is 4 bytes */
+		bfw (stp->desc.value << 3); /* sym addr left shifted 3 bits */
+	        memCpy (usname, stp->sym, 8);	/* move 8 bytes of sym name */
+	        bfn0a ();		/* output 8 bytes from usname */
+	        pb (hbbs, EXPFUNC, 0);	/* put common block def on bo */
+#endif
+	      }				/* symbol is absolute */
+	    }				/* no debug option */
+	  }				/* type not local */
+#else
+    	  ;	/* null statement for else */
+#endif /* MOVED to PASS 2*/
+a2208 6
+#ifdef TRYIT
+/*XXX	    hbbn = stp->sym[0];			/* common block number if any */
+	    hweval.flags = stp->desc.flags;	/* get rel flags */
+/*XXX	    hweval.flags = stp->sym[1];		/* get rel flags */
+/*	    hweval.type = stp->sym[3];		/* and it's type */
+#else
+a2212 1
+#endif
+d2268 4
+a2272 1
+#ifndef TRY_IN_PASS_2
+a2307 1
+#endif /* MOVED to PASS 2*/
+@
+
+
+1.2
+log
+@Add cfsd and cf2f macro instructions.
+@
+text
+@d2036 2
+a2037 1
+    	temp |= 0x0400;			/* show C object */
+d2380 2
+d2383 3
+d2410 2
+d2413 3
+a2419 4
+#ifdef MACS
+prtval("end2 stp", &stp->desc);
+prtval("end2 cs sbp", &sbp->csdesc);
+#endif
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d39 1
+d272 2
+d386 3
+a388 1
+	aerr	/*	79    ENTRY    - SPARE			*/
+d1175 36
+d1416 20
+@

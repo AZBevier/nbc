@@ -1,4 +1,58 @@
-/* defs.h */
+head	1.7;
+access;
+symbols;
+locks
+	jbev:1.7; strict;
+comment	@ * @;
+
+
+1.7
+date	2021.06.28.21.43.16;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2016.01.28.02.48.29;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2016.01.28.02.42.09;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2016.01.28.02.32.30;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.03.22.20.41.11;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	95.08.09.00.34.05;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.04.14.23.48.02;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file
+@
+
+
+1.7
+log
+@make longp an int32.  Add uint8 type.
+@
+text
+@/* defs.h */
 #ifdef DODEBUG
 #define MACD
 #define MACP
@@ -6,7 +60,7 @@
 #endif
 #undef BIN
 
-#ifdef mpx
+#ifdef MPX
 #include <types.h>
 #endif
 
@@ -17,8 +71,6 @@ extern void *malloc();
 extern void *realloc();
 extern void free();
 extern void exit();
-extern void *calloc();
-extern int  unlink();
 
 #ifdef DOS
 #define longp	long		/* 32 bits on everything else */
@@ -32,14 +84,13 @@ extern int  unlink();
 #else
 #ifdef __alpha
 #define longp	long		/* 64 bits on alpha */
-#define	int32	int		    /* must be 32 bits */
+#define	int32	int		/* must be 32 bits */
 #else
 
-#define	int64	long	    /* must be 64 bits */
-#define	int32	int		    /* must be 32 bits */
+#define longp	long	/* 32 bits on everything else */
+/*#define longp	int		*/ /* 32 bits on everything else */
+#define	int32	int		/* must be 32 bits */
 #define	uint32	unsigned int32		/* must be 32 bits */
-/* #define longp	long */ /* 32 bits on everything else */
-#define longp	int32		/* 32 bits on everything else */
 #endif
 #define	uint8	unsigned char		/* must be 8 bits */
 #define	int16	unsigned short	/* must be 16 bits */
@@ -246,8 +297,8 @@ struct	tval {			/* structure containing type, flags, value */
 	unsigned  type:8;	/* its type */
 	unsigned  flags:8;	/* misc flags */
 	unsigned  tmp:16;	/* filler */
-/* ngp value;		*/  /* and value */
-	uint32    value;	/* and value */
+	longp value;		/* and value */
+/*	unsigned  int32 value;	/* and value */
 };
 
 extern	struct	tval	val ();
@@ -556,8 +607,8 @@ extern	char	lablscan[];	/* label we are scanning for */
 extern	char	prnt[];		/* the print buffer */
 extern	struct	tval	ud;	/* undefined value entry */
 /***************************************************/
-extern	uint8	hwmspbuf;	/* count of chars in print buffer */
-#define	TCWSIZE	108		    /* title buffer size */
+extern	char	hwmspbuf;	/* count of chars in print buffer */
+#define	TCWSIZE	108		/* title buffer size */
 extern	char 	tcwd[];		/* title buffer */
 #define	TCWPROG	&tcwd[3]	/* program name 8 chars + 4 filler */
 #define	TCWDATE	&tcwd[15]	/* date & time 24 chars */
@@ -565,9 +616,9 @@ extern	char 	tcwd[];		/* title buffer */
 #define	TCWTTLE	&tcwd[107]	/* 4 char filler */
 extern	char	FMTD_DT[];	/* object date and time */
 
-#define BRL	120		        /* length of binary record */
-extern  uint8	ppt;		/* binary record length (120) */
-extern	uint8 	PBL[];	    /* binary buffer */
+#define BRL	120		/* length of binary record */
+extern	char	ppt;		/* binary record length (120) */
+extern	unsigned char	PBL[];	/* binary buffer */
 #define PBLF	PBL[0]		/* function code location */
 #define PBLB	PBL[1]		/* record byte count */
 extern	short	*pblc;
@@ -580,14 +631,14 @@ extern	unsigned char	*pblp;
 extern	int32	lice;		/* line count */
 extern	int32	lict;		/* current line number */
 extern	struct	tval	max;	/* maximum program size */
-/* extern	char	imip; */ /* image in progress flag */
+/* extern	char	imip;		/* image in progress flag */
 
 extern	char	unterm;		/* last unstring terminator */
 extern	int	unstnp;		/* store pointer for unst */
 extern	char	label[];	/* the unstrung label, any */
 #define MAXCHARS	24	/* maximum chars in usname */
-extern	char	usname[];	/* contains last 24 char name unstrung */
-extern	uint8   pcmode;		/* current program mode */
+extern	uint8	usname[];	/* contains last 24 char name unstrung */
+extern	char	pcmode;		/* current program mode */
 #define PCABS	0		/* 0 - prog in abs mode */
 #define PCDS	1		/* 1 - prog in dsect mode */
 #define PCCOM	2		/* 2 - prog in common mode */
@@ -708,7 +759,7 @@ extern	struct optab *curops;	/* current opcode table pointer */
 extern	struct symbol FAR *libsch();
 
 extern	int32	inttag;		/* internal tag number */
-extern	uint8   inscnt;		/* input scanner count */
+extern	char	inscnt;		/* input scanner count */
 extern	int32	hwact;		/* current state information */
 
 extern	struct tval currpc;	/* address of leftmost byte in this line */
@@ -750,7 +801,7 @@ extern	struct tval expr[];	/* expression variable information */
 extern	short	hbccct;		/* next common block count */
 extern	char	tot;		/* length constant for tdat */
 extern	char	hbtttf;		/* type of data being translated */
-extern	uint8   hbavar;		/* holds addr variant to be used */
+extern	char	hbavar;		/* holds addr variant to be used */
 extern	char	hbbn;		/* common block/section number */
 extern	char	hbbbfb;		/* 0 means no data bytes output */
 extern	char	hbbbct;		/* NUMBER OF BYTES GENERATED FOR THIS  */
@@ -760,11 +811,11 @@ extern	struct tval inag;	/* AUGEND TYPE AND VALUE */
 extern	struct tval inac;	/* ACCUMULAND TYPE AND VALUE */
 extern	struct tval accum;	/* 2nd ACCUMULAND TYPE AND VALUE */
 extern	char	valundf;	/* undefined val returned from val */
-extern	uint8	inagbn;		/* block # for common */
-extern	uint8	inacbn;		/* block # for common */
+extern	char	inagbn;		/* block # for common */
+extern	char	inacbn;		/* block # for common */
 
 
-/*struct	tval	dval;	*/	/* descriptor for the value unstrung */
+/*struct	tval	dval;		/* descriptor for the value unstrung */
 
 extern	short	hhvfx;		/* this is a right to left bit stack */
 extern	short	hhvfo;		/* the number of bits in the stack */
@@ -854,7 +905,7 @@ extern	char	stk[];		/* 4k macro parameter substitution area */
 /* stk contains multiple 24 char parameter names used during expansion */
 /* it is pointed to by the level pointers in stackp->clev */
 
-/* extern	struct macro *macp;	*/	/* address of macros */
+/* extern	struct macro *macp;		/* address of macros */
 
 /********************************/
 /* variables defined in xref.c */
@@ -869,3 +920,101 @@ extern void writerpt();		/* output xref report */
 extern FILE*ut2fd;		/* UT2 */
 extern char *xrbuf;		/* xref buffer 768*20 */
 extern void writerep();		/* output cross reference */
+@
+
+
+1.6
+log
+@define longp length
+@
+text
+@d35 3
+a37 1
+#define longp	long		/* 32 bits on everything else */
+d39 1
+d41 1
+d537 1
+a537 1
+extern	unsigned char	hwbyte[];  /* THIS WORD CONTAINS THE GENERATED CODE */
+d586 1
+a586 1
+extern	char	usname[];	/* contains last 24 char name unstrung */
+@
+
+
+1.5
+log
+@add extern statements for malloc, realloc, free, and exit
+@
+text
+@d22 1
+d31 7
+a37 1
+#define	int32	long		/* must be 32 bits */
+d242 1
+a242 1
+	int32 value;		/* and value */
+@
+
+
+1.4
+log
+@make main type int instead of void
+@
+text
+@d14 6
+@
+
+
+1.3
+log
+@Add cross reference support.
+Add mods for alpha port.
+@
+text
+@d104 1
+a104 1
+extern	void	main(int, char **);
+d109 1
+a109 1
+extern	int	frprintf(FILE *, char *, char *);
+d118 1
+a118 1
+extern	void	main(/* int, char ** */);
+d123 1
+a123 1
+extern	int	frprintf(/* FILE *, char *, char * */);
+@
+
+
+1.2
+log
+@Add definition for gen16a.
+@
+text
+@d15 1
+a17 1
+#ifdef DOS
+d24 2
+d112 1
+d126 1
+d544 2
+a545 2
+#define	TCWTITL	&tcwd[39]	/* title of 64 chars max */
+#define	TCWTTLE	&tcwd[103]	/* 4 char filler */
+d577 3
+d797 2
+a798 1
+extern	unsigned char	dpnum;		/* datapool number */
+d838 14
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d397 1
+d462 1
+@

@@ -1,18 +1,41 @@
-#
-# Makefile for nbasm for running nbasm on mpx3x
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.06.00.05.21;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move objects instead of copy
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for nbasm for running nbasm on mpx1x
 # Object files must be produced and then cataloged
-# on MPX3.X using the LD.NBASM command file.
+# on MPX1.X using the LD.NBASM command file.
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
 BIN = /bin
-LBIN = ./mpx3x
+LBIN = ./mpx1x
 INSTALL = cp
 MOVE = mv
 YACC = nbyacc
-MAKEFILE = make.mpx3x
+MAKEFILE = make.mpx1x
 
 HDRS = defs.h float.h
 SRCS = main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c \
@@ -20,9 +43,9 @@ SRCS = main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c \
 OBJS = main.o macro.o goasm.o parse.o io.o opcode.o pseudo.o symbol.o \
 	xref.o float.o myatof.o
 
-SLD = ld.nbasm3x
+SLD = ld.nbasm1x
 LD = LD.NBASM
-SMK = mk.nbasm3x
+SMK = mk.nbasm1x
 MK = MK.NBASM
 ALLS = $(HDRS) $(SRCS)
 
@@ -36,34 +59,35 @@ $(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
 
 clean:
 	-rm -f $(OBJS)
-	@for n in $(OBJS) ; do \
+	@@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
 
 #	$(BIN)/cp $(MAIN) $(SBIN)/$(MAIN)
 clobber: clean		# delete main from current directory
-	@for n in $(ALLS) ; do \
+	@@for n in $(ALLS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all 		# build and then copy main to install directory
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
 	fi;
-	@for n in $(OBJS) ; do \
+	@@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		$(MOVE) $$n $(LBIN)/$$nn ; \
 	done
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
-	@for n in $(ALLS) ; do \
+	@@for n in $(ALLS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD) $(LBIN)/$(MK)
 
+@

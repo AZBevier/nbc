@@ -1,4 +1,38 @@
-/*~!myatof.c*/
+head	1.3;
+access;
+symbols;
+locks
+	jbev:1.3; strict;
+comment	@ * @;
+
+
+1.3
+date	2018.10.12.21.47.53;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2016.01.28.01.38.13;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.3
+log
+@Correct warning errors
+@
+text
+@/*~!myatof.c*/
 /* Name:  myatof.c Part No.: _______-____r
  *
  * Copyright 1995 - J B Systems, Morrison, CO
@@ -16,7 +50,7 @@
  * (a).
  */
 
-#ident	"@(#)nblib:myatof.c	1.0"
+#ident	"@@(#)nblib:myatof.c	1.0"
 
 #ifdef MYATOF
 
@@ -58,7 +92,7 @@ register  unsigned char  *s;
 	s = sss;
 #else
 	*sss='\0';
-	strcpy((char *)sss, (char *)s);
+	strcpy(sss,s);
 	s = sss;
 #endif
 	zerof( &ifpn );		/* clear destination number */
@@ -160,3 +194,26 @@ register  unsigned char  *s;
 }
 
 #endif /* MYATOF */
+@
+
+
+1.2
+log
+@Fix strcpy warning error
+@
+text
+@d33 3
+d46 1
+a46 2
+FPN *
+myatof(s)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d25 1
+@

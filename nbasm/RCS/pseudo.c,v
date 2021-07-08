@@ -1,4 +1,43 @@
-/* pseudo.c */
+head	1.4;
+access;
+symbols;
+locks
+	jbev:1.4; strict;
+comment	@ * @;
+
+
+1.4
+date	2016.01.28.03.52.29;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.03.22.20.41.11;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.02.23.20.00.18;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.4
+log
+@Fix bouc calls
+@
+text
+@/* pseudo.c */
 
 /* pseudo-op processing */
 
@@ -181,7 +220,7 @@ void	ccp1()
 	char	dummy[12];			/* dummy loc for usname */
 	int32	*tnum;
 	int32	temp;
-	int	blknum = 0;
+	int	blknum;
 	struct	tval	tdef;
 
 	if (!yeanay()) 			/* are we assembling */
@@ -296,7 +335,7 @@ ccp5:
 printf("ccp5 blknum = %x, hbccct = %d label [%0.8s]\n", blknum, hbccct, label);
 prtval("ccp ccp5", &tdef);
 */
-	hwcmsize[blknum] = (hwcmsize[blknum] & 0xffff0000) | 
+	hwcmsize[blknum] = (hwcmsize[blknum] & 0xffff0000L) | 
 	  (tdef.value & 0xffff);	/* save size information */
 	if (PASS & 1)			/* pass 1 */
 	  if (yeanay())			/* are we assembling */
@@ -480,6 +519,7 @@ void	lpop()
 
 void	org()
 {
+	char	tname[8];		/* space for temp u/c name */
 	int	temp;
 	
 	if (ASECT & option) {		/* are auto sectioning? */
@@ -607,7 +647,7 @@ void	prog()
     unst (0x80080000L);		/* terminate on space or comma */
     memcpy(dummy, usname, 8);	/* get the program name */
     dummy[8] = '\0';		/* null terminate it */
-/*    str2upr(dummy);*/		/* make upper case */
+/*    str2upr(dummy);		/* make upper case */
     memcpy (TCWPROG, dummy, 8); /* set program name */
 /*
 printf("program usname = %0.16s, TCWPROG = %0.16s\n", usname, TCWPROG);
@@ -639,7 +679,7 @@ static	struct	tval	refd = {	/* def/ext definition entry */
 
 void	ref()
 {
-/*  struct	symbol	FAR *stp; */
+	struct	symbol	FAR *stp;
 	int32	temp;
 	
 	if (curops->aug & 1)		/* is this an extern */
@@ -655,8 +695,7 @@ void	ref()
 	    seterr ('F');		/* no, set blank name error */
 	    continue;			/* process next element */
 	  }
-/* stp = ss (&refd, usname);*/	/* search and insert in sym tab */
-	  ss (&refd, usname);	/* search and insert in sym tab */
+	  stp = ss (&refd, usname);	/* search and insert in sym tab */
 	  if (INTSS & spmac) {		/* was symbol internally generated */
 	    seterr ('I');		/* set internal ref error */
 	    continue;			/* process next element */
@@ -708,7 +747,7 @@ expout:					/* generate expanded loader codes */
 	    temp = (symval.value >> 16) & 0xff;	/* common block # */
 	    bfb(temp + 2);		/* output common blk number plus 2 */
 	    temp = (symval.value & 0xffff);	/* get offset in common */
-	  } else {			/* not sext */
+	  } else {			/* not sext
 	    /* output section number (dsec/csect) */
 	    bfb ((symval.flags & CSDS) ? 1 : 0);
 	    temp = symval.value;	/* get the offset address */
@@ -742,7 +781,7 @@ printf("res 1 expr[0].value = %x\n", expr[0].value);
 */
 	if (expr[0].tmp) 	/* see if non-numeric terminator */
 /* CHANGED 03/31/93 ????? */
-/*	  bouc (expr[0].value);	*/ /* get PC to correct boundry */
+/*	  bouc (expr[0].value);	/* get PC to correct boundry */
 	bouc ((int32)expr[0].tmp);	/* get PC to correct boundry */
 	pc = sectpc[pcmode].value;	/* get the program counter */
 /* printf("res 1 pc = %x\n", pc); */
@@ -777,9 +816,9 @@ prtval("rez 1 currpc", &currpc);
 prtval("rez 1 expr[0]", &expr[0]);
 prtval("rez 1 expr[1]", &expr[1]);
 */
-/*	if (!expr[0].tmp)*/		/* see if non-numeric terminator */
+/*	if (!expr[0].tmp)		/* see if non-numeric terminator */
 	if (expr[0].tmp)		/* see if non-numeric terminator */
-/*	  bouc (expr[0].value);	*/ 	/* get PC to correct boundry */
+/*	  bouc (expr[0].value);		/* get PC to correct boundry */
 	bouc ((int32)expr[0].tmp);	/* get PC to correct boundry */
 /*
 prtval("rez 2 currpc", &currpc);
@@ -880,7 +919,7 @@ int	onoff;		/* on/off flag */
 
 void	sdirs()
 {
-/*	int	cnts; */
+	int	cnts;
 	int	temp;
 	char	dummy[8];
 	struct	tval	sdef;
@@ -889,7 +928,7 @@ void	sdirs()
 
 	  case 2:			/* sorg directive */
 
-/*	cnts = inscnt;	*/		/* save input buffer pointer */
+	cnts = inscnt;			/* save input buffer pointer */
 	val(0);				/* skip blanks and get value */
 	if (!yeanay())			/* are we assembling */
 	  return;			/* return if not assembling */
@@ -921,7 +960,7 @@ sorg3:					/* process common type */
 	  /* set up to fake out val */
 	  hbstac[0] = '+';		/* set terminator to + */
 	  hbstac[1] = ' ';		/* prev was blank */
-/*	  cnts = inscnt;    */	/* reset count */
+	  cnts = inscnt;		/* reset count */
 	  inag = sectpc[PCCOM];		/* get common sect info */
 	  inag.value &= 0xffff0000L;	/* with offset zero */
 	  bits2 |= ALVAL;		/* indicate 1st operand evaluation */
@@ -947,7 +986,7 @@ sorg3:					/* process common type */
 
 	if (yeanay()) {			/* are we assembling */
 	  unst(0x80c80000L);		/* yes, unstring on sp , ( ) */
-	  if ((hbstac[0] = ' '))	/* space terminator */
+	  if (hbstac[0] = ' ')		/* space terminator */
 	    goto ssect1;		/* only 1 symbol, o.k. */
 /* printf("ssect: X error\n"); */
 	  seterr ('X');			/* set section error */
@@ -1014,7 +1053,7 @@ ssect21:
 	}
 	sectpc[PCCOM].type = inac.type;	/* set new type */
 	sectpc[PCCOM].value = ((((hwcmsize[inacbn] & 0xffffL) + inac.value)
-	  & 0xffffL) | ((int32)inacbn << 16));	/* or in block number */
+	 & 0xffffL) | ((int32)inacbn << 16));	/* or in block number */
 	pcmode = PCCOM;			/* set the PC pointer to common */
 	goto sorg0;			/* go finish up */
 
@@ -1099,12 +1138,15 @@ printf("space: exit\n");
 /*
  * titl - get title
  */
+
+char	hbtitm;				/* count for title */
+
 void	titl()
 {
 	char	chr;
 	char	*til = TCWTITL;
-    uint8	hbtitm = 0;	/* count for title */
 
+	hbtitm = 0;			/* char count for title */
 	memset(TCWTITL, ' ',TCWTTLE-TCWTITL);	/* clear title buffer */
 	do {
 	  chr = gbyt(0x80800000L);	/* get a byte */
@@ -1146,24 +1188,23 @@ void stab()
 {
     int	temp;
     int32 temp2;
-    int charcnt = 0; /* chars in src line */
-    int	blnkcnt = 0; /* blanks at start of line */
+    int charcnt;	/* chars in src line */
+    int	blnkcnt;	/* blanks at start of line */
     unsigned char sline[80];	/* the source line */
     unsigned char chr;	/* the character read in */
     char dummy[12];	/* dummy loc for usname */
-    char suname[12]; 	/* struct/union name */
+    char suname[12];	/* struct/union name */
     int lower[16];	/* lower bound, always zero */
     int upper[16];	/* upper bound, size - 1 */
     int	ptrcnt = 0;	/* count of ptr cmd found */
     int	arycnt = 0;	/* count of ary cmd found */
     int type = 2;	/* default to int */
-    int size = 0;	/* variable size */
+    int size;		/* variable size */
     int regval = 0;	/* register number */
     int	offset;		/* stack offset */
     int nosym = 0;	/* auto, reg, or hsym if set */
     int flags = 0;	/* flags byte to output */
 
-    memset(suname, ' ',12);	/* clear name buffer */
     switch (curops->aug) {
     	case 0x4:	/* .sym */
     	    /* unstring one element skipping leading blanks. */
@@ -1233,19 +1274,19 @@ loopy:
     		suname[8] = '\0';	/* null terminate it */
     		flags |= 0x08;		/* set bit 28 for s/u ref */
     	    } else
-    	    if (!strncmp((char *)usname, "UCHAR", 5))  /* uchar variable */
+    	    if (!strncmp(usname, "UCHAR", 5))  /* uchar variable */
     		type = 8;
     	    else
-    	    if (!strncmp((char *)usname, "USHORT", 6))  /* ushort variable */
+    	    if (!strncmp(usname, "USHORT", 6))  /* ushort variable */
     		type = 9;
     	    else
-    	    if (!strncmp((char *)usname, "UINT", 4))  /* uint variable */
+    	    if (!strncmp(usname, "UINT", 4))  /* uint variable */
     		type = 10;
     	    else
-    	    if (!strncmp((char *)usname, "ULONG", 5))  /* ulong variable */
+    	    if (!strncmp(usname, "ULONG", 5))  /* ulong variable */
     		type = 11;
     	    else
-    	    if (!strncmp((char *)usname, "ENUM", 4)) {  /* enum variable */
+    	    if (!strncmp(usname, "ENUM", 4)) {  /* enum variable */
     		type = 12;
     		unst(0x80000000L);	/* unstring enum name */
     					/* term on space */
@@ -1254,33 +1295,33 @@ loopy:
     		suname[8] = '\0';	/* null terminate it */
     		flags |= 0x08;		/* set bit 28 for s/u ref */
 	    } else
-    	    if (!strncmp((char *)usname, "GSYM", 4)) {  /* global (def) variable */
+    	    if (!strncmp(usname, "GSYM", 4)) {  /* global (def) variable */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
     	    } else
-    	    if (!strncmp((char *)usname, "ESYM", 4)) {  /* global (ext) variable */
+    	    if (!strncmp(usname, "ESYM", 4)) {  /* global (ext) variable */
     		type = -1;		/* do not output extern's */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
     	    } else
-    	    if (!strncmp((char *)usname, "LSYM", 4)) {  /* local variable */
+    	    if (!strncmp(usname, "LSYM", 4)) {  /* local variable */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
     	    } else
-    	    if (!strncmp((char *)usname, "GFTN", 4)) {  /* global (ext) function */
+    	    if (!strncmp(usname, "GFTN", 4)) {  /* global (ext) function */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
     	    } else
-    	    if (!strncmp((char *)usname, "SFTN", 4)) {  /* static function */
+    	    if (!strncmp(usname, "SFTN", 4)) {  /* static function */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
     	    } else
-    	    if (!strncmp((char *)usname, "PARM", 4)) {  /* local parameter */
+    	    if (!strncmp(usname, "PARM", 4)) {  /* local parameter */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
@@ -1291,12 +1332,12 @@ loopy:
     		flags |= 0x10;		/* set bit 27 for stack variable */
     		flags |= 0x02;		/* set bit 30 for abs address */
     	    } else
-    	    if (!strncmp((char *)usname, "USYM", 4)) {  /* unknown variable */
+    	    if (!strncmp(usname, "USYM", 4)) {  /* unknown variable */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
     	    } else
-    	    if (!strncmp((char *)usname, "RSYM", 4)) {  /* register variable */
+    	    if (!strncmp(usname, "RSYM", 4)) {  /* register variable */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
@@ -1308,7 +1349,7 @@ loopy:
     		flags |= 0x04;		/* set bit 29 for register */
     		flags |= 0x02;		/* set bit 30 for abs address */
     	    } else
-    	    if (!strncmp((char *)usname, "AUTO", 4)) {  /* stack variable */
+    	    if (!strncmp(usname, "AUTO", 4)) {  /* stack variable */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
@@ -1319,7 +1360,7 @@ loopy:
     		flags |= 0x10;		/* set bit 27 for stack variable */
     		flags |= 0x02;		/* set bit 30 for abs address */
     	    } else
-    	    if (!strncmp((char *)usname, "HSYM", 4)) {  /* hidden static variable */
+    	    if (!strncmp(usname, "HSYM", 4)) {  /* hidden static variable */
     		/* get variable size */
     		val(0);			/* skip spaces & get value */
     		size = inac.value;	/* get the value */
@@ -1389,10 +1430,10 @@ loopy:
     		bfw(regval << 3);	/* output 4 bytes to bo stack */
     	    else {
     		temp2 = symval.value << 3;	/* get current address */
-/*    		temp2 = currpc.value << 3;	*/ /* get current address */
-/*    		temp2 = sectpc[pcmode].value << 3; */ /* get current address */
+/*    		temp2 = currpc.value << 3;	/* get current address */
+/*    		temp2 = sectpc[pcmode].value << 3; /* get current address */
 /* fprintf(stderr, "addr: %x\n", temp2); */
-/*    	temp2 = sectpc[PCCS].value << 3;	*/ /* get current address */
+/*    	temp2 = sectpc[PCCS].value << 3;	/* get current address */
     		bfw(temp2);		/* output 4 bytes to bo stack */
     	    }
     	    memcpy(usname, dummy, 8);	/* get the symbol, if any */
@@ -1529,3 +1570,87 @@ loopy:
     pb(hbbs, EXPFUNC, 0);	/* publish debugger record */
     return;			/* all done, exit */
 }
+@
+
+
+1.3
+log
+@Add cross reference support.
+Add mods for alpha port.
+@
+text
+@d164 1
+a164 1
+	bouc (theval.value);		/* bound the pc */
+d746 1
+a746 1
+    	  bouc (expr[0].tmp);	/* get PC to correct boundry */
+d783 1
+a783 1
+    	  bouc (expr[0].tmp);	/* get PC to correct boundry */
+@
+
+
+1.2
+log
+@Fix for MPX port.
+@
+text
+@d147 1
+d191 1
+d193 4
+a196 1
+/* printf("entering ccp1 usname = %0.8s, dummy = %0.8s\n", usname, dummy); */
+d199 1
+a199 1
+	  dpnum = 100;			/* reserved value for datapool */
+a200 1
+/* printf("ccp1 returning usname = %0.8s, dummy = %0.8s\n", usname, dummy); */
+d208 2
+a209 2
+	  dpnum = tnum[0];		/* just use the l/o part */
+	  if (dpnum > 99)		/* only 0-99 are valid */
+a256 1
+/* printf("ccp9 blknum = %d, val = %d\n", blknum, (tdef.value >> 16)); */
+d260 3
+d281 1
+a281 1
+	if ((temp + (tdef.value & 0xffff) & 0xffff0000L)) {
+d296 1
+a296 1
+printf("ccp5 blknum = %d, hbccct = %d\n", blknum, hbccct);
+d309 1
+a309 1
+ * dpnum has the datapool number
+d315 3
+a317 2
+
+/* printf("entering dpcom usname = %0.8s\n", usname); */
+d322 3
+a324 1
+/* printf("dpcom unst1 usname = %0.8s\n", usname); */
+d329 4
+a332 2
+	dpd.value = (int32)dpnum << 16;	/* set dp number */
+/* prtval("dpcom dpd", &dpd); */
+d340 3
+a342 1
+/* printf("dpcom unst2 usname = %0.8s\n", usname); */
+d378 3
+a380 1
+/* printf("calling tall from equ with label %.8s, pcmode = %x\n",label, pcmode); */
+d1024 1
+a1024 1
+	  dpnum = 255;			/* value for sect in datapool defs */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d596 1
+a596 1
+    str2upr(dummy);		/* make upper case */
+@

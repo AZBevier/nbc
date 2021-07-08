@@ -5,35 +5,38 @@
 #include "defs.h"
 #include <stdio.h>
 #include <string.h>
+#ifndef mpx
+#include <stdlib.h>
+#endif
+/*#include <stdlib.h>*/
 #ifdef DOS
 #include <io.h>
 #include <malloc.h>
 #endif
 
-/* #define DEBUG */
+/*#define DEBUG*/
 
-#define XRBUFSIZE 200*768
+#define XRBUFSIZE 300*768
 static int32	xrefmode;	/* xref mode */
 static int32	reccnt;		/* number of records */
 static int32 	xrbufp;		/* next buffer entry */
 static int32 	segments;	/* number of buffer segments written */
 
 int mycmp();		/* qsort function */
-void qsort();
 
 /*
- * xnegate - routine to negate 8 char name for for macro lookup
+ * xnegate - routine to negate 8 char name for macro lookup
  * input - 8 char name pointer
  * output - point to 8 char negated name
  */
 
-static char negname[8];		/* the negated name returned */
+static uint8 negname[8];		/* the negated name returned */
 
-char * xsnegate (name)
-register char * name;
+uint8 *xsnegate (name)
+register uint8 *name;
 {
-	register int	i;
-	register char * rname = negname;
+	int	    i;
+	uint8   *rname = negname;
 
 	for (i=0; i<8; i++)
 	  rname[i] = (char)(-(int)(name[i]));
@@ -76,10 +79,13 @@ report:
 #ifdef DEBUG
 if(info->type == TYPL)
 printf("REPTR name [%0.2x%0.2x%0.2x%0.2x] flags %x type %x sval %x\n",
+name[4], name[5], name[6], name[7],
+#if 0
 #ifdef mpx
 name[4], name[5], name[6], name[7],
 #else
 name[7], name[6], name[5], name[4],
+#endif
 #endif
 info->flags, info->type, sval);
 else if(info->type == TYMACDEF)
@@ -107,6 +113,8 @@ printf("REPTR name [%0.8s] flags %x type %x value %x sval %x\n",
 	xrbufp += 16;		/* bump pointer */
 	if(xrbufp >= XRBUFSIZE) {
 	    /* sort the buffer before we write it out */
+printf("OVERFLOW xrbuf %s %x\n", xrbuf, xrbufp);
+fflush(stdout);
 	    qsort(xrbuf, XRBUFSIZE/16, 16, mycmp);
 	    segments++;
 #ifdef NO_XREF_WRITES
@@ -172,6 +180,16 @@ int cmd;			/* type of command */
 	switch (cmd) {
 	    case DOXREF:
 		xrefmode = cmd;	/* save current mode */
+#ifndef NOT_IN_MAIN
+#ifdef DOS
+		xrbuf = (char *)_fmalloc(XRBUFSIZE);
+#else
+		/* enought for 12800 symbol references */
+		xrbuf = (char *)malloc(XRBUFSIZE);
+#endif
+		if (!xrbuf)		/* if no memory terminate assemble */
+		    abortm("** UNABLE TO ALLOCATE MEMORY FOR XREF STORAGE **");
+#endif
 		return;		/* xref cnd done */
 	    case NOXREF:
 		xrefmode = cmd;	/* save current mode */
@@ -186,9 +204,9 @@ int cmd;			/* type of command */
 		xrbufp = 0;		/* nothing in buffer */
 		segments = 0;		/* nothing written */
 #ifdef NO_XREF_WRITES
-		fseek (ut2fd, (int32)0, 0);	/* rewind ut2 file */
+		fseek (ut2fd, (longp)0, 0);	/* rewind ut2 file */
 #endif
-		return;		/* xref cmd done */
+		return;		/* xref cnd done */
 	    case PASS2:
 		xrefmode &= ~PASS1;	/* not pass 1 */
 		xrefmode |= PASS2;	/* now pass 2 */
@@ -203,7 +221,7 @@ int cmd;			/* type of command */
 #ifdef NO_XREF_WRITES
 		    if (fwrite(xrbuf, 1, xrbufp+remcnt, ut2fd) < 0)
 			xrer();		/* no return */
-		    fseek (ut2fd, (int32)0, 0);	/* rewind ut2 file */
+		    fseek (ut2fd, (longp)0, 0);	/* rewind ut2 file */
 #endif
 		}
 		return;			/* xref cnd done */
@@ -222,11 +240,10 @@ int length;
 	int pp;
 	unsigned char oldname[8];
 	char xx[12];
-	char *til = TCWTITL;
 	char *ep;
 	int i;
 	unsigned char name[8];
-	int value, literal;
+	int literal;
 	char flags, type;
 
 /*
@@ -327,7 +344,7 @@ printf("type %d ttype %d\n", type, tt.type);
 	    	    memcpy((char *)&literal, &name[4], 4);
 #endif
 		    /* store 8 hex chars */
-		    sprintf(xx, "%0.8X", literal);
+		    sprintf(xx, "%.8X", literal);
 		    memcpy(&prmt[12], xx, 8);
 		    continue;
 		} else if (type < TYMACDEF) {
@@ -350,7 +367,7 @@ printf("type %d ttype %d\n", type, tt.type);
 		    memcpy(&prmt[12], xsnegate(name), 8);
 		    continue;
 		} else {
-		    sprintf(xx, "%0.8X", literal);
+		    sprintf(xx, "%.8X", literal);
 /*
 printf("fixup type %d name %0.8s\n", type, name);
 */
@@ -376,7 +393,7 @@ printf("fixup type %d name %0.8s\n", type, name);
 	    sval &= 0x7fffff;
 	    /* store 5 dec chars */
 /*	    sprintf(xx, "%0.5d", value); */
-	    sprintf(xx, "%0.5d", sval);
+	    sprintf(xx, "%.5d", sval);
 	    memcpy(&prmt[pp + 23], xx, 5);
 	    pp += 8;			/* next print position */
 	    continue;

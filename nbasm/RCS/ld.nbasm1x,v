@@ -1,4 +1,27 @@
-$DEFM
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.11.02.08.39;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@remove line numbers
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
 $JOB NBASM
 $PAGE 0
 $IFT FILE CCOBJ.O OBJSKIP
@@ -45,3 +68,4 @@ $DEFN ENDJOB
 $EOJ
 $PAGE 24
 $ENDM
+@

@@ -36,14 +36,14 @@ $(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
 
 clean:
 	-rm -f $(OBJS)
+	@for n in $(OBJS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		/bin/rm -f $(LBIN)/$$nn ; \
+	done
 
 #	$(BIN)/cp $(MAIN) $(SBIN)/$(MAIN)
 clobber: clean		# delete main from current directory
 	@for n in $(ALLS) ; do \
-		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
-		/bin/rm -f $(LBIN)/$$nn ; \
-	done
-	@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
@@ -57,7 +57,7 @@ install: all 		# build and then copy main to install directory
 	fi;
 	@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
-		$(INSTALL) $$n $(LBIN)/$$nn ; \
+		$(MOVE) $$n $(LBIN)/$$nn ; \
 	done
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)

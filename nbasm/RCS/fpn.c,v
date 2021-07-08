@@ -1,0 +1,321 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initiall RCS file.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#include float.h
+
+/* floating point service	*/
+static short	fexp;			/* floating exponent		*/
+static short	fr[8];			/* floating fraction		*/
+static long	fvhigh,fvlow;		/* floating final form		*/
+static short	binexp;
+
+/*	floating point  conversions	*/
+
+cntofp(num)
+int *num;	/* the number */
+{
+}
+
+flpack(p,typ,fe,f)NODE *p;char *f;{
+#ifdef DEBUG
+	reg int i,j;
+if(debug){dprt("flpack: %x, %x ",typ,fe);for(i=0;i<8;i++)dprt("%x ",f[i]&0xff);
+dprt("\n");}
+	xflpack(p,typ,fe,f);
+if(debug)dprt("flpack returns %lx %lx\n",p->nd_fval,p->nd_fvl2);
+}
+xflpack(p,typ,fe,f)NODE *p;char *f;{
+#endif
+
+	/* pack up a floating point number	*/
+
+	reg int	i,j;
+	reg int	sign;
+
+	binexp = 0;
+
+	for( i=0; i<8; i++ ) fr[i] = f[i] & 0xff;
+	fexp = fe;
+	p->nd_fval = p->nd_fvl2 = 0;
+	fvhigh = fvlow = 0;
+	sign = 0;
+	if( fr[7] & 0x80 ){
+		sign = j = 1;
+		for( i=0; i<8; i++ ){
+			j += ~fr[i] & 0xff;
+			fr[i] = j & 0xff;
+			j >>= 8;
+		}
+	}
+	for( i=0; i<8; i++ ) if( fr[i] ) break;
+	if( i == 8 ) return;				/* true zero */
+	norm();
+	j = 0;
+	while( fexp < 0 ){ j = div10(); fexp++; norm(); } /* reduce dec exp */
+	if( j >= 5 ){ incf(); norm(); }
+	while( fexp > 0 ){ mul10(); fexp--; norm(); }
+	fclang();
+#ifdef IEEE
+	if( sign ) fvhigh |= 0x80000000L;
+#else
+	if( sign ){
+		fvhigh = ~fvhigh;
+		fvlow = -fvlow;
+		if( fvlow == 0 ) fvhigh++;
+	}
+#endif
+	p->nd_fval = fvhigh;
+	p->nd_fvl2 = fvlow;
+	if( getsize(typ) < 8 ) fcvtf(p);
+	p->nd_type = typ;
+}
+
+fclang(){
+
+	reg int	i;
+
+#ifdef DEBUG
+	if( debug ) fdump("fclang");
+#endif
+#ifdef IEEE
+	for( i=0; i<9; i++ )frsh();
+#else
+	for( i=0; i<5; i++ )frsh();
+#endif
+	incf();
+	frsh();
+	for( i=3; i>=0; i-- ) fvlow = (fvlow << 8) | fr[i];
+	for( i=7; i>=4; i-- ) fvhigh = (fvhigh << 8) | fr[i];
+#ifdef IEEE
+	fvhigh &= 0x000fffffL;		/* clear out 12 bits */
+	fvhigh |= (long)((binexp + 1085) & 0x7ff) << 20;
+#else
+	fvhigh &= 0x00ffffffL;		/* clear out 8 bits */
+	fvhigh |= (long)((binexp + 126) & 0x7f) << 24;
+#endif
+}
+
+norm(){
+
+	while( fr[7] <= 63 ){ flsh(); binexp--; }
+	while( fr[7] > 127 ){ frsh(); binexp++; }
+}
+
+flsh(){
+
+	reg int	i,j;
+
+	j = 0;
+	for( i=0; i<8; i++ ){
+		j |= fr[i] << 1;
+		fr[i] = j & 0xff;
+		j >>= 8;
+	}
+}
+
+frsh(){
+
+	reg int	i,j;
+
+	j = 0;
+	for( i=7; i>= 0; i-- ){
+		j |= fr[i];
+		fr[i] = j >> 1;
+		j = (j & 1) << 8;
+	}
+}
+
+mul10(){
+
+	reg int	i,j;
+
+	j = 0;
+	for( i=0; i<8; i++ ){
+		j += fr[i] * 10; 
+		fr[i] = j;
+		j >>= 8;
+	}
+}
+
+div10(){
+
+	reg int	i,j;
+
+	j = 0;
+	for( i=7; i>=0; i-- ){
+		j <<= 8;
+		j |= fr[i];
+		fr[i] = j/10;
+		j %= 10;
+	}
+	return j;
+}
+
+incf(){		/* increment */
+
+	reg int	i;
+
+	for( i=0; i<8; i++ ){
+		fr[i]++;
+		if( (fr[i] &= 0xff) ) return;
+	}
+}
+
+fcvtf(p)reg NODE *p;{			/* convert to single */
+
+	reg int	i;
+	long	sign;
+
+#ifdef IEEE
+	sign = p->nd_fval & 0x80000000L;	/* save sign */
+	i = p->nd_fvl2 >> 29;		/* get three bits */
+	i &= 7;
+	p->nd_fval -= 0x40000000L;	/* remove exponent bias	*/
+	p->nd_fval <<= 3;		/* make room for three bits */
+	p->nd_fval += i;		/* put in bottom three bits */
+	p->nd_fvl2 = 0;
+	p->nd_fval += 0x40000000L;	/* restore exponent bias*/
+	p->nd_fval &= 0x7fffffffL;	/* turn off sign	 */
+	p->nd_fval |= sign;
+#else
+	p->nd_fvl2 = 0;			/* simply truncate	*/
+#endif
+}
+
+fcvtd(p)reg NODE *p;{			/* convert to double */
+
+	reg int	i;
+	long	sign;
+
+#ifdef IEEE
+	sign = p->nd_fval & 0x80000000L;
+	i = p->nd_fval;
+	i &= 7;
+	p->nd_fvl2 = (long)i << 29;
+	p->nd_fval -= 0x40000000L;	/* remove exponent bias	*/
+	p->nd_fval <<= 1;		/* exponent sign to sign position */
+	p->nd_fval >>= 4;		/* extend it */
+	p->nd_fval &= 0x7fffffffL;	/* and clear sign bit */
+	p->nd_fval += 0x40000000L;	/* restore exponent bias*/
+	p->nd_fval |= sign;
+#else
+	p->nd_fvl2 = 0;			/* simply guarantee zero	*/
+#endif
+}
+
+cvitof( p )reg NODE *p;{		/* convert to float		*/
+
+	reg int	i;
+	reg int	signl;
+	long	sign;
+
+	sign = 0;
+	if( p->nd_fval == 0 ){
+		p->nd_fvl2 = 0;
+		goto pret;
+	}
+	if( p->nd_fval < 0 ){
+		sign++;
+		p->nd_fval = -p->nd_fval;
+	}
+	for( i=0; i<4; i++ ){
+		fr[i] = p->nd_fval & 0xff;
+		p->nd_fval >>= 8;
+	}
+	for( ; i<8; i++ ) fr[i] = 0;
+	fexp = binexp = 0;
+	norm();
+	fclang();
+	p->nd_fval = fvhigh;
+	p->nd_fvl2 = fvlow;
+pret:	p->nd_type = TYREAL|(8<<5);
+	if( sign ) p->nd_fval |= 0x80000000L;
+}
+
+cvftoi( p ) reg NODE *p; {		/* float to int */
+
+	reg int	i;
+	reg int	sign;
+
+	if( p->nd_fval == 0 ){
+		p->nd_fvl2 = 0;
+		p->nd_type = deflong;
+		return;
+	}
+	if( p->nd_fval < 0 ) sign++;
+#ifdef IEEE
+	i = p->nd_fval >> 20;
+	if( varlen( p->nd_type ) == 8 ){	/* from double */
+		i &= 0x7ff;			/* exponent is 11 bits */
+		i -= 1027;			/* remove bias */
+		p->nd_fvl2 >>= 20;
+		p->nd_fvl2 &= 0xfff;
+		p->nd_fval = (p->nd_fval << 12) | p->nd_fvl2 | 0x80000000L;
+		p->nd_fvl2 = 0;
+	} else {
+		i = (i >> 3) & 0xff;		/* exponent is 8 bits */
+		i -= 127;			/* remove bias */
+		p->nd_fval = (p->nd_fval << 23 ) | 0x80000000L;
+	}
+#else		/* use the UNIDOT format	*/
+	if( sign ) fneg( p );
+	i = p->nd_fval >> 24;
+	i &= 0x7f;				/* get exponent	*/
+	i -= 64;				/* remove bias	*/
+	p->nd_fvl2 >>= 24;
+	p->nd_fvl2 &= 0xff;
+	p->nd_fval = (p->nd_fval << 8) | p->nd_fvl2;
+	p->nd_fvl2 = 0;
+#endif
+	if( i < -1 ){				/* no significance at all */
+		p->nd_fval = 0;
+		i = 31;
+	}
+	while( i < 31 ){
+		p->nd_fval >>= 1;
+		p->nd_fval &= 0x7fffffffL;
+		i++;
+	}
+	if( sign ) p->nd_fval = -p->nd_fval;
+	p->nd_type = deflong;
+}
+
+fneg( p ) reg NODE *p; {
+#ifdef IEEE
+	p->nd_fval ^= 0x80000000L;
+#else
+	p->nd_fval = ~p->nd_fval;
+	if( (p->nd_fvl2 = -p->nd_fvl2) == 0 ) p->nd_fval++;
+#endif
+}
+
+#ifdef DEBUG
+fdump(s)char *s;{
+	reg int	i;
+	dprt("fd(%s)fexp = %d binexp = %d ",s,fexp,binexp);
+	dprt(" %4x %4x ",fvhigh,fvlow);
+	for( i=7; i>= 0; i-- ) dprt(" %2x",fr[i] );
+	putc( '\n', stderr);
+}
+#endif
+@

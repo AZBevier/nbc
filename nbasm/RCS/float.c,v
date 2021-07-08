@@ -1,4 +1,57 @@
-/*~!float.c*/
+head	1.7;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.7
+date	2021.06.28.22.34.51;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2018.10.12.21.47.34;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2016.01.27.23.24.23;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.02.23.19.56.13;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.01.13.23.04.39;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.13.20.29.23;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.7
+log
+@Fix warnings.
+@
+text
+@/*~!float.c*/
 /* Name:  float.c Part No.: _______-____r
  *
  * Copyright 1995 - J B Systems, Morrison, CO
@@ -16,7 +69,7 @@
  * (a).
  */
 
-#ident	"@(#)nbcc:float.c	1.1"
+#ident	"@@(#)nbcc:float.c	1.1"
 
 /************************************************************************
 *									*
@@ -704,3 +757,280 @@ FPN *F;
 	norm( F );
 #endif
 }
+@
+
+
+1.6
+log
+@Correct warning errors
+@
+text
+@d33 2
+a34 2
+static int mul10fk();
+static int negs();
+d36 1
+a36 1
+static int mvb();
+a64 1
+	int		i;
+d144 1
+a144 1
+static int mul10fk(f,k)
+d189 1
+a189 1
+static int negs( s, n )
+d220 1
+a220 1
+static int mvb( tgt, src, n )
+a306 1
+	char	*se;
+d600 1
+a600 1
+	int	v;
+@
+
+
+1.5
+log
+@change ftoi to int from long
+@
+text
+@d27 1
+d32 1
+d45 12
+a56 2
+#define reg	register
+#define uns	unsigned
+d62 6
+a67 4
+isnzf( f ) reg FPN *f; { /* return nz if *f is not identically zero	*/
+	reg		i;
+	reg char	*p;
+	reg char	*pe;
+d75 5
+a79 2
+isnzs( s, n ) reg char *s; {
+	reg char	*se;
+d90 6
+a95 3
+static int
+addsk( s, n, k ) reg char *s; reg uns k; {
+	reg char	*se;
+d105 5
+a109 2
+static int
+mulsk( s, n, radix, k ) reg char *s; reg uns k; {
+d111 1
+a111 1
+	reg char	*se;
+d121 6
+a126 3
+divsk( s, n, radix, k ) reg char *s; reg uns k; {
+
+	reg char	*se;
+d145 4
+a148 3
+static int
+mul10fk(f,k) reg FPN *f; reg uns k; {
+
+d151 9
+a159 7
+		return;
+	}
+	k = mulsk( f->nf, NF, 10, k );
+	if( k || isnegf(f) ){		/* overflow, divide back out	*/
+		k = divsk( f->nf, NF, 10, k );
+		f->ne++;
+		if( k > 5 ) addsk( f->nf, NF, 1 );		/* round */
+d163 4
+a166 2
+int
+dodig( f, k, tz ) reg FPN *f; {
+d190 5
+a194 3
+static int
+negs( s, n ) reg char	*s; {
+	reg char	*se;
+d203 3
+a205 1
+negf( f ) reg FPN *f; {
+d209 3
+a211 3
+static int
+absf( f ) reg FPN *f; {	/* makes positive and returns sign		*/
+
+d221 5
+a225 3
+static int
+mvb( tgt, src, n ) register char *tgt, *src; {
+	register char *bnd;
+d227 2
+a228 1
+	for( bnd = tgt + n; tgt < bnd; )  *tgt++ = *src++;
+d232 4
+a235 2
+addff( f1, f2 ) reg FPN *f1, *f2; {
+	reg		k;
+d237 1
+a237 1
+	short		sgn1,		/* sign of f1			*/
+d239 1
+a239 1
+	short		tz;
+d288 3
+a290 1
+subff( f1, f2 ) reg FPN *f1, *f2; {
+d302 9
+a310 7
+mulff( f1, f2 ) FPN *f1, *f2; {
+	reg		i,j;
+	reg 		k;
+	reg char	*s;
+	reg char	*se;
+	char		sb[NF+NF];	/* intermediate multiply buffer	*/
+	short		sgn1,		/* sign of f1			*/
+d374 4
+a377 3
+zerof( f ) reg FPN *f; {
+	reg char	*s,
+			*se;
+d435 5
+a439 3
+divff( f1, f2 ) FPN *f1, *f2; {
+	reg		k;
+	char		x1[ NF+1 ],		/* multiples of divisor	*/
+d444 1
+a444 2
+	short		sgn1,
+			sgn2;
+d529 6
+a534 5
+static int
+cmpss( s1, n1, s2, n2 ) reg char *s1, *s2; {
+	reg char	*se1,
+			*se2;
+	reg		i;
+d545 6
+a550 4
+static int
+subss( s1, n1, s2, n2, k ) reg char *s1, *s2; reg /*uns*/ k;{
+	reg char	*se1,
+			*se2;
+d569 6
+a574 4
+static int
+addss( s1, n1, s2, n2, k ) reg char *s1, *s2; reg /*uns*/ k;{
+	reg char	*se1,
+			*se2;
+d594 4
+a597 2
+int
+ftoi(f,rnd) reg FPN *f; {
+d599 2
+a600 2
+	reg	i;
+	reg	j;
+d620 4
+a623 1
+sdump(s,n) reg char *s; reg n; {
+d629 4
+a632 2
+sdec( s, n ){
+	reg i;
+d645 2
+a646 2
+	register int	i;
+	register uns int j=0;
+d666 2
+a667 2
+	register int	i;
+	register uns int j=0;
+d674 1
+a674 1
+itod( num, F )		/* convert int to double */
+d678 1
+a678 1
+	register int	i;
+d694 1
+a694 1
+uitod( num, F )		/* convert unsigned int to double */
+d698 1
+a698 1
+	register int	i;
+@
+
+
+1.4
+log
+@Allow variable precision
+@
+text
+@d543 1
+a543 1
+long
+d549 1
+a549 1
+	long	v;
+@
+
+
+1.3
+log
+@Correct software floatind divide.
+@
+text
+@d55 1
+a55 1
+	p = f->nf;
+d57 1
+a57 1
+	for( p = f->nf, pe = p+NF; p < pe; p++ ) if( *p ) return 1;
+d335 1
+a335 1
+	for( s=f->nf, se = s+NF; s<se; s++ ) *s = 0;
+@
+
+
+1.2
+log
+@Correct floating point conversion error.  NASA bug.
+@
+text
+@d52 2
+a53 2
+	reg uns char	*p;
+	reg uns char	*pe;
+d331 1
+a331 1
+	reg uns char	*s,
+d563 1
+a563 1
+#ifdef FLODEB
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d262 1
+a262 1
+	reg uns		k;
+d401 4
+d438 1
+d440 5
+d448 1
+d450 5
+d458 1
+d460 5
+d468 1
+d470 5
+d499 1
+a499 1
+subss( s1, n1, s2, n2, k ) reg char *s1, *s2; reg uns k;{
+d521 1
+a521 1
+addss( s1, n1, s2, n2, k ) reg char *s1, *s2; reg uns k;{
+@

@@ -1,0 +1,32 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/* dummy.c */
+
+#include	"defs.h"
+
+/* just a bunch of stub routines */
+void	reptr(d1,d2)
+int d1, d2;
+{}
+@

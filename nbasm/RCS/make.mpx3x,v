@@ -1,4 +1,27 @@
-#
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.06.00.05.43;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move objects instead of copy
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
 # Makefile for nbasm for running nbasm on mpx3x
 # Object files must be produced and then cataloged
 # on MPX3.X using the LD.NBASM command file.
@@ -36,34 +59,35 @@ $(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
 
 clean:
 	-rm -f $(OBJS)
-	@for n in $(OBJS) ; do \
+	@@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
 
 #	$(BIN)/cp $(MAIN) $(SBIN)/$(MAIN)
 clobber: clean		# delete main from current directory
-	@for n in $(ALLS) ; do \
+	@@for n in $(ALLS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all 		# build and then copy main to install directory
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
 	fi;
-	@for n in $(OBJS) ; do \
+	@@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		$(MOVE) $$n $(LBIN)/$$nn ; \
 	done
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
-	@for n in $(ALLS) ; do \
+	@@for n in $(ALLS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD) $(LBIN)/$(MK)
 
+@

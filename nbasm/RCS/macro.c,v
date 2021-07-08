@@ -1,4 +1,53 @@
-/* macro.c */
+head	1.6;
+access;
+symbols;
+locks
+	jbev:1.6; strict;
+comment	@ * @;
+
+
+1.6
+date	2018.10.15.20.08.13;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2018.10.12.18.33.40;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2016.01.28.03.46.28;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.03.22.20.41.11;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.02.23.19.58.40;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.08.23.23.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.6
+log
+@Correct form suppoert code, was failing
+@
+text
+@/* macro.c */
 
 #include "defs.h"
 #include <stdio.h>
@@ -11,7 +60,6 @@
 /* #define DBUGIF */
 /* #define SETD */
 /* #define DEBUG */
-/*#define MACS*/
 
 #ifdef DOS
 #include <io.h>
@@ -64,7 +112,7 @@ void	macinit()
 	    macer();
    	  }
 	  macopen++;			/* show mac open */
-	  fseek (macfd, (int64)0, 0);	/* rewind mac file */
+	  fseek (macfd, (longp)0, 0);	/* rewind mac file */
 	  return;			/* return */
 	}
 
@@ -113,7 +161,7 @@ char	*name;
 	memcpy(ucname, name, 8);	/* copyin macro name */
 	ucname[8] = '\0';		/* null terminate string */
 	str2upr(ucname);		/* make uppercase */
-	fseek (macfd, (int64)0, 0);	/* rewind mac file */
+	fseek (macfd, (longp)0, 0);	/* rewind mac file */
 #ifdef DBUGM1X
 printf("looking for macro %0.8s\n", ucname);
 #endif
@@ -126,7 +174,7 @@ printf("buffer primed\n");
 #ifdef DOS
 	chrp = (uchrfp)_fmalloc(256);	/* get some memory */
 #else
-	chrp = (uchrfp)malloc((uint32)256);	/* get some memory */
+	chrp = (uchrfp)malloc(256);	/* get some memory */
 #endif
 	if (!chrp)			/* did we get it */
  	  abortm("** UNABLE TO ALLOCATE MEMORY FOR MACRO STORAGE **");
@@ -134,7 +182,7 @@ printf("buffer primed\n");
 	chrcnt = 256;			/* chars allocated */
 	protoflg = 0;			/* not in prototype yet */
 	maccnt = 0;			/* macro chars processed */
-/*reread:*/
+reread:
 	while (readrec() != EOF) {	/* read a record,search till EOF */
 	  if (*libbuf == 0xef)		/* 1st byte of a record */
 	    goto libsc3;		/* either 1st or middle record */
@@ -222,7 +270,7 @@ printf("about to move %x bytes\n", rcnt);
 #endif
 	    macd.tmp = maccnt;		/* set macro byte count */
 	    macd.flags = libcnt;	/* set parameter count */
-	    macd.value = (int32)chrp;	/* set prototype address */
+	    macd.value = (longp)chrp;	/* set prototype address */
 	    /* put new macro definition if macro symbol table */
 #ifdef DBUGM1X
 printf("macro %0.8s defined with %d params, %x chars read into %x\n",
@@ -275,7 +323,7 @@ int	prim()
 	if((rv = fread(sysbuf, 1, 7680, macfd) == EOF))
 	  return(EOF);			/* return EOF */
 	currec = 0;			/* clear record counter */
-	recnum = 40;			/* 40 records @ 48w (192b) per record */
+	recnum = 40;			/* 40 records @@ 48w (192b) per record */
 #ifdef DBUGM1
 printf("prime read %x chars, %d records\n", rv, recnum);
 #endif
@@ -312,7 +360,7 @@ uchrfp	hwrepsp;		/* repeat prototype storage pointer */
 
 uchrfp	hwcmac; 		 /* holds ptr to body of latest form/macro */
 uchrfp	hwcmacp;  		/* holds a chaining pointer to form list */
-/* struct macro *macp;	*/	/* address of macros */
+/* struct macro *macp;		/* address of macros */
 char	*stkp;			/* pointer to parameter expansion area in stk */
 char	stk[8000];		/* macro parameter substitution area */
 /* stk contains multiple 24 char parameter names used during expansion */
@@ -376,7 +424,7 @@ printf("defmpro1: calling ss label = %0.8s\n", label);
 	 lnegate (label, nlabel);	/* make negative version for macros/forms */
 	 nlabel[8] = '\0';
 	 dmstp = ss (&macx, nlabel);		/* enter macro name */
-/*	 dmstp = ss (&macx, csnegate(label)); */ /* enter macro name */
+//	 dmstp = ss (&macx, csnegate(label));  /* enter macro name */
 #ifdef MACD
 printf("defmpro1: ss return dmstp = %x\n", dmstp);
 #endif
@@ -412,7 +460,7 @@ printf("defmpro3 entry unstrung usname = %0.8s\n", usname);
 	  /* now update macro symbol entry for number of parameters */
 	  head->desc.flags = defcnt;	/* set the count */
         /* and update symbol table entry with macro symbol table address */
-        dmstp->desc.value = (int32)head; /* macro def entry addr */
+        dmstp->desc.value = (longp)head; /* macro def entry addr */
 	  maccnt = 0;			/* zero number of chars in macro */
 #ifdef MACD
 printf("defmpro3: dmstp = %x, head = %x\n", dmstp, head);
@@ -451,7 +499,7 @@ printf("endmpro: entry\n");
 	  goto endm11;			/* yes, no error */
 	if (macstate & (CONDSCAN | RSCAN))	/* skipping src or rept scan */
 	  return;			/* yes, just return */
-/*endm5:*/					/* addressing error */
+endm5:					/* addressing error */
 	seterr ('A');			/* set addressing error */
 	goto endm10;			/* reset flags, and exit */
 
@@ -535,11 +583,11 @@ prtsymt();				/* dump the symbol table */
 	    for (i = 0; i < maccnt; i++) 
 	      work[i] = work1[i];	/* copy the char */
 	    _ffree((uchrfp)work1);	/* deallocate the old */
-	    head->desc.value = (int32)work;	/* set the new addr */
+	    head->desc.value = (longp)work;	/* set the new addr */
 	    }
 #else
 	head->desc.value = 
-	  (int32)realloc((uchrfp)head->desc.value, (uint32)maccnt);
+	  (longp)realloc((uchrfp)head->desc.value, maccnt);
 #endif
 #ifdef DEBUG
 {
@@ -623,7 +671,7 @@ void	formp()
 	  lnegate (label, nlabel);	/* make negative version for macros/forms */
 	  nlabel[8] = '\0';
 	  dmstp = ss (&formx, nlabel);		/* enter macro name */
-/*	  dmstp = ss (&formx, csnegate(label)); */ /* enter macro name */
+//	  dmstp = ss (&formx, csnegate(label));  /* enter macro name */
 	  /* insure zero description */
 	  formx.value = formx.tmp = formx.flags = 0;
 	  head = macss (&formx, label, MACADD);	/* enter in macro storage */
@@ -634,7 +682,7 @@ void	formp()
 	  high = head->desc.tmp;	/* count of chars allocated */
 	/* FIXME - added next statement to fixed map failt */
 	/* and update symbol table entry with macro symbol table address */
-	dmstp->desc.value = (int32)head; /* macro def entry addr */
+	dmstp->desc.value = (longp)head; /* macro def entry addr */
 #ifdef MACD
 	printf("formp: maccnt = %x high = %x\n", maccnt, high);
 #endif
@@ -688,11 +736,11 @@ formp3:					/* pass 2 merge point */
 	    for (i = 0; i < maccnt; i++) 
 	      work[i] = work1[i];	/* copy the char */
 	    _ffree((uchrfp)work1);	/* deallocate the old */
-	    head->desc.value = (int32)work;	/* set the new addr */
+	    head->desc.value = (longp)work;	/* set the new addr */
 	    }
 #else
 	head->desc.value =
-	  (int32)realloc((uchrfp)head->desc.value, maccnt);
+	  (longp)realloc((uchrfp)head->desc.value, maccnt);
 #endif
 #endif
 #ifdef MACD
@@ -718,17 +766,16 @@ formp3:					/* pass 2 merge point */
 
 void	formexp()
 {
-#ifdef MACD
 	int32 bitv;
+#ifdef MACD
 	printf("Entering formexp()\n");
 #endif
 	inptstat |= FORMGET;		/* indicate stripping down a form */
 	/* get where it is stored */
 	hwcmac = (uchrfp)dmstp->desc.value;		/* head */
-/*	head = (struct symbol FAR *)dmstp->desc.value;*/		/* head */
+	head = (struct symbol FAR *)dmstp->desc.value;		/* head */
 	hwcmacp = hwcmac;			/* save pointer for form prototype */
 #ifdef MACD
-	head = (struct symbol FAR *)dmstp->desc.value;		/* head */
 	printf("formexp: data %x%x%x\n", hwcmacp[0], hwcmacp[1], hwcmacp[2]);
 	printf("formexp: dmstp %x charp %x\n", (int)dmstp, (int)hwcmacp);
 	prtval("formexp dmstp", &dmstp->desc);
@@ -1043,6 +1090,7 @@ static	char	*mact;			/* end of parameter storage in stk */
 
 void	macexp()
 {
+	struct	symbol	FAR *mstp;	/* temp macro symbol entry pointer */
 	unsigned	i, j;
 
 	if (yeanay()) {			/* are we assembling */
@@ -1071,7 +1119,7 @@ printf("macexp: EXPAND set 1\n");
 	  mact = (char *)stackp->clev;	/* parameter expansion stack address */
 	  /* get macro prototype address */
 	  stackp->maca = (uchrfp)dmstp->desc.value;
-/*XXX	  mpp = stackp;	*/		/* macro expans entry for this level */
+/*XXX	  mpp = stackp;			/* macro expans entry for this level */
 #ifdef MACD
 printf("macexp: %d parameters found, stkp = %x, level = %x\n",stackp->pcnt, stkp, level);
 #endif
@@ -1085,13 +1133,11 @@ printf("macexp: clearing param %d, stkp = %x, mact = %x\n",i, stkp,mact);
 	}
 	do {				/* get all the parameters, term on , */
 	  unsigned char theff = 0xff;
-#ifdef MACD
 	  unsigned char ttt;
-#endif
 
 	  unst(0x80080000L);		/* unstring param, term on sp & comma */
-#ifdef MACD
 	  ttt = *usname;
+#ifdef MACD
 printf("macexp: unstrung |%c%0.11s| stkp = %x, mact = %x\n",
 (ttt == 0xff ? '!' : ttt), &usname[1], stkp, mact);
 #endif
@@ -1186,11 +1232,11 @@ prtval("mbyt1head", &head->desc);
 	    for (i = 0; i < high; i++) 
 	      work[i] = work1[i];	/* copy the char */
 	    _ffree((uchrfp)work1);	/* deallocate the old */
-	    head->desc.value = (int32)work;	/* set the new addr */
+	    head->desc.value = (longp)work;	/* set the new addr */
 	    }
 #else
 	  head->desc.value =
-	    (int32)realloc((uchrfp)head->desc.value, (uint32)(high + 256));
+	    (longp)realloc((uchrfp)head->desc.value, high + 256);
 #endif
 	  macsp = (uchrfp)head->desc.value;	/* new buffer address */
 	  macsp += high;		/* where to start storing */
@@ -1227,7 +1273,7 @@ struct	symbol	dumrept = {		/* dummy repeat header */
 	(struct symbol FAR *)0,		/* zero llink, rlink, flink */
 	"REP",				/* no symbol */
 	0,0,0,				/* zero type, flags, tmp & value */
-	(int32)0
+	(longp)0
 };
 #else
 static	struct	symbol	FAR * dumrept;
@@ -1266,9 +1312,9 @@ void	reptp()
 	if (!dumrept)			/* if no memory terminate assemble */
  	  abortm("** UNABLE TO ALLOCATE MEMORY FOR REPT STORAGE **");
 #ifdef DOS
-	dumrept->desc.value = (int32)_fmalloc(256);
+	dumrept->desc.value = (longp)_fmalloc(256);
 #else
-	dumrept->desc.value = (int32)malloc((uint32)256);
+	dumrept->desc.value = (longp)malloc(256);
 #endif
 	if (!dumrept->desc.value)	/* if no memory terminate assemble */
  	  abortm("** UNABLE TO ALLOCATE MEMORY FOR REPT STORAGE **");
@@ -1434,3 +1480,142 @@ prtval("setpro final val", &setp);
 	return;				/* done */
 }
 
+@
+
+
+1.5
+log
+@correct missing 0x in unst calls in macro.c
+Add missing line of code in formp that save address of head in macro causing map fault
+@
+text
+@d5 1
+d39 1
+d342 1
+d375 4
+a378 1
+	dmstp = ss (&macx, csnegate(label));  /* enter macro name */
+d593 1
+d595 3
+d614 3
+d622 4
+a625 1
+	  dmstp = ss (&formx, csnegate(label));  /* enter macro name */
+d634 6
+d642 4
+d648 3
+d668 3
+d674 2
+a675 2
+	/* and update symbol table entry with macro symbol table address */
+	dmstp->desc.value = (longp)head; /* macro def entry addr */
+d696 15
+d720 4
+d726 13
+a738 2
+	hwcmac = (uchrfp)dmstp->desc.value;
+	hwcmacp = hwcmac;		/* save pointer for form prototype */
+d746 3
+d750 3
+d754 3
+d758 3
+d1166 1
+a1166 1
+printf("mbyt1: maccnt=%x\n",maccnt);
+d1205 2
+a1206 2
+printf("mbyt1: head = %x, maccnt = %x, high = %x\n", head, maccnt,high);
+prtval("mbyt1head", &head->desc);
+d1210 4
+@
+
+
+1.4
+log
+@fix int32 pointers to be longp type
+@
+text
+@d356 1
+a356 1
+	  unst(80080000L);		/* term on space or comma */
+d407 2
+a408 2
+	  /* and update symbol table entry with macro symbol table address */
+	  dmstp->desc.value = (longp)head; /* macro def entry addr */
+d595 1
+a595 1
+	      unst(80080000L);		/* term on space or comma */
+d642 2
+@
+
+
+1.3
+log
+@Add cross reference support.
+Add mods for alpha port.
+@
+text
+@d64 1
+a64 1
+	  fseek (macfd, (int32)0, 0);	/* rewind mac file */
+d113 1
+a113 1
+	fseek (macfd, (int32)0, 0);	/* rewind mac file */
+d222 1
+a222 1
+	    macd.value = (unsigned int32)chrp;	/* set prototype address */
+d408 1
+a408 1
+	  dmstp->desc.value = (unsigned int32)head; /* macro def entry addr */
+d531 1
+a531 1
+	    head->desc.value = (unsigned int32)work;	/* set the new addr */
+d535 1
+a535 1
+	  (unsigned int32)realloc((uchrfp)head->desc.value, maccnt);
+d656 1
+a656 1
+	    head->desc.value = (unsigned int32)work;	/* set the new addr */
+d660 1
+a660 1
+	  (unsigned int32)realloc((uchrfp)head->desc.value, maccnt);
+d1110 1
+a1110 1
+	    head->desc.value = (unsigned int32)work;	/* set the new addr */
+d1114 1
+a1114 1
+	    (unsigned int32)realloc((uchrfp)head->desc.value, high + 256);
+d1147 1
+a1147 1
+	(unsigned int32)0
+d1186 1
+a1186 1
+	dumrept->desc.value = (unsigned int32)_fmalloc(256);
+d1188 1
+a1188 1
+	dumrept->desc.value = (unsigned int32)malloc(256);
+@
+
+
+1.2
+log
+@Fix for MPX port.
+@
+text
+@d56 1
+a56 1
+	  if ((macfd = fopen(macfile,"r")) <= 0) {
+d287 1
+a287 1
+unsigned char	dpnum;		/* datapool number */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d53 3
+d57 1
+@

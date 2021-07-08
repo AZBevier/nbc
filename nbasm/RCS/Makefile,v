@@ -1,0 +1,231 @@
+head	1.5;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.5
+date	2018.10.12.18.25.27;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	96.03.22.21.02.01;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	96.03.22.20.42.29;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	96.01.13.23.10.42;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.08.08.23.27.31;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.5
+log
+@Add -m32 build option for linux (32bit build on 64 bit machine)
+@
+text
+@# /* makefile */
+# 			Makefile for NBCAS/GASM
+# 	    (c) Copyright 1990 J B Systems, Morrison, CO
+# 			All Rights Reserved
+#
+DESTDIR		=
+INSTDIR		= $(DESTDIR)/system/bin
+CC		= /usr/bin/cc
+DCC		= /bin/cc.sco
+LINT		= /usr/bin/lint
+CFLAGS		= $(OPT)
+#OPT		= -O -g -DMYATOF -pg
+OPT		= -O -DMYATOF -m32 # -Wall
+DOPTS		= -O -dos -DDOS
+LIBS		=
+INSTALL		= /bin/cp
+CHMOD		= /bin/chmod
+PROGRAM		= nbcas
+DPROGRAM	= gasm.exe
+
+HDRS	= defs.h
+
+SRCS 	= main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c \
+	xref.c float.c myatof.c
+
+CSRCS 	= main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c xref.c
+
+OBJS 	= main.o macro.o goasm.o parse.o io.o opcode.o pseudo.o symbol.o \
+	xref.o float.o myatof.o
+
+DOBJS 	= main.obj macro.obj goasm.obj parse.obj io.obj opcode.obj pseudo.obj symbol.obj xref.obj
+
+all:	$(PROGRAM)
+
+lint:	$(SRCS)
+	rm -f lint.out
+	$(LINT) $(SRCS) >lint.out
+
+dos:	$(DPROGRAM)
+
+$(DPROGRAM):    $(DOBJS)
+	$(DCC) $(DOPTS) $(LDFLAGS) $(LIBS) -o $@@ $(DOBJS)
+
+$(PROGRAM):     $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LIBS) -o $@@ $(OBJS)
+
+xref.o:	xref.c defs.h
+
+xref.obj:	xref.c defs.h
+	$(DCC) $(DOPTS) -c xref.c
+	mv xref.o xref.obj
+
+float.o:	float.c float.h
+
+myatof.o:	myatof.c float.h
+
+goasm.o:	goasm.c defs.h
+
+goasm.obj:	goasm.c defs.h
+	$(DCC) $(DOPTS) -c goasm.c
+	mv goasm.o goasm.obj
+
+io.o:	io.c defs.h
+
+io.obj:	io.c defs.h
+	$(DCC) $(DOPTS) -c io.c
+	mv io.o io.obj
+
+main.o:		main.c defs.h
+
+main.obj:	main.c defs.h
+	$(DCC) $(DOPTS) -c main.c
+	mv main.o main.obj
+
+macro.o:	macro.c defs.h
+
+macro.obj:	macro.c defs.h
+	$(DCC) $(DOPTS) -c macro.c
+	mv macro.o macro.obj
+
+opcode.o:	opcode.c defs.h
+
+opcode.obj:	opcode.c defs.h
+	$(DCC) $(DOPTS) -c opcode.c
+	mv opcode.o opcode.obj
+
+parse.o:	parse.c defs.h float.h
+
+parse.obj:	parse.c defs.h
+	$(DCC) $(DOPTS) -c parse.c
+	mv parse.o parse.obj
+
+pseudo.o:	pseudo.c defs.h
+
+pseudo.obj:	pseudo.c defs.h
+	$(DCC) $(DOPTS) -c pseudo.c
+	mv pseudo.o pseudo.obj
+
+symbol.o:	symbol.c defs.h
+
+symbol.obj:	symbol.c defs.h
+	$(DCC) $(DOPTS) -c symbol.c
+	mv symbol.o symbol.obj
+
+clean:
+	rm -f $(DOBJS) 
+	rm -f $(OBJS) a.out core 
+
+clobber:	clean
+	rm -f $(PROGRAM)
+	rm -f $(DPROGRAM)
+
+install:	all
+	$(CHMOD) 755 $(PROGRAM)
+	$(INSTALL) $(PROGRAM) $(INSTDIR)
+
+print:;		@@$(PRINT) $(HDRS) $(SRCS) Makefile
+@
+
+
+1.4
+log
+@Fix syntax error.
+@
+text
+@d13 1
+a13 1
+OPT		= -O -DMYATOF
+@
+
+
+1.3
+log
+@Mods crossreference support.
+Mods for alpha port.
+@
+text
+@d113 1
+a113 1
+install:	all;
+@
+
+
+1.2
+log
+@Add dependency for float.h to parse.c rule.
+@
+text
+@d12 2
+a13 1
+OPT		= -O -g -DMYATOF
+d24 1
+a24 1
+	dummy.c float.c myatof.c
+d26 1
+a26 1
+CSRCS 	= main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c dummy.c
+d29 1
+a29 1
+	dummy.o float.o myatof.o
+d31 1
+a31 1
+DOBJS 	= main.obj macro.obj goasm.obj parse.obj io.obj opcode.obj pseudo.obj symbol.obj dummy.obj
+d47 1
+a47 1
+dummy.o:	dummy.c defs.h
+d49 3
+a51 3
+dummy.obj:	dummy.c defs.h
+	$(DCC) $(DOPTS) -c dummy.c
+	mv dummy.o dummy.obj
+d114 1
+a114 1
+	-rm -f $(INSTDIR)/$(PROGRAM)
+a115 1
+	$(CHMOD) 755 $(INSTDIR)/$(PROGRAM)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d86 1
+a86 1
+parse.o:	parse.c defs.h
+@
