@@ -1,4 +1,37 @@
-DEFM                                                                            
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2021.02.07.16.27.12;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.02.06.21.14.29;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.02.16.23.50.55;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.3
+log
+@Remove unused label
+@
+text
+@DEFM                                                                            
 IFT PATH=OBJ.O SKIP                                                             
 CREA OBJ.O                                                                      
 %SKIP                                                                           
@@ -14,8 +47,8 @@ CREA CPPMAP
 %SKIP                                                                           
 AS SLO TO CPPMAP                                                                
 AS SGO TO OBJ.O                                                                 
-AS LIB TO @SYSTEM(BIN)CLB                                                       
-AS DIR TO @SYSTEM(BIN)CDR                                                       
+AS LIB TO @@SYSTEM(BIN)CLB                                                       
+AS DIR TO @@SYSTEM(BIN)CDR                                                       
 OPTION 19 25                                                                      
 $CATALOG                                                                        
 FILES 8                                                                        
@@ -32,3 +65,29 @@ NOTE *** ERROR ***  CATALOG FAILED
 PAGE
 EOJ                                                                             
 ENDM                                                                            
+@
+
+
+1.2
+log
+@Change to macro
+@
+text
+@a33 1
+%ENDHELP                                                                        
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a11 1
+OPTION 19                                                                       
+d19 1
+d23 1
+a24 1
+SPACE 16                                                                        
+d32 1
+@

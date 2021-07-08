@@ -1,0 +1,59 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	95.02.16.23.50.55;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/* Program to determine compiler defines */
+
+#ifdef mpx
+int gotmpx;
+#endif
+
+#ifdef gould
+int gotgould;
+#endif
+
+#ifdef i386
+int goti386;
+#endif
+
+#ifdef unix
+int gotunix;
+#endif
+
+#ifdef sel
+int gotsel;
+#endif
+
+#ifdef ON_SEL
+int gotON_SEL;
+#endif
+
+#ifdef sysv
+int gotsysv;
+#endif
+
+#ifdef linux
+int gotlinux;
+#endif
+
+main(){}
+@

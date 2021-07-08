@@ -1,0 +1,134 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2019.03.14.04.04.51;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.03.10.20.28.46;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.02.16.23.50.55;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.3
+log
+@CHange object file creation size
+@
+text
+@$DEFM                                                                           
+$PAGE 0                                                                         
+$JOB NBCPP                                                                      
+$IFT FILE CCOBJ.O OBJSKIP                                                       
+$FILEMGR                                                                        
+CREATE CCOBJ.O,DM,300                                                           
+X                                                                               
+$DEFNAME OBJSKIP                                                                
+$IFT FILE NBCPPMAP MAPSKIP                                                      
+$FILEMGR                                                                        
+CREATE NBCPPMAP,DM,100                                                          
+X                                                                               
+$DEFNAME MAPSKIP                                                                
+$A2 IN=SYC                                                                      
+$A1 OT=CCOBJ.O                                                                  
+$COMPRESS                                                                       
+C.SRTE.O                                                                         
+NBCPP.O                                                                         
+NBCPY.O                                                                         
+$NOTE  END OF COMPRESS                                                          
+$OPTION 19 25                                                                   
+$A1 SLO=NBCPPMAP                                                                
+$ALLOCATE 27000                                                                 
+$A1 SGO=CCOBJ.O                                                                 
+$A1 LIB=CLB,,U                                                                  
+$A1 DIR=CDR,,U                                                                  
+$CATALOG                                                                        
+FILES 16                                                                        
+BUFFERS 16                                                                      
+OPTION LOWER PROMPT                                                             
+ENVIRONMENT ,,SHARED,MAP2048                                                    
+CATALOG NBCPP                                                                   
+$IFF ABORT ENDJOB                                                               
+$NOTE *** ERROR *** CATALOG OF NBCPP FAILED                                     
+$DEFN ENDJOB                                                                    
+$EOJ                                                                            
+$PAGE 24                                                                        
+$ENDM                                                                           
+@
+
+
+1.2
+log
+@modify for building on mpx1x.
+@
+text
+@d6 1
+a6 1
+CREATE CCOBJ.O,DM,100                                                           
+d11 1
+a11 1
+CREATE NBCPPMAP,DM,200                                                          
+d17 1
+a17 1
+C.SRT.O                                                                         
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 15
+a15 7
+DEFM                                                                            
+IFT PATH=OBJ.O SKIP                                                             
+CREA OBJ.O                                                                      
+%SKIP                                                                           
+JOB LINKCF UNIX                                                                 
+$AS IN TO SYC                                                                   
+$AS OT TO OBJ.O                                                                 
+d17 1
+d21 6
+a26 8
+OPTION 19                                                                       
+IFT PATH=CPPMAP SKIP                                                            
+CREA CPPMAP                                                                     
+%SKIP                                                                           
+AS SLO TO CPPMAP                                                                
+AS SGO TO OBJ.O                                                                 
+AS LIB TO @@SYSTEM(BIN)CLB                                                       
+AS DIR TO @@SYSTEM(BIN)CDR                                                       
+d28 2
+a29 2
+FILES 8                                                                        
+BUFFERS 8                                                                      
+a30 1
+SPACE 16                                                                        
+d32 7
+a38 9
+BUILD NBCPP                                                                     
+$IFT ABORT ERROR1                                                               
+GOTO END                                                                        
+%ERROR1                                                                         
+NOTE *** ERROR ***  CATALOG FAILED                                              
+%END                                                                            
+EOJ                                                                             
+%ENDHELP                                                                        
+ENDM                                                                            
+@

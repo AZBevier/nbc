@@ -1,0 +1,53 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.02.11.02.39.55;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.03.10.20.42.02;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Fixup for mpx3x build without make4mpx on system.
+@
+
+
+1.2
+log
+@Remove line numbers
+@
+text
+@$DEFM
+$NOTE OPTI NOCO
+$NBCC -C -V -N -DMPX -B^(BIN) -I^(NCINCLUDE) NBCPP.C
+$NBYACC NBCPY.Y
+$DCAT <Y.TAB.C >NBCPY.C
+$NBCC -C -V -N -DMPX -B^(BIN) -I^(NCINCLUDE) NBCPY.C
+$ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 7
+a7 7
+$DEFM                                                                   0001.000
+$NOTE OPTI NOCO                                                         0002.000
+$NBCC -C -V -N -DMPX -B^(BIN) -I^(NCINCLUDE) NBCPP.C                    0003.000
+$NBYACC NBCPY.Y                                                         0004.000
+$DCAT <Y.TAB.C >NBCPY.C                                                 0005.000
+$NBCC -C -V -N -DMPX -B^(BIN) -I^(NCINCLUDE) NBCPY.C                    0006.000
+$ENDM                                                                   0007.000
+@

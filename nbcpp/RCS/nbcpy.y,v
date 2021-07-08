@@ -1,4 +1,32 @@
-/* cpy.y */
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	2021.06.28.17.37.57;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.02.16.23.50.55;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.2
+log
+@Add #include "stdio.h"
+@
+text
+@/* cpy.y */
 
 %{
 /*
@@ -95,3 +123,13 @@ term:
  * 	(c) Copyright 1986 Gould Inc.
  * 	    All Rights Reserved.
  */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d92 1
+@

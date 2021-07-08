@@ -1,0 +1,128 @@
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.3
+date	2021.07.01.02.27.32;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.03.10.23.57.15;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.03.10.23.22.11;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checckin
+@
+
+
+1.3
+log
+@Correct nbcpy processing.
+@
+text
+@#
+# Makefile for nbcpp for running nbcpp on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.NBCPP command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx1x
+
+OBJS = nbcpp.o nbcpy.o
+HDRS =
+SRCS= nbcpp.c nbcpy.y
+MAIN = $(OBJS)
+SLD = ld.nbcpp1x
+LD = LD.NBCPP
+SMK = mk.nbcpp1x
+MK = MK.NBCPP
+
+all:	$(SLD) $(SMK) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+nbcpy.o: nbcpy.c
+
+nbcpy.c: nbcpy.y
+	$(SYSBIN)/nbyacc nbcpy.y
+	cp y.tab.c nbcpy.c
+	$(CC) $(CFLAGS) nbcpy.c
+
+clean:
+	-rm -f *.o $(LBIN)/*.O nbcpy.c y.tab.c
+
+clobber: clean
+	-rm -f $(LBIN)/NBCPP.O $(LBIN)/NBCPP.C $(LBIN)/$(LD)
+	-rm -f $(LBIN)/NBCPY.O $(LBIN)/NBCPY.C $(LBIN)/$(MK)
+	-rm -f $(LBIN)/NBCPY.Y $(LBIN)/YYLEX.C
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <nbcpp.c >$(LBIN)/NBCPP.C
+	mpxblk <nbcpy.c >$(LBIN)/NBCPY.C
+	-rm -f nbcpy.c
+	mpxblk <nbcpy.y >$(LBIN)/NBCPY.Y
+	mpxblk <yylex.c >$(LBIN)/YYLEX.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	$(MOVE) nbcpp.o $(LBIN)/NBCPP.O
+	$(MOVE) nbcpy.o $(LBIN)/NBCPY.O
+	/bin/chmod 664 $(LBIN)/*.?
+	-rm -f $(OBJS)
+@
+
+
+1.2
+log
+@add LD * MK to program list
+@
+text
+@d17 1
+a17 1
+SRCS= nbcpp.c nbcpy.c
+d29 2
+d46 5
+d53 1
+d58 2
+a59 2
+	$(INSTALL) nbcpp.o $(LBIN)/NBCPP.O
+	$(INSTALL) nbcpy.o $(LBIN)/NBCPY.O
+d61 1
+a61 1
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d40 2
+a41 1
+	-rm -f $(LBIN)/NBCPY.Y
+d47 1
+@

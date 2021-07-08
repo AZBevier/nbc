@@ -1,0 +1,33 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.02.16.23.50.55;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM                                                                           
+$PAGE 0
+$NOTE OPTI NOCO                                                                 
+$NBCC -C -N NBCPP.C                                                             
+$@@SYSTEM(BIN)NBYACC NBCPY.Y                                                    
+VOLMGR COPY Y.TAB.C NBCPY.C REPL=T                                              
+$NBCC -C -N NBCPY.C                                                             
+$PAGE
+$ENDM                                                                           
+@
