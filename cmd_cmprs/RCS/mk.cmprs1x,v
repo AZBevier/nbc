@@ -1,0 +1,27 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.02.23.21.12;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Correct build environmenet.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) CMPRS.C
+$ENDM
+@

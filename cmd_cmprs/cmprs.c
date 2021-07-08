@@ -1,0 +1,866 @@
+/*~!cmprs.c*/
+/* Name:  cmprs.c Part No.: _______-____r
+ *
+ * Copyright 1995 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"Make4MPX $Id: cmprs.c,v 1.3 2021/07/02 23:18:44 jbev Exp $"
+
+/*
+ * $Log: cmprs.c,v $
+ * Revision 1.3  2021/07/02 23:18:44  jbev
+ * Coorect warning errors.
+ *
+ * Revision 1.2  1996/03/25 18:14:29  jbev
+ * Mods for alpha port.
+ *
+ * Revision 1.1  1995/03/14 01:23:10  jbev
+ * Initial revision
+ *
+ */
+
+/*
+ * cmprs command:
+ *	cmprs -I namelist -O ofile file1 file2 ....
+ *
+ * I - name of file containing object file pathnames.
+ *
+ * O - file to ouput object to.
+ *
+ * default to reading filenames from command line and outputing
+ * object files to stdout
+ *
+ */
+
+#include <stdio.h>
+#include <sys/fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <string.h>
+#include <ctype.h>
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#endif
+
+#ifdef mpx
+#define CASSG
+#include <unixio.h>
+#endif
+
+extern int readbb();
+extern int copyobj();
+extern int usage();
+extern char *getcwd();
+#ifdef NOTUSED
+static char *cvtdname();
+#endif
+static char *cvtfname();
+static char *pathname();
+static void crunch();
+#ifdef mpx
+extern char curvol[];
+extern char curdir[];
+extern char *getcwvd();
+extern char *str2lc();
+static void conv2unix();
+static void blcpy();
+static void strlcpy();
+#endif
+
+#ifndef mpx
+#define O_UNBLK	0
+#define O_BIN	0
+int mpxbb();
+#endif
+
+#define	MAXN	128
+#define BLKSIZE    768
+
+char tfn[MAXN];
+
+struct stat s1, s2, s3;
+
+int iflg = 0;		/* input names from given file */
+int oflg = 0;		/* output to specified file */
+
+int ofd = 0;		/* temp output file descriptor */
+int ifd = 0;		/* temp input file descriptor */
+int cffd = 0;		/* current file descriptor */
+
+int objcnt = 0;		/* object block count */
+
+char fbuf[BLKSIZE];
+char obuf[BLKSIZE];
+
+int main(argc, argv)
+int argc;
+char *argv[];
+{
+    int i, nr, rc, optc;
+    extern int optind;
+    extern char *optarg;
+    int errflg = 0;
+    char *ip = (char *)0, *op = (char *)0;
+    char *tp, *dp = (char *)0;
+
+    while ((optc=getopt(argc, argv, "I:i:O:o:")) != EOF)
+    	switch(optc) {
+    	    /* Get file containing file list */
+    	    case 'I':
+   	    case 'i':
+    		iflg++;
+    		/* convert arg to input file name */
+    		strcpy(tfn, optarg);
+    		if((ip = cvtfname(tfn)) == (char *)0) {
+    fprintf(stderr, "cmprs: can't resolve input file name %s\n", optarg);
+    		    usage();
+    		}
+    		break;
+
+    	    /* Get output file name */
+    	    case 'O':
+   	    case 'o':
+    		oflg++;
+    		/* convert arg to output file name */
+    		strcpy(tfn, optarg);
+    		if((op = cvtfname(tfn)) == (char *)0) {
+    fprintf(stderr, "cmprs: can't resolve output file name %s\n", optarg);
+    		    usage();
+    		}
+    		break;
+
+    	    case '?':		/* who knows what he wants */
+    		errflg++;
+    	}
+
+    if ((((argc-optind) < 1) && (!iflg)) || errflg) {
+    	usage();
+    }
+
+    /* see if output file is present.  If not create. */
+    if (oflg && (stat(op, &s1) < 0)) {
+    	fprintf(stderr, "cmprs: output file not present, creating %s\n", op);
+    	if ((ofd = creat(op, 0666)) < 0) {
+    	    fprintf(stderr, "cmprs: can't create output file %s\n", op);
+    	    exit(2);
+    	}
+    	close(ofd);	/* close, so we can open in binary mode */
+    	stat(op, &s1);	/* restat the file */
+    }
+
+    /* if not regular file, error */
+    if (oflg && ((s1.st_mode & S_IFMT) != S_IFREG)) {
+    	fprintf(stderr, "cmprs: output not regular file %s\n", op);
+    	exit(2);
+    }
+
+    if (oflg) {
+    	/* it's there, see if we can open in binary mode */
+    	if ((ofd = open(op, O_BIN | O_WRONLY, 0666)) < 0) {
+    	    fprintf(stderr, "ar: can't open output %s\n", op);
+    	    exit(2);
+    	}
+    } else {
+    	/* we are going to stdout, so make sure file is binary */
+#ifdef mpx
+    	struct filtag *Curfil = filtabl + 1;	/* for stdout */
+    	struct flprmtag *Curfprm = &Curfil->filparm;
+    	Curfprm->binary = 1;
+#endif
+    	ofd = 1;		/* output file number */
+    }
+
+    /* see if input file is present. */
+    if (iflg && (stat(ip, &s2) < 0)) {
+    	fprintf(stderr, "cmprs: input file not present %s\n", ip);
+    	exit(2);
+    }
+
+    /* if not regular file, error */
+    if (iflg && ((s2.st_mode & S_IFMT) != S_IFREG)) {
+    	fprintf(stderr, "cmprs: input file not regular file %s\n", ip);
+    	exit(2);
+    }
+
+    /* it's there, see if we can open */
+    if (iflg && ((ifd = open(ip, O_RDONLY, 0666)) < 0)) {
+    	fprintf(stderr, "ar: can't open input file %s\n", ip);
+    	exit(2);
+    }
+
+    /* we are finally ready to do something */
+    /* the input file is open, if specified, and the ofd has been
+     * set to stdout or a file opened in blocked/binary mode */
+
+    tp = (char *)0;
+    /* do any files on command line first */
+    for (rc = optind; rc < argc; rc++) {
+    	/* convert arg to input file name */
+    	strcpy(tfn, argv[rc]);
+    	if((tp = cvtfname(tfn)) == (char *)0) {
+    	    fprintf(stderr, "cmprs: can't resolve file name %s\n", argv[rc]);
+    	    /* just ignore */
+    	    continue;
+    	}
+    	if((cffd = open(tp, O_BIN | O_RDONLY, 0666)) < 0) {
+    	    fprintf(stderr, "cmprs: can't open object file %s\n", argv[rc]);
+    		/* just ignore */
+    		free(tp);
+    		continue;
+    	}
+    	copyobj(cffd, ofd, tp);		/* copy the file */
+    	free(tp);
+    }
+    if (!iflg) {			/* if no input file, done */
+#ifndef mpx
+    	nr = mpxbb(ofd, dp, 120, 1);	/* last write to output */
+#endif
+    	if (oflg)
+    	    close(ofd);			/* close output */
+    	exit(0);			/* all was O.K. */
+    }
+    /* now do any files in input file */
+doinput:
+    dp = tfn;
+    tp = (char *)0;
+#ifdef mpx
+    nr = readraw(ifd, dp, MAXN);
+#else
+#ifdef NOT_NOW
+    nr = readbb1(ifd, dp, MAXN);
+#else
+    for (i=0; i<MAXN; i++) {
+    	nr = read(ifd, &dp[i], 1);
+    	if (nr <= 0)
+    	    break;
+    	if (dp[i] == '\n') {
+    	    nr = i;
+    	    break;
+    	}
+    }
+#endif
+#endif
+    if (nr <= 0) {
+    	/* we are at EOF on input */
+#ifndef mpx
+    	nr = mpxbb(ofd, dp, 120, 1);	/* last write to output */
+#endif
+    	if (oflg)
+    	    close(ofd);			/* close output */
+    	exit(0);			/* all was O.K. */
+    }
+    dp[nr] = '\0';		/* null terminate */
+    for (i=0; i<nr; i++) {
+    	if (dp[i] != ' ' && dp[i] != '\0')
+    	    goto gotname;
+    	if (dp[i] != '\0')
+    	    break;
+    }
+    goto doinput;
+gotname:
+    if(*dp == '*' || *dp == '#')	/* ignore comment lines */
+    	goto doinput;
+    /* convert arg to input file name */
+    if((tp = cvtfname(tfn)) == (char *)0) {
+    	fprintf(stderr, "cmprs: can't resolve file name %s\n", dp);
+    	/* just ignore */
+    	goto doinput;
+    }
+    if((cffd = open(tp, O_BIN | O_RDONLY, 0666)) < 0) {
+    	fprintf(stderr, "cmprs: can't open object file %s\n", dp);
+    	/* just ignore */
+    	free(tp);
+    	goto doinput;
+    }
+    copyobj(cffd, ofd, tp);		/* copy the file */
+    free(tp);
+    goto doinput;			/* get next one */
+    /*NOTREACHED*/
+}
+
+/* copy object file */
+int
+copyobj(infd, outfd, file)
+int infd;
+int outfd;
+char *file;
+{
+    int dffound;
+    int nr;
+    char *dp;
+
+    dffound = 0;		/* no df record yet */
+    objcnt = 0;			/* object records yet */
+
+    /* copy object to output */
+readobj:
+    dp = obuf;
+#ifdef mpx
+    nr = readraw(infd, dp, 120);
+#else
+    nr = readbb(infd, dp, 120);
+#endif
+    if(nr <= 0) {		/* if eof, we done */
+    	close(infd);
+    	if(dffound) {
+    	    fprintf(stderr, "cmprs: %d records copied from file %s\n",
+    	      objcnt, file);
+    	    return(0);
+    	} else {
+    	    fprintf(stderr, "cmprs: unexpected EOF on file %s\n", file);
+    	    return(-1);
+    	}
+    }
+    objcnt++;		/* bump object record count */
+    if(((*dp & 0xff) != 0xdf) && ((*dp & 0xff) != 0xff)) {
+    	fprintf(stderr, "cmprs: bad object file %s\n", file);
+    	close(infd);
+    	/* just ignore */
+    	return(-1);
+    }
+    if((*dp & 0xff) == 0xdf)	/* last record */
+    	dffound = 1;		/* df record found */
+#ifdef mpx
+    nr = writraw(outfd, dp, 120);
+#else
+    nr = mpxbb(outfd, dp, 120, 0);
+#endif
+    if(nr <= 0) {
+    	fprintf(stderr, "cmprs: error writing output file\n");
+    	close(infd);
+    	close(outfd);
+    	exit(2);			/* we done */
+    }
+    /* record exhausted, get next record */
+    goto readobj;
+    /*NOREACHED*/
+}
+
+#ifndef mpx
+static	unsigned  char	bb[BLKSIZE];	/* blocking buffer */
+static	char	first = 0;		/* 1st time thru flag */
+
+/*
+ * mpxbb - make up mpx block file output
+ * input - buffer address
+ *	 - byte count
+ */
+
+int
+mpxbb(fd, buf, cnt, last)
+int	fd;
+unsigned char	*buf;
+int	cnt;
+int	last;
+{
+    int	boff;			/* next write address offset */
+
+    if (!first) {			/* is this 1st time thru */
+    	first = 1;			/* set the flag */
+    	memset (bb, '\0', BLKSIZE);	/* zero the buffer */
+    	bb[3] = 4;			/* next write byte offset */
+    	bb[4] = 0x60;			/* set beg/end of block */
+    	bb[5] = 0;			/* 1st block count is 0 bytes */
+    }
+    boff = (bb[2] << 8) | (bb[3]);	/* get next write address offset */
+    if (last)
+    	goto alldone;			/* close out the file */
+    /* see if enough room in buffer for this record */
+    /* add current offset + 2 (for last record info) plus new */
+    /* record size plus 4 (2 for this rec, 2 for last) */
+    if ((boff + 2 + cnt + 4) >= BLKSIZE) {
+    	/* not enough space, write out this record */
+    	if (write(fd, bb, BLKSIZE) < 0)
+    	    return(-1);
+    	memset (bb, '\0', BLKSIZE);	/* zero the buffer */
+    	bb[4] = 0x60;			/* set beg/end of block */
+    	bb[5] = 0;			/* 1st block count is 0 bytes */
+					/* after 1st write */
+    	boff = 4;			/* init count at 4 bytes */
+    }
+    /* we have enough room, move in the record */
+    /* clear last record end of block flag, set up this record */
+    /* info and last rec info at end of data, and update cnt */
+    bb[boff] &= ~0x20;			/* clear end of block flag */
+    bb[boff+2] = 0x00;			/* clear this blocks flags */
+    bb[boff+3] = cnt;			/* set this record count */
+    memcpy(&bb[boff+4], buf, cnt);	/* copy in the data */
+    boff += (cnt+4);			/* update count */
+    bb[boff] = 0x20;			/* set eob status flag */
+    bb[boff+1] = cnt;			/* set last rec byte count */
+    bb[2] = (boff & 0xff00) >> 8;	/* set hi byte of count */
+    bb[3] = (boff & 0xff);		/* set lo byte of count */
+    return(cnt);			/* done */
+
+alldone:
+    /* that was the last record, set eof flag in bb, write it and exit */
+    /* see if enough room in buffer for EOM record */
+    /* add current offset + 2 (for last record info) plus new */
+    /* EOF record size of 4 (2 for this rec, 2 for last) */
+    if ((boff + 2 + 4) >= BLKSIZE) {
+    	/* not enough space, write out this record */
+    	if (write(fd, bb, BLKSIZE) < 0)
+    	    return(-1);
+    	memset (bb, '\0', BLKSIZE);	/* zero the buffer */
+    	bb[4] = 0x60;			/* set beg/end of block */
+    	bb[5] = 0;			/* 1st block count is 0 bytes */
+					/* after 1st write */
+    	boff = 4;			/* init count at 4 bytes */
+    }
+    bb[boff] &= ~0x20;			/* clear end of block flag */
+/*  bb[boff+2] = 0x80;	*/		/* clear this blocks flags */
+    bb[boff+2] = 0xa0;			/* clear this blocks flags */
+    bb[boff+3] = 0;			/* set record count of 0 */
+    bb[boff+4] = 0xa0;			/* set EOF/EOB flags */
+    boff += 4;				/* 4 more bytes */
+    bb[2] = (boff & 0xff00) >> 8;	/* set hi byte of count */
+    bb[3] = (boff & 0xff);		/* set lo byte of count */
+    /* write out EOF record */
+    if (write(fd, bb, BLKSIZE) < 0)
+    	return(-1);
+    first = 0;				/* reset 1st time flag */
+    return(cnt);			/* get out, done */
+}
+
+/*
+ * This function reads MPX blocked files
+ */
+
+int bin = 0;
+unsigned char si[BLKSIZE];
+
+int
+readbb (fd, ip, cnt)
+int	fd;
+char 	*ip;
+int	cnt;
+{
+    int c;
+    int i = 0;
+
+    if (bin == 0) {
+    	read(fd, si, BLKSIZE);
+    	bin = 6;
+    }
+    /* check for EOF */
+    if (si[bin] & 0x80) {
+    	bin = 0;
+    	return(0);		/* we have EOF */
+    }
+    /* check for EOB in last record */
+    if (si[bin - 2] & 0x20) {
+    	read(fd, si, BLKSIZE);	/* we have EOB */
+    	bin = 6;
+    }
+    if ((c = si[bin+1]) > 0) {
+    	for (i = 0; i < c; i++) {
+    	    ip[i] = si[bin + 2 + i];
+    	    if (i >= cnt)
+    		break;
+    	}
+    	bin += (c + 4);
+    	return (i);
+    }
+    bin = 0;
+    return (i);
+}
+/*
+ * This function reads MPX blocked files
+ */
+
+int bin1 = 0;
+unsigned char si1[BLKSIZE];
+
+int
+readbb1 (fd, ip, cnt)
+int	fd;
+char 	*ip;
+int	cnt;
+{
+    int c;
+    int i = 0;
+
+    if (bin1 == 0) {
+    	read(fd, si1, BLKSIZE);
+    	bin1 = 6;
+    }
+    /* check for EOF */
+    if (si1[bin1] & 0x80) {
+    	bin1 = 0;
+    	return(0);		/* we have EOF */
+    }
+    /* check for EOB in last record */
+    if (si1[bin1 - 2] & 0x20) {
+    	read(fd, si1, BLKSIZE);	/* we have EOB */
+    	bin1 = 6;
+    }
+    if ((c = si1[bin1+1]) > 0) {
+    	for (i = 0; i < c; i++) {
+    	    ip[i] = si1[bin1 + 2 + i];
+    	    if (i >= cnt)
+    		break;
+    	}
+    	bin1 += (c + 4);
+    	return (i);
+    }
+    bin1 = 0;
+    return (i);
+}
+#endif /* mpx */
+
+
+int usage()
+{
+    fprintf(stderr, "Usage: cmprs [-i filenames][-o outfile][f1 f2 ... fn]\n");
+    exit(2);
+}
+
+#ifdef NOTUSED
+/* cvtdname
+ * convert an arbitrary directory name to a qualified unix pathname.
+ * return pointer to malloc'd name or null if error.
+ */
+static char *
+cvtdname(path)
+char *path;
+{
+    char *dirp, *dbuf, *retp;
+
+    dbuf = (char *)malloc(MAXN);
+#ifdef mpx
+    /* make sure pathname is l/c */
+    str2lc(path);
+#endif
+    /* get default working directory */
+    dirp = getcwd(0, MAXN);
+#ifdef mpx
+    /* see if just a name, if so add () around name */
+    if (*path != '/' && *path != '@' && *path != '^' && *path != '('
+      && *path != '.') {
+    	/* put () around dir name to see if o.k. */
+    	dbuf[0] = '(';		/* start with ( */
+    	strcpy(&dbuf[1], path);	/* copy name */
+    	strcat(dbuf, ")");	/* put on ) */
+    	retp = pathname(dirp, dbuf);
+    } else {
+    	retp = pathname(dirp, path);
+    }
+#else
+    retp = pathname(dirp, path);
+#endif
+    if (dbuf)
+    	free(dbuf);
+    if (dirp)
+    	free(dirp);
+    return(retp);
+}
+#endif
+
+/* cvtfname
+ * convert an arbitrary filename to a qualified unix pathname.
+ * return pointer to malloc'd name or null if error.
+ */
+static char *
+cvtfname(path)
+char *path;
+{
+    char *dirp, *retp;
+
+#ifdef mpx
+    /* make sure pathname is l/c */
+    str2lc(path);
+#endif
+    /* get default working directory */
+    dirp = getcwd(0, MAXN);
+    retp = pathname(dirp, path);
+    if (dirp)
+    	free(dirp);
+    return(retp);
+}
+
+/* Convert relative to absolute pathnames */
+
+/* Given a working directory and an arbitrary pathname, resolve them into
+ * an absolute pathname. Memory is allocated for the result, which
+ * the caller must free
+ */
+static char *
+pathname(cd,path)
+char *cd;	/* Current working directory */
+char *path;	/* Pathname argument */
+{
+    register char *buf;
+
+    if(cd == (char *)0 || path == (char *)0)
+    	return (char *)0;
+
+    /* Strip any leading white space on args */
+    while(*cd == ' ' || *cd == '\t')
+    	cd++;
+    while(*path == ' ' || *path == '\t')
+    	path++;
+
+    /* Allocate and initialize output buffer; user must free
+     * add fudge factor to malloc size in case user specified
+     * just a / and we must replace it with /system/system
+     */
+    buf = (char *)malloc((unsigned)strlen(cd) + strlen(path) + 16);
+    buf[0] = '\0';
+
+    /* Interpret path relative to cd only if it doesn't begin with "/" */
+    /* for MPX also see if @, ^, or ( */
+    if(*path == '/'
+#ifdef mpx
+      || *path == '@' || *path == '^' || *path == '('
+#endif
+      ) {
+    	crunch(buf,path);
+    } else {
+    	crunch(buf,cd);
+    	crunch(buf,path);
+    }
+
+    /* Special case: null final path means the root directory */
+    if(buf[0] == '\0'){
+    	buf[0] = '/';
+    	buf[1] = '\0';
+    }
+#ifdef mpx
+    /* now convert to a qualified unix name if it was entered
+     * as an MPX name
+     */
+    conv2unix(buf);
+#endif
+
+    return buf;
+}
+
+/* Process a path name string, starting with and adding to
+ * the existing buffer
+ */
+static void
+crunch(buf,path)
+char *buf;
+register char *path;
+{
+    register char *cp;
+	
+    cp = buf + strlen(buf);	/* Start write at end of current buffer */
+	
+    /* Now start crunching the pathname argument */
+    for(;;){
+    	/* Strip leading /'s; one will be written later */
+    	while(*path == '/')
+    	    path++;
+    	if(*path == '\0')
+    	    break;		/* no more, all done */
+    	/* Look for parent directory references, either at the end
+    	 * of the path or imbedded in it
+    	 */
+    	if(strcmp(path,"..") == 0 || strncmp(path,"../",3) == 0) {
+    	    /* Hop up a level */
+    	    if((cp = strrchr(buf,'/')) == (char *)0)
+    		    cp = buf;		/* Don't back up beyond root */
+    		*cp = '\0';		/* In case there's another .. */
+    		path += 2;		/* Skip ".." */
+    		while(*path == '/')	/* Skip one or more slashes */
+    		    path++;
+    		/* Look for current directory references, either at the end */
+    		/* of the path or imbedded in it */
+    	} else if(strcmp(path,".") == 0 || strncmp(path,"./",2) == 0) {
+    	    /* "no op" */
+    	    path++;			/* Skip "." */
+    	    while(*path == '/')		/* Skip one or more slashes */
+    		path++;
+    	} else {
+    	    /* Ordinary name, copy up to next '/' or end of path */
+#ifdef mpx
+    if(cp == buf && (*path == '@' || *path == '^' || *path == '(')) {
+    } else
+#endif
+    	    *cp++ = '/';
+    	    while(*path != '/' && *path != '\0')
+    		*cp++ = *path++;
+    	}
+    }
+    *cp++ = '\0';
+}
+
+#ifdef mpx
+/* convert unix or mpx filename to unix filename */
+/* .'s and multiple /'s will have been removed by crunch above */
+/* first char must be /, ., @, ^, or ( to be converted */
+/* NOTE: string supplied must be big enough for conversion */
+
+static void
+conv2unix(s)
+register char *s;
+{
+    register char *os = s;
+    char *tp;
+
+    if (s == 0 || *s == 0)return;
+    	switch (*os) {
+    	    case '/':		/* path starts with /, leave it */
+    		/* check for just a '/', if yes, give /system/system */
+    		if (*++os == '\0') {	/* see if just a '/' */
+    		    strcat(os, "system/system"); /* copy in root */
+    		    return;		/* we are done */
+    		}
+    		return;		/* done with conversion */
+
+    	    case '^':		/* path starts with ^ put in /curvol */
+    		getcwvd();	/* get current working vol, dir */
+    		/* move over other "stuff" to make room for vol */
+    		bcopy(&os[1], os+strlen(curvol)+1, strlen(os));
+    		blcpy(curvol, os+1, strlen(curvol));
+    		/* go to process dir name, if any */
+    		goto dodir;
+
+    	    case '(':		/* path starts with ( put in /curvol */
+    		getcwvd();	/* get current working vol, dir */
+    		/* move over other "stuff" to make room for vol */
+    		bcopy(os, os+strlen(curvol)+1, strlen(os)+1);
+    		blcpy(curvol, os+1, strlen(curvol));
+    		/* drop thru to process dir name, if any */
+
+    	    case '@':		/* path starts with @ put in / */
+dodir:
+    		*os++ = '/';
+    		/* check for just an '@', if yes, give /system */
+    		if (*os == '\0') {	/* see if just a '@' */
+    		    strcat(os, "system/system"); /* copy in root */
+    		    return;		/* we are done */
+    		}
+    		/* check to see if @vol^dir or @vol^(dir) */
+    		if (tp = strchr(os, '^')) {       /* got end of vol */
+    		    /* check to see if next char is '('.  If yes,
+    		     * just delete the ^ and continue
+    		     */
+    		    if (tp[1] == '(') {		/* see if '(' */
+    			bcopy(&tp[1], tp, strlen(tp));
+    		    } else {
+    			*tp++ = '/';	/* terminate volume name */
+    		    }
+    		    os = tp;		/* next char in input */
+    		}
+    		if (tp = strchr(os, '(')) {	/* got end of vol */
+    		    *tp++ = '/';	/* terminate volume name */
+    		    os = tp;		/* next char in input */
+    		    if (tp = strchr(os, ')')) {  /* get end of dir */
+    			if (tp[1] == '\0')  /* see if a file name */
+    			    *tp = '\0';	/* no, leave off last / */
+    			else
+    			    *tp++ = '/';    /* terminate directory */
+    			os = tp;        /* start of file name or null */
+    		    } else {		/* have /vol/, will get error */
+    			return;
+    		    }
+    		} else {		/* have /vol, just wants volume */
+    		    return;
+    		}
+    		return;			/* done with conversion */
+
+    	    case '.' :            /* curr directory? */
+    		if (os[1] == '.') { /* have .. now what? */
+    		    if (os[2] == '/') { /* have ../ put in cur vol */
+    			getcwvd();	/* get current working vol, dir */
+    			bcopy(&os[3], os+strlen(curvol)+2, strlen(os) - 1);
+    			*os++ = '/';
+    			blcpy(curvol, os, strlen(curvol));
+    			os += (strlen(curvol)+1);
+    			*os++ = '/';
+    			return;
+    		    }
+    		    if (os[2] == 0) { /* have just .. give vol */
+    			getcwvd();	/* get current working vol, dir */
+    			*os++ = '/';
+    			strlcpy (os, curvol);
+    			os += strlen(curvol);
+    			*os++ = '\0';        /* end of volume */
+    			return;          /* return /vol */
+    		    }
+    		    return;            /* have ..? just an error */
+    		}
+    		if (os[1] == '/') {  /* have ./, just curr dir */
+    		    /* copy down file name */
+    		    bcopy(&os[2], os, strlen(os));
+    		    return;
+    		}
+    		if (os[1] == 0) {    /* have just ., return curr dir */
+    		    *os++ = '/';
+    		    getcwvd();	/* get current working vol, dir */
+    		    strlcpy(os, curvol); /* copy in volume */
+    		    os += strlen(curvol);
+    		    *os++ = '/';        /* start of dir */
+    		    strlcpy(os, curdir); /* copy in dir */
+    		    os += strlen(curdir);
+    		    *os++ = '\0';        /* terminate dir */
+    		    return;
+    		}
+    		return;              /* have .? just an error */
+    	    default:
+    		return;              /* everything else o.k. */
+    	}
+}
+
+/*
+ * copy string p2 to string p1, converting to l/c as we go.
+ */
+static void
+strlcpy(p1, p2)
+char * p1;
+char * p2;
+{
+    int c;
+    /* copy p2 to p1 */
+    while (c = *p2++) {
+    	if (isupper(c))
+    	    c = tolower(c);
+    	*p1++ = c;
+    }
+    *p1 = '\0';
+}
+
+/*
+ * copy string b1 to l/c string b2, with overlap testing
+ */
+static void
+blcpy (b1, b2, length)
+     register char *b1;
+     register char *b2;
+     register int length;
+{
+    register int c;
+    /* handle buffer overlap case */
+    if (b1 < b2)	/* possible overlap */
+    	for (b1 += length, b2 += length; length--; ) {
+    	    c = *--b1;
+    	    if (isupper(c))
+    		c = tolower(c);
+    	    *--b2 = c;
+    	}
+    else
+    	for (;length--;) {
+    	    c = *b1++;
+    	    if (isupper(c))
+    		c = tolower(c);
+    	    *b2++ = c;
+    	}
+}
+
+#endif /* mpx */

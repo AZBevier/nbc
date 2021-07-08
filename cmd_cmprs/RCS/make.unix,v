@@ -1,0 +1,65 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.02.23.22.05;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@CHange build environmnet.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for cmprs for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 -Wall
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = cmprs.o
+HDRS =
+SRCS = cmprs.c
+MAIN = cmprs
+DOC = cmprs.m
+
+all:	$(DOC) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS) $(LBIN)/$(DOC)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	$(INSTALL) $(LBIN)/cmprs $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
