@@ -1,0 +1,81 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.02.23.01.57;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.02.22.14.58;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Change build environment.
+@
+
+
+1.2
+log
+@Add -Wall option.
+@
+text
+@#
+# Makefile for chtyp for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 -Wall
+SYSBIN = /system/bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS = chtyp.o
+HDRS =
+SRCS = chtyp.c
+MAIN = chtyp
+DOC = chtyp.m
+
+all:	$(DOC) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(SRCS)	
+	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS) $(LBIN)/$(DOC)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+#	$(INSTALL) $(LBIN)/chtyp $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -DMPX -m32
+@
