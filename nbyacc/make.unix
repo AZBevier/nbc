@@ -2,13 +2,13 @@
 # Makefile for nbyacc for running on Linux
 #
 CC = cc
-CFLAGS = -O -DMPX -m32
+CFLAGS = -O -DMPX -m32 -Wall
 SYSBIN = /system/bin
 SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-YACC = yacc
+#YACC = yacc
 MAKEFILE = make.unix
 
 # Fill in with correct information
@@ -21,7 +21,7 @@ PAR = yaccpar
 
 MAIN = nbyacc
 
-all:	$(MAIN)
+all:	clean $(MAIN)
 	-/bin/echo $(MAIN) is up to date.
 
 $(MAIN):	$(MAKEFILE) $(PAR) $(DEPS) $(OBJS)
@@ -34,9 +34,10 @@ clean:
 clobber:	clean		# delete main from current directory
 	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/y1.c
 	/bin/rm -f $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
+	/bin/rm -f $(LBIN)/y1.o $(LBIN)/y2.o $(LBIN)/y3.o $(LBIN)/y4.o
 	/bin/rm -f $(LBIN)/dextern $(LBIN)/files $(LBIN)/yaccpar
 
-install:	all			# build if necessary, and then copy main to system directory
+install:	all		# build if necessary, and then copy main to system directory
 	@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
@@ -48,5 +49,6 @@ install:	all			# build if necessary, and then copy main to system directory
 	$(INSTALL) $(LBIN)/$(PAR) $(SYSLIB)/$(PAR)
 	$(INSTALL) $(DEPS) $(LBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
+	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/dextern $(LBIN)/files $(LBIN)/*.?
 

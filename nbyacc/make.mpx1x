@@ -5,12 +5,13 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+INC = /system/cinclude
+CFLAGS = -C -1 -DMPX -DMPX1X -I$(INC) -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
 LBIN = ./mpx1x
 INSTALL = cp
 MOVE = mv
-YACC = nbyacc
+YACC = $(SYSBIN)/nbyacc
 MAKEFILE = make.mpx1x
 
 OBJS = y1.o y2.o y3.o y4.o
@@ -25,10 +26,10 @@ LD = LD.NBYAC
 SMK = mk.nbyac1x
 MK = MK.NBYAC
 
-all:	$(MAIN)
+all:	clean $(MAIN)
 	-/bin/echo $(MAIN) objects created
 
-$(MAIN):	$(MAKEFILE) $(DEPS) $(SRCS)
+$(MAIN):	$(MAKEFILE) $(PAR) $(DEPS) $(SRCS)
 	$(CC) $(CFLAGS) $(SRCS)
 
 clean:
@@ -57,10 +58,10 @@ install: all    # build if necessary, and then copy main to system directory
 	mpxblk <yaccpar >$(LBIN)/YACCPAR
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
-	$(INSTALL) y1.o $(LBIN)/Y1.O
-	$(INSTALL) y2.o $(LBIN)/Y2.O
-	$(INSTALL) y3.o $(LBIN)/Y3.O
-	$(INSTALL) y4.o $(LBIN)/Y4.O
+	$(MOVE) y1.o $(LBIN)/Y1.O
+	$(MOVE) y2.o $(LBIN)/Y2.O
+	$(MOVE) y3.o $(LBIN)/Y3.O
+	$(MOVE) y4.o $(LBIN)/Y4.O
 	/bin/chmod 664 $(LBIN)/*.?
 	/bin/chmod 664 $(LBIN)/DEXTERN
 	/bin/chmod 664 $(LBIN)/FILES

@@ -1,17 +1,46 @@
-#
-# Makefile for nbyacc for running nbyacc on mpx3x
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.06.28.21.08.19;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.02.05.23.35.39;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move object instead of copy
+@
+
+
+1.2
+log
+@Do clean before install.
+@
+text
+@#
+# Makefile for nbyacc for running nbyacc on mpx1x
 # Object files must be produced and then cataloged
-# on MPX3.X using the LD.NBYAC command file.
+# on MPX1.X using the LD.NBYAC command file.
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+INC = /system/cinclude
+CFLAGS = -C -1 -DMPX -DMPX1X -I$(INC) -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
-LBIN = ./mpx3x
+LBIN = ./mpx1x
 INSTALL = cp
 MOVE = mv
 YACC = $(SYSBIN)/nbyacc
-MAKEFILE = make.mpx3x
+MAKEFILE = make.mpx1x
 
 OBJS = y1.o y2.o y3.o y4.o
 HDRS =
@@ -20,10 +49,10 @@ DEPS = dextern files
 PAR = yaccpar
 
 MAIN = $(OBJS)
-SLD = ld.nbyac3x
-LD = LD.NBYACC
-SMK = mk.nbyac3x
-MK = MK.NBYACC
+SLD = ld.nbyac1x
+LD = LD.NBYAC
+SMK = mk.nbyac1x
+MK = MK.NBYAC
 
 all:	clean $(MAIN)
 	-/bin/echo $(MAIN) objects created
@@ -43,7 +72,7 @@ clobber: clean      # delete main from current directory
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all    # build if necessary, and then copy main to system directory
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
@@ -65,3 +94,24 @@ install: all    # build if necessary, and then copy main to system directory
 	/bin/chmod 664 $(LBIN)/DEXTERN
 	/bin/chmod 664 $(LBIN)/FILES
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 2
+a9 1
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+d14 1
+a14 1
+YACC = nbyacc
+d29 1
+a29 1
+all:	$(MAIN)
+d32 1
+a32 1
+$(MAIN):	$(MAKEFILE) $(DEPS) $(SRCS)
+@

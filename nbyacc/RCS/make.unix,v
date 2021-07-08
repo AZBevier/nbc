@@ -1,0 +1,273 @@
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.6
+date	2021.06.28.21.09.56;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2021.02.05.23.39.50;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2021.02.05.23.34.48;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2019.01.31.20.47.07;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.10.18.17.37;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.01.09.19.55.40;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial version
+@
+
+
+1.6
+log
+@Add -Wall option.
+@
+text
+@#
+# Makefile for nbyacc for running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 -Wall
+SYSBIN = /system/bin
+SYSLIB = /system/lib
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+#YACC = yacc
+MAKEFILE = make.unix
+
+# Fill in with correct information
+
+OBJS = y1.o y2.o y3.o y4.o
+HDRS =
+SRCS = y1.c y2.c y3.c y4.c
+DEPS = dextern files
+PAR = yaccpar
+
+MAIN = nbyacc
+
+all:	clean $(MAIN)
+	-/bin/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(PAR) $(DEPS) $(OBJS)
+	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
+	/bin/chmod 755 $(MAIN)
+
+clean:
+	-rm -f $(OBJS)
+
+clobber:	clean		# delete main from current directory
+	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/y1.c
+	/bin/rm -f $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
+	/bin/rm -f $(LBIN)/y1.o $(LBIN)/y2.o $(LBIN)/y3.o $(LBIN)/y4.o
+	/bin/rm -f $(LBIN)/dextern $(LBIN)/files $(LBIN)/yaccpar
+
+install:	all		# build if necessary, and then copy main to system directory
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	$(INSTALL) $(PAR) $(LBIN)/$(PAR)
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	$(INSTALL) $(LBIN)/$(PAR) $(SYSLIB)/$(PAR)
+	$(INSTALL) $(DEPS) $(LBIN)
+	$(INSTALL) $(SRCS) $(LBIN)
+	$(MOVE) $(OBJS) $(LBIN)
+	/bin/chmod 664 $(LBIN)/dextern $(LBIN)/files $(LBIN)/*.?
+
+@
+
+
+1.5
+log
+@Move objects instead of copy
+@
+text
+@d5 1
+a5 1
+CFLAGS = -O -DMPX -m32
+d11 1
+a11 1
+YACC = yacc
+d24 1
+a24 1
+all:	$(MAIN)
+d40 1
+a40 1
+install:	all			# build if necessary, and then copy main to system directory
+@
+
+
+1.4
+log
+@Update install macro
+@
+text
+@d52 1
+a52 1
+	$(INSTALL) $(OBJS) $(LBIN)
+@
+
+
+1.3
+log
+@add dependencies
+@
+text
+@a0 2
+#~!Makefile for nbyacc
+# Name:  Makefile Part No.: _______-____r
+d2 1
+a2 1
+# Copyright 1994 - J B Systems, Morrison, CO
+d4 8
+a11 36
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"@@(#)Make:nbyacc/Makefile	1.0"
+
+# Make parameters when running on MPX
+
+ROOT = /
+TARGET = /system/bin
+SOURCE = .
+PREFIX = 
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/bin
+BIN = /bin
+UBIN = /usr/bin
+LIB = /lib
+YBIN = /usr/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M -UMPX
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -O -m32
+LD = $(UBIN)/$(PREFIX)ld
+LDFLAGS = -m32 #-Ynbyaccmap
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+d16 1
+a16 2
+OBJECTS = y1.o y2.o y3.o y4.o
+
+a17 1
+
+d20 1
+a23 2
+ALL:	all
+
+d25 1
+a25 7
+	$(BIN)/echo $(MAIN) is up to date.
+
+$(MAIN):	$(MAKEFILE) $(DEPS) $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+	$(BIN)/chmod 755 $(MAIN)
+#	$(BIN)/chgrp system $(MAIN)
+#	$(BIN)/chown system $(MAIN)
+d27 3
+a29 1
+CLEAN:  clean
+d32 1
+a32 19
+	$(BIN)/rm -f $(OBJECTS)
+
+CLOBBER: clobber
+
+clobber: clean
+	$(BIN)/rm -f $(MAIN)
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	@@for i in $(SRCS); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+INSTALL: install
+d34 20
+a53 2
+install: all
+	$(BIN)/cp $(MAIN) $(TARGET)/$(MAIN)
+a54 1
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.2
+log
+@Update for Linux port
+@
+text
+@d51 1
+d60 1
+a60 1
+$(MAIN):	$(MAKEFILE) $(OBJECTS)
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d23 1
+a23 1
+ROOT = /system/system
+d29 1
+a29 1
+SBIN = /system/system
+d32 2
+a33 2
+LIB = /system/bin
+YBIN = /system/bin
+d35 1
+a35 1
+CPFLAGS = -M
+d37 3
+a39 3
+CFLAGS = -DMPX
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS = #-Ynbyaccmap
+@

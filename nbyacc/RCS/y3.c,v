@@ -1,11 +1,44 @@
-/*	Copyright (c) 1984 AT&T	*/
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	2021.06.28.21.03.22;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.10.18.33.21;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2016.01.29.21.42.43;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial version
+@
+
+
+1.3
+log
+@Correct warnings.
+@
+text
+@/*	Copyright (c) 1984 AT&T	*/
 /*	  All Rights Reserved  	*/
 
 /*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T	*/
 /*	The copyright notice above does not evidence any   	*/
 /*	actual or intended publication of such source code.	*/
 
-#ident	"@(#)yacc:y3.c	1.6"
+#ident	"@@(#)yacc:y3.c	1.6"
 # include "dextern"
 
 	/* important local variables */
@@ -421,3 +454,85 @@ void hideprod(){
 		}
 	if( j ) fprintf( stderr, "%d rules never reduced\n", j );
 	}
+@
+
+
+1.2
+log
+@Fix warning errors for Linux port.
+,
+@
+text
+@d236 2
+a237 1
+void precftn(r,t,s) int r, t, s; { /* decide a shift/reduce conflict by precedence.
+d248 3
+a250 2
+		if( foutput != NULL ) fprintf( foutput, "\n%d: shift/reduce conflict (shift %d, red'n %d) on %s",
+						s, temp1[t], r, symnam(t) );
+d297 3
+a299 2
+	/* for error recovery, arrange that, if there is a shift on the
+	/* error recovery token, `error', that the default be the error action */
+d404 4
+a407 5
+	/* in order to free up the mem and amem arrays for the optimizer,
+	/* and still be able to output yyr1, etc., after the sizes of
+	/* the action array is known, we hide the nonterminals
+	/* derived by productions in levprd.
+	*/
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d15 1
+a15 1
+output(){ /* print the output for the states */
+d78 1
+a78 1
+apack(p, n ) int *p;{ /* pack state i from temp1 into amem */
+d80 1
+a80 1
+	register *pp, *qq, *rr;
+d126 1
+a127 1
+	return(0);
+d130 1
+a130 1
+go2out(){ /* output the gotos for the nontermninals */
+d186 1
+a186 1
+go2gen(c){ /* output the gotos for nonterminal c */
+d236 1
+a236 1
+precftn(r,t,s){ /* decide a shift/reduce conflict by precedence.
+d241 1
+a241 1
+	int lp,lt, action;
+d269 1
+a269 1
+wract(i){ /* output state i */
+d342 2
+a343 2
+wrstate(i){ /* writes state i */
+	register j0,j1;
+d383 1
+a383 1
+wdef( s, n ) char *s; { /* output a definition of s to the value n */
+d387 1
+a387 1
+warray( s, v, n ) char *s; int *v, n; {
+d389 1
+a389 1
+	register i;
+d400 1
+a400 1
+hideprod(){
+d407 1
+a407 1
+	register i, j;
+@

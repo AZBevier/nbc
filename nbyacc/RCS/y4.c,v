@@ -1,11 +1,44 @@
-/*	Copyright (c) 1984 AT&T	*/
+head	1.3;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.3
+date	2021.06.28.21.03.34;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.10.18.33.52;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2016.01.29.21.42.58;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial version
+@
+
+
+1.3
+log
+@Correct warnings.
+@
+text
+@/*	Copyright (c) 1984 AT&T	*/
 /*	  All Rights Reserved  	*/
 
 /*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T	*/
 /*	The copyright notice above does not evidence any   	*/
 /*	actual or intended publication of such source code.	*/
 
-#ident	"@(#)yacc:y4.c	1.4"
+#ident	"@@(#)yacc:y4.c	1.4"
 # include "dextern"
 
 # define a amem
@@ -351,3 +384,68 @@ int gtnm(){
 	return( c );
 
 	}
+@
+
+
+1.2
+log
+@Fix warning errors for Linux port.
+@
+text
+@d103 1
+a103 1
+			/* temporarily, kill this for compatibility
+d260 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d36 1
+a36 1
+callopt(){
+d38 1
+a38 1
+	register i, *p, j, k, *q;
+d40 1
+a40 1
+#ifdef mpx
+d158 1
+a158 1
+gin(i){
+d160 1
+a160 1
+	register *p, *r, *s, *q1, *q2;
+d203 2
+a204 2
+stin(i){
+	register *r, *s, n, flag, j, *q1, *q2;
+d256 2
+a257 2
+nxti(){ /* finds the next i */
+	register i, max, maxi;
+d276 1
+a276 1
+osummary(){
+d279 1
+a279 1
+	register i, *p;
+d294 1
+a294 1
+aoutput(){ /* this version is for C */
+d307 1
+a307 1
+arout( s, v, n ) char *s; int *v, n; {
+d309 1
+a309 1
+	register i;
+d321 1
+a321 1
+gtnm(){
+d323 1
+a323 1
+	register s, val, c;
+@

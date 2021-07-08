@@ -1,6 +1,30 @@
-$DEFM
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.02.11.02.47.27;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@remove line numbers
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$DEFM
 $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DWORD32 -DMPX Y1.C
 $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DWORD32 -DMPX Y2.C
 $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DWORD32 -DMPX Y3.C
 $NBCC -C -V -1 -N -DMPX1X -B^(BIN) -I^(CINCLUDE) -DWORD32 -DMPX Y4.C
 $ENDM
+@

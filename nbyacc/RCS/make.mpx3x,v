@@ -1,4 +1,32 @@
-#
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.06.28.21.08.47;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.02.05.23.36.15;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Move obj instead of copy
+@
+
+
+1.2
+log
+@Do clean before install.
+@
+text
+@#
 # Makefile for nbyacc for running nbyacc on mpx3x
 # Object files must be produced and then cataloged
 # on MPX3.X using the LD.NBYAC command file.
@@ -43,7 +71,7 @@ clobber: clean      # delete main from current directory
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all    # build if necessary, and then copy main to system directory
-	@if [ -d $(LBIN) ]; then \
+	@@if [ -d $(LBIN) ]; then \
 			echo "$(LBIN) already exits"; \
 	else \
 			mkdir $(LBIN); \
@@ -65,3 +93,24 @@ install: all    # build if necessary, and then copy main to system directory
 	/bin/chmod 664 $(LBIN)/DEXTERN
 	/bin/chmod 664 $(LBIN)/FILES
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d8 1
+a8 1
+CFLAGS = -C -DMPX -DMPX1X -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d13 1
+a13 1
+YACC = nbyacc
+d28 1
+a28 1
+all:	$(MAIN)
+d31 1
+a31 1
+$(MAIN):	$(MAKEFILE) $(DEPS) $(SRCS)
+@
