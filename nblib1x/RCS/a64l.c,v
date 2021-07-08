@@ -1,0 +1,69 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!a64l.c*/
+/* Name:  a64l.c Part No.: _______-____r
+ *
+ * Copyright 1991 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)nbclib:a64l.c	1.1"
+
+/*
+ * convert base 64 ascii to long int
+ * char set is [./0-9A-Za-z]
+ *
+ */
+
+#define BITSPERCHAR	6 /* to hold entire character set */
+
+long
+a64l(s)
+register char *s;
+{
+	register int i, c;
+	long lg = 0;
+
+	for (i = 0; (c = *s++) != '\0'; i += BITSPERCHAR) {
+		if (c > 'Z')
+			c -= 'a' - 'Z' - 1;
+		if (c > '9')
+			c -= 'A' - '9' - 1;
+		lg |= (long)(c - ('0' - 2)) << i;
+	}
+	return (lg);
+}
+@

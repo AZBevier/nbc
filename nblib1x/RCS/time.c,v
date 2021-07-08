@@ -1,0 +1,335 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	2019.03.03.22.57.16;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.2
+log
+@Use 64 bit long (time_t) to hold secs since 1/1/1970
+@
+text
+@/*~!time.c*/
+/* Name:  time.c Part No.: _______-____r
+ *
+ * Copyright 1994 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)nbclib:time.c	1.3"
+
+#include <timeb.h>
+#include <time.h>
+#include <string.h>
+#include <errno.h>
+#include <limits.h>
+#include <types.h>
+
+/*
+ * Everything in this file is a routine implementing a system call.
+ */
+#ifdef MPX1X
+static int buff[6];
+static char dpm[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+#endif
+/*
+ * return the current time (mpx system binary format)
+ */
+
+void gtime(it)
+int it[];  /* 2wd array, wd 1= days since 1/1/1960 */
+/*            wd 2= time in .1 ms since midnight */
+{
+    int reg[8],cc;
+#ifndef MPX1X
+    reg[1]=( (int) &it[0] | 0x01000000);
+    cc = mpxsvc (0x2050,reg,reg);
+#else
+    int cent, year, mon, day, temp;
+    int quadyr, temp2, i;
+
+    reg[7] = (int)buff;			/* 6 word buffer */
+    cc = mpxsvc (0x1015,reg,reg);
+
+    cent = (unsigned int)buff[2] >> 24;	/* get century */
+    cent--;				/* 1x states 20 for 19 */
+    i = year = (buff[2] >> 16) & 0xff;	/* get year */
+    mon = (buff[2] >> 8) & 0xff;	/* get month */
+    day = buff[2] & 0xff;		/* get day */
+    temp = 0;
+    if (cent == 19) {			/* 19XX */
+      year -= 60;			/* adjust for base year */
+    } else if (cent == 20) {		/* 20XX */
+      temp = 365*100+10;		/* 1/1/60 to 1/1/2000 */
+    } else {				/* >= 21XX */
+      temp = (cent - 20) * (365*40 + 10); /* days per century */
+      temp += 365*100+10;		/* 1/1/60 to 1/1/2000 */
+    }
+    quadyr = year/4;			/* number of quad years */
+    temp += quadyr * (365*4 + 1);	/* days per quad years */
+    temp2 = year - (quadyr * 4);	/* remaining years */
+    if (temp2) {			/* if remaining years */
+      temp += ((temp2 * 365) + 1);	/* days/yr + 1 leap year */
+    }
+    if ((i & 3) == 0) {			/* see if leap year */
+      if (mon > 2)			/* if month > Feb */
+        temp += 1;			/* adjust for leap year */
+    }
+    for (i = 0; i < (mon - 1); i++)	/* add in days up to curr mon */
+      temp += dpm[i];			/* add in days */
+
+    temp += (day - 1);			/* lastly, add in day, zero relative */
+    it[0] = temp;			/* set for caller */
+
+    /* (interrupts * 10000 .1ms/sec) / (interrupts/sec) */
+#ifdef OVERFLOWS
+    temp2 = (buff[3] * 10000) / buff[4]; /* get num of 100us since midnight */
+    it[1] = temp2;			/* set for caller */
+#else
+    asm (" lw r1,_buff+3w");		/* get ints today */
+    asm (" mpi r0,10000");		/* num of .1ms today */
+    asm (" dvmw r0,_buff+4w");		/* div by ints/sec gives num of .1ms */
+    asm (" stw r1,_buff+5w");		/* put where we can get it */
+    it[1] = buff[5];			/* set for caller */
+#endif
+
+    return;
+#endif
+}
+
+/*
+ * New time entry-- return TOD with milliseconds, timezone,
+ * DST flag
+ */
+
+/* TIMEZONE, DSTFLAG, and TIMEDIF defined in <timeb.h> and
+ * must be set for local values in MPX.  TZ will be used
+ * to determine local timezome */
+
+void ftime(t)
+struct timeb *t;
+{
+	int mpxtime[2];
+   	struct tm *ct;
+   	time_t utime;		/* unix internal time (GMT) */
+
+	gtime(mpxtime);		/* this returns local MPX time */
+    	/* get secs sense 1970, not 1960 */
+	utime =(time_t)((mpxtime[0]-3653)*86400)+(time_t)(mpxtime[1]/10000);
+    	/* utime has local time, convert to m/d/y etc */
+    	ct = gmtime(&utime);
+    	/* now convert to GMT time */
+    	t->time = tconv (ct->tm_year+1900, ct->tm_mon+1, ct->tm_mday,
+    	    ct->tm_hour, ct->tm_min, ct->tm_sec);
+	t->millitm =  (mpxtime[1]/10) - ((mpxtime[1]/10000)*1000);
+	t->timezone = timezone;
+	t->dstflag = daylight;
+#ifdef NOT_ANY_MORE
+	if(t->mnemonic != (char *)0)*t->mnemonic = '\0';
+#endif
+}
+
+/*
+ * Return time in secs from Jan 1, 1970
+*/
+/* time call value needs to point to a long (64 bits) to work */
+time_t time(tloc)
+time_t  *tloc;
+{
+	int mpxtime[2];
+   	struct tm *ct;
+   	time_t utime, secs;		/* unix internal time (GMT) */
+
+	gtime(mpxtime);		/* this returns local MPX time */
+    	/* get secs sense 1970, not 1960 */
+	secs =(time_t)((mpxtime[0]-3653)*86400)+(time_t)(mpxtime[1]/10000);
+    	/* secs has local time, convert to m/d/y etc */
+    	ct = gmtime(&secs);
+    	/* now convert to GMT time */
+    	utime = tconv (ct->tm_year+1900, ct->tm_mon+1, ct->tm_mday,
+    	    ct->tm_hour, ct->tm_min, ct->tm_sec);
+	if (tloc != 0) *tloc=utime;
+	return (utime);
+}
+
+/*
+ * Set the time
+ */
+
+int stime(t)
+struct timeb t;
+{
+	/*    this routine does nothing   */
+        errno = EPERM;
+        return (-1);
+}
+
+/*
+ * Set file times
+ */
+
+#ifndef FIX_040694
+/* do not move this definition, must be 2w bounded */
+asm (" bound 1d");
+static int rdbuf[192];		/* resource descriptor buffer 2w bounded */
+#endif
+
+int utime(file,timep)
+char  *file;
+int   *timep;		/* access/modification times */
+{
+/* implemented 04/06/94 */
+#ifndef FIX_040694
+    int adays, ahms;
+    int mdays, mhms;
+    int mpxtime[2];
+    int reg[8];
+    char path[PATH_MAX];
+
+    if (!(file != 0 && *file != 0)) {
+      errno = ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    strcpy(path, file);		/* make a local copy */
+    unix2mpx(path);		/* convert to MPX path */
+    
+    /* now read the file rd for modification */
+    reg[1] = (int)path;		/* get pnv */
+    reg[1] |= (strlen(path) << 24);	/* get pnv */
+    reg[6] = (int)rdbuf;	/* rd buffer address */
+    reg[7] = 0;			/* no cnp */
+    mpxsvc (0x202a, reg, reg);	/* m.mod service */
+    if (reg[7] != 0) {
+      errno = ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+
+    /* if time pointer is null, use current time */
+    if (timep == (int *)0) {
+	gtime(mpxtime);		/* this returns local MPX time */
+    	adays = mdays = mpxtime[0];	/* days */
+    	mhms = mhms = mpxtime[1];	/* .1 ms today */
+    } else {
+    	/*
+    	 * unix time is days/sec since 1970
+    	 * mpx time is in days/.1ms since 1960
+    	 */
+
+    	/* do access time 1st */
+    	/* get days since 1960 */
+    	adays = (timep[0] / 86400) + 3653;
+    	/* get .1 ms in day */
+    	ahms = (timep[0] % 86400) * 10000;
+
+    	/* do modification time 2nd */
+    	/* get days since 1960 */
+    	mdays = (timep[1] / 86400) + 3653;
+    	/* get .1 ms in day */
+    	mhms = (timep[1] % 86400) * 10000;
+    }
+    /* modify the rd */
+    /* access time */
+    rdbuf[12] = adays;
+    rdbuf[13] = ahms;
+    /* modification time */
+    rdbuf[14] = mdays;
+    rdbuf[15] = mhms;
+    /* now write the file rd after modification */
+    reg[6] = (int)rdbuf;	/* rd buffer address */
+    reg[7] = 0;			/* no cnp */
+    mpxsvc (0x202b, reg, reg);	/* m.rewrit service */
+    if (reg[7] != 0) {
+      errno = ENOENT;		/* set file not found error */
+      return(-1);		/* error return value */
+    }
+    return (0);			/* return o.k. */
+#endif
+}
+
+void times(buf)
+int buf[];
+{
+	int reg[8],cc;
+
+	cc = mpxsvc (0x102d,reg,reg);
+	buf[0]= reg[7]/16667; /* conv micro-sec to 1/60 secs */
+	buf[1]=0;  /* no system time  */
+	buf[2]=0;  /* no child time  */
+	buf[3]=0;  /* no child system time  */
+}
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d26 1
+d39 1
+a39 1
+gtime(it)
+d109 1
+a109 1
+ftime(t)
+d113 2
+a114 2
+    	struct tm *ct;
+    	int utime;		/* unix internal time (GMT) */
+d118 1
+a118 1
+	utime =((mpxtime[0]-3653)*86400)+(mpxtime[1]/10000);
+d135 3
+a137 3
+
+time(tloc)
+int  *tloc;
+d139 3
+a141 3
+	int mpxtime[2],secs;
+    	struct tm *ct;
+    	int utime;		/* unix internal time (GMT) */
+d145 1
+a145 1
+	secs =((mpxtime[0]-3653)*86400)+(mpxtime[1]/10000);
+d159 1
+a159 1
+stime(t)
+d177 1
+a177 1
+utime(file,timep)
+d250 1
+a250 1
+times(buf)
+@

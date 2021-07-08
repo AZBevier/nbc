@@ -1,5 +1,5 @@
-#~!Makefile for nblib1x when building for MPX on Linux
-# Name:  make.mpx1x Part No.: _______-____r
+#~!Makefile for nblib when building for MPX1X on Linux
+# Name:  make.unix Part No.: _______-____r
 #
 # Copyright 1995 - J B Systems, Morrison, CO
 #
@@ -16,12 +16,12 @@
 # (a).
 #
 
-#ident	"@(#)Make:nblib/make.mpx1x	1.0"
+#ident	"@(#)Make:nblib/make.unix	1.0"
 
 # Make parameters when running on Unix for MPX
 
 ROOT = /
-TARGET = ./
+TARGET = /system/bin
 SOURCE = .
 PREFIX = nb
 INCLUDE = /system/$(PREFIX)include
@@ -29,27 +29,27 @@ SINCLUDE = $(INCLUDE)
 SBIN = /system/bin
 BIN = /system/bin
 UBIN = /system/bin
-SLIB = /system/lib
+LIB = /system/lib
 YBIN = /system/bin
-CPP = $(SLIB)/$(PREFIX)cpp
-CPFLAGS = -C -UMPX
-CC = $(SBIN)/$(PREFIX)cc
-CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -N -UMPX
+CC = $(UBIN)/$(PREFIX)cc
+#CFLAGS = -DMPX -Ui386
+CFLAGS = -Ui386 -DMPX1X
 LD = $(UBIN)/$(PREFIX)nbcat
-LDFLAGS = 
+LDFLAGS = #-YXXXXmap
 YACC = $(YBIN)/$(PREFIX)yacc
 YFLAGS =
-PRE = $(SLIB)/mpxpre1x
 CLIBPREFIX = c
-MAKEFILE = make.mpx1x
+MAKEFILE = make.unix
 
 # Fill in with correct information
 
 HDRS = errmsg.h hash.h libgen.h print.h	stdiom.h strselect.h unixio.h
 
-OBJS_A = c.srt.o c.srte.o fcall.o jump.o #3X pnpars.o
+OBJS_A = c.srt.o c.srte.o fcall.o jump.o pnpars.o
 
-SRCS_A = c.srt.s c.srte.s fcall.s jump.s #3X pnpars.s
+SRCS_A = c.srt.s c.srte.s fcall.s jump.s pnpars.s
 
 OBJ_1X = cassg.o username.o
 
@@ -98,7 +98,7 @@ OBJ3 = mpxini.o mpxio.o mpxsvc.o nice.o num.o numd.o pathfind.o pause.o \
 	sleep.o sprintf.o sputs.o sqrt.o stat.o str2up.o stradd.o strcasecmp.o \
 	strcat.o strccpy.o strchr.o strcmp.o strcpy.o strcspn.o strdup.o \
 	strecnt.o strecpy.o stricmp.o strlen.o strncat.o strncmp.o strncpy.o \
-	strnicmp.o strnlen.o strpbrk.o strpos.o strrchr.o strrpbrk.o strrpos.o strspn.o
+	strnicmp.o strnlen.o strpbrk.o strpos.o strrchr.o strrpbrk.o strrpos.o	strspn.o
 
 SRC3 = mpxini.c mpxio.c mpxsvc.c nice.c num.c numd.c pathfind.c pause.c \
 	perror.c pipe.c pow.c printf.c putchar.c putenv.c puts.c putw.c	\
@@ -107,7 +107,7 @@ SRC3 = mpxini.c mpxio.c mpxsvc.c nice.c num.c numd.c pathfind.c pause.c \
 	sleep.c sprintf.c sputs.c sqrt.c stat.c str2up.c stradd.c strcasecmp.c \
 	strcat.c strccpy.c strchr.c strcmp.c strcpy.c strcspn.c	strdup.c \
 	strecnt.c strecpy.c stricmp.c strlen.c strncat.c strncmp.c strncpy.c \
-	strnicmp.c strnlen.c strpbrk.c strpos.c strrchr.c strrpbrk.c strrpos.c strspn.c
+	strnicmp.c strnlen.c strpbrk.c strpos.c strrchr.c strrpbrk.c strrpos.c	strspn.c
 
 OBJ4 = strspn.o strtod.o strtok.o strtol.o swab.o sweekday.o sync.o tan.o \
 	tanh.o tconv.o tconvs.o tell.o tempfile.o tempnam.o time.o time_comm.o \
@@ -123,19 +123,16 @@ SRC4 = strspn.c strtod.c strtok.c strtol.c swab.c sweekday.c sync.c tan.c \
 
 MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ_1X)
 
-ALLSRC = $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC_1X)
-
 ALL:	all
 
-#all:	files $(MAIN) $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC_1X)
-all:	files $(MAIN) $(ALLSRC)
+all:	files $(MAIN)
 	$(BIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ_1X)
-	$(BIN)/echo clib/cdir are up to date.
+	echo clib/cdir are up to date.
 
 files:
 	-touch clib
@@ -155,7 +152,6 @@ CLOBBER: clobber
 
 clobber: clean
 	-rm -f clib cdir
-	-rm -f clb cdr CLB CDR
 
 DEPEND: depend
 
@@ -165,58 +161,54 @@ depend: $(SRCS) $(HDRS) $(MAKEFILE)
 
 	$(BIN)/mkdep $(MAKEFILE) >dep.out
 	@for i in $(SRCS_A); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC1); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC2); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC3); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC4); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	$(BIN)/echo "# End of dependencies" >> dep.out;
-	$(BIN)/mv dep.out $(MAKEFILE)
+	-echo "# End of dependencies" >> dep.out;
+	-mv dep.out $(MAKEFILE)
 
 INSTALL: install
 
 install: all
-	$(BIN)/cp clib clb
-	$(BIN)/cp clib CLB
-	$(BIN)/cp cdir cdr
-	$(BIN)/cp cdir CDR
-#	$(BIN)/cp clib $(BIN)/clb
-#	$(BIN)/cp cdir $(BIN)/cdr
+	-cp clib $(BIN)/clb1x
+	-cp cdir $(BIN)/cdr1x
 
 prefile:
 
 # Source file 'c.srt.s'
-c.srt.o: $(PRE) c.srt.s
-	$(CC) -P$(PRE) -C c.srt.s -o c.srt.o #-Lc.srt.L
+c.srt.o: prefile c.srt.s
+	$(CC) -Pprefile -c c.srt.s -o c.srt.o
 
 # Source file 'c.srte.s'
-c.srte.o: $(PRE) c.srte.s
-	$(CC) -P$(PRE) -C c.srte.s -o c.srte.o #-Lc.srte.L
+c.srte.o: prefile c.srte.s
+	$(CC) -Pprefile -c c.srte.s -o c.srte.o
 
 # Source file 'fcall.s'
 fcall.o: prefile fcall.s
-	$(CC) -P$(PRE) -C fcall.s -o fcall.o
+	$(CC) -Pprefile -c fcall.s -o fcall.o
 
 # Source file 'jump.s'
-jump.o: $(PRE) jump.s
-	$(CC) -P$(PRE) -C jump.s -o jump.o
+jump.o: prefile jump.s
+	$(CC) -Pprefile -c jump.s -o jump.o
 
 # Source file 'pnpars.s'
-pnpars.o: $(PRE) pnpars.s
-	$(CC) -P$(PRE) -C pnpars.s -o pnpars.o
+pnpars.o: prefile pnpars.s
+	$(CC) -Pprefile -c pnpars.s -o pnpars.o
 
 # DO NOT DELETE THIS LINE -- the dependencies begin here

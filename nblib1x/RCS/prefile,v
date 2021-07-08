@@ -1,0 +1,260 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.10.30.21.25.54;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@* TXPM EQU FILE FOR TXPM 3X SYSTEM
+C.3227   SETT
+C.TRACF  SETF
+C.MEMO   SETF
+C.SALONE SETF
+C.SYSGON SETF
+C.MPX1X  SETF                           for 1x code
+C.MPX3X  SETT                           for 3x code
+MPX35    SETF                           for 3.5 code
+*
+         LIST       OFF
+************************************************************************
+*
+* ASSEMBLE MACRO M.TXPM
+*
+* PURPOSE: Set equates needed for all other T-XPM macros
+*
+* CALLING SEQUENCE:
+*
+*        M.TXPM
+*
+* RETURN:
+*
+*        Equates set.
+*
+************************************************************************
+*
+M.TXPM   DEFM
+*
+*--------------------------------------------------------------------
+*
+*   H.TXPM Equates for internal structures and global values
+*
+         LIST      OFF
+C.TXPM   EQU       X'C4'           T-XPM COPY OF C.TSAD
+C.UBIAS  EQU       X'C8'           HAT ADDRESS OF H.UBIAS ROUTINE
+*                                  BYTE ZERO OF C.UBIAS IS TXPMFLGS *242*
+C.TASKR  EQU       X'CC'           TXPM LOC FOR USER REGS
+C.RETURN EQU       X'D0'           TXPM FAST INT DISP/RETURN
+C.INTVA  EQU       X'D4'           CPU INT VECTOR TABLE ADDRESS
+C.EVNT   EQU       X'D8'           POINTER TO EVNT.PTR
+C.CTXT   EQU       X'DC'           POINTER TO DQE CONTEXT AREA
+C.XPMRET EQU       X'E0'           ADDRESS OF S.TXPM.0 IN H.TXPM
+C.TRPCA  EQU       X'E4'           ADDRESS OF TRAP CONTEXT AREA
+*
+DQE.CXTA EQU       X'60'           ADDRESS OF CONTEXT AREA IN DQE
+DQE.PSDA EQU       X'64'           INT PSD ADDRESS IN DQE
+*
+*--------------------------------------------------------------------
+*
+*   TASK CONTEXT AREA EQUATES
+*
+TSK.NMAP EQU       0B              # OF OS MAPS TO INCLUDE
+TSK.FLG1 EQU       1B              1ST FLAG BYTE
+TSK.ATI  EQU       2B              CURRENT INTERRUPT LEVEL (WORD OFFST)
+TSK.FLG2 EQU       3B              2ND FLAG BYTE
+TSK.BIAS EQU       1W              BIAS DIFFERENCE BETWEEN MPX & TXPM
+TSK.DBHT EQU       2W              'REAL' DEBUG HAT ADDRESS
+TSK.NORM EQU       3W              NUMBER OF OVERRUN MAPS (BYTE 0)
+TSK.LVLP EQU       3W              CURRENT LVL POINTER (BYTES 1-3)
+TSK.LVL0 EQU       4W              INTERRUPT LEVEL 0 (NORMAL)
+TSK.LVL1 EQU       5W              INTERRUPT LEVEL 1 (MESSAGE)
+TSK.LVL2 EQU       6W              INTERRUPT LEVEL 2 (END ACT PRIOR 2)
+TSK.LVL3 EQU       7W              INTERRUPT LEVEL 3 (BREAK)
+TSK.LVL4 EQU       8W              INTERRUPT LEVEL 4 (DEBUG)
+TSK.LINE EQU       9W              ADDRESS OF BLOCKING BUFFER WHICH
+*                                  CONTAINS COPY OF T.LINEBUF
+TSK.RPSD EQU       10W             RETURN PSD FOR USER
+TSK.REGP EQU       12W             POINTER TO REG SAVE AREA FOR USER
+TSK.RET  EQU       13W             RETURN ADDRESS FOR SVC PROCESSING
+TSK.DQE  EQU       14W             DQE ADDRESS FOR THIS TASK       *E3*
+TSK.SPR  EQU       15W             SPARE WORD IN CONTEXT AREA      *E3*
+*
+*--------------------------------------------------------------------
+*
+*   EQUATES FOR TSK.FLG1
+*
+USR.TSAB EQU       0               IF SET, USER WANTS TO REFERENCE TSA
+TSK.TSAB EQU       1               IF SET, TSA IS BIASED
+TSK.DBAT EQU       2               NOT USED, AVAILABLE
+TSK.EACT EQU       3               NOT USED, AVAILABLE          *232*
+STK.BIAS EQU       4               IF SET, AID STACK HAS BEEN BIASED
+TSK.AID  EQU       5               IF SET, TASK USES AID STACK
+TSK.FORC EQU       6               IF SET, TASK FORCED TO T_XPM
+TSK.TXPM EQU       7               IF SET, TASK IS 'NO-MPX' TASK
+*
+*--------------------------------------------------------------------
+*
+*   EQUATES FOR TSK.FLG2
+*
+TSK.CMD  EQU       0               IF SET, M.CMD SVC IN PROCESS
+TSK.AUTO EQU       1               IF SET, AUTO OPEN REQUESTED
+EXEC.SVC EQU       2               NOT USED, AVAILABLE          *232*
+ORG.SVC2 EQU       3               NOT USED, AVAILABLE          *232*
+DSP.TXPM EQU       4               IF SET, THIS IS A T-XPM DISPATCH (7X)
+TSK.MORN EQU       5               IF SET, MAP OVERRUN OCCURRED
+TSK.IPU  EQU       6               NOT USED, AVAILABLE          *232*
+TSK.OMPX EQU       7               IF SET, ONLY RUN AS MPX TASK
+*
+DQE.LCXT EQU       16W             LEN OF EACH DQE CTXT AREA
+*
+*--------------------------------------------------------------------
+*
+*  EQUATES FOR INTERRUPT LEVEL IN DQE CONTEXT AREA
+*
+*  EQUATES FOR TSK.LVL                                          *219*
+*
+SVC.TYPA EQU       0               TYPE 'A' SVC
+SVC.AID  EQU       1               'AID' SVC
+TSK.SVC  EQU       2               IF SET, CURRENTLY EXEC. SVC (1 OR 2)
+TSK.NU1  EQU       3               NOT USED, SVC TYPE NOW IN TSK.SVCI *219*
+TSK.CNP  EQU       4               CNP SUPPLIED FOR CURRENT SVC
+TSK.NU2  EQU       5               NOT USED.                    *219*
+TSK.RTYP EQU       6               IF SET, RESOURCE TYPE NOT IDENTIFIED
+TSK.NU3  EQU       7               NOT USED.                    *219*
+*
+*  EQUATES FOR TSK.SVCI                                         *219*
+*
+TSK.SVCX EQU       0               NOT USED                     *219*
+TSK.SVC1 EQU       1               IF SET, SVC TYPE 1           *219*
+TSK.SVC2 EQU       2               IF SET, SVC TYPE 2           *219*
+TSK.SVC6 EQU       3               IF SET, SVC TYPE 6           *219*
+TSK.SVC7 EQU       4               IF SET, SVC TYPE 7           *219*
+TSK.SVCE EQU       5               IF SET, SVC TYPE E           *219*
+TSK.SVCY EQU       6               NOT USED                     *219*
+TSK.SVCZ EQU       7               NOT USED                     *219*
+*
+TSK.LVL  EQU       0B              FIRST BYTE OF LEVEL INFO
+TSK.SVCI EQU       1B              SVC TYPE INDICATORS          *219*
+TSK.SVCT EQU       2B              SVC CALL # FOR SVC TYPES 1 2, AND 15
+DQE.RTYP EQU       3B              RESOURCE TYPE INDICATOR
+*
+*--------------------------------------------------------------------
+*
+*  EQUATES FOR 'FCB.SPST' FLAGS - WORD 6 OF FCB                 *232*
+*
+FCB.ECP  EQU       4               IF SET, XEQ CHAN PROG IN EFFECT
+FCB.FBIT EQU       5               IF SET, 'F' BIT IN USE
+FCB.EA   EQU       6               IF SET, BIASED FCB ADDRESS IS IN EM
+FCB.BSED EQU       7               FCB ALREADY BIASED FOR THIS SVC
+*
+*--------------------------------------------------------------------
+*
+*  EQUATES FOR LOAD MODULE PREAMBLE
+*
+PR.NPAGE EQU        X'131'         NUMBER OF DSECT PAGES
+PR.NMAP  EQU        X'132'         NUMBER OF OS MAP BLOCKS TO INCLUDE
+PR.NOMPX EQU        X'133'         BIT 7 SET SAYS THIS IS TXPM TASK
+*                                  BIT 6 SET SAYS SEPERATE OVERLAYS
+*                                  BIT 5 SET SAYS ONLY MPX TASK
+*
+*            PREAMBLE WORD X'2C':  BYTE 2 = # OS MAPS TO INCLUDE
+*                                  BYTE 3 = 1, RUN TASK AS 'NO-MPX'
+*
+*  NOTE:  IF BYTE 3 = 1 ('NO-MPX' TASK) AND BYTE 2 = 0 (INCLUDE 0
+*         OS MAPS), THEN THE TASK WILL BE RUN IN THE 'MPX' ENVIORNMENT.
+*         THUS, AT LEAST 1 OS MAP MUST BE MAPPED IN AT RUN TIME IN THE
+*         'NO-MPX' ENVIRONMENT.
+*
+*--------------------------------------------------------------------
+*
+*  EQUATES FOR TRAP INFORMATION BLOCK (OF WHICH THERE IS ONE FOR
+*  EACH TRAP/INTERRUPT FOUND BY TXPM AT ENTRY POINT 8).
+*
+PSD.WRD2 EQU       0W              ORIGINAL NEW PSD WORD 2 FROM HANDLER
+PSD.OMPX EQU       1W              ADDRESS OF MPX ICB IN HANDLER
+PSD.OTMP EQU       2W              ADDRESS OF T-XPM ICB
+ICXT.FLG EQU       3W              INTERRUPT CONTEXT FLAGS
+RPL.INST EQU       4W              REPLACED INSTRUCTION
+PSD.RET1 EQU       5W              BRANCH BACK TO INT/TRAP HANDLER
+*
+ICXT.SPL EQU       0               IF SET, THIS IS SPECIAL INT     *E3*
+ICXT.CLD EQU       1               IF SET, NON CLASS F INTERRUPT
+ICXT.CLF EQU       2               IF SET, CLASS F INTERRUPT
+*
+TRAP.LEN EQU       6W              LENGTH OF EACH TRAP BLOCK
+ITC.LEN  EQU       10W             LENGTH OF INT/TRAP CXT CODE
+TOT.LEN  EQU       TRAP.LEN+ITC.LEN  TOTAL LENGTH OF CXT FOR TRAP/INTS
+*
+*--------------------------------------------------------------------
+*
+*  EQUATES FOR 'TXPMFLGS' - NOW BYTE ZERO OF C.UBIAS (C8)       *242*
+*
+TXPMFLGS EQU       C.UBIAS         BYTE ZERO OF X'C8'           *242*
+TXPMOS   EQU       0               IF SET, TXPM ON SYSTEM       *242*
+RTC      EQU       1               IF SET, ACCEL IS ON          *242*
+NOT.MPX  EQU       2               IF SET, MPX NOT MAPPED IN    *242*
+IN.TXPM  EQU       3               IF SET, TXPM RUNNING IN IPU  *242*
+AID.DSP  EQU       4               IF SET, H.AID DISPATCH       *242*
+IPU.INIT EQU       5               IF SET, IPU HAS BEEN INIT'S  *242*
+NO.AID   EQU       6               IF SET, AID NOT ON SYSTEM    *242*
+ONE.INIT EQU       7               ONE-SHOT INIT DONE FLAG      *243*
+*
+*--------------------------------------------------------------------
+*
+*  EQUATES FOR 'AID' SUBROUTINE CALL STACK (MUST CORRESPOND TO H.AID!)
+*
+STK.END  EQU       2W
+STK.OEND EQU       34W
+STK.LPTR EQU       42W
+*
+*--------------------------------------------------------------------
+*
+*  DEBUG EQUATES
+*
+*  EQUATES FOR EVENT BUFFER
+*
+EVNT.LEN EQU       X'40'           16 WORD ENTRIES
+EVNT.TYP EQU       0               EVENT TYPE
+EVNT.SIL EQU       1W              EVENT SOFTWARE INTERRUPT LEVEL
+EVNT.NAM EQU       2W              TASK NAME
+EVNT.PSD EQU       4W              EVENT PSD
+EVNT.SVC EQU       6W              EVENT SVC
+EVNT.TSK EQU       7W              EVENT DQE NUMBER
+EVNTREGS EQU       1F              USER'S REGISTERS
+*
+*--------------------------------------------------------------------
+*
+*  EQUATES FOR 'EVENT.PTR'
+*
+EVNT.DSP EQU       0               IF SET, RECORD T-XPM DISPATCHS
+EVNT.TSH EQU       1               IF SET, RECORD J.* & OPCOM      *E3*
+EVNT.TRP EQU       2               IF SET, RECORD TRAPS
+EVNT.INT EQU       3               IF SET, RECORD INTERRUPTS
+NO.TXPM  EQU       4               IF SET, DISABLE TXPM OPERATION
+NO.AE    EQU       5               IF SET, DISABLE A.E. TRAPS      *E3*
+TXPM.ACC EQU       6               IF SET, TURN ON ACCELERATOR
+MPX.ONLY EQU       7               IF SET, DO NOT FORCE TXPM TASKS
+*
+*--------------------------------------------------------------------
+*
+         LIST      ON
+         ENDM
+*
+         LIST      ON
+@

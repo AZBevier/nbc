@@ -1,4 +1,52 @@
-#~!Makefile for nblib1x when building for MPX on Linux
+head	1.6;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.6
+date	2021.06.27.14.43.24;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2019.02.25.22.56.05;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2019.02.25.22.38.00;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2019.02.15.21.44.48;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2019.01.31.22.23.02;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2019.01.31.21.30.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin
+@
+
+
+1.6
+log
+@Update for nbc-master build.
+@
+text
+@#~!Makefile for nblib1x when building for MPX on Linux
 # Name:  make.mpx1x Part No.: _______-____r
 #
 # Copyright 1995 - J B Systems, Morrison, CO
@@ -16,7 +64,7 @@
 # (a).
 #
 
-#ident	"@(#)Make:nblib/make.mpx1x	1.0"
+#ident	"@@(#)Make:nblib/make.mpx1x	1.0"
 
 # Make parameters when running on Unix for MPX
 
@@ -164,23 +212,23 @@ depend: $(SRCS) $(HDRS) $(MAKEFILE)
 #	$(BIN)/mv dep.out $(MAKEFILE)
 
 	$(BIN)/mkdep $(MAKEFILE) >dep.out
-	@for i in $(SRCS_A); do \
+	@@for i in $(SRCS_A); do \
 	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	@for i in $(SRC1); do \
+	@@for i in $(SRC1); do \
 	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	@for i in $(SRC2); do \
+	@@for i in $(SRC2); do \
 	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	@for i in $(SRC3); do \
+	@@for i in $(SRC3); do \
 	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	@for i in $(SRC4); do \
+	@@for i in $(SRC4); do \
 	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
@@ -220,3 +268,173 @@ pnpars.o: $(PRE) pnpars.s
 	$(CC) -P$(PRE) -C pnpars.s -o pnpars.o
 
 # DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.5
+log
+@Add nb prefix for ar program to be nbar.
+@
+text
+@d1 2
+a2 2
+#~!Makefile for nblib when building for MPX on Linux
+# Name:  make.unix Part No.: _______-____r
+d19 1
+a19 1
+#ident	"@@(#)Make:nblib/make.unix	1.0"
+d24 1
+a24 1
+TARGET = /system/bin
+d32 1
+a32 1
+LIB = /system/lib
+d34 4
+a37 4
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -N -UMPX
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -DMPX -Ui386
+d39 1
+a39 1
+LDFLAGS = #-YXXXXmap
+d42 1
+d44 1
+a44 1
+MAKEFILE = make.unix
+d50 1
+a50 1
+OBJS_A = c.srt.o c.srte.o fcall.o jump.o pnpars.o
+d52 1
+a52 1
+SRCS_A = c.srt.s c.srte.s fcall.s jump.s pnpars.s
+d101 1
+a101 1
+	strnicmp.o strnlen.o strpbrk.o strpos.o strrchr.o strrpbrk.o strrpos.o	strspn.o
+d110 1
+a110 1
+	strnicmp.c strnlen.c strpbrk.c strpos.c strrchr.c strrpbrk.c strrpos.c	strspn.c
+d124 3
+a126 1
+MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
+d130 2
+a131 1
+all:	files $(MAIN)
+d137 1
+d141 2
+a142 2
+	$(BIN)/touch clib
+	$(BIN)/touch cdir
+d147 6
+a152 6
+	$(BIN)/rm -f $(OBJS_A)
+	$(BIN)/rm -f $(OBJ1)
+	$(BIN)/rm -f $(OBJ2)
+	$(BIN)/rm -f $(OBJ3)
+	$(BIN)/rm -f $(OBJ4)
+#	$(BIN)/rm -f $(OBJ_1X)
+d157 2
+a158 1
+	$(BIN)/rm -f clib cdir
+d193 6
+a198 2
+	$(BIN)/cp clib $(BIN)/clb
+	$(BIN)/cp cdir $(BIN)/cdr
+d203 2
+a204 2
+c.srt.o: prefile c.srt.s
+	$(CC) -Pprefile -c c.srt.s -o c.srt.o
+d207 2
+a208 2
+c.srte.o: prefile c.srte.s
+	$(CC) -Pprefile -c c.srte.s -o c.srte.o
+d212 1
+a212 1
+	$(CC) -Pprefile -c fcall.s -o fcall.o
+d215 2
+a216 2
+jump.o: prefile jump.s
+	$(CC) -Pprefile -c jump.s -o jump.o
+d219 2
+a220 2
+pnpars.o: prefile pnpars.s
+	$(CC) -Pprefile -c pnpars.s -o pnpars.o
+@
+
+
+1.4
+log
+@Add missing prepended c for clib/cdir definition.
+@
+text
+@d128 5
+a132 5
+	$(BIN)/ar -rc $(CLIBPREFIX) $(OBJS_A)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ1)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ2)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ3)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ4)
+@
+
+
+1.3
+log
+@Change assemble suffix from .S to .s
+@
+text
+@d42 1
+a42 1
+CLIBPREFIX =
+@
+
+
+1.2
+log
+@Remove -m32 option when building for MPX on Linux
+@
+text
+@d51 1
+a51 1
+SRCS_A = c.srt.S c.srte.S fcall.S jump.S pnpars.S
+d192 19
+a210 19
+# Source file 'c.srt.S'
+c.srt.o: prefile c.srt.S
+	$(CC) -Pprefile -c c.srt.S -o c.srt.o
+
+# Source file 'c.srte.S'
+c.srte.o: prefile c.srte.S
+	$(CC) -Pprefile -c c.srte.S -o c.srte.o
+
+# Source file 'fcall.S'
+fcall.o: prefile fcall.S
+	$(CC) -Pprefile -c fcall.S -o fcall.o
+
+# Source file 'jump.S'
+jump.o: prefile jump.S
+	$(CC) -Pprefile -c jump.S -o jump.o
+
+# Source file 'pnpars.S'
+pnpars.o: prefile pnpars.S
+	$(CC) -Pprefile -c pnpars.S -o pnpars.o
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+#~!Makefile for nblib when building for Linux on Linux
+d19 1
+a19 1
+#ident	"@@(#)Make:nblib/Makefile	1.0"
+d21 1
+a21 1
+# Make parameters when running on Unix
+d37 1
+a37 1
+CFLAGS = -DMPX -Ui386 -m32
+@

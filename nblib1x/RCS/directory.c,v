@@ -1,0 +1,398 @@
+head	1.1;
+access;
+symbols;
+locks
+	jbev:1.1; strict;
+comment	@ * @;
+
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!directory.c*/
+/* Name:  directory.c Part No.: _______-____r
+ *
+ * Copyright 1993 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)nbclib:directory.c	1.2"
+
+#ifdef MPX1X
+#include <finfo.h>
+#endif
+
+#include <types.h>
+#include <string.h>
+#include <dirent.h>
+#include <ctype.h>
+#include <limits.h>
+#include <errno.h>
+#include <fcntl.h>
+
+extern void	free();
+extern int	open();
+extern int	close();
+extern long	lseek();
+
+#ifdef MPX1X
+static struct finfo foosave;		/* file info block save area */
+static int smd[8];			/* SMD entry */
+static int reg[8];
+#endif
+
+/*
+ * open a directory.
+ * name is a valid pathname to a directory
+ */
+
+DIR * opendir (name)
+char *name;
+{
+    DIR *dirp;
+    int fd;
+#ifdef MPX1X
+    static struct finfo *foo;		/* file info block ptr */
+#endif
+
+    char dirnam[PATH_MAX+32];
+    int slen;
+
+    strcpy(dirnam, name);
+    unix2mpx(dirnam);		/* convert to mpx name */
+    slen = strlen(dirnam);	/* get length */
+
+    /* see if name has ^ or @@ or ( as 1st char.
+     * if not, try to make it a volume name
+     */
+    switch (*dirnam) {
+      case '\'':		/* it is O.K. */
+        break;
+      case '@@':			/* it is O.K. */
+#ifdef JUNK
+    	/* see if @@vol^, if so delete ^ */
+    	if (dirnam[slen-1] == '^')
+    	    dirnam[slen-1] = '\0';
+#endif
+        break;
+      case '^':			/* if just ^, will log dirs */
+    				/* else make sure it has ( around dir name */
+        if (dirnam[1] == 0)
+    	  break;
+    	if (dirnam[1] != '(') {		/* put in () around name */
+    	  /* use bcopy because name overlaps. Leave 1 spaces */
+    	  bcopy (&dirnam[1], &dirnam[2], slen-1);	/* copy it */
+    	  dirnam[1] = '(';
+    	  dirnam[slen+1] = ')';
+    	  dirnam[slen+2] = '\0';	/* terminate it */
+    	  break;
+    	}
+    	break;			/* fix 02/04/93 JCB */
+      case '(':			/* need to add ^ to start */
+    	/* use bcopy because name overlaps. Leave 1 spaces */
+    	bcopy (dirnam, &dirnam[1], slen);	/* copy it */
+    	*dirnam = '^';		/* current volume */
+    	dirnam[slen+1] = '\0';	/* terminate it */
+    	break;
+      default:			/* we need to fix */
+    	/* use bcopy because name overlaps. Leave 2 spaces */
+    	bcopy (dirnam, &dirnam[2], slen);	/* copy it */
+    	/* now set ^( at beginning, and ) at end */
+    	*dirnam = '^';		/* current volume */
+    	dirnam[1] = '(';
+    	dirnam[slen+2] = ')';
+    	dirnam[slen+3] = '\0';	/* terminate it */
+    }
+#ifdef MPX1X
+    if ((foo = pn2fib(dirnam)) == NULL) {
+      errno = ENOTDIR;		/* set dir not found error */
+      return (NULL);		/* error return value */
+    }
+
+    /* set username for this dir, save old */
+    if (setuser(foo->username, foo->userkey) != NULL) {
+      errno = ENOTDIR;		/* set dir not found error */
+      return (NULL);		/* error return value */
+    }
+
+    if ((strncmp((char*)foo->username, "SYSTEM  ", 8) == 0) ||
+      (strncmp((char*)foo->username, "        ", 8) == 0) ||
+      ((foo->username[0] == 0) && (foo->username[1] == 0)))
+      reg[4] = 2;		/* system files only */
+    else
+      reg[4] = 3;		/* user files only */
+    reg[5] = (int)smd;		/* where SMD entry goes */
+
+#else /* MPX1X */
+
+#ifdef JUNK_02_05_93
+  if (*dirnam != '\'') {
+    slen = strlen(dirnam);	/* get length */
+    /* use bcopy because name overlaps. Leave 1 space */
+    bcopy (dirnam, &dirnam[1], slen);	/* copy it */
+    *dirnam = '\'';		/* set leading quote */
+    dirnam[slen+1] = '\0';	/* terminate it */
+    strcat(dirnam, " SHAR=Y'");
+  }
+#endif
+
+  /* open directory */
+  if ((fd = open (dirnam, O_RDONLY | O_UNBLK)) == -1) {
+    errno = ENOTDIR;
+    return (NULL);
+  }
+#endif
+
+  /* get space for the directory entry */
+  if ((dirp = (DIR *) malloc (sizeof (DIR))) == NULL) {
+#ifdef MPX1X
+    resetuser();		/* reset username to what it was */
+#else
+    close (fd);
+#endif
+    errno = ENOMEM;
+    return (NULL);
+  }
+
+  /* get space for the directory buffer */
+  if ((dirp->dd_buf = (char *) malloc (DIRBUF)) == NULL) {
+    errno = ENOMEM;
+#ifdef MPX1X
+    resetuser();		/* reset username to what it was */
+#else
+    close (fd);
+#endif
+    free (dirp);
+    return (NULL);
+  }
+
+#ifdef MPX1X
+  dirp->dd_fd = reg[4];
+  dirp->dd_size = reg[5];
+#else
+  dirp->dd_fd = fd;
+  dirp->dd_size = 0;
+#endif
+  dirp->dd_loc = 0;
+  /* copy directory name into dirp for later use */
+#ifdef MPX1X
+  strcpy(dirp->dd_dir, dirnam);
+#else
+  strcpy(dirp->dd_dir, getpath(fd));
+#endif
+  return (dirp);        /* return pointer to dir structure */
+}
+
+/*
+ * get next entry in a directory.
+ * dirp is dir ptr from opendir call.
+ * this is the unix interface
+ */
+
+struct dirent *  readdir (dirp)
+DIR *dirp;
+{
+  struct dirent *dp;
+  char *ptr;
+  char *tp;
+  int  i;
+
+  dp = readmdir(dirp);  /* read directory entry */
+  if (dp == NULL)return (NULL);
+
+  /* make lower case file name */
+  ptr = dp->d_name;
+  ptr--;
+  while (*++ptr)if(isupper(*ptr))*ptr = tolower(*ptr);
+  for (i=0; ((i < PATH_MAX) && (ptr[i] != ' ')); i++);
+  ptr = dp->d_name;
+  if (ptr[0] == '@@')
+    ptr[0] = '/';         /* replace @@ with slash */
+  tp = strchr(ptr, '(');     /*  find '(' */
+  if (tp)*tp = '/';
+  tp = strchr(ptr, ')');     /*  find ')' */
+  if (tp)*tp = '/';
+
+#ifdef JUNK
+printf("readdir: file = [%s]\n", ptr);
+#endif
+
+  return (dp);
+}
+
+/*
+ * get next entry in a directory.
+ * dirp is dir ptr from opendir call.
+ * this is the mpx interface
+ */
+
+struct dirent * readmdir (dirp)
+register DIR		*dirp;	/* stream from opendir() */
+{
+    register struct dirent	*dp;	/* -> directory data */
+    char *ptr;
+    int  i;
+
+#ifdef MPX1X
+    if (dirp->dd_size == 0)		/* we are at end */
+      return (NULL);
+    reg[4] = dirp->dd_fd;
+    reg[5] = dirp->dd_size;
+    mpxsvc (0x1073, reg, reg);		/* m.log service */
+    if (reg[5] == 0) {
+      dirp->dd_fd = reg[4];
+      dirp->dd_size = reg[5];
+      return (NULL);
+    }
+    dp = (struct dirent *)dirp->dd_buf;
+
+    /* copy in anything else we want from smd into dirent */
+    memcpy(dp->d_name, (char *)smd, 8);	/* get the file name */
+    dp->d_ino = smd[2] & 0xffffff;	/* disk address */
+    dp->d_flags = (unsigned int)smd[3] >> 16;	/* file flags */
+    dp->d_rdflg = (unsigned int)smd[2] >> 16;	/* file type */
+    dp->d_rtype = 10;			/* perminate file */
+    dp->d_diri = reg[4];		/* smd index value */
+    memcpy(dp->d_ownr, (char *)&smd[4], 8);	/* get username */
+
+    /* null terminate file name */
+    ptr = dp->d_name;
+    for (i=0; ((i < 8) && (ptr[i] != ' ')); i++);
+    ptr[i] = 0;
+
+    /* null terminate ownername */
+    ptr = dp->d_ownr;
+    for (i=0; ((i < 8) && (ptr[i] != ' ')); i++);
+    ptr[i] = 0;
+
+    dirp->dd_fd = reg[4];
+    dirp->dd_size = reg[5];
+    return (dp);
+
+#else
+
+  for (;;) {
+    if (dirp->dd_size == 0) {
+      dirp->dd_size = readraw (dirp->dd_fd, dirp->dd_buf, DIRBLKSIZ);
+      if (dirp->dd_size <= 0)
+        return (NULL);
+    }
+    if (dirp->dd_loc >= dirp->dd_size) {
+      dirp->dd_loc = dirp->dd_size = 0;
+      continue;
+    }
+    dp = (struct dirent *) (dirp->dd_buf + dirp->dd_loc);
+
+    dirp->dd_loc += DIRENTSIZ(dp);
+
+    /* if not active entry, continue */
+    if (!(dp->d_flags & 0x80000000))
+      continue;
+
+    /* null terminate string */
+    ptr = dp->d_name;
+    for (i=0; ((i < MAXNAMLEN) && (ptr[i] != ' ')); i++);
+    ptr[i] = 0;
+
+    return (dp);
+  }
+#endif
+}
+
+/*
+ * closedir -- C library extension routine
+ * close a directory.
+ */
+
+int
+closedir( dirp )
+register DIR	*dirp;		/* stream from opendir() */
+{
+    free( dirp->dd_buf );
+    free( (char *)dirp );
+#ifdef MPX1X
+    resetuser();		/* reset username to what it was */
+    return(0);
+#else
+    return(close( dirp->dd_fd ));
+#endif
+}
+
+/*
+ * rewind a directory
+ */
+
+void rewinddir (dirp)
+register DIR *dirp;
+{
+#ifndef MPX1X
+  lseek(dirp->dd_fd, 0, 0);     /* rewind it */
+  dirp->dd_loc = 0;
+#endif
+  return;
+}
+
+/*
+ * seekdir -- C library extension routine
+ */
+
+void
+seekdir(dirp, loc)
+register DIR	*dirp;		/* stream from opendir() */
+long		loc;		/* position from telldir() */
+{
+
+#ifndef MPX1X
+    register struct dirent * dp;
+    if (telldir(dirp) == loc)
+      return; 		/* save time */
+    dirp->dd_loc = 0;
+    lseek(dirp->dd_fd, loc, 0);
+    dirp->dd_size = 0;
+#endif
+}
+
+/*
+ * telldir -- C library extension routine
+ */
+
+long
+telldir( dirp )
+DIR	*dirp;			/* stream from opendir() */
+{
+#ifndef MPX1X
+    struct dirent *dp;
+    if (lseek(dirp->dd_fd, 0, 1) == 0)	/* if at beginning of dir */
+      return(0);			/* return 0 */
+    dp = (struct dirent *)&dirp->dd_buf[dirp->dd_loc];
+    return(dp->d_diri * sizeof(struct dirent));
+#else
+    return(0);			/* return 0 */
+#endif
+}
+@

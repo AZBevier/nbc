@@ -1,0 +1,314 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@/*~!malloc.c*/
+/* Name:  malloc.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)nbclib:malloc.c	1.1"
+
+#include "values.h"
+
+#define NDEBUG
+#ifdef debug
+#undef NDEBUG
+#endif
+
+#include <assert.h>
+
+#undef malloc
+#undef free
+#undef realloc
+
+/*	avoid break bug */
+#define GRANULE 0
+
+/* this make the assumption that MAXINT is one less than an
+   even block */
+#define MAXALLOC (MAXINT-BLOCK+1)
+
+/*      C storage allocator
+ *	circular first-fit strategy
+ *	works with noncontiguous, but monotonically linked, arena
+ *	each block is preceded by a ptr to the (pointer of)
+ *	the next following block
+ *	blocks are exact number of words long
+ *	aligned to the data type requirements of ALIGN
+ *	pointers to blocks must have BUSY bit 0
+ *	bit in ptr is 1 for busy, 0 for idle
+ *	gaps in arena are merely noted as busy blocks
+ *	last block of arena (pointed to by alloct) is empty and
+ *	has a pointer to first
+ *	idle blocks are coalesced during space search
+ *
+ *	a different implementation may need to redefine
+ *	ALIGN, NALIGN, BLOCK, BUSY, INT
+ *	where INT is integer type to which a pointer can be cast
+*/
+
+#define INT int
+
+#ifdef gould
+#define ALIGN double
+#else
+#define ALIGN int
+#endif
+
+#define NALIGN 1
+#define WORD sizeof(union store)
+
+#define BLOCK 1024	/* a multiple of WORD*/
+
+#define MAXUNINT	0xf80000	/* max memory int value	*/
+/*
+ * MAXNBYTES is the maximum value that nbytes can be and not
+ * have overflow during the execution of the malloc calculations
+ */
+#define MAXNBYTES	(int)(((MAXUNINT/BLOCK) * (BLOCK/WORD) - 2) * WORD)
+#define BUSY 1
+#define NULL 0
+#define testbusy(p) ((INT)(p)&BUSY)
+#define setbusy(p) (union store *)((INT)(p)|BUSY)
+#define clearbusy(p) (union store *)((INT)(p)&~BUSY)
+
+union store {
+	union store *ptr;
+	ALIGN dummy[NALIGN];
+	int calloc;		/*calloc clears an array of integers*/
+};
+
+extern char *sbrk(), *memcpy();
+
+static union store allocs[2];	/*initial arena*/
+static union store *allocp;	/*search ptr*/
+static union store *alloct;	/*arena top*/
+static union store *allocx;	/*for benefit of realloc*/
+static union store *allocend;	/*the last block, if it is free, or
+				  *alloct */
+
+char *
+malloc(nbytes)
+int nbytes;
+{
+	register union store *p, *q;
+	register int nw;
+	register int temp;
+	register int incr = 0;
+	int sav_temp;
+	int one = 1;
+	int maxalloc = MAXALLOC;
+
+	if (nbytes > MAXNBYTES)
+		return (NULL);
+
+	if(allocs[0].ptr == 0) {		/*first time*/
+		allocs[0].ptr = setbusy(&allocs[1]);
+		allocs[1].ptr = setbusy(&allocs[0]);
+		alloct = &allocs[1];
+		allocp = &allocs[0];
+		allocend = alloct;
+	}
+	nw = (nbytes+WORD+WORD-1)/WORD;
+	assert(allocp >= allocs && allocp <= alloct);
+	assert(allock());
+	for(p=allocp; ; ) {
+		for(temp=0; ; ) {
+			if(!testbusy(p->ptr)) {
+				while(!testbusy((q=p->ptr)->ptr)) {
+					assert(q > p && q < alloct);
+					allocp = p;
+					p->ptr = q->ptr;
+					if (allocend == q) allocend = p;
+				}
+				if(q >= p+nw && p+nw >= p)
+					goto found;
+			}
+			q = p;
+			p = clearbusy(p->ptr);
+			if(p > q)
+				assert(p <= alloct);
+			else if(q != alloct || p != allocs) {
+				assert(q == alloct && p == allocs);
+				return(NULL);
+			} else if(++temp > one)
+				break;
+		}
+		/* set block to search next */
+		p = allocend;
+		q = (union store *)sbrk(0);
+		if (q != alloct+1)  {
+			/* the addition must be done in words to
+			   prevent overflow.  Also, use temporaries,
+			   since order of operations may be changed,
+			   otherwise. */
+			temp = ((nw+BLOCK/WORD - 1)/(BLOCK/WORD));
+			temp = temp * BLOCK;
+			if (((INT)q%WORD) != 0)  {
+				incr = (WORD-(INT)q%WORD);
+				q = (union store *)((char *)q + incr);
+				temp += incr;
+			}
+		}  else  {
+			temp = nw - (alloct - allocend);
+			temp = ((temp+BLOCK/WORD)/(BLOCK/WORD));
+			temp = temp * BLOCK;
+		}
+		if(((int)q)+temp+GRANULE < (int)q) {
+			return(NULL);
+		}
+		
+		sav_temp = temp;
+		if (temp > maxalloc)  {
+			if ((INT)sbrk(maxalloc) == -1)  {
+				return NULL;
+			}
+			temp -= maxalloc;
+		}
+		if((INT)sbrk((int) temp) == -1) {
+			brk((char *)q - incr);   	/* move brkval back */
+			return(NULL);
+		}
+		allocend = q;
+		assert(q > alloct);
+		alloct->ptr = q;
+		/* must subtract incr, since both q and temp had
+		   incr added */
+		q->ptr = (union store *)
+			   ((char *)q + sav_temp - incr) - 1;
+		if(q != alloct+1)
+			alloct->ptr = setbusy(alloct->ptr);
+		alloct = q->ptr;
+		alloct->ptr = setbusy(allocs);
+		q = p;
+	}
+found:
+	allocp = p + nw;
+	assert(allocp <= alloct);
+	if(q > allocp) {
+		allocx = allocp->ptr;
+		allocp->ptr = p->ptr;
+	}
+	p->ptr = setbusy(allocp);
+	/* move last block ptr, if necessary */
+	if (allocend == p)  allocend = allocp;
+	return((char*)(p+1));
+}
+
+/*      freeing strategy tuned for LIFO allocation */
+
+void
+free(ap)
+register char *ap;
+{
+    extern char *bufrsio;	/* start of i/o buffers */
+    register union store *p = (union store *)ap;
+
+    if (ap < bufrsio)		/* see where pointer is */
+    	return;			/* not valid, just return */
+    assert(p > clearbusy(allocs[1].ptr) && p <= alloct);
+    assert(allock());
+    allocp = --p;
+    assert(testbusy(p->ptr));
+    /* if just freed last block in arena */
+    p->ptr = clearbusy(p->ptr);
+    if (p->ptr == alloct)  allocend = p;
+    assert(p->ptr > allocp && p->ptr <= alloct);
+    assert(allocend <= alloct);
+}
+
+/*
+ *	realloc(p, nbytes) reallocates a block obtained from malloc()
+ *	and freed since last call of malloc()
+ *	to have new size nbytes, and old content
+ *	returns new location, or 0 on failure
+ */
+
+char *
+realloc(p, nbytes)
+char	*p;
+int nbytes;
+{
+	register char *q;
+	register union store *ap, *aq;
+	register int nw;
+	int onw;
+
+	ap = (union store *)p;
+	if(testbusy(ap[-1].ptr))
+		free(p);
+	onw = ap[-1].ptr - ap;
+	q = malloc(nbytes);
+	if(q == NULL || q == p)
+		return(q);
+	nw = (nbytes+WORD-1)/WORD;
+	if(nw < onw)
+		onw = nw;
+	aq = (union store *) memcpy(q, p, onw * WORD);
+	if(aq < ap && aq+nw >= ap)
+		(aq+(aq+nw-ap))->ptr = allocx;
+	return(q);
+}
+
+#ifdef debug
+allock()
+{
+#ifdef longdebug
+	register union store *p;
+	int x;
+	x = 0;
+	for(p= &allocs[0]; clearbusy(p->ptr) > p; p=clearbusy(p->ptr)) {
+		if(p == allocp)
+			x++;
+	}
+	assert(p == alloct);
+	return(x == 1 || p == allocp);
+#else
+	return(1);
+#endif
+}
+#endif
+
+/*	For debugging purposes only
+/*rstalloc()
+/*{
+/*	
+/*	allocs[0].ptr = 0;
+/*	brk(clearbusy(allocs[1].ptr));
+/*}
+*/
+@

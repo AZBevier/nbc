@@ -1,0 +1,590 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	2019.03.02.23.25.49;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.10.30.21.25.01;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.2
+log
+@Do UT assignment hack for mpx1.x
+@
+text
+@/*~!mpxini.c*/
+/* Name:  mpxini.c Part No.: _______-____r
+ *
+ * Copyright 1992 - J B Systems, Morrison, CO
+ *
+ * The recipient of this product specifically agrees not to distribute,
+ * disclose, or disseminate in any way, to any one, nor use for its own
+ * benefit, or the benefit of others, any information contained  herein
+ * without the expressed written consent of J B Systems.
+ *
+ *                     RESTRICTED RIGHTS LEGEND
+ *
+ * Use, duplication, or disclosure by the Government is  subject  to
+ * restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+ * in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+ * (a).
+ */
+
+#ident	"@@(#)nbclib:mpxini.c	1.1"
+
+/*
+ *	MPXINI.C
+ */
+
+/* This routine picks up arguments from the command line and constructs
+ * an argument list for a C program.  In the process, input and output
+ * redirection is performed if indicated.  */
+
+/*#define RRDEBUG*/
+
+#include <mosde.h>	/* Machine dependent equates !MOD */
+#include <stdio.h>
+#include <errno.h>
+#include <prb.h>
+
+#define ARGCNT 60     /* WAS 8 */
+#define ARGLEN 80     /* was 30 */
+#define LINELEN 768   /* was 80 */
+#define READ 0
+#define WRITE 1
+#define NULL 0
+#define MPX_DEFAULT 0x1ff	/* default to r,w,x */
+
+struct _myidbl _myid;   /* the ext def of the data block from myid */
+char *envdata[ARGCNT];  /* the environment data */
+char **environ=envdata; /* environment list pointer */
+extern int runrflg;     /* run req flag */
+struct prb prb;         /* param rec block */
+extern char* getenv();  /* get environment assignment */
+void getcwvd();
+char curvol[18];        /* current working volume */
+char curdir[18];        /* current working directory */
+
+#ifdef MPX1X
+int curwdir[2];		/* curdir as two blank filled words */
+short userkey;		/* for 1X, contains compressed key */
+static  int	r5val,r6val,r7val;
+/* NOTE, this buffer must be on word boundry */
+char   argbuf[LINELEN];         /* buffer for argument strings */
+#endif
+static int utfcb[16] = {0x00555420,0,0x06000000,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0};
+asm(" bound 1d");
+static int rrs[6];
+static int cnp[6];
+static int dopipe = 0;
+
+_mpxini()
+{
+#include "version.h"
+
+    int    argc = 0;                /* argument counter */
+    char   *argv[ARGCNT];           /* pointers to arguments */
+#ifndef MPX1X
+    char   argbuf[LINELEN];         /* buffer for argument strings */
+#endif
+    char   *argptr = argbuf;        /* pointer into argbuf */
+    char   *curptr = argptr;        /* current arg pointer */
+    char   *argpin = 0;             /* pointer into argbuf (in redir)*/
+    char   *argpot = 0;             /* pointer into argbuf (out redir)*/
+    char   *argper = 0;             /* pointer into argbuf (err redir)*/
+    int    sotapp = 0;              /* stdout redir and append */
+    int    serapp = 0;              /* stderr redir and append */
+    int    sersot = 0;              /* stderr redir to stdout */
+    int    argsize;                 /* argument size */
+    int    sin,sout,eout;           /* file descriptors for input/output */
+    int    i,j;
+    int    exmode;                  /* execute mode */
+#ifdef MPX1X
+    char   *iinp = "LFC=UT";        /* interactive input */
+#else
+    char   *iinp = "SYC";           /* interactive input */
+#endif
+    char   *jinp = "SYC";           /* job input */
+    char   *actinp;                 /* actual input */
+    char   *iout = "LFC=UT";        /* interactive output */
+    char   *jout = "SLO";           /* job output */
+    char   *utd = "UT=DTCHUN ";     /* device assigned to "UT " lfc */
+    char   *utd2 = "DEV=TYCHUN SHAR=T ";  /* device assigned to "UT " lfc */
+    char   *actout;                 /* actual output */
+    char   *ierr = "LFC=UT";        /* interactive output */
+    char   *jerr = "SLO";           /* job output */
+    char   *acterr;                 /* actual output */
+    char   taskid[9];               /* task id string */
+    char   *ept = 0;                /* ptr into argbuf for env info */
+    char   **ep;                    /* curr env pointer */
+    int    reg[8];                  /* mpx regs */
+#ifdef RRDEBUG
+   	char msg1[80];
+#endif
+
+    /* set default activation stdin, stdout, stderr */
+    /* this for when we are activated */
+    actinp = "DEV=NU";
+    actout = "DEV=NU";
+    acterr = "DEV=NU";
+
+    exmode = _mpxin2();		/* Find out if task was activated */
+    getcwvd();			/* get curr vol/dir for task */
+    argbuf[0] = 0;		/* insure null args */
+
+#ifdef RRDEBUG
+    sprintf(msg1, "\r\nRUN BUG: exmode = %x runrflg = %x\n", exmode, runrflg);
+    contyp(msg1);
+#endif
+
+    if (!runrflg) {		/* if not run requested */
+      for(i=0;i<8;i++)
+    	taskid[i] = ((j=_myid._lm[i]) != ' ') ? j : '\0';
+      taskid[8] = '\0';
+      argv[argc++] = taskid;	/* set up first argument in list */
+    } else {
+      prb.rba = (int)argbuf;    /* arg buffer addr */
+      prb.rbl = LINELEN;        /* buf size */
+      reg [2] = (int)&prb;      /* prb address */
+      mpxsvc(0x107b, reg, reg); /* get run req params */
+      if (reg[6])
+    	_exitmpx("rreq");	/* go abort if error */
+    }
+
+    if(exmode || runrflg) {	/* If task was TSM or JOB */
+      if(exmode) {		/* If task was TSM or JOB */
+    	actinp = ((exmode == 'J')?jinp: iinp);
+    	actout = ((exmode == 'J')?jout: iout);
+    	acterr = ((exmode == 'J')?jerr: ierr);
+        argptr = argbuf;	/* set argument buffer pointer */
+      } else {
+    	/* if run requested */
+    	actinp = iout;
+    	actout = iout;
+    	acterr = ierr;
+
+#ifdef MPX1X
+    	/* set key in r4 & r5 */
+    	asm (" zr r4");
+    	asm (" zr r5");
+    	/* set username in r6 & r7 */
+    	asm (" lw r6,_argbuf");
+    	asm (" lw r7,_argbuf+1w");
+    	asm (" svc 1,x'74'");	/* set new username, m.user */
+    	getcwvd();		/* get curr vol/dir for task */
+        argptr = argbuf+8;	/* set argument buffer pointer */
+#else
+        argptr = argbuf;	/* set argument buffer pointer */
+#endif
+      }
+
+      /* get arguments until last one found from command line */
+      while (1) {
+    	if (!runrflg) {
+    	  /* parse tsm command line */
+    	  if ((argsize = ctscan(argptr,ARGLEN)) == 0)
+    	    break;
+    	  curptr = argptr;     /* pointer to actual CL arguments */
+    	  argptr += argsize;   /* argptr points after arg string */
+    	  *argptr++ = NULL;    /* null terminate string */
+    	} else {
+    	  /* parse run req buffer */
+    	  if (*argptr == 0) {
+    	    ept = ++argptr;     /* set environ ptr */
+    	    break;              /* done with args */
+    	  }
+    	  curptr = argptr;      /* point to next arg */
+    	  argsize = strlen(curptr); /* current string length */
+    	  argptr += argsize + 1; /* skip to next string */
+    	}
+
+    	/* Check if argument is a redirection argument */
+    	switch(*curptr){
+
+    	  case '<':
+    	    argpin = curptr + 1;    /* input redirection */
+    	    break;
+
+    	  case '>':
+    	    if (*++curptr != '>')   /* check for append mode */
+    	      argpot = curptr;
+    	    else {
+    	      sotapp = 1;
+    	      argpot = curptr + 1;
+    	    }
+    	    break;
+
+    	  case '2':
+    	    if (*++curptr != '>') { /* check for redirect of stderr */
+    	      argv[argc++] = --curptr;
+    	      break;               /* add argument to argument list*/
+    	    }
+    	    else {
+    	      /* stderr is redirected somewhere */
+    	      switch (*++curptr) {
+
+    		case '>':          /* append */
+    		  argper = curptr + 1;
+    		  serapp = 1;
+    		  break;
+
+    		case '&':    /* redir to ? (only stdout so far)*/
+    		  if(*++curptr == '1')
+    		    sersot = 1;
+    		    /* redirect to stdout
+    		     * which may not have been redirected yet!
+    		     */
+    		    break;
+
+    		default:           /* redir to file */
+    		  argper = curptr;
+    		  break;
+    	      }
+    	    }
+    	    break;
+
+    	  default:
+    	  argv[argc++] = curptr;    /* add argument to argument list*/
+    	} /* end of switch */
+      } /* end of while */
+
+      if (runrflg) {  /* get environment */
+    	ep = environ;
+    	if (!(ept != 0 && *ept != 0))
+    	  environ = (char **)NULL;
+    	while (*ept) {
+    	  curptr = ept;
+    	  ept += strlen(curptr) + 1;
+    	  *ep++ = curptr;
+    	}
+    	*ep = (char *)NULL;
+      } else {
+    	/* tsm task, get UT assignment for environment */
+    	int *tsa;
+    	int *dqe;
+    	int kk[2];
+    	int *udt;
+    	short nudt;
+    	int dev;
+#ifdef MPX35
+    	mpxsvc(0x207d, reg, reg);       /* jcb */
+    	tsa = (int*)reg[1];             /* jcb */
+#else
+    	tsa = (int *)(*((int *)C_TSAD));	/* 0xa80 c.tsad */
+#endif
+    	dqe = (int *)tsa[T_PRNO/sizeof(int)]; /* get t.prno */
+    	kk[0] = dqe[(DQE_PSN/sizeof(int)) + 1]; /* get dev from dqe.psn */
+    	kk[1] = 0;              /* ensure zero at end */
+    	sscanf(kk,"%4x", &dev);  /* get hex device address */
+    	udt = (int *)(*(int*)C_UDTA);		/* addr of UDT tables */
+    	nudt = (short) (*((short *)C_UDTN));	/* num of UDT's */
+    	for (; nudt--; udt += (UDT_SIZE/sizeof(int))) {
+    	  if ((udt[1] & 0xffff) == dev) {
+    	    dev |= ((udt[1] & 0x00ff0000) << 8);  /* get device type */
+    	    goto got;
+    	  }
+    	}
+    	dev |= 0x0c000000;      /* assume ty */
+got:
+    	reg[2] = (dev & 0xff000000) >> 24;
+    	mpxsvc (0x1014, reg, reg);	/* M.DEVID */
+    	sprintf (utd, "UT=%c%c%04.4x", ((reg[2] & 0xff00) >> 8),
+    	    (reg[2] & 0xff), dev & 0xffff);
+    	ep = environ;
+    	*ep++ = utd;
+    	*ep = (char *)NULL;
+      }
+
+      if (runrflg) {
+    	/* must assign UT for run req task */
+    	int dev;
+    	int devty;
+    	static char *dp;
+#ifdef RRDEBUG
+    	char msg[80];
+#endif
+    	if ((dp = getenv("UT")) == NULL) {
+    	  /* we only get here if we were run requested and
+    	   * no environment was passed.  This happens when
+    	   * a C task is started with the sequence directive.
+    	   * fixed 05/13/92 JCB */
+    	  actinp = "DEV=NU";	/* set NULL devices */
+    	  actout = "DEV=NU";
+    	  acterr = "DEV=NU";
+#ifdef RRDEBUG
+    	sprintf(msg, "\rRUN BUG0: runrflg = %x, getenv ret dp=%s\n", runrflg, dp);
+    	contyp(msg);
+#endif
+    	  goto rrnoenv;
+    	}
+/*    	  _exitmpx("UT? "); */
+#ifdef RRDEBUG
+    	sprintf(msg, "\rRUN BUG1: exmode = %x, getenv ret dp=%s\n", exmode, dp);
+    	contyp(msg);
+#endif
+        /* See if we can allocate a shared UT device */
+    	strcpy(utd2, "DEV=");
+    	strcat(utd2, dp);
+    	reg[2] = (int)dp[1];
+    	reg[2] |= (((int)dp[0]) << 8);
+    	mpxsvc (0x1014, reg, reg);
+    	devty = reg[2];
+    	sscanf (&dp[2], "%4x", &dev);  /* get hex device address */
+    	dev |= (devty << 24);
+    	rrs[0] = 0x00555420;      /* "UT " */
+    	reg[1] = (int)rrs;
+/*    	reg[7] = 0; */
+/*      mpxsvc (0x2053, reg, reg);*/ /* deassign UT */
+    	rrs[1] = 0x03060000;      /* type 3 size 6 wds */
+/*      rrs[2] = 0xf8000000;      /* allow r/w */
+    	rrs[2] = 0x00000000;      /* allow r/w */
+    	rrs[3] = 0;
+    	rrs[4] = (dev | 0x80008000); /* dev type, chan, sub addr */
+    	rrs[5] = 0;
+#ifdef MAKE
+    	reg[7] = 0;
+#else
+    	reg[7] = (int)cnp;		/* the cnp */
+    	cnp[0] = 1;			/* don't wait */
+/*    	cnp[2] = 0x00800000;		/* default access, shared */
+/*    	cnp[2] = 0x00040000;		/* default access, shared */
+/*    	cnp[2] = 0x00100000;		/* default access, shared */
+        cnp[2] = 0;
+#endif
+#ifdef RRDEBUG
+    	sprintf(msg, "\rRUN BUG2: rrs built: %x %x %x %x %x %x\n", rrs[0], rrs[1],
+    	    rrs[2], rrs[3], rrs[4], rrs[5]);
+    	contyp(msg);
+    	sprintf(msg, "\rRUN BUG2a: cnp built: %x %x %x %x %x %x\n", cnp[0],
+     cnp[1], cnp[2], cnp[3], cnp[4], cnp[5]);
+    	contyp(msg);
+#endif
+
+#ifdef MPX1X
+        /* See if we can allocate a shared UT device */
+        /* I do not see a way to share a TY or CT on MPX 1.X */
+    	r5val = 0x03555420;		/* type 3, lfc=ut */
+    	r6val = (int)&rrs[4];		/* chan, sa */
+    	r7val = (int)&rrs[5];		/* point to null */
+    	asm (" la 1,altret");		/* set error ret addr */
+    	asm (" lw 5,_r5val");		/* get type & LFC */
+    	asm (" lw 6,_r6val");		/* get chan & sa */
+    	asm (" lw 7,_r7val");		/* no reel or size */
+    	asm (" svc 1,x'40'");		/* M.ALOC */
+    	asm (" li 6,-1");		/* o.k. return */
+    	asm ("altret stw 6,_r6val");	/* save error code */
+    	if (r6val != -1) {
+#ifdef RRDEBUG
+    	sprintf(msg, "\rRUN BUG3: aloc error, r6 = %x\r\n", r6val);
+    	contyp(msg);
+#endif
+        /* this is for MPX1X testing */
+        /* It seems we always get an error on MPX 1.X */
+        /* so just assign the null device instead */
+    	  actinp = "DEV=NU";	/* set NULL devices */
+    	  actout = "DEV=NU";
+    	  acterr = "DEV=NU";
+    	  goto rrnoenv;
+/* TESTING    	  _exitmpx("rrs "); */
+    	}
+
+#else /* MPX1X */
+
+    	mpxsvc (0x2052, reg, reg);	/* m.assn */
+    	reg[7] = cnp[2] & 0xffff;	/* get status */
+#ifdef RRDEBUG
+    	sprintf(msg, "\rRUN BUG3: assign called: r7 = %x\n", reg[7]);
+    	contyp(msg);
+#endif
+        reg[1] = (int)utfcb;		/* fcb address */
+    	reg[7] = (int)cnp;		/* the cnp */
+    	cnp[0] = 1;			/* don't wait */
+#ifdef MAKE
+/*    	cnp[2] = 0x00800000;		/* default access, shared */
+/*    	cnp[2] = 0x00040000;		/* default access, shared */
+    	cnp[2] = 0x00100000;		/* default access, shared */
+#else
+    	cnp[2] = 0;
+#endif
+    	mpxsvc (0x2042, reg, reg);	/* m.openr */
+    	reg[7] = cnp[2] & 0xffff;	/* get status */
+#ifdef RRDEBUG
+    	sprintf(msg, "\rRUN BUG4: openr called: r7 = %x\n", reg[7]);
+    	contyp(msg);
+#endif
+/*	if (reg[7] != 0)_exitmpx("rrs "); */
+    	if (reg[7] != 0) {
+    	  dopipe = 1;		/* use pipes */
+    	  actinp = "DEV=NU";
+    	  actout = "DEV=NU";
+    	  acterr = "DEV=NU";
+    	}
+
+#endif /* MPX1X */
+      }
+
+    } /* end of if for TSM, JOB or run request */
+
+rrnoenv:	/* we come here for sequence directive from sysgen */
+    /*
+     * open the assigned devices, will be NULL for activated tasks
+     */
+    argv[argc] = (char *)NULL;  /* null terminate argv JCB */
+
+    if (argpin) {		/* REDIRECTION OF STDIN */
+      if ((sin = open(argpin,READ)) != 0)
+    	_exitmpx("in2 ");
+    } else {			/* NO REDIRECTION OF STDIN */
+    	if ((sin = open(actinp,READ)) != 0)
+    	  _exitmpx("in1 ");
+    }
+
+    if (argpot) {		/* REDIRECTION OF STDOUT */
+      if (sotapp) {		/* WITH APPEND MODE */
+    	errno = 0;
+    	if ((sout = open(argpot,WRITE)) == 1) {
+    	  if (seek(sout,0,2) < 0)
+    	    _exitmpx("out3");
+    	} else if (errno == E004) {
+    	  if ((sout = creat(argpot,MPX_DEFAULT)) != 1)
+    	    _exitmpx("out1");
+    	}
+
+      } else {			/* WITHOUT APPEND MODE */
+    	/* check for keywords list, print and null */
+
+    	/* LIST? */
+    	if (strcmp(argpot,"LIST") == 0 || strcmp(argpot,"list") == 0)
+    	  sout = open(actout,WRITE);       /* yes, open term */
+
+    	/* PRINT? */
+    	else if (strcmp(argpot,"PRINT") == 0 || strcmp(argpot,"print") == 0)
+    	  sout = open(jout,WRITE);            /* yes, open SLO */
+
+    	/* NULL? */
+    	else if (strcmp(argpot,"NULL") == 0 || strcmp(argpot,"null") == 0)
+    	  sout = open("DEV=NU",WRITE);        /* yes, open null */
+
+    	/* Output is to a file */
+    	else if ((sout = creat(argpot, MPX_DEFAULT)) != 1)
+    	  _exitmpx("out4");
+      }
+    } else {			/* NO REDIRECTION OF STDOUT */
+      if ((sout = open(actout,WRITE)) != 1)
+    	_exitmpx("out6");
+      if (dopipe)_pop(1);	/* do a pipe */
+    }
+
+    if (sersot) {		/* STDERR ONTO STDOUT */
+      if ((eout = open("LFC=UX1",WRITE)) != 2)
+    	_exitmpx("err7");
+    } else if (argper) {	/* REDIRECTION OF STDERR */
+      if (serapp) {		/* APPEND MODE */
+    	errno = 0;
+    	if ((eout = open(argper,WRITE)) == 2) {
+    	  if (seek(eout,0,2) < 0)
+    	    _exitmpx("err3");
+    	} else if (errno == E004) {
+    	  if ((eout = creat(argper,MPX_DEFAULT)) != 2)
+    	    _exitmpx("err1");
+    	}
+      } else {			/* WITHOUT APPEND MODE */
+    	/* check for keywords list, print and null */
+    	if (strcmp(argper,"LIST") == 0 || strcmp(argper,"list") == 0)
+    	  eout = open(acterr,WRITE);
+    	else if (strcmp(argper,"PRINT") == 0 || strcmp(argper,"print") == 0)
+    	  eout = open(jerr,WRITE);
+    	else if (strcmp(argper,"NULL") == 0 || strcmp(argper,"null") == 0)
+    	  eout = open("DEV=NU", WRITE);
+    	else if ((eout = creat(argper,MPX_DEFAULT)) != 2)
+    	/* Output is to a file */
+    	  _exitmpx("err4");
+      }
+    } else {			/* NO REDIRECTION OF STDERR */
+      if ((eout = open(acterr,WRITE)) != 2)
+        _exitmpx("err6");
+      if (dopipe)_pop(2);	/* do a pipe */
+    }
+
+/*XXXXX    } /* end of if for TSM, JOB or run request */
+
+    asm (" lw 0,x'a80'");	/* if txpm turn off tsa biasing */
+    asm (" camw 0,x'a80'");
+    asm (" beq $+2w");
+    asm (" svc 1,3");
+
+    /* Call the C program with the arguments given. */
+
+    main(argc,argv);		/* call the main routine */
+    exit(0);			/* if main returns, exit normally */
+}
+
+
+static int _mpxin2()
+{
+ int   reg[8];
+ int   i;
+
+ for (i=0;i<8;i++) reg[i] = 0;
+
+ reg[5] = 0x80000000;
+ reg[7] = (int) &_myid;
+ mpxsvc(0x1064,reg,reg);	/* M.ID */
+
+ return((int)_myid._pn[0]);
+}
+
+#ifdef RRDEBUG
+static int tcpb[3] = {0,0,0};
+static char lstr[120];
+
+/* routine to type a message on the console */
+contyp(str)
+char *str;
+{
+    int i;
+
+    strcpy (lstr, str);
+    i=strlen(str);
+    tcpb[0]= (((unsigned)i << 20) | 0x00080000) |  (int)lstr;
+    asm(" la r1,_tcpb");
+    asm(" svc 1,x'3f'");
+}
+#endif
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d29 2
+d108 3
+d122 5
+d301 4
+d312 1
+d351 2
+d365 1
+a365 1
+    	sprintf(msg, "\rRUN BUG3: aloc error, r6 = %x\n", r6val);
+d368 8
+a375 1
+    	  _exitmpx("rrs ");
+@

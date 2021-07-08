@@ -1,0 +1,1035 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2019.01.31.22.25.26;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.10.30.21.25.54;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.2
+log
+@remove -m32 option for MPX
+@
+text
+@#~!Makefile for nblib when building for MPX on Linux
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1995 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"@@(#)Make:nblib/Makefile	1.0"
+
+# Make parameters when running on Unix
+
+ROOT = /system/system
+TARGET = /system/bin
+SOURCE = .
+PREFIX = nb
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/system
+BIN = /system/bin
+UBIN = /system/bin
+LIB = /system/bin
+YBIN = /system/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -DMPX -Ui386
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS = -YXXXXmap
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+CLIBPREFIX =
+MAKEFILE = Makefile
+
+# Fill in with correct information
+
+HDRS = errmsg.h hash.h libgen.h print.h	stdiom.h strselect.h unixio.h
+
+OBJS_A = c.srt.o c.srte.o fcall.o jump.o pnpars.o
+
+SRCS_A = c.srt.S c.srte.S fcall.S jump.S pnpars.S
+
+OBJ_1X = cassg.o username.o
+
+SRC_1X = cassg.c username.c
+
+OBJ1 = a64l.o abort.o abs.o access.o alarm.o alloca.o asin.o assert.o \
+	atan.o atof.o atoi.o atol.o basename.o bcmp.o bcopy.o bgets.o \
+	brk.o bsearch.o	bufsplit.o bzero.o calloc.o cftime.o chdir.o \
+	chmod.o chown.o chroot.o clock.o clrerr.o conprint.o crypt.o \
+	ctime.o ctscan.o ctype.o data.o day.o directory.o dirname.o \
+	doprnt.o doscan.o drand48.o dup.o ecvt.o eexit.o erf.o Err.o \
+	erraction.o errafter.o errbefore.o errexit.o errlst.o error.o \
+	errprefix.o errsource.o	errstrtok.o errtag.o errtext.o errtofix.o
+
+SRC1 = a64l.c abort.c abs.c access.c alarm.c alloca.c asin.c assert.c \
+	atan.c atof.c atoi.c atol.c basename.c bcmp.c bcopy.c bgets.c \
+	brk.c bsearch.c	bufsplit.c bzero.c calloc.c cftime.c chdir.c \
+	chmod.c chown.c chroot.c clock.c clrerr.c conprint.c crypt.c \
+	ctime.c ctscan.c ctype.c data.c day.c directory.c dirname.c \
+	doprnt.c doscan.c drand48.c dup.c ecvt.c eexit.c erf.c Err.c \
+	erraction.c errafter.c errbefore.c errexit.c errlst.c error.c \
+	errprefix.c errsource.c	errstrtok.c errtag.c errtext.c errtofix.c
+
+OBJ2 = errusage.o exec.o exp.o fabs.o fdopen.o fgetc.o fgets.o filbuf.o \
+	findiop.o floor.o flsbuf.o fmod.o fopen.o fork.o fprintf.o fps.o \
+	fputc.o fputs.o fread.o frexp.o fseek.o fstat.o ftell.o fwrite.o \
+	gamma.o gcvt.o getchar.o getcwd.o getcwvd.o getenv.o getopt.o \
+	getpath.o getpid.o gets.o getw.o gmatch.o hash.o hsearch.o hypot.o \
+	index.o j0.o j1.o jn.o julian.o kill.o l3.o l64a.o ldexp.o leap.o \
+	link.o log.o logdir.o lsearch.o lseek.o malloc.o matherr.o memccpy.o \
+	memchr.o memcmp.o memcpy.o memset.o mkdir.o mkdirp.o mktemp.o modf.o
+
+SRC2 = errusage.c exec.c exp.c fabs.c fdopen.c fgetc.c fgets.c filbuf.c \
+	findiop.c floor.c flsbuf.c fmod.c fopen.c fork.c fprintf.c fps.c \
+	fputc.c fputs.c fread.c frexp.c fseek.c fstat.c ftell.c fwrite.c \
+	gamma.c gcvt.c getchar.c getcwd.c getcwvd.c getenv.c getopt.c \
+	getpath.c getpid.c gets.c getw.c gmatch.c hash.c hsearch.c hypot.c \
+	index.c j0.c j1.c jn.c julian.c kill.c l3.c l64a.c ldexp.c leap.c \
+	link.c log.c logdir.c lsearch.c lseek.c malloc.c matherr.c memccpy.c \
+	memchr.c memcmp.c memcpy.c memset.c mkdir.c mkdirp.c mktemp.c modf.c
+
+OBJ3 = mpxini.o mpxio.o mpxsvc.o nice.o num.o numd.o pathfind.o pause.o \
+	perror.o pipe.o pow.o printf.o putchar.o putenv.o puts.o putw.o	\
+	qsort.o rand.o regerror.o rew.o rindex.o rmdirp.o sbrk.o scanf.o \
+	setbuf.o setpgrp.o setuid.o setvbuf.o sgets.o signal.o sin.o sinh.o \
+	sleep.o sprintf.o sputs.o sqrt.o stat.o str2up.o stradd.o strcasecmp.o \
+	strcat.o strccpy.o strchr.o strcmp.o strcpy.o strcspn.o strdup.o \
+	strecnt.o strecpy.o stricmp.o strlen.o strncat.o strncmp.o strncpy.o \
+	strnicmp.o strnlen.o strpbrk.o strpos.o strrchr.o strrpbrk.o strrpos.o	strspn.o
+
+SRC3 = mpxini.c mpxio.c mpxsvc.c nice.c num.c numd.c pathfind.c pause.c \
+	perror.c pipe.c pow.c printf.c putchar.c putenv.c puts.c putw.c	\
+	qsort.c rand.c regerror.c rew.c rindex.c rmdirp.c sbrk.c scanf.c \
+	setbuf.c setpgrp.c setuid.c setvbuf.c sgets.c signal.c sin.c sinh.c \
+	sleep.c sprintf.c sputs.c sqrt.c stat.c str2up.c stradd.c strcasecmp.c \
+	strcat.c strccpy.c strchr.c strcmp.c strcpy.c strcspn.c	strdup.c \
+	strecnt.c strecpy.c stricmp.c strlen.c strncat.c strncmp.c strncpy.c \
+	strnicmp.c strnlen.c strpbrk.c strpos.c strrchr.c strrpbrk.c strrpos.c	strspn.c
+
+OBJ4 = strspn.o strtod.o strtok.o strtol.o swab.o sweekday.o sync.o tan.o \
+	tanh.o tconv.o tconvs.o tell.o tempfile.o tempnam.o time.o time_comm.o \
+	tmpfile.o tmpnam.o to_date.o tree.o triml.o trimt.o tsearch.o \
+	ungetc.o unix2mpx.o unixio.o unlink.o vfprintf.o vprintf.o vsprintf.o \
+	wait.o weekday.o
+
+SRC4 = strspn.c strtod.c strtok.c strtol.c swab.c sweekday.c sync.c tan.c \
+	tanh.c tconv.c tconvs.c tell.c tempfile.c tempnam.c time.c time_comm.c \
+	tmpfile.c tmpnam.c to_date.c tree.c triml.c trimt.c tsearch.c \
+	ungetc.c unix2mpx.c unixio.c unlink.c vfprintf.c vprintf.c vsprintf.c \
+	wait.c weekday.c
+
+MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
+
+ALL:	all
+
+all:	files $(MAIN)
+	$(BIN)/ar -rc $(CLIBPREFIX) $(OBJS_A)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ1)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ2)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ3)
+	$(BIN)/ar -rv $(CLIBPREFIX) $(OBJ4)
+	$(BIN)/echo clib/cdir are up to date.
+
+files:
+	$(BIN)/touch clib
+	$(BIN)/touch cdir
+
+CLEAN:  clean
+
+clean:
+	$(BIN)/rm -f $(OBJS_A)
+	$(BIN)/rm -f $(OBJ1)
+	$(BIN)/rm -f $(OBJ2)
+	$(BIN)/rm -f $(OBJ3)
+	$(BIN)/rm -f $(OBJ4)
+#	$(BIN)/rm -f $(OBJ_1X)
+
+CLOBBER: clobber
+
+clobber: clean
+	$(BIN)/rm -f clib cdir
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+#	$(BIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+#	$(BIN)/mv dep.out $(MAKEFILE)
+
+	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	@@for i in $(SRCS_A); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC1); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC2); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC3); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC4); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+
+INSTALL: install
+
+install: all
+	$(BIN)/cp clib $(BIN)/clb
+	$(BIN)/cp cdir $(BIN)/cdr
+
+prefile:
+
+# Source file 'c.srt.S'
+c.srt.o: prefile c.srt.S
+	$(CC) -Pprefile -c c.srt.S -o c.srt.o
+
+# Source file 'c.srte.S'
+c.srte.o: prefile c.srte.S
+	$(CC) -Pprefile -c c.srte.S -o c.srte.o
+
+# Source file 'fcall.S'
+fcall.o: prefile fcall.S
+	$(CC) -Pprefile -c fcall.S -o fcall.o
+
+# Source file 'jump.S'
+jump.o: prefile jump.S
+	$(CC) -Pprefile -c jump.S -o jump.o
+
+# Source file 'pnpars.S'
+pnpars.o: prefile pnpars.S
+	$(CC) -Pprefile -c pnpars.S -o pnpars.o
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 1
+a1 1
+#~!Makefile for nblib
+d21 1
+a21 1
+# Make parameters when running on MPX
+d42 1
+a42 1
+CLIBPREFIX = c
+a212 775
+# Source file 'c.srt.S'
+c.srt.o: c.srt.S
+# Source file 'c.srte.S'
+c.srte.o: c.srte.S
+# Source file 'fcall.S'
+fcall.o: fcall.S
+# Source file 'jump.S'
+jump.o: jump.S
+# Source file 'pnpars.S'
+pnpars.o: pnpars.S
+# Source file 'a64l.c'
+a64l.o: a64l.c
+# Source file 'abort.c'
+abort.o: abort.c
+# Source file 'abs.c'
+abs.o: abs.c
+# Source file 'access.c'
+access.o: access.c
+access.o: /system/nbinclude/types.h
+access.o: /system/nbinclude/limits.h
+access.o: /system/nbinclude/errno.h
+access.o: /system/nbinclude/stat.h
+access.o: /system/nbinclude/types.h
+# Source file 'alarm.c'
+alarm.o: alarm.c
+# Source file 'alloca.c'
+alloca.o: alloca.c
+# Source file 'asin.c'
+asin.o: asin.c
+asin.o: /system/nbinclude/math.h
+asin.o: /system/nbinclude/values.h
+asin.o: /system/nbinclude/errno.h
+# Source file 'assert.c'
+assert.o: assert.c
+# Source file 'atan.c'
+atan.o: atan.c
+atan.o: /system/nbinclude/math.h
+atan.o: /system/nbinclude/values.h
+atan.o: /system/nbinclude/errno.h
+# Source file 'atof.c'
+atof.o: atof.c
+atof.o: /system/nbinclude/ctype.h
+atof.o: /system/nbinclude/values.h
+atof.o: /system/nbinclude/math.h
+atof.o: /system/nbinclude/errno.h
+# Source file 'atoi.c'
+atoi.o: atoi.c
+atoi.o: /system/nbinclude/ctype.h
+# Source file 'atol.c'
+atol.o: atol.c
+atol.o: /system/nbinclude/ctype.h
+# Source file 'basename.c'
+basename.o: basename.c
+basename.o: /system/nbinclude/string.h
+basename.o: ./libgen.h
+# Source file 'bcmp.c'
+bcmp.o: bcmp.c
+# Source file 'bcopy.c'
+bcopy.o: bcopy.c
+# Source file 'bgets.c'
+bgets.o: bgets.c
+bgets.o: /system/nbinclude/stdio.h
+# Source file 'brk.c'
+brk.o: brk.c
+brk.o: /system/nbinclude/errno.h
+# Source file 'bsearch.c'
+bsearch.o: bsearch.c
+# Source file 'bufsplit.c'
+bufsplit.o: bufsplit.c
+bufsplit.o: ./libgen.h
+# Source file 'bzero.c'
+bzero.o: bzero.c
+# Source file 'calloc.c'
+calloc.o: calloc.c
+# Source file 'cftime.c'
+cftime.o: cftime.c
+cftime.o: /system/nbinclude/ctype.h
+cftime.o: /system/nbinclude/fcntl.h
+cftime.o: /system/nbinclude/stdio.h
+cftime.o: /system/nbinclude/time.h
+cftime.o: /system/nbinclude/types.h
+cftime.o: /system/nbinclude/stat.h
+cftime.o: /system/nbinclude/types.h
+# Source file 'chdir.c'
+chdir.o: chdir.c
+chdir.o: /system/nbinclude/limits.h
+chdir.o: /system/nbinclude/errno.h
+# Source file 'chmod.c'
+chmod.o: chmod.c
+chmod.o: /system/nbinclude/errno.h
+chmod.o: /system/nbinclude/limits.h
+# Source file 'chown.c'
+chown.o: chown.c
+chown.o: /system/nbinclude/errno.h
+chown.o: /system/nbinclude/limits.h
+# Source file 'chroot.c'
+chroot.o: chroot.c
+# Source file 'clock.c'
+clock.o: clock.c
+clock.o: /system/nbinclude/sys/types.h
+clock.o: /system/nbinclude/sys/times.h
+clock.o: /system/nbinclude/sys/param.h
+# Source file 'clrerr.c'
+clrerr.o: clrerr.c
+clrerr.o: /system/nbinclude/stdio.h
+# Source file 'conprint.c'
+conprint.o: conprint.c
+# Source file 'crypt.c'
+crypt.o: crypt.c
+# Source file 'ctime.c'
+ctime.o: ctime.c
+ctime.o: /system/nbinclude/time.h
+ctime.o: /system/nbinclude/types.h
+ctime.o: /system/nbinclude/timeb.h
+# Source file 'ctscan.c'
+ctscan.o: ctscan.c
+ctscan.o: /system/nbinclude/mosde.h
+# Source file 'ctype.c'
+ctype.o: ctype.c
+ctype.o: /system/nbinclude/ctype.h
+# Source file 'data.c'
+data.o: data.c
+data.o: /system/nbinclude/stdio.h
+# Source file 'day.c'
+day.o: day.c
+day.o: /system/nbinclude/stdio.h
+day.o: ./libgen.h
+# Source file 'directory.c'
+directory.o: directory.c
+directory.o: /system/nbinclude/types.h
+directory.o: /system/nbinclude/string.h
+directory.o: /system/nbinclude/dirent.h
+directory.o: /system/nbinclude/ctype.h
+directory.o: /system/nbinclude/limits.h
+directory.o: /system/nbinclude/errno.h
+directory.o: /system/nbinclude/fcntl.h
+# Source file 'dirname.c'
+dirname.o: dirname.c
+dirname.o: /system/nbinclude/string.h
+dirname.o: ./libgen.h
+# Source file 'doprnt.c'
+doprnt.o: doprnt.c
+doprnt.o: /system/nbinclude/stdio.h
+doprnt.o: /system/nbinclude/ctype.h
+doprnt.o: /system/nbinclude/varargs.h
+doprnt.o: /system/nbinclude/nan.h
+doprnt.o: /system/nbinclude/values.h
+doprnt.o: ./print.h
+# Source file 'doscan.c'
+doscan.o: doscan.c
+doscan.o: /system/nbinclude/stdio.h
+doscan.o: /system/nbinclude/ctype.h
+doscan.o: /system/nbinclude/varargs.h
+doscan.o: /system/nbinclude/values.h
+doscan.o: /system/nbinclude/errno.h
+# Source file 'drand48.c'
+drand48.o: drand48.c
+drand48.o: drand48.c
+# Source file 'dup.c'
+dup.o: dup.c
+dup.o: /system/nbinclude/errno.h
+# Source file 'ecvt.c'
+ecvt.o: ecvt.c
+# Source file 'eexit.c'
+eexit.o: eexit.c
+eexit.o: /system/nbinclude/stdio.h
+# Source file 'erf.c'
+erf.o: erf.c
+erf.o: /system/nbinclude/math.h
+# Source file 'Err.c'
+Err.o: Err.c
+Err.o: ./errmsg.h
+# Source file 'erraction.c'
+erraction.o: erraction.c
+erraction.o: ./errmsg.h
+erraction.o: /system/nbinclude/stdio.h
+# Source file 'errafter.c'
+errafter.o: errafter.c
+errafter.o: ./errmsg.h
+errafter.o: /system/nbinclude/stdio.h
+errafter.o: /system/nbinclude/varargs.h
+# Source file 'errbefore.c'
+errbefore.o: errbefore.c
+errbefore.o: /system/nbinclude/varargs.h
+errbefore.o: ./errmsg.h
+# Source file 'errexit.c'
+errexit.o: errexit.c
+errexit.o: ./errmsg.h
+# Source file 'errlst.c'
+errlst.o: errlst.c
+# Source file 'error.c'
+error.o: error.c
+error.o: /system/nbinclude/stdio.h
+# Source file 'errprefix.c'
+errprefix.o: errprefix.c
+errprefix.o: ./errmsg.h
+# Source file 'errsource.c'
+errsource.o: errsource.c
+errsource.o: ./errmsg.h
+# Source file 'errstrtok.c'
+errstrtok.o: errstrtok.c
+# Source file 'errtag.c'
+errtag.o: errtag.c
+errtag.o: ./errmsg.h
+# Source file 'errtext.c'
+errtext.o: errtext.c
+errtext.o: ./errmsg.h
+errtext.o: /system/nbinclude/stdio.h
+errtext.o: ./strselect.h
+errtext.o: /system/nbinclude/varargs.h
+# Source file 'errtofix.c'
+errtofix.o: errtofix.c
+errtofix.o: ./errmsg.h
+# Source file 'errusage.c'
+errusage.o: errusage.c
+errusage.o: ./errmsg.h
+errusage.o: /system/nbinclude/stdio.h
+errusage.o: /system/nbinclude/varargs.h
+# Source file 'exec.c'
+exec.o: exec.c
+exec.o: /system/nbinclude/mosde.h
+exec.o: /system/nbinclude/sys/types.h
+exec.o: /system/nbinclude/psb.h
+exec.o: /system/nbinclude/prb.h
+exec.o: /system/nbinclude/errno.h
+exec.o: /system/nbinclude/string.h
+exec.o: /system/nbinclude/limits.h
+# Source file 'exp.c'
+exp.o: exp.c
+exp.o: /system/nbinclude/math.h
+exp.o: /system/nbinclude/values.h
+exp.o: /system/nbinclude/errno.h
+# Source file 'fabs.c'
+fabs.o: fabs.c
+# Source file 'fdopen.c'
+fdopen.o: fdopen.c
+fdopen.o: /system/nbinclude/stdio.h
+fdopen.o: /system/nbinclude/sys/errno.h
+# Source file 'fgetc.c'
+fgetc.o: fgetc.c
+fgetc.o: /system/nbinclude/stdio.h
+# Source file 'fgets.c'
+fgets.o: fgets.c
+fgets.o: /system/nbinclude/stdio.h
+fgets.o: ./stdiom.h
+# Source file 'filbuf.c'
+filbuf.o: filbuf.c
+filbuf.o: /system/nbinclude/stdio.h
+# Source file 'findiop.c'
+findiop.o: findiop.c
+findiop.o: /system/nbinclude/stdio.h
+# Source file 'floor.c'
+floor.o: floor.c
+# Source file 'flsbuf.c'
+flsbuf.o: flsbuf.c
+flsbuf.o: /system/nbinclude/stdio.h
+flsbuf.o: ./stdiom.h
+flsbuf.o: /system/nbinclude/sys/errno.h
+# Source file 'fmod.c'
+fmod.o: fmod.c
+fmod.o: /system/nbinclude/math.h
+# Source file 'fopen.c'
+fopen.o: fopen.c
+fopen.o: /system/nbinclude/stdio.h
+fopen.o: /system/nbinclude/fcntl.h
+# Source file 'fork.c'
+fork.o: fork.c
+fork.o: /system/nbinclude/errno.h
+# Source file 'fprintf.c'
+fprintf.o: fprintf.c
+fprintf.o: /system/nbinclude/stdio.h
+fprintf.o: /system/nbinclude/varargs.h
+# Source file 'fps.c'
+fps.o: fps.c
+# Source file 'fputc.c'
+fputc.o: fputc.c
+fputc.o: /system/nbinclude/stdio.h
+# Source file 'fputs.c'
+fputs.o: fputs.c
+fputs.o: /system/nbinclude/stdio.h
+fputs.o: ./stdiom.h
+# Source file 'fread.c'
+fread.o: fread.c
+fread.o: /system/nbinclude/stdio.h
+fread.o: ./stdiom.h
+fread.o: /system/nbinclude/sys/types.h
+# Source file 'frexp.c'
+frexp.o: frexp.c
+frexp.o: /system/nbinclude/nan.h
+# Source file 'fseek.c'
+fseek.o: fseek.c
+fseek.o: /system/nbinclude/stdio.h
+# Source file 'fstat.c'
+fstat.o: fstat.c
+fstat.o: /system/nbinclude/stdio.h
+# Source file 'ftell.c'
+ftell.o: ftell.c
+ftell.o: /system/nbinclude/stdio.h
+# Source file 'fwrite.c'
+fwrite.o: fwrite.c
+fwrite.o: /system/nbinclude/stdio.h
+fwrite.o: ./stdiom.h
+fwrite.o: /system/nbinclude/sys/types.h
+# Source file 'gamma.c'
+gamma.o: gamma.c
+gamma.o: /system/nbinclude/math.h
+gamma.o: /system/nbinclude/values.h
+gamma.o: /system/nbinclude/errno.h
+# Source file 'gcvt.c'
+gcvt.o: gcvt.c
+# Source file 'getchar.c'
+getchar.o: getchar.c
+getchar.o: /system/nbinclude/stdio.h
+# Source file 'getcwd.c'
+getcwd.o: getcwd.c
+getcwd.o: /system/nbinclude/stdio.h
+getcwd.o: /system/nbinclude/sys/errno.h
+getcwd.o: /system/nbinclude/types.h
+getcwd.o: /system/nbinclude/ctype.h
+# Source file 'getcwvd.c'
+getcwvd.o: getcwvd.c
+getcwvd.o: /system/nbinclude/mosde.h
+getcwvd.o: /system/nbinclude/stdio.h
+# Source file 'getenv.c'
+getenv.o: getenv.c
+getenv.o: /system/nbinclude/stdio.h
+getenv.o: /system/nbinclude/timeb.h
+# Source file 'getopt.c'
+getopt.o: getopt.c
+# Source file 'getpath.c'
+getpath.o: getpath.c
+getpath.o: /system/nbinclude/limits.h
+getpath.o: /system/nbinclude/stdio.h
+# Source file 'getpid.c'
+getpid.o: getpid.c
+getpid.o: /system/nbinclude/tsa.h
+# Source file 'gets.c'
+gets.o: gets.c
+gets.o: /system/nbinclude/stdio.h
+gets.o: ./stdiom.h
+# Source file 'getw.c'
+getw.o: getw.c
+getw.o: /system/nbinclude/stdio.h
+getw.o: ./stdiom.h
+# Source file 'gmatch.c'
+gmatch.o: gmatch.c
+# Source file 'hash.c'
+hash.o: hash.c
+hash.o: /system/nbinclude/assert.h
+hash.o: /system/nbinclude/stdio.h
+hash.o: ./hash.h
+# Source file 'hsearch.c'
+hsearch.o: hsearch.c
+hsearch.o: /system/nbinclude/stdio.h
+# Source file 'hypot.c'
+hypot.o: hypot.c
+hypot.o: /system/nbinclude/math.h
+hypot.o: /system/nbinclude/values.h
+hypot.o: /system/nbinclude/errno.h
+# Source file 'index.c'
+index.o: index.c
+# Source file 'j0.c'
+j0.o: j0.c
+j0.o: /system/nbinclude/math.h
+j0.o: /system/nbinclude/values.h
+j0.o: /system/nbinclude/errno.h
+# Source file 'j1.c'
+j1.o: j1.c
+j1.o: /system/nbinclude/math.h
+j1.o: /system/nbinclude/values.h
+j1.o: /system/nbinclude/errno.h
+# Source file 'jn.c'
+jn.o: jn.c
+jn.o: /system/nbinclude/math.h
+jn.o: /system/nbinclude/values.h
+jn.o: /system/nbinclude/errno.h
+# Source file 'julian.c'
+julian.o: julian.c
+julian.o: /system/nbinclude/stdio.h
+julian.o: ./libgen.h
+# Source file 'kill.c'
+kill.o: kill.c
+kill.o: /system/nbinclude/errno.h
+kill.o: /system/nbinclude/signal.h
+# Source file 'l3.c'
+l3.o: l3.c
+# Source file 'l64a.c'
+l64a.o: l64a.c
+l64a.o: /system/nbinclude/values.h
+# Source file 'ldexp.c'
+ldexp.o: ldexp.c
+ldexp.o: /system/nbinclude/values.h
+ldexp.o: /system/nbinclude/errno.h
+# Source file 'leap.c'
+leap.o: leap.c
+leap.o: ./libgen.h
+# Source file 'link.c'
+link.o: link.c
+link.o: /system/nbinclude/string.h
+link.o: /system/nbinclude/errno.h
+link.o: /system/nbinclude/limits.h
+# Source file 'log.c'
+log.o: log.c
+log.o: /system/nbinclude/math.h
+log.o: /system/nbinclude/values.h
+log.o: /system/nbinclude/errno.h
+# Source file 'logdir.c'
+logdir.o: logdir.c
+logdir.o: /system/nbinclude/ctype.h
+logdir.o: /system/nbinclude/stdio.h
+logdir.o: /system/nbinclude/limits.h
+logdir.o: /system/nbinclude/errno.h
+# Source file 'lsearch.c'
+lsearch.o: lsearch.c
+# Source file 'lseek.c'
+lseek.o: lseek.c
+# Source file 'malloc.c'
+malloc.o: malloc.c
+malloc.o: /system/nbinclude/values.h
+malloc.o: /system/nbinclude/assert.h
+# Source file 'matherr.c'
+matherr.o: matherr.c
+matherr.o: /system/nbinclude/math.h
+# Source file 'memccpy.c'
+memccpy.o: memccpy.c
+# Source file 'memchr.c'
+memchr.o: memchr.c
+# Source file 'memcmp.c'
+memcmp.o: memcmp.c
+# Source file 'memcpy.c'
+memcpy.o: memcpy.c
+# Source file 'memset.c'
+memset.o: memset.c
+# Source file 'mkdir.c'
+mkdir.o: mkdir.c
+# Source file 'mkdirp.c'
+mkdirp.o: mkdirp.c
+mkdirp.o: /system/nbinclude/stdio.h
+mkdirp.o: /system/nbinclude/errno.h
+mkdirp.o: /system/nbinclude/string.h
+# Source file 'mktemp.c'
+mktemp.o: mktemp.c
+# Source file 'modf.c'
+modf.o: modf.c
+modf.o: /system/nbinclude/nan.h
+modf.o: /system/nbinclude/values.h
+# Source file 'mpxini.c'
+mpxini.o: mpxini.c
+mpxini.o: /system/nbinclude/mosde.h
+mpxini.o: /system/nbinclude/stdio.h
+mpxini.o: /system/nbinclude/errno.h
+mpxini.o: /system/nbinclude/prb.h
+mpxini.o: /system/nbinclude/version.h
+# Source file 'mpxio.c'
+mpxio.o: mpxio.c
+mpxio.o: /system/nbinclude/stdio.h
+# Source file 'mpxsvc.c'
+mpxsvc.o: mpxsvc.c
+# Source file 'nice.c'
+nice.o: nice.c
+nice.o: /system/nbinclude/errno.h
+# Source file 'num.c'
+num.o: num.c
+num.o: /system/nbinclude/ctype.h
+num.o: ./libgen.h
+# Source file 'numd.c'
+numd.o: numd.c
+numd.o: /system/nbinclude/ctype.h
+numd.o: ./libgen.h
+# Source file 'pathfind.c'
+pathfind.o: pathfind.c
+pathfind.o: /system/nbinclude/sys/types.h
+pathfind.o: /system/nbinclude/sys/stat.h
+pathfind.o: /system/nbinclude/types.h
+pathfind.o: ./libgen.h
+# Source file 'pause.c'
+pause.o: pause.c
+pause.o: /system/nbinclude/errno.h
+# Source file 'perror.c'
+perror.o: perror.c
+# Source file 'pipe.c'
+pipe.o: pipe.c
+pipe.o: /system/nbinclude/errno.h
+# Source file 'pow.c'
+pow.o: pow.c
+pow.o: /system/nbinclude/math.h
+pow.o: /system/nbinclude/values.h
+pow.o: /system/nbinclude/errno.h
+# Source file 'printf.c'
+printf.o: printf.c
+printf.o: /system/nbinclude/stdio.h
+printf.o: /system/nbinclude/varargs.h
+# Source file 'putchar.c'
+putchar.o: putchar.c
+putchar.o: /system/nbinclude/stdio.h
+# Source file 'putenv.c'
+putenv.o: putenv.c
+# Source file 'puts.c'
+puts.o: puts.c
+puts.o: /system/nbinclude/stdio.h
+puts.o: ./stdiom.h
+# Source file 'putw.c'
+putw.o: putw.c
+putw.o: /system/nbinclude/stdio.h
+# Source file 'qsort.c'
+qsort.o: qsort.c
+# Source file 'rand.c'
+rand.o: rand.c
+# Source file 'regerror.c'
+regerror.o: regerror.c
+regerror.o: ./libgen.h
+# Source file 'rew.c'
+rew.o: rew.c
+rew.o: /system/nbinclude/stdio.h
+# Source file 'rindex.c'
+rindex.o: rindex.c
+# Source file 'rmdirp.c'
+rmdirp.o: rmdirp.c
+rmdirp.o: /system/nbinclude/sys/types.h
+rmdirp.o: /system/nbinclude/sys/stat.h
+rmdirp.o: /system/nbinclude/types.h
+rmdirp.o: /system/nbinclude/stdio.h
+rmdirp.o: /system/nbinclude/errno.h
+rmdirp.o: /system/nbinclude/string.h
+# Source file 'sbrk.c'
+sbrk.o: sbrk.c
+# Source file 'scanf.c'
+scanf.o: scanf.c
+scanf.o: /system/nbinclude/stdio.h
+scanf.o: /system/nbinclude/varargs.h
+# Source file 'setbuf.c'
+setbuf.o: setbuf.c
+setbuf.o: /system/nbinclude/stdio.h
+# Source file 'setpgrp.c'
+setpgrp.o: setpgrp.c
+# Source file 'setuid.c'
+setuid.o: setuid.c
+# Source file 'setvbuf.c'
+setvbuf.o: setvbuf.c
+setvbuf.o: /system/nbinclude/stdio.h
+# Source file 'sgets.c'
+sgets.o: sgets.c
+sgets.o: /system/nbinclude/values.h
+# Source file 'signal.c'
+signal.o: signal.c
+signal.o: /system/nbinclude/signal.h
+signal.o: /system/nbinclude/errno.h
+# Source file 'sin.c'
+sin.o: sin.c
+sin.o: /system/nbinclude/math.h
+sin.o: /system/nbinclude/values.h
+sin.o: /system/nbinclude/errno.h
+# Source file 'sinh.c'
+sinh.o: sinh.c
+sinh.o: /system/nbinclude/math.h
+sinh.o: /system/nbinclude/values.h
+sinh.o: /system/nbinclude/errno.h
+# Source file 'sleep.c'
+sleep.o: sleep.c
+# Source file 'sprintf.c'
+sprintf.o: sprintf.c
+sprintf.o: /system/nbinclude/stdio.h
+sprintf.o: /system/nbinclude/varargs.h
+sprintf.o: /system/nbinclude/values.h
+# Source file 'sputs.c'
+sputs.o: sputs.c
+sputs.o: /system/nbinclude/values.h
+# Source file 'sqrt.c'
+sqrt.o: sqrt.c
+sqrt.o: /system/nbinclude/errno.h
+sqrt.o: /system/nbinclude/math.h
+# Source file 'stat.c'
+stat.o: stat.c
+stat.o: /system/nbinclude/types.h
+stat.o: /system/nbinclude/limits.h
+stat.o: /system/nbinclude/stat.h
+stat.o: /system/nbinclude/types.h
+stat.o: /system/nbinclude/string.h
+stat.o: /system/nbinclude/errno.h
+# Source file 'str2up.c'
+str2up.o: str2up.c
+str2up.o: /system/nbinclude/ctype.h
+# Source file 'stradd.c'
+stradd.o: stradd.c
+# Source file 'strcasecmp.c'
+strcasecmp.o: strcasecmp.c
+# Source file 'strcat.c'
+strcat.o: strcat.c
+# Source file 'strccpy.c'
+strccpy.o: strccpy.c
+strccpy.o: ./libgen.h
+# Source file 'strchr.c'
+strchr.o: strchr.c
+# Source file 'strcmp.c'
+strcmp.o: strcmp.c
+# Source file 'strcpy.c'
+strcpy.o: strcpy.c
+# Source file 'strcspn.c'
+strcspn.o: strcspn.c
+# Source file 'strdup.c'
+strdup.o: strdup.c
+strdup.o: /system/nbinclude/string.h
+# Source file 'strecnt.c'
+strecnt.o: strecnt.c
+strecnt.o: /system/nbinclude/ctype.h
+strecnt.o: /system/nbinclude/string.h
+strecnt.o: ./libgen.h
+# Source file 'strecpy.c'
+strecpy.o: strecpy.c
+strecpy.o: /system/nbinclude/ctype.h
+strecpy.o: /system/nbinclude/string.h
+strecpy.o: ./libgen.h
+# Source file 'stricmp.c'
+stricmp.o: stricmp.c
+stricmp.o: /system/nbinclude/ctype.h
+# Source file 'strlen.c'
+strlen.o: strlen.c
+# Source file 'strncat.c'
+strncat.o: strncat.c
+strncat.o: /system/nbinclude/types.h
+# Source file 'strncmp.c'
+strncmp.o: strncmp.c
+strncmp.o: /system/nbinclude/types.h
+# Source file 'strncpy.c'
+strncpy.o: strncpy.c
+strncpy.o: /system/nbinclude/types.h
+# Source file 'strnicmp.c'
+strnicmp.o: strnicmp.c
+strnicmp.o: /system/nbinclude/types.h
+strnicmp.o: /system/nbinclude/ctype.h
+# Source file 'strnlen.c'
+strnlen.o: strnlen.c
+strnlen.o: ./libgen.h
+# Source file 'strpbrk.c'
+strpbrk.o: strpbrk.c
+# Source file 'strpos.c'
+strpos.o: strpos.c
+# Source file 'strrchr.c'
+strrchr.o: strrchr.c
+# Source file 'strrpbrk.c'
+strrpbrk.o: strrpbrk.c
+# Source file 'strrpos.c'
+strrpos.o: strrpos.c
+# Source file 'strspn.c'
+strspn.o: strspn.c
+# Source file 'strspn.c'
+strspn.o: strspn.c
+# Source file 'strtod.c'
+strtod.o: strtod.c
+strtod.o: ./atof.c
+strtod.o: /system/nbinclude/ctype.h
+strtod.o: /system/nbinclude/values.h
+strtod.o: /system/nbinclude/math.h
+strtod.o: /system/nbinclude/errno.h
+# Source file 'strtok.c'
+strtok.o: strtok.c
+# Source file 'strtol.c'
+strtol.o: strtol.c
+strtol.o: /system/nbinclude/ctype.h
+# Source file 'swab.c'
+swab.o: swab.c
+# Source file 'sweekday.c'
+sweekday.o: sweekday.c
+sweekday.o: ./libgen.h
+# Source file 'sync.c'
+sync.o: sync.c
+# Source file 'tan.c'
+tan.o: tan.c
+tan.o: /system/nbinclude/math.h
+tan.o: /system/nbinclude/values.h
+tan.o: /system/nbinclude/errno.h
+# Source file 'tanh.c'
+tanh.o: tanh.c
+tanh.o: /system/nbinclude/math.h
+tanh.o: /system/nbinclude/values.h
+# Source file 'tconv.c'
+tconv.o: tconv.c
+tconv.o: ./libgen.h
+tconv.o: /system/nbinclude/time.h
+# Source file 'tconvs.c'
+tconvs.o: tconvs.c
+tconvs.o: ./libgen.h
+tconvs.o: /system/nbinclude/time.h
+# Source file 'tell.c'
+tell.o: tell.c
+# Source file 'tempfile.c'
+tempfile.o: tempfile.c
+tempfile.o: /system/nbinclude/stdio.h
+# Source file 'tempnam.c'
+tempnam.o: tempnam.c
+tempnam.o: /system/nbinclude/stdio.h
+tempnam.o: /system/nbinclude/string.h
+# Source file 'time.c'
+time.o: time.c
+time.o: /system/nbinclude/timeb.h
+time.o: /system/nbinclude/time.h
+time.o: /system/nbinclude/string.h
+time.o: /system/nbinclude/errno.h
+time.o: /system/nbinclude/limits.h
+# Source file 'time_comm.c'
+time_comm.o: time_comm.c
+time_comm.o: /system/nbinclude/ctype.h
+time_comm.o: /system/nbinclude/stdio.h
+time_comm.o: /system/nbinclude/sys/types.h
+time_comm.o: /system/nbinclude/time.h
+# Source file 'tmpfile.c'
+tmpfile.o: tmpfile.c
+tmpfile.o: /system/nbinclude/stdio.h
+# Source file 'tmpnam.c'
+tmpnam.o: tmpnam.c
+tmpnam.o: /system/nbinclude/stdio.h
+# Source file 'to_date.c'
+to_date.o: to_date.c
+to_date.o: ./libgen.h
+# Source file 'tree.c'
+tree.o: tree.c
+tree.o: /system/nbinclude/stdio.h
+tree.o: ./hash.h
+# Source file 'triml.c'
+triml.o: triml.c
+triml.o: /system/nbinclude/string.h
+triml.o: ./libgen.h
+# Source file 'trimt.c'
+trimt.o: trimt.c
+trimt.o: /system/nbinclude/string.h
+trimt.o: ./libgen.h
+# Source file 'tsearch.c'
+tsearch.o: tsearch.c
+tsearch.o: /system/nbinclude/search.h
+# Source file 'ungetc.c'
+ungetc.o: ungetc.c
+ungetc.o: /system/nbinclude/stdio.h
+# Source file 'unix2mpx.c'
+unix2mpx.o: unix2mpx.c
+unix2mpx.o: /system/nbinclude/string.h
+# Source file 'unixio.c'
+unixio.o: unixio.c
+unixio.o: /system/nbinclude/types.h
+unixio.o: /system/nbinclude/limits.h
+unixio.o: /system/nbinclude/errno.h
+unixio.o: ./unixio.h
+unixio.o: /system/nbinclude/mosde.h
+unixio.o: /system/nbinclude/stdio.h
+unixio.o: /system/nbinclude/stat.h
+unixio.o: /system/nbinclude/types.h
+unixio.o: /system/nbinclude/string.h
+unixio.o: /system/nbinclude/fcntl.h
+unixio.o: /system/nbinclude/sys/types.h
+unixio.o: /system/nbinclude/psb.h
+unixio.o: /system/nbinclude/fcb.h
+# Source file 'unlink.c'
+unlink.o: unlink.c
+unlink.o: /system/nbinclude/string.h
+unlink.o: /system/nbinclude/limits.h
+unlink.o: /system/nbinclude/errno.h
+# Source file 'vfprintf.c'
+vfprintf.o: vfprintf.c
+vfprintf.o: /system/nbinclude/stdio.h
+vfprintf.o: /system/nbinclude/varargs.h
+# Source file 'vprintf.c'
+vprintf.o: vprintf.c
+vprintf.o: /system/nbinclude/stdio.h
+vprintf.o: /system/nbinclude/varargs.h
+# Source file 'vsprintf.c'
+vsprintf.o: vsprintf.c
+vsprintf.o: /system/nbinclude/stdio.h
+vsprintf.o: /system/nbinclude/varargs.h
+vsprintf.o: /system/nbinclude/values.h
+# Source file 'wait.c'
+wait.o: wait.c
+wait.o: /system/nbinclude/errno.h
+# Source file 'weekday.c'
+weekday.o: weekday.c
+weekday.o: ./libgen.h
+# End of dependencies
+@

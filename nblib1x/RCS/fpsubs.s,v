@@ -1,0 +1,201 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.10.30.21.24.48;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file checkin.
+.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@*~!fpsub.s*/
+* Name:  fpsub.s Part No.: _______-____r
+*
+* Copyright 1990 - J B Systems, Morrison, CO
+*
+* The recipient of this product specifically agrees not to distribute,
+* disclose, or disseminate in any way, to any one, nor use for its own
+* benefit, or the benefit of others, any information contained  herein
+* without the expressed written consent of J B Systems.
+*
+*                     RESTRICTED RIGHTS LEGEND
+*
+* Use, duplication, or disclosure by the Government is  subject  to
+* restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+* in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+* (a).
+*/
+* #ident	"@@(#)nbclib:fpsub.c	1.0"
+*
+*       Floating Point Subroutines
+*
+*       written by J. Bevier
+*       08/24/90
+*
+*********************************************************************
+*
+        program         fpsubs
+*
+*       cvtif   - converts from int to float
+*       input   r1 = value to be converted
+*       output  r1 = converted value
+*
+        csect
+cvtif   cequ     $
+        zbr     r0,2
+        trr     r1,r1           is value zero
+        bgt     posi            br if positive
+        beq     zero            br if zero
+        trn     r1,r1           reg is negative
+        sbr     r0,2            set neg flag
+posi    scz     r1,r2
+        srl     r1,1
+        sbr     r1,0
+        tbr     r2,30
+        bns     test1
+        srl     r1,2
+test1   tbr     r2,31
+        bns     test2
+        srl     r1,1
+test2   srl     r2,2
+        sui     r2,72
+        trn     r2,r2
+        src     r2,8
+        srl     r1,8
+        orr     r2,r1
+        tbr     r0,2            was input neg
+        bns     zero            br if not
+        trn     r1,r1           make neg again
+zero    trsw    r0              return
+*
+*       cvtfi   - converts from float to int
+*       input   r1 = value to be converted
+*       output  r1 = converted value
+*
+cvtfi   zbr     r0,2            clear neg flag
+        trr     r1,r1           what is data
+        bgt     posf            br if positive
+        bz      fzero           br if zero
+        trn     r1,r1           make neg into pos
+        sbr     r0,2            set neg flag
+posf    xcr     r0,r2           need r0
+        zr      r0              clear for shift
+        slld    r0,8            get exp
+        sui     r0,64           take off excess notation
+        ble     fmin            br if very small
+        sui     r0,8            see if in range
+        bgt     max             br if too big
+        trn     r0,r0
+        sll     r0,2            make shift count
+        ormh    r0,srli         or in srl instr
+        exrr    r0              do the shift
+        tbr     r0,0            see if overflow to neg
+        bs      max             br if yes
+        tbr     r2,2            original val neg
+        bns     dret            return if not
+        trn     r1,r1           put back to neg
+dret    trsw    r2              return
+fzero   trsw    r0              return zero
+min     zr      r1              return min of zero
+        trsw    r2
+max     li      r1,-1           get all ones
+        zbr     r1,0            max pos value now
+        trsw    r2              return
+srli    srl     r1,0
+*
+*       cvtld   - converts from 64 bit int to double
+*       cvtdl   - converts from double to 64 bit int
+*       input   r6&r7 = value to be converted
+*       output  r6&r7 = converted value
+*
+_l.zero  datad     0
+allfs    datad     x'ffffffffffffffff'
+*
+cvtld    sbr       r0,4
+         bu        beg
+cvtdl    zbr       r0,4
+beg      zbr       r0,2
+*
+         trr       r6,r6        arg in r6, r7
+         bgt       pos
+         blt       neg
+         trr       r7,r7
+         bz        zero
+         bu        pos
+neg      eomd      r6,allfs     negative
+         sumd      r6,allfs
+         sbr       r0,2
+         trr       r6,r4
+pos      tbr       r0,4
+         bs        c.ld
+*
+* convert double to long
+* arg in r4, r7
+*
+c.dl     srl       r4,24           exponent in r4
+         slld      r6,8            pure fraction
+         sui       r4,64
+         ble       dzero           too small
+         sui       r4,16
+         bgt       dmax
+         trn       r4,r4
+         sll       r4,2             r2 = 4 * (16 - exp)
+         zbr       r4,26           see if shift count is >= 32
+         bns       nos32
+         trr       r6,r7           yes, do trr to shift by 32 bits
+         zr        r6
+nos32    ormh      r4,srldi
+         exrr      r4              shift r6, r7
+         tbr       r6,0
+         bs        dmax
+tret     tbr       r0,2            see if it was negative
+         bns       dret
+         eomd      r6,allfs     negative
+         sumd      r6,allfs
+dret     trsw      r0
+dzero    zr        r6
+         zr        r7
+         bu        dret
+dmax     li        r6,-1
+         trr       r6,r7
+         zbr       r6,0
+         bu        dret
+*
+srldi    srld      r6,0
+*
+* convert long to double
+* arg in r6, r7    (r4 == r6)
+* arg > 0
+*
+c.ld     zr        r5              for exponent
+         anmw      r4,=x'ff000000'
+         beq       lda
+         srld      r6,8             very large
+         li        r5,-2
+lda      trr       r6,r4
+         anmw      r4,=x'00f00000'
+         bne       ldd            see if normalized
+         slld      r6,4
+         abr       r5,31
+         bu        lda
+ldd      trn       r5,r5
+         adi       r5,x'4e'
+         src       r5,8
+         orr       r5,r6
+         bu        tret
+         end
+@
