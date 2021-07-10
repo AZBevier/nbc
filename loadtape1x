@@ -53,7 +53,7 @@ mkfmtape -ao -uNBCPP ../../nbctape1x.tap *.O
 mkfmtape -ap -uNBCPP ../../nbctape1x.tap NBCPP
 cd ../..
 cd nbccom/mpx1x
-mkfmtape -at -uNBCCOM ../../nbctape1x.tap *.C *.Y ??.NBCOM NBCOMMAP
+mkfmtape -at -uNBCCOM ../../nbctape1x.tap *.C *.Y ??.NBCOM
 mkfmtape -ao -uNBCCOM ../../nbctape1x.tap *.O 
 mkfmtape -ap -uNBCCOM ../../nbctape1x.tap NBCCOM
 cd ../..
@@ -71,3 +71,211 @@ cd nblib1x
 mkfmtape -at -uNBLIB ../nbctape1x.tap MK.* PREFILE
 mkfmtape -al -uNBLIB ../nbctape1x.tap CLB CDR
 cd ..
+cd nbar/mpx1x
+mkfmtape -at -dNBAR ../../nbctape3x.tap *.C ??.NBAR
+mkfmtape -ao -dNBAR ../../nbctape3x.tap *.O 
+mkfmtape -ap -dNBAR ../../nbctape3x.tap NBAR
+cd ../..
+cd nbyacc/mpx1x
+mkfmtape -at -dNBYACC ../../nbctape3x.tap DEXTERN YACC* M* FILES Y?.C LD.*
+mkfmtape -ao -dNBYACC ../../nbctape3x.tap Y?.O
+mkfmtape -ap -dNBYACC ../../nbctape3x.tap NBYACC 
+mkfmtape -at -dLIB ../../nbctape3x.tap YACCPAR
+cd ../..
+cd nblex/mpx1x
+mkfmtape -at -uNBLEX ../../nbctape3x.tap N?FORM *.C *.Y ??.NBLEX NBLEXMAP
+mkfmtape -ao -uNBLEX ../../nbctape3x.tap *.O 
+mkfmtape -ap -uNBLEX ../../nbctape3x.tap NBLEX 
+cd ../..
+cd nbcc/mpx1x
+mkfmtape -at -uNBCC ../../nbctape3x.tap *.C ??.NBCC NBCCMAP
+mkfmtape -ao -uNBCC ../../nbctape3x.tap *.O 
+mkfmtape -ap -uNBCC ../../nbctape3x.tap NBCC
+cd ../..
+cd nbcpp/mpx1x
+mkfmtape -at -uNBCPP ../../nbctape3x.tap *.C *.Y ??.NBCPP
+mkfmtape -ao -uNBCPP ../../nbctape3x.tap *.O 
+mkfmtape -ap -uNBCPP ../../nbctape3x.tap NBCPP
+cd ../..
+cd nbccom/mpx1x
+mkfmtape -at -uNBCCOM ../../nbctape3x.tap *.C *.H *.Y *.NBCOM NBCOMMAP
+mkfmtape -ao -uNBCCOM ../../nbctape3x.tap *.O 
+mkfmtape -ap -uNBCCOM ../../nbctape3x.tap NBCCOM
+cd ../..
+cd nbcas/mpx1x
+mkfmtape -at -uNBCAS ../../nbctape3x.tap *.S ??.NBCAS NBCASMAP
+mkfmtape -ao -uNBCAS ../../nbctape3x.tap *.O 
+mkfmtape -ap -uNBCAS ../../nbctape3x.tap NBCAS
+cd ../..
+cd nbasm/mpx1x
+mkfmtape -at -uNBASM ../../nbctape3x.tap *.C *.H ??.NBASM NBASMMAP MPXPRE
+mkfmtape -ao -uNBASM ../../nbctape3x.tap *.O 
+mkfmtape -ap -uNBASM ../../nbctape3x.tap NBASM
+cd ../..
+cd nblib/BLOCKED
+mkfmtape -at -uNBLIB ../../nbctape3x.tap MAK.* PREFILE *.H *.S
+mkfmtape -at -uNBLIB ../../nbctape3x.tap [A-F]*.C
+mkfmtape -at -uNBLIB ../../nbctape3x.tap [G-R]*.C
+mkfmtape -at -uNBLIB ../../nbctape3x.tap [S-Z]*.C
+mkfmtape -al -uNBLIB ../../nbctape3x.tap CLB CDR
+cd ../..
+cd cmd_ar/mpx1x
+mkfmtape -at -uAR ../../nbctape3x.tap MK.* LD.* *.M *.C ARMAP
+mkfmtape -ao -uAR ../../nbctape3x.tap *.O 
+mkfmtape -ap -uAR ../../nbctape3x.tap AR
+cd ../..
+cd cmd_basename/mpx1x
+mkfmtape -at -uBASENAME ../../nbctape3x.tap MK.* LD.* *.M *.C BNMAP
+mkfmtape -ao -uBASENAME ../../nbctape3x.tap *.O 
+mkfmtape -ap -uBASENAME ../../nbctape3x.tap BASENAME
+cd ../..
+cd cmd_cd/mpx1x
+mkfmtape -at -uCD ../../nbctape3x.tap MK.* LD.* *.M *.C CDMAP
+mkfmtape -ao -uCD ../../nbctape3x.tap *.O 
+mkfmtape -ap -uCD ../../nbctape3x.tap CD
+cd ../..
+cd cmd_chgrp/mpx1x
+mkfmtape -at -uCHGRP ../../nbctape3x.tap MK.* LD.* *.M *.C CHGRPMAP
+mkfmtape -ao -uCHGRP ../../nbctape3x.tap *.O 
+mkfmtape -ap -uCHGRP ../../nbctape3x.tap CHGRP
+cd ../..
+cd cmd_chmod/mpx1x
+mkfmtape -at -uCHMOD ../../nbctape3x.tap MK.* LD.* *.M *.C CHMODMAP
+mkfmtape -ao -uCHMOD ../../nbctape3x.tap *.O 
+mkfmtape -ap -uCHMOD ../../nbctape3x.tap CHMOD
+cd ../..
+cd cmd_chown/mpx1x
+mkfmtape -at -uCHOWN ../../nbctape3x.tap MK.* LD.* *.M *.C CHOWNMAP
+mkfmtape -ao -uCHOWN ../../nbctape3x.tap *.O 
+mkfmtape -ap -uCHOWN ../../nbctape3x.tap CHOWN
+cd ../..
+cd cmd_chtyp/mpx1x
+mkfmtape -at -uCHTYP ../../nbctape3x.tap MK.* LD.* *.M *.C CHTYPMAP
+mkfmtape -ao -uCHTYP ../../nbctape3x.tap *.O 
+mkfmtape -ap -uCHTYP ../../nbctape3x.tap CHTYP
+cd ../..
+cd cmd_cmprs/mpx1x
+mkfmtape -at -uCMPRS ../../nbctape3x.tap MK.* LD.* *.M *.C CMPRSMAP
+mkfmtape -ao -uCMPRS ../../nbctape3x.tap *.O 
+mkfmtape -ap -uCMPRS ../../nbctape3x.tap CMPRS
+cd ../..
+cd cmd_cp/mpx1x
+mkfmtape -at -uCP ../../nbctape3x.tap MK.* LD.* *.M *.C CPMAP
+mkfmtape -ao -uCP ../../nbctape3x.tap *.O 
+mkfmtape -ap -uCP ../../nbctape3x.tap CP
+cd ../..
+cd cmd_date/mpx1x
+mkfmtape -at -uDATE ../../nbctape3x.tap MK.* LD.* *.M *.C DATEMAP
+mkfmtape -ao -uDATE ../../nbctape3x.tap *.O 
+mkfmtape -ap -uDATE ../../nbctape3x.tap DATE
+cd ../..
+cd cmd_dodep/mpx1x
+mkfmtape -at -uDODEP ../../nbctape3x.tap MK.* LD.* *.M *.C DODEPMAP
+mkfmtape -ao -uDODEP ../../nbctape3x.tap *.O 
+mkfmtape -ap -uDODEP ../../nbctape3x.tap DODEP
+cd ../..
+cd cmd_echo/mpx1x
+mkfmtape -at -uECHO ../../nbctape3x.tap MK.* LD.* *.M *.C ECHOMAP
+mkfmtape -ao -uECHO ../../nbctape3x.tap *.O 
+mkfmtape -ap -uECHO ../../nbctape3x.tap ECHO
+cd ../..
+cd cmd_expr/mpx1x
+mkfmtape -at -uEXPR ../../nbctape3x.tap MK.* LD.* *.M *.H *.C EXPRMAP
+mkfmtape -ao -uEXPR ../../nbctape3x.tap *.O 
+mkfmtape -ap -uEXPR ../../nbctape3x.tap EXPR
+cd ../..
+cd cmd_false/mpx1x
+mkfmtape -at -uFALSE ../../nbctape3x.tap MK.* LD.* *.M *.C FALSEMAP
+mkfmtape -ao -uFALSE ../../nbctape3x.tap *.O 
+mkfmtape -ap -uFALSE ../../nbctape3x.tap FALSE
+cd ../..
+cd cmd_grep/mpx1x
+mkfmtape -at -uGREP ../../nbctape3x.tap MK.* LD.* *.M *.H *.C GREPMAP
+mkfmtape -ao -uGREP ../../nbctape3x.tap *.O 
+mkfmtape -ap -uGREP ../../nbctape3x.tap GREP
+cd ../..
+cd cmd_ln/mpx1x
+mkfmtape -at -uLN ../../nbctape3x.tap MK.* LD.* *.M *.C LNMAP
+mkfmtape -ao -uLN ../../nbctape3x.tap *.O 
+mkfmtape -ap -uLN ../../nbctape3x.tap LN
+cd ../..
+cd cmd_ls/mpx1x
+mkfmtape -at -uLS ../../nbctape3x.tap MK.* LD.* *.M *.C *.H LSMAP
+mkfmtape -ao -uLS ../../nbctape3x.tap *.O 
+mkfmtape -ap -uLS ../../nbctape3x.tap LS
+cd ../..
+cd cmd_make/mpx1x
+mkfmtape -at -uMAKE ../../nbctape3x.tap MK.* LD.* *.M *.C *.H MAKEMAP
+mkfmtape -ao -uMAKE ../../nbctape3x.tap *.O 
+mkfmtape -ap -uMAKE ../../nbctape3x.tap MAKE
+cd ../..
+cd cmd_mkdep/mpx1x
+mkfmtape -at -uMKDEP ../../nbctape3x.tap MK.* LD.* *.M *.C MKDEPMAP
+mkfmtape -ao -uMKDEP ../../nbctape3x.tap *.O 
+mkfmtape -ap -uMKDEP ../../nbctape3x.tap MKDEP
+cd ../..
+cd cmd_mkdir/mpx1x
+mkfmtape -at -uMKDIR ../../nbctape3x.tap MK.* LD.* *.M *.C MKDIRMAP
+mkfmtape -ao -uMKDIR ../../nbctape3x.tap *.O 
+mkfmtape -ap -uMKDIR ../../nbctape3x.tap MKDIR
+cd ../..
+cd cmd_mkfile/mpx1x
+mkfmtape -at -uMKFILE ../../nbctape3x.tap MK.* LD.* *.M *.C MKFILMAP
+mkfmtape -ao -uMKFILE ../../nbctape3x.tap *.O 
+mkfmtape -ap -uMKFILE ../../nbctape3x.tap MKFILE
+cd ../..
+cd cmd_mv/mpx1x
+mkfmtape -at -uMV ../../nbctape3x.tap MK.* LD.* *.M *.C MVMAP
+mkfmtape -ao -uMV ../../nbctape3x.tap *.O 
+mkfmtape -ap -uMV ../../nbctape3x.tap MV
+cd ../..
+cd cmd_mvdir/mpx1x
+mkfmtape -at -uMVDIR ../../nbctape3x.tap MK.* LD.* *.M *.C MVDIRMAP
+mkfmtape -ao -uMVDIR ../../nbctape3x.tap *.O 
+mkfmtape -ap -uMVDIR ../../nbctape3x.tap MVDIR
+cd ../..
+cd cmd_pwd/mpx1x
+mkfmtape -at -uPWD ../../nbctape3x.tap MK.* LD.* *.M *.C PWDMAP
+mkfmtape -ao -uPWD ../../nbctape3x.tap *.O 
+mkfmtape -ap -uPWD ../../nbctape3x.tap PWD
+cd ../..
+cd cmd_rcs/mpx1x
+mkfmtape -at -uRCS ../../nbctape3x.tap MK.* LD.* *.M *.C
+mkfmtape -ao -uRCS ../../nbctape3x.tap *.O 
+mkfmtape -ap -uRCS ../../nbctape3x.tap CI CO IDENT MERGE RCS RCSDIFF RCSMERGE RLOG
+cd ../..
+cd cmd_rm/mpx1x
+mkfmtape -at -uRM ../../nbctape3x.tap MK.* LD.* *.M *.C RMMAP
+mkfmtape -ao -uRM ../../nbctape3x.tap *.O 
+mkfmtape -ap -uRM ../../nbctape3x.tap RM
+cd ../..
+cd cmd_rmdir/mpx1x
+mkfmtape -at -uRMDIR ../../nbctape3x.tap MK.* LD.* *.M *.C RMDIRMAP
+mkfmtape -ao -uRMDIR ../../nbctape3x.tap *.O 
+mkfmtape -ap -uRMDIR ../../nbctape3x.tap RMDIR
+cd ../..
+cd cmd_sed/mpx1x
+mkfmtape -at -uSED ../../nbctape3x.tap MK.* LD.* *.M *.C *.H SEDMAP
+mkfmtape -ao -uSED ../../nbctape3x.tap *.O 
+mkfmtape -ap -uSED ../../nbctape3x.tap SED
+cd ../..
+cd cmd_sh/mpx1x
+mkfmtape -at -uSH ../../nbctape3x.tap MK.* LD.* *.M *.C *.H SHMAP
+mkfmtape -ao -uSH ../../nbctape3x.tap *.O 
+mkfmtape -ap -uSH ../../nbctape3x.tap SH
+cd ../..
+cd cmd_touch/mpx1x
+mkfmtape -at -uTOUCH ../../nbctape3x.tap MK.* LD.* *.M *.C TOUCHMAP
+mkfmtape -ao -uTOUCH ../../nbctape3x.tap *.O 
+mkfmtape -ap -uTOUCH ../../nbctape3x.tap TOUCH
+cd ../..
+cd cmd_true/mpx1x
+mkfmtape -at -uTRUE ../../nbctape3x.tap MK.* LD.* *.M *.C TRUEMAP
+mkfmtape -ao -uTRUE ../../nbctape3x.tap *.O 
+mkfmtape -ap -uTRUE ../../nbctape3x.tap TRUE
+cd ../..
+cd cmd_uniq/mpx1x
+mkfmtape -at -uUNIQ ../../nbctape3x.tap MK.* LD.* *.M *.C UNIQMAP
+mkfmtape -ao -uUNIQ ../../nbctape3x.tap *.O 
+mkfmtape -ap -uUNIQ ../../nbctape3x.tap UNIQ
+cd ../..
