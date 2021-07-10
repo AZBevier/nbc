@@ -1,10 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
-locks
-	jbev:1.2; strict;
+locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.07.10.00.07.32;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.07.06.00.37.56;	author jbev;	state Exp;
@@ -22,9 +26,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Add make4mpx programs.
+@Add rcs, sh, and make commands.
 @
 text
 @#########
@@ -156,15 +160,18 @@ compile	:
 	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_rcs   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) install
 	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) install
@@ -201,15 +208,18 @@ remake	: mkdirs
 	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_rcs   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
 	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) remake
@@ -246,15 +256,18 @@ clean	:
 	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_rcs   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
 	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) clean
@@ -297,15 +310,18 @@ clobber	:
 	cd cmd_grep  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_ln    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_ls    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_make  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_mkdep ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_mkdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_mkfile; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_mv    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_mvdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_pwd   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_rcs   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_rm    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_rmdir ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_sed   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
+	cd cmd_sh    ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_sum   ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_touch ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
 	cd cmd_true  ; $(MAKE) -f make.unix ROOT=$(ROOT) clobber
@@ -328,6 +344,26 @@ clobber	:
 		rmdir --ignore-fail-on-non-empty $I; \
 	fi;
 
+@
+
+
+1.2
+log
+@Add make4mpx programs.
+@
+text
+@d130 1
+d137 1
+d141 1
+d178 1
+d185 1
+d189 1
+d226 1
+d233 1
+d237 1
+d280 1
+d287 1
+d291 1
 @
 
 

@@ -124,6 +124,7 @@ compile	:
 	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
+	cd cmd_rcs   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
 	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) install
@@ -172,6 +173,7 @@ remake	: mkdirs
 	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
+	cd cmd_rcs   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
 	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) remake
@@ -220,6 +222,7 @@ clean	:
 	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
+	cd cmd_rcs   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
 	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clean
@@ -268,6 +271,7 @@ clobber	:
 	cd cmd_mv    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 	cd cmd_mvdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 	cd cmd_pwd   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
+	cd cmd_rcs   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 	cd cmd_rm    ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 	cd cmd_rmdir ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
 	cd cmd_sed   ; $(MAKE) -f make.mpx1x ROOT=$(ROOT) clobber
