@@ -1,0 +1,170 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.2
+date	2021.07.09.20.42.57;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	95.04.13.20.41.07;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS file.
+@
+
+
+1.2
+log
+@Not used.
+@
+text
+@#ifndef REMAP_H
+#define REMAP_H
+
+#define DEFAULT zz0000zz
+#define FOPEN_R zz0001zz
+#define FOPEN_R_WORK zz0002zz
+#define FOPEN_W zz0003zz
+#define FOPEN_WPLUS zz0004zz
+#define FOPEN_WPLUS_WORK zz0005zz
+#define FOPEN_W_WORK zz0006zz
+#define RCSfile zz0007zz
+#define RCSfilename zz0008zz
+#define Revision zz0009zz
+#define Revisions zz0010zz
+#define S_IRUSR zz0011zz
+#define S_IRUSR2 zz0012zz
+#define ULONG_MAX10 zz0013zz
+#define VERSION_DEFAULT zz0014zz
+#define already zz0015zz
+#define already_newline zz0016zz
+#define argument zz0017zz
+#define arguments zz0018zz
+#define branchno zz0019zz
+#define branchnum zz0020zz
+#define bufautoend zz0021zz
+#define cacheget zz0022zz
+#define cachegeteof zz0023zz
+#define catching_ints zz0024zz
+#define catchints zz0025zz
+#define changed zz0026zz
+#define changedRCS zz0027zz
+#define closeerrno zz0028zz
+#define closeerror zz0029zz
+#define comment zz0030zz
+#define commentFormat zz0031zz
+#define defaultRCSmode zz0032zz
+#define default_answer zz0033zz
+#define default_state zz0034zz
+#define deletelines zz0035zz
+#define deletelns zz0036zz
+#define diff_label1 zz0037zz
+#define diff_label2 zz0038zz
+#define differences zz0039zz
+#define different zz0040zz
+#define entries zz0041zz
+#define entries_max zz0042zz
+#define filename zz0043zz
+#define filenametoolong zz0044zz
+#define finishedit zz0045zz
+#define finisheditline zz0046zz
+#define getlogin zz0047zz
+#define getstate zz0048zz
+#define getstates zz0049zz
+#define has_sigaction zz0050zz
+#define has_wait zz0051zz
+#define hshentries zz0052zz
+#define hshentry zz0053zz
+#define ignored zz0054zz
+#define ignored_phrases zz0055zz
+#define included_sys_param_h zz0056zz
+#define initial zz0057zz
+#define initialch zz0058zz
+#define initialfile zz0059zz
+#define initialized zz0060zz
+#define initiallog zz0061zz
+#define insertline zz0062zz
+#define insertlns zz0063zz
+#define keyword zz0064zz
+#define keywords zz0065zz
+#define lockerlink zz0066zz
+#define lockerlist zz0067zz
+#define message zz0068zz
+#define messagefile zz0069zz
+#define messagelst zz0070zz
+#define nbranch zz0071zz
+#define nbranches zz0072zz
+#define newdate zz0073zz
+#define newdatebuf zz0074zz
+#define newlock zz0075zz
+#define newlocker zz0076zz
+#define newlocklst zz0077zz
+#define newworkfilename zz0078zz
+#define newworkmode zz0079zz
+#define nextlock zz0080zz
+#define nextlocked zz0081zz
+#define nextrev zz0082zz
+#define nextrevpair zz0083zz
+#define nextstate zz0084zz
+#define nextstatus zz0085zz
+#define override zz0086zz
+#define overrides zz0087zz
+#define previous zz0088zz
+#define previouslock zz0089zz
+#define rcsbase zz0090zz
+#define rcsbaseId zz0091zz
+#define rcsclean zz0092zz
+#define rcscleanExit zz0093zz
+#define rcscleanId zz0094zz
+#define rcsdiff zz0095zz
+#define rcsdiffId zz0096zz
+#define rcsmerge zz0097zz
+#define rcsmergeId zz0098zz
+#define redefined zz0099zz
+#define redefinition zz0100zz
+#define redirect zz0101zz
+#define redirected zz0102zz
+#define redirection zz0103zz
+#define revision zz0104zz
+#define revisions zz0105zz
+#define rmvlock zz0106zz
+#define rmvlocklst zz0107zz
+#define snapshotedit zz0108zz
+#define snapshotline zz0109zz
+#define targetdatebuf zz0110zz
+#define targetdelta zz0111zz
+#define terminate zz0112zz
+#define terminated zz0113zz
+#define terminator zz0114zz
+#define uncache zz0115zz
+#define uncache_exit zz0116zz
+#define unexpected zz0117zz
+#define unexpected_EOF zz0118zz
+#define usrbindiff zz0119zz
+#define usrbindiff3 zz0120zz
+#define usrbinmail zz0121zz
+#define usrbinmerge zz0122zz
+#define va_start zz0123zz
+#define workstat zz0124zz
+#define workstatstat zz0125zz
+
+#endif /* REMAP_H */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d1 3
+d130 2
+@

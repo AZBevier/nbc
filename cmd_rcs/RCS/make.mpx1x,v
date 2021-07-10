@@ -1,0 +1,140 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.07.09.23.10.36;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.09.22.12.16;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New makefile.
+@
+
+
+1.2
+log
+@Correct doc handling.
+@
+text
+@#
+# Makefile for make for running make on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.MAKE command file.
+#
+CC = nbcc
+SLIB = /system/lib
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+SYSBIN = /system/bin
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx1x
+
+OBJS =  ci.o co.o ident.o maketime.o merge.o merger.o partime.o rcs.o \
+	rcsclean.o rcsdiff.o rcsedit.o rcsfcmp.o rcsfnms.o rcsgen.o \
+	rcskeep.o rcskeys.o rcslex.o rcsmap.o rcsmerge.o rcsrev.o rcssyn.o \
+	rcsutil.o rlog.o
+
+HDRS = conf.h rcsbase.h #remap.h
+
+SRCS =  ci.c co.c ident.c maketime.c merge.c merger.c partime.c rcs.c \
+	rcsclean.c rcsdiff.c rcsedit.c rcsfcmp.c rcsfnms.c rcsgen.c \
+	rcskeep.c rcskeys.c rcslex.c rcsmap.c rcsmerge.c rcsrev.c rcssyn.c \
+	rcsutil.c rlog.c
+
+DOCS = ci.m co.m ident.m merge.m rcsclean.m rcsdiff.m rcsfile.m \
+	rcsfreeze.m rcsintro.m rcs.m rcsmerge.m rlog.m
+
+MAIN = $(OBJS)
+
+SLD = ld.ci1x ld.co1x ld.ident1x ld.merge1x ld.rcs1x ld.rcscl1x \
+	ld.rcsdf1x ld.rcsmg1x ld.rlog1x
+
+#LD = LD.RCS
+SMK = mk.rcs1x
+MK = MK.RCS
+
+all:	$(SLD) $(SMK) $(DOCS) $(HDRS) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(MAIN) $(LBIN)/*.O $(LBIN)/*.M $(LBIN)/$(MK)
+	-rm -f $(LBIN)/*.C $(LBIN)/*.H $(LBIN)/LD.*
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	@@for n in $(SRCS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+#	mpxblk <$(SRCS) >$(LBIN)/$(SRC)
+	@@for n in $(HDRS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+#	mpxblk <$(HDRS) >$(LBIN)/$(HD)
+	@@for n in $(SLD) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
+	done
+#	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	@@for n in $(OBJS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		$(MOVE) $$n $(LBIN)/$$nn ; \
+	done
+	@@for n in $(DOCS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		$(MOVE) $$n $(LBIN)/$$nn ; \
+	done
+#	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d20 1
+a20 1
+HDRS = conf.h rcsbase.h remap.h
+d31 5
+a35 2
+SLD = ld.rcs1x
+LD = LD.RCS
+d37 1
+a37 1
+MK = MK.SH
+d48 2
+a49 2
+	-rm -f $(MAIN) $(LBIN)/*.O $(LBIN)/$(DOC) $(LBIN)/$(LD) $(LBIN)/$(MK)
+	-rm -f $(LBIN)/*.C $(LBIN)/*.H
+d67 5
+a71 1
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+a72 1
+#	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+d81 1
+@

@@ -1,0 +1,135 @@
+#
+# Makefile for rcs when running on Linux
+#
+CC = cc
+CFLAGS = -O -DMPX -m32 -Wall
+BIN = /bin
+LBIN = ./linux
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.unix
+
+OBJS =	ci.o co.o ident.o maketime.o merge.o merger.o partime.o rcs.o \
+	rcsclean.o rcsdiff.o rcsedit.o rcsfcmp.o rcsfnms.o rcsgen.o \
+	rcskeep.o rcskeys.o rcslex.o rcsmap.o rcsmerge.o rcsrev.o rcssyn.o \
+	rcsutil.o rlog.o
+
+HDRS = conf.h rcsbase.h #remap.h
+
+SRCS =	ci.c co.c ident.c maketime.c merge.c merger.c partime.c rcs.c \
+	rcsclean.c rcsdiff.c rcsedit.c rcsfcmp.c rcsfnms.c rcsgen.c \
+	rcskeep.c rcskeys.c rcslex.c rcsmap.c rcsmerge.c rcsrev.c rcssyn.c \
+	rcsutil.c rlog.c
+
+MAIN = ci co ident merge rcs rcsdiff rcsmerge rlog rcsclean
+
+DOC = ci.m co.m ident.m merge.m rcsclean.m rcsdiff.m rcsfile.m \
+	rcsfreeze.m rcsintro.m rcs.m rcsmerge.m rlog.m
+
+all:	$(DOC) $(HDRS) $(MAIN)
+
+$(MAIN): $(MAKEFILE) $(HDRS) $(SRCS)	
+
+#
+#$(MAIN): $(MAKEFILE) $(HDRS) $(SRCS)	
+#	$(CC) $(CFLAGS) -o $(MAIN) $(SRCS)
+#	/bin/chmod 755 $(MAIN)
+
+ci = ci.o rcslex.o rcssyn.o rcsgen.o rcsedit.o rcskeys.o rcsmap.o \
+	rcsrev.o rcsutil.o rcsfnms.o partime.o maketime.o rcskeep.o \
+	rcsfcmp.o
+ci : $(ci)
+#	$(LINK) $(ci) $(LDLIBS) -Ycimap -o $@
+	$(CC) $(CFLAGS) -o ci $(ci)
+	$(BIN)/chmod 775 $@
+
+co = co.o rcslex.o rcssyn.o rcsgen.o rcsedit.o rcskeys.o rcsmap.o \
+	rcsrev.o rcsutil.o rcsfnms.o partime.o maketime.o rcskeep.o
+co : $(co)
+#	$(LINK) $(co) $(LDLIBS) -Ycomap -o $@
+	$(CC) $(CFLAGS) -o co $(co)
+	$(BIN)/chmod 775 $@
+
+ident = ident.o rcsmap.o
+ident : $(ident)
+#	$(LINK) $(ident) $(LDLIBS) -Yidentmap -o $@
+	$(CC) $(CFLAGS) -o ident $(ident)
+	$(BIN)/chmod 775 $@
+
+merge = merge.o merger.o rcsfnms.o rcslex.o \
+	rcsmap.o rcsrev.o rcssyn.o rcsutil.o \
+	rcskeep.o rcskeys.o
+merge : $(merge)
+#	$(LINK) $(merge) $(LDLIBS) -Ymergemap -o $@
+	$(CC) $(CFLAGS) -o merge $(merge)
+	$(BIN)/chmod 775 $@
+
+rlog = rlog.o rcslex.o rcsmap.o rcssyn.o rcsrev.o rcsutil.o partime.o \
+	maketime.o rcsfnms.o rcskeep.o rcskeys.o
+rlog : $(rlog)
+#	$(LINK) $(rlog) $(LDLIBS) -Yrlogmap -o $@
+	$(CC) $(CFLAGS) -o rlog $(rlog)
+	$(BIN)/chmod 775 $@
+
+rcs = rcs.o rcslex.o rcssyn.o rcsrev.o rcsutil.o rcsgen.o rcsedit.o rcskeys.o \
+	rcsmap.o rcsfnms.o rcskeep.o
+rcs : $(rcs)
+#	$(LINK) $(rcs) $(LDLIBS) -Yrcsmap -o $@
+	$(CC) $(CFLAGS) -o rcs $(rcs)
+	$(BIN)/chmod 775 $@
+
+rcsclean = rcsclean.o rcsedit.o rcsfcmp.o rcsfnms.o rcsgen.o rcskeys.o \
+	rcslex.o rcsmap.o rcsrev.o rcssyn.o rcsutil.o rcskeep.o
+rcsclean : $(rcsclean)
+#	$(LINK) $(rcsclean) $(LDLIBS) -Yrcscleanmap -o $@
+	$(CC) $(CFLAGS) -o rcsclean $(rcsclean)
+	$(BIN)/chmod 775 $@
+
+rcsdiff = rcsdiff.o rcsutil.o rcsfnms.o rcsmap.o rcsrev.o rcssyn.o rcslex.o \
+	maketime.o partime.o rcskeep.o rcskeys.o
+rcsdiff : $(rcsdiff)
+#	$(LINK) $(rcsdiff) $(LDLIBS) -Yrcsdiffmap -o $@
+	$(CC) $(CFLAGS) -o rcsdiff $(rcsdiff)
+	$(BIN)/chmod 775 $@
+
+rcsmerge = rcsmerge.o merger.o rcsutil.o rcsfnms.o rcsmap.o rcsrev.o rcssyn.o \
+	rcslex.o rcskeep.o rcskeys.o
+rcsmerge : $(rcsmerge)
+#	$(LINK) $(rcsmerge) $(LDLIBS) -Yrcsmergemap -o $@
+	$(CC) $(CFLAGS) -o rcsmerge $(rcsmerge)
+	$(BIN)/chmod 775 $@
+
+clean:
+	rm -f $(OBJS)
+
+clobber: clean
+	rm -f $(MAIN) $(LBIN)/*.m
+	rm -f $(LBIN)/*.c $(LBIN)/*.h
+	@for n in $(MAIN) ; do \
+		rm -f $$n $(LBIN)/$$n ; \
+	done
+
+install: all
+	@if [ -d $(LBIN) ]; then \
+		echo "$(LBIN) already exits"; \
+	else \
+		mkdir $(LBIN); \
+	fi;
+	@for n in $(MAIN) ; do \
+		$(MOVE) $$n $(LBIN)/$$n ; \
+	done
+#	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	@for n in $(SRCS) ; do \
+		$(INSTALL) $$n $(LBIN)/$$n ; \
+	done
+#	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	@for n in $(HDRS) ; do \
+		$(INSTALL) $$n $(LBIN)/$$n ; \
+	done
+#	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
+	@for n in $(DOC) ; do \
+		$(INSTALL) $$n $(LBIN)/$$n ; \
+	done
+#	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
+	/bin/chmod 664 $(LBIN)/*.?
+

@@ -1,0 +1,77 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.1
+date	2021.07.08.22.04.07;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@
+IDENT(1)                                                 IDENT(1)
+
+
+NAME
+       ident - identify files
+
+SYNOPSIS
+       ident [ -q ] [ file ... ]
+
+DESCRIPTION
+       ident   searches   for  all  occurrences  of  the  pattern
+       $keyword:...$ in the named  files  or,  if  no  file  name
+       appears, the standard input.
+
+       These  patterns are normally inserted automatically by the
+       RCS command co,  but can  also  be inserted manually.  The
+       option  -q  suppresses  the  warning given if there are no
+       patterns in a file.
+
+       ident works on text files as  well  as  object  files  and
+       dumps.  For example, if the C program in f.c contains
+
+              char  rcsid[] = "$Id: f.c,v 5.0 1990/08/22 09:09:36
+              eggert Exp $";
+
+       and f.c is compiled into f.o, then the command
+
+              ident  f.c  f.o
+
+       will output
+
+              f.c:
+                  $Id: f.c,v 5.0 1990/08/22 09:09:36 eggert Exp $
+              f.o:
+                  $Id: f.c,v 5.0 1990/08/22 09:09:36 eggert Exp $
+
+IDENTIFICATION
+       Author: Walter F. Tichy.
+       Revision Number: 5.0; Release Date: 1990/08/22.
+       Copyright (C) 1982, 1988, 1989 by Walter F. Tichy.
+       Copyright (C) 1990 by Paul Eggert.
+       Ported to MPX-32 05/05/95 by James C. Bevier, J B Systems.
+
+SEE ALSO
+       ci.m,  co.m,  rcs.m,  rcsdiff.m,  rcsintro.m,  rcsmerge.m,
+       rlog.m,  rcsfile.m
+       Walter  F.  Tichy,  RCS--A  System  for  Version  Control,
+       Software--Practice  &  Experience  15,  7   (July   1985),
+       637-654.
+
+GNU - RCS - IDENT           J B Systems                  05/05/95
+
+@

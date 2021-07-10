@@ -1,0 +1,43 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@ * @;
+
+
+1.1
+date	2021.07.09.20.41.46;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Fix warning errors.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#include "a.h"
+#include "a.ha"
+#if has_prototypes
+char *f(char **p, ...)
+#else
+char *f(p, va_alist) char **p; va_dcl
+#endif
+{
+	char *s;
+	va_list v;
+	vararg_start(v,p);
+	s = p[va_arg(v,int)];
+	va_end(v);
+	return s;
+}
+int main P((int, char**));
+int main(argc, argv) int argc; char **argv; {
+	exitmain(f(argv,0) != argv[0]  ||  f(argv,1) != argv[1]);
+}
+@

@@ -1,0 +1,79 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@// @;
+
+
+1.1
+date	2021.07.08.22.04.07;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial RCS version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@
+MERGE(1)                                                 MERGE(1)
+
+
+NAME
+       merge - three-way file merge
+
+SYNOPSIS
+       merge  [  -L  label1  [  -L label3 ] ] [ -p ] [ -q ] file1
+       file2 file3
+
+DESCRIPTION
+       merge incorporates all changes that  lead  from  file2  to
+       file3  into  file1.  The result goes to standard output if
+       -p is present, into file1 otherwise.  merge is useful  for
+       combining  separate changes to an original.  Suppose file2
+       is the original, and both file1 and  file3  are  modifica-
+       tions of file2.  Then merge combines both changes.
+
+       An  overlap occurs if both file1 and file3 have changes in
+       a common segment of lines.  On a  few  older  hosts  where
+       diff3  does  not  support  the  -E  option, merge does not
+       detect overlaps, and merely  supplies  the  changed  lines
+       from  file3.  On most hosts, if overlaps occur, merge out-
+       puts a message  (unless  the  -q  option  is  given),  and
+       includes  both  alternatives  in the result.  The alterna-
+       tives are delimited as follows:
+
+              <<<<<<< file1
+              lines in file1
+              =======
+              lines in file3
+              >>>>>>> file3
+
+       If there are overlaps, the user should edit the result and
+       delete  one  of  the  alternatives.   If the -L label1 and
+       -L label3 options are given,  the  labels  are  output  in
+       place of the names file1 and file3 in overlap reports.
+
+DIAGNOSTICS
+       Exit  status  is 0 for no overlaps, 1 for some overlaps, 2
+       for trouble.
+
+IDENTIFICATION
+       Author: Walter F. Tichy.
+       Revision Number: 5.3; Release Date: 1991/02/28.
+       Copyright (C) 1982, 1988, 1989 by Walter F. Tichy.
+       Copyright (C) 1990, 1991 by Paul Eggert.
+       Ported to MPX-32 05/05/95 by James C. Bevier, J B Systems.
+
+SEE ALSO
+       diff3.m,  diff.m,  rcsmerge.m,  co.m.
+
+GNU - RCS - MERGE           J B Systems                  05/05/95
+
+@
