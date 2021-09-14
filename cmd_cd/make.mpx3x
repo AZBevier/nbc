@@ -25,13 +25,10 @@ MK = MK.CD
 SDOC = cd.m
 DOC = CD.M
 
-all:	$(SLD) $(SMK) $(SDOC) mpxini.o $(MAIN)
+all:	$(SLD) $(SMK) $(SDOC) $(MAIN)
 
 $(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
 	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
-
-mpxini.o:	$(MAKEFILE) $(HDRS) mpxini.c
-	$(SYSBIN)/$(CC) $(CFLAGS) mpxini.c
 
 clean:
 	-rm -f *.o $(LBIN)/*.O
@@ -47,12 +44,10 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	mpxblk <$(SRCS) >$(LBIN)/$(SRC)
-	mpxblk <mpxini.c >$(LBIN)/MPXINI.C
 #	mpxblk <$(HDRS) >$(LBIN)/$(HD)
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
 	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
 	$(MOVE) cd.o $(LBIN)/CD.O
-	$(MOVE) mpxini.o $(LBIN)/MPXINI.O
 	/bin/chmod 664 $(LBIN)/*.?
 
