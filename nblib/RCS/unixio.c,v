@@ -1,10 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
-locks
-	jbev:1.2; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.3
+date	2021.09.14.19.03.11;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2019.01.05.01.32.32;	author jbev;	state Exp;
@@ -23,9 +27,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Added binary to fix cp, mv, eetc in make4mpx 12/17/97
+@Fix warning errors.
 @
 text
 @/*~!unixio.c*/
@@ -60,6 +64,11 @@ text
 /* this version opens mode 1 as mpx update.   */
 /* This is because write mode in MPX is not   */
 /* sufficiently similar to write mode on UNIX */
+
+/* For MPX1X make as small as possible at expense of speed */
+#ifdef MPX1X
+#define NOBBS
+#endif
 
 #define _ERRNODEF
 #include <types.h>
@@ -1852,8 +1861,10 @@ int   fd;
 
   curfprm->mode = NOTUSED;
   curfprm->linptr = curfprm->blkptr = curfprm->block = curfprm->binary =
-    curfprm->eofptr = curfprm->eof = curfprm->device = curfprm->bbs =
-    curfprm->eom = 0;
+    curfprm->eofptr = curfprm->eof = curfprm->device = curfprm->eom = 0;
+#ifndef NOBBS
+    curfprm->bbs = 0;
+#endif
   BUFVALID = BUFALTER = 0;   /* Version G Fix */
 
   return(GOOD);
@@ -2403,7 +2414,11 @@ int n;		/* number of bytes */
 /* These routines handle blocked and optionally compressed MPX files */
 
 #define IOCMAX 10	/* max users, start with 10 for now */
+#ifdef MPX1X
+#define BLKMAX 4	/* buffered disk blocks per user */
+#else
 #define BLKMAX 10	/* buffered disk blocks per user */
+#endif
 
 struct ioc {
     int 	fd;		/* file descriptor for i/o */
@@ -3404,6 +3419,21 @@ printf("rmerr: error = %d\n", num);
     return;
 }
 #endif /* NOBSS */
+@
+
+
+1.2
+log
+@Added binary to fix cp, mv, eetc in make4mpx 12/17/97
+@
+text
+@d34 5
+d1830 4
+a1833 2
+    curfprm->eofptr = curfprm->eof = curfprm->device = curfprm->bbs =
+    curfprm->eom = 0;
+d2383 3
+d2387 1
 @
 
 

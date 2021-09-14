@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.14.19.02.37;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.10.30.21.25.01;	author jbev;	state Exp;
@@ -18,9 +22,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Fix warning error.
 @
 text
 @/*~!weekday.c*/
@@ -53,9 +57,24 @@ text
 #include	"libgen.h"
 
 int
+weekday(dayn)
+long dayn;				/* absolute date */
+{
+    return ((int)((dayn+5) % 7));	/* day 1 is a Saturday */
+}
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d31 2
+a32 2
 weekday(day)
 long day;				/* absolute date */
-{
+d34 1
+a34 1
     return( (day+5) % 7 );		/* day 1 is a Saturday */
-}
 @

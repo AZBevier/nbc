@@ -121,7 +121,7 @@ SRC4 = strspn.c strtod.c strtok.c strtol.c swab.c sweekday.c sync.c tan.c \
 
 MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
 
-ALL:	all mpxpre
+ALL:	all prefile
 
 all:	clean files $(MAIN)
 	$(SBIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)

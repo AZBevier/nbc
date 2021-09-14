@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.14.19.11.07;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.10.30.21.25.01;	author jbev;	state Exp;
@@ -18,9 +22,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Add debug code.
 @
 text
 @/*~!asin.c*/
@@ -88,7 +92,9 @@ int acosflag;
 		}
 		return (exc.retval);
 	}
-	if (x > X_EPS) { /* skip for efficiency and to prevent underflow */
+    /* skip for efficiency and to prevent underflow */
+	if (x > X_EPS) {
+/*??    if (x < (X_EPS)) { */
 		static double p[] = {
 			-0.69674573447350646411e0,
 			 0.10152522233806463645e2,
@@ -130,4 +136,15 @@ double x;
 {
 	return (asin_acos(x, 1));
 }
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d66 3
+a68 1
+	if (x > X_EPS) { /* skip for efficiency and to prevent underflow */
 @

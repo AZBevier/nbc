@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.14.19.09.08;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.10.30.21.25.01;	author jbev;	state Exp;
@@ -18,9 +22,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Added debug code.
 @
 text
 @/*~!exp.c*/
@@ -66,9 +70,13 @@ static double p[] = {
     0.50000000000000000000e0,
 };
 
+/*
 #ifdef ieee
+*/
 static double rval;
+/*
 #endif
+*/
 
 double
 exp(x)
@@ -94,7 +102,17 @@ register double x;
 			return (rval);	/* causing ldexp to underflow */
 			}
 #else
+#ifdef USE_ASM
+            /* for gould, min double value */
+			{
+			asm (" lw 0,=x'00100000'");
+			asm (" lw 1,=x'000000ca'");
+			asm (" std 0,_rval");
+			return (rval);	/* causing ldexp to underflow */
+			}
+#else
 			return (MINDOUBLE); /* causing ldexp to underflow */
+#endif
 #endif
 		exc.type = UNDERFLOW;
 		exc.retval = 0.0;
@@ -122,4 +140,18 @@ register double x;
 	x *= _POLY2(y, p);
 	return (ldexp(0.5 + x/(_POLY3(y, q) - x), n + 1));
 }
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d44 1
+d46 1
+d48 1
+d50 1
+d76 9
+d86 1
 @

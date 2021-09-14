@@ -26,7 +26,7 @@
  * an argument list for a C program.  In the process, input and output
  * redirection is performed if indicated.  */
 
-#define RRDEBUG
+/*#define RRDEBUG*/
 
 #include <mosde.h>	/* Machine dependent equates !MOD */
 #include <stdio.h>

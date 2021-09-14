@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.14.19.05.03;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.10.30.21.25.01;	author jbev;	state Exp;
@@ -18,9 +22,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Fix warning errors.
 @
 text
 @/*~!tmpfile.c*/
@@ -67,14 +71,28 @@ tmpfile()
 
 #ifdef mpx
     if((p = fopen("TEMP", "w+")) == NULL)
-      return NULL;
+      return (FILE *)0;
 #else
     (void) tmpnam(tfname);
     if((p = fopen(tfname, "w+")) == NULL)
-      return NULL;
+      return (FILE *)0;
     else
       (void) unlink(tfname);
 #endif
     return(p);
 }
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d45 1
+a45 1
+      return NULL;
+d49 1
+a49 1
+      return NULL;
 @
