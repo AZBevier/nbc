@@ -1,0 +1,269 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.09.14.18.29.19;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial checkin.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#~!Makefile for nblib when building for MPX on Linux
+# Name:  make.mpx3x Part No.: _______-____r
+#
+# Copyright 1995 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+
+#ident	"@@(#)Make:nblib/make.mpx3x	1.0"
+
+# Make parameters when running on Unix for MPX
+
+ROOT = /
+TARGET = /system/bin
+SOURCE = .
+PREFIX = nb
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/bin
+UBIN = /system/bin
+YBIN = /system/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -C -UMPX
+CC = $(UBIN)/$(PREFIX)cc
+#CFLAGS = -C -N -DMPX -Ui386 -M$(SBIN)/m.mpxmac3x -P$(SBIN)/mpxpre3x
+CFLAGS = -C -DMPX -Ui386 -M$(SBIN)/m.mpxmac3x -P$(SBIN)/mpxpre3x
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS = #-YXXXXmap
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+CLIBPREFIX = c
+MAKEFILE = make.mpx3x
+
+# Fill in with correct information
+
+HDRS = errmsg.h hash.h libgen.h print.h	stdiom.h strselect.h unixio.h
+
+OBJS_A = c.srt.o c.srte.o fcall.o jump.o pnpars.o
+
+SRCS_A = c.srt.s c.srte.s fcall.s jump.s pnpars.s
+
+OBJ_1X = cassg.o username.o
+
+SRC_1X = cassg.c username.c
+
+OBJ1 = a64l.o abort.o abs.o access.o alarm.o alloca.o asin.o assert.o \
+	atan.o atof.o atoi.o atol.o basename.o bcmp.o bcopy.o bgets.o \
+	brk.o bsearch.o	bufsplit.o bzero.o calloc.o cftime.o chdir.o \
+	chmod.o chown.o chroot.o clock.o clrerr.o conprint.o crypt.o \
+	ctime.o ctscan.o ctype.o data.o day.o directory.o dirname.o \
+	doprnt.o doscan.o drand48.o dup.o ecvt.o eexit.o erf.o Err.o \
+	erraction.o errafter.o errbefore.o errexit.o errlst.o error.o \
+	errprefix.o errsource.o	errstrtok.o errtag.o errtext.o errtofix.o
+
+SRC1 = a64l.c abort.c abs.c access.c alarm.c alloca.c asin.c assert.c \
+	atan.c atof.c atoi.c atol.c basename.c bcmp.c bcopy.c bgets.c \
+	brk.c bsearch.c	bufsplit.c bzero.c calloc.c cftime.c chdir.c \
+	chmod.c chown.c chroot.c clock.c clrerr.c conprint.c crypt.c \
+	ctime.c ctscan.c ctype.c data.c day.c directory.c dirname.c \
+	doprnt.c doscan.c drand48.c dup.c ecvt.c eexit.c erf.c Err.c \
+	erraction.c errafter.c errbefore.c errexit.c errlst.c error.c \
+	errprefix.c errsource.c	errstrtok.c errtag.c errtext.c errtofix.c
+
+OBJ2 = errusage.o exec.o exp.o fabs.o fdopen.o fgetc.o fgets.o filbuf.o \
+	findiop.o floor.o flsbuf.o fmod.o fopen.o fork.o fprintf.o fps.o \
+	fputc.o fputs.o fread.o frexp.o fseek.o fstat.o ftell.o fwrite.o \
+	gamma.o gcvt.o getchar.o getcwd.o getcwvd.o getenv.o getopt.o \
+	getpath.o getpid.o gets.o getw.o gmatch.o hash.o hsearch.o hypot.o \
+	index.o j0.o j1.o jn.o julian.o kill.o l3.o l64a.o ldexp.o leap.o \
+	link.o log.o logdir.o lsearch.o lseek.o malloc.o matherr.o memccpy.o \
+	memchr.o memcmp.o memcpy.o memset.o mkdir.o mkdirp.o mktemp.o modf.o
+
+SRC2 = errusage.c exec.c exp.c fabs.c fdopen.c fgetc.c fgets.c filbuf.c \
+	findiop.c floor.c flsbuf.c fmod.c fopen.c fork.c fprintf.c fps.c \
+	fputc.c fputs.c fread.c frexp.c fseek.c fstat.c ftell.c fwrite.c \
+	gamma.c gcvt.c getchar.c getcwd.c getcwvd.c getenv.c getopt.c \
+	getpath.c getpid.c gets.c getw.c gmatch.c hash.c hsearch.c hypot.c \
+	index.c j0.c j1.c jn.c julian.c kill.c l3.c l64a.c ldexp.c leap.c \
+	link.c log.c logdir.c lsearch.c lseek.c malloc.c matherr.c memccpy.c \
+	memchr.c memcmp.c memcpy.c memset.c mkdir.c mkdirp.c mktemp.c modf.c
+
+OBJ3 = mpxini.o mpxio.o mpxsvc.o nice.o num.o numd.o pathfind.o pause.o \
+	perror.o pipe.o pow.o printf.o putchar.o putenv.o puts.o putw.o	\
+	qsort.o rand.o regerror.o rew.o rindex.o rmdirp.o sbrk.o scanf.o \
+	setbuf.o setpgrp.o setuid.o setvbuf.o sgets.o signal.o sin.o sinh.o \
+	sleep.o sprintf.o sputs.o sqrt.o stat.o str2up.o stradd.o strcasecmp.o \
+	strcat.o strccpy.o strchr.o strcmp.o strcpy.o strcspn.o strdup.o \
+	strecnt.o strecpy.o stricmp.o strlen.o strncat.o strncmp.o strncpy.o \
+	strnicmp.o strnlen.o strpbrk.o strpos.o strrchr.o strrpbrk.o strrpos.o	strspn.o
+
+SRC3 = mpxini.c mpxio.c mpxsvc.c nice.c num.c numd.c pathfind.c pause.c \
+	perror.c pipe.c pow.c printf.c putchar.c putenv.c puts.c putw.c	\
+	qsort.c rand.c regerror.c rew.c rindex.c rmdirp.c sbrk.c scanf.c \
+	setbuf.c setpgrp.c setuid.c setvbuf.c sgets.c signal.c sin.c sinh.c \
+	sleep.c sprintf.c sputs.c sqrt.c stat.c str2up.c stradd.c strcasecmp.c \
+	strcat.c strccpy.c strchr.c strcmp.c strcpy.c strcspn.c	strdup.c \
+	strecnt.c strecpy.c stricmp.c strlen.c strncat.c strncmp.c strncpy.c \
+	strnicmp.c strnlen.c strpbrk.c strpos.c strrchr.c strrpbrk.c strrpos.c	strspn.c
+
+OBJ4 = strspn.o strtod.o strtok.o strtol.o swab.o sweekday.o sync.o tan.o \
+	tanh.o tconv.o tconvs.o tell.o tempfile.o tempnam.o time.o time_comm.o \
+	tmpfile.o tmpnam.o to_date.o tree.o triml.o trimt.o tsearch.o \
+	ungetc.o unix2mpx.o unixio.o unlink.o vfprintf.o vprintf.o vsprintf.o \
+	wait.o weekday.o
+
+SRC4 = strspn.c strtod.c strtok.c strtol.c swab.c sweekday.c sync.c tan.c \
+	tanh.c tconv.c tconvs.c tell.c tempfile.c tempnam.c time.c time_comm.c \
+	tmpfile.c tmpnam.c to_date.c tree.c triml.c trimt.c tsearch.c \
+	ungetc.c unix2mpx.c unixio.c unlink.c vfprintf.c vprintf.c vsprintf.c \
+	wait.c weekday.c
+
+MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
+
+ALL:	all mpxpre
+
+all:	clean files $(MAIN)
+	$(SBIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
+	$(SBIN)/echo clib/cdir are up to date.
+
+files:
+	-touch clib
+	-touch cdir
+
+CLEAN:  clean
+
+clean:
+	-rm -f $(OBJS_A)
+	-rm -f $(OBJ1)
+	-rm -f $(OBJ2)
+	-rm -f $(OBJ3)
+	-rm -f $(OBJ4)
+#	-rm -f $(OBJ_1X)
+
+CLOBBER: clobber
+
+clobber: clean
+	-rm -f clib cdir
+	-rm -f clb cdr CLB CDR
+
+DEPEND: depend
+
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+#	$(SBIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+#	$(SBIN)/mv dep.out $(MAKEFILE)
+
+	$(SBIN)/mkdep $(MAKEFILE) >dep.out
+	@@for i in $(SRCS_A); do \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC1); do \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC2); do \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC3); do \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	@@for i in $(SRC4); do \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(SBIN)/echo "# End of dependencies" >> dep.out;
+	-mv dep.out $(MAKEFILE)
+
+INSTALL: install
+
+install: all mak.nblib mak.nbobj
+	-cp clib clb
+	-cp cdir cdr
+	-cp clb BLOCKED/CLB
+	-cp cdr BLOCKED/CDR
+	@@for n in $(HDRS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@@for n in $(MAIN) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		cp $$n BLOCKED/$$nn ; \
+	done
+	@@for n in $(SRCS_A) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@@for n in $(SRC1) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@@for n in $(SRC2) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@@for n in $(SRC3) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@@for n in $(SRC4) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	mpxblk <prefile >BLOCKED/PREFILE
+	mpxblk <mak.nblib >BLOCKED/MAK.NBLIB
+	mpxblk <mak.nbobj >BLOCKED/MAK.NBOBJ
+
+prefile:
+
+# Source file 'c.srt.s'
+c.srt.o: prefile c.srt.s
+	$(CC) -Pprefile -c c.srt.s -o c.srt.o
+
+# Source file 'c.srte.s'
+c.srte.o: prefile c.srte.s
+	$(CC) -Pprefile -c c.srte.s -o c.srte.o
+
+# Source file 'fcall.s'
+fcall.o: prefile fcall.s
+	$(CC) -Pprefile -c fcall.s -o fcall.o
+
+# Source file 'jump.s'
+jump.o: prefile jump.s
+	$(CC) -Pprefile -c jump.s -o jump.o
+
+# Source file 'pnpars.s'
+pnpars.o: prefile pnpars.s
+	$(CC) -Pprefile -c pnpars.s -o pnpars.o
+
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+@
