@@ -1,9 +1,14 @@
-head	1.6;
+head	1.7;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.7
+date	2021.09.13.19.19.53;	author jbev;	state Exp;
+branches;
+next	1.6;
 
 1.6
 date	2021.07.01.23.35.30;	author jbev;	state Exp;
@@ -41,9 +46,9 @@ desc
 @
 
 
-1.6
+1.7
 log
-@Fix clean object list.
+@Change mpxmac file location.
 @
 text
 @#
@@ -73,18 +78,34 @@ clean:
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@@if [ -d $(LBIN) ]; then \
-			echo "$(LBIN) already exits"; \
+		echo "$(LBIN) already exits"; \
 	else \
-			mkdir $(LBIN); \
+		mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/nbar $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.6
+log
+@Fix clean object list.
+@
+text
+@d28 1
+d32 1
+a32 1
+			echo "$(LBIN) already exits"; \
+d34 1
+a34 1
+			mkdir $(LBIN); \
 @
 
 

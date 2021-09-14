@@ -5,8 +5,8 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 LBIN = ./mpx1x
 INSTALL = cp
 MOVE = mv
@@ -31,17 +31,12 @@ clean:
 
 clobber: clean
 	-rm -f $(LBIN)/NBCC.O $(LBIN)/NBCC.C
-	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+	-rm -f $(LBIN)/$(MK) $(LBIN)/$(LD)
 
 install: all
-	@if [ -d $(LBIN) ]; then \
-			echo "$(LBIN) already exits"; \
-	else \
-			mkdir $(LBIN); \
-	fi;
 	mpxblk <nbcc.c >$(LBIN)/NBCC.C
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
-	$(MOVE) nbcc.o $(LBIN)/NBCC.O
+	$(INSTALL) nbcc.o $(LBIN)/NBCC.O
 	/bin/chmod 664 $(LBIN)/*.?
 

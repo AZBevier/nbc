@@ -5,10 +5,15 @@
 #include	<string.h>
 /* #include	<stdlib.h> */
 
-#define FPBUG   /* if defined, no debugging */
+/*#define FPBUG*/   /* if defined, debugging */
 /*#define MACS*/
 /*#define MACP*/
 /*#define MACD*/
+/*
+#ifndef MYATOF
+#define MYATOF
+#endif
+*/
 
 #ifdef DOS
 int	runst(int32);
@@ -446,7 +451,7 @@ printf("unstll: got a %c\n", thechar);
 	    if (termchk (thechar, terms))	/* see if a terminator */
 	      ccset = 1;		/* it was terminator, tell caller */
 #ifdef MACP
-printf("termchk3 ret ccset = %x, usname = %.8s, term = %c\n", ccset, usname, thechar);
+printf("termchk3 ret ccset = %x, usname = %s, term = %c\n", ccset, usname, thechar);
 #endif
 	    bits &= ~INSIG;		/* force off insignificant flag */
 	    return(thechar);		/* return the character */
@@ -486,7 +491,7 @@ unstsrc:			/* allow ';'and '"' in stab entries */
 	  if (termchk (thechar, terms))	/* see if a terminator */
 	    ccset = 1;			/* it was terminator, tell caller */
 #ifdef MACP
-printf("termchk ret ccset = %x, usname = %.8s, term = %c\n", ccset, usname, thechar);
+printf("termchk ret ccset = %x, usname = %s, term = %c\n", ccset, usname, thechar);
 #endif
 	  bits &= ~INSIG;		/* force off insignificant flag */
 	  return(thechar);		/* return the character */
@@ -552,7 +557,7 @@ unstb2:					/* yes, go finish dummy processing */
 	  if (termchk (thechar, terms))	/* see if a terminator */
 	    ccset = 1;			/* it was terminator, tell caller */
 #ifdef MACP
-printf("termchk2 ret ccset = %x, usname = %.8s, term = %c\n", ccset, usname, thechar);
+printf("termchk2 ret ccset = %x, usname = %s, term = %c\n", ccset, usname, thechar);
 #endif
 	  bits &= ~INSIG;		/* force off insignificant flag */
 	  return(thechar);		/* return the character */
@@ -1027,7 +1032,7 @@ val3:
 	  inag.tmp = unterm;		/* save the terminator */
 	  valterm = unterm;		/* save terminator */
 #ifdef MACP
-printf("val3: usname = %.8s, unterm = %c\n", usname, unterm);
+printf("val3: usname = %s, unterm = %c\n", usname, unterm);
 #endif
 	  if ((unterm == '\'') || (unterm == '(')) /* was terminator ' or ( */
 	    goto valq;			/* go process */
@@ -1526,7 +1531,7 @@ printf("tdat: i = %x, term = %c,\n", i, unterm);
 	    tmd(i);			/* go decode data type */
 #ifdef MACD
 printf("tdat 2: returned %x, %x for type %d\n", hdtds[0], hdtds[1], i);
-printf("tdat 2: hbtttf = %x, usname = %.8s\n", hbtttf, usname);
+printf("tdat 2: hbtttf = %x, usname = %s\n", hbtttf, usname);
 #endif
 	    if (hbtttf >= 4)		/* processing a gen or data */
 	      goto tdat4;		/* no */
@@ -1882,7 +1887,7 @@ int	typ;				/* exponent type */
 	hhtde = 0;			/* zero the user entered exponent */
 	bits &= ~XPONENT;		/* clear user entered exp flag */
 #ifdef MYATOF
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfn: typ = %d\n", typ);
 #endif
     	if(typ >= 5) {			/* see if e or r type */
@@ -1904,7 +1909,7 @@ stn:
 	  /* see if char is a valid terminator of . E B , or ' */
 	  if (islower(tmp=chr)) 	/* is letter lower case */
 	    tmp = toupper(chr);		/* make u/c */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("stn: switching on %c\n", tmp);
 #endif
 	  switch ((int32)tmp) {		/* switch on the u/c chr */
@@ -1945,14 +1950,20 @@ nerrx:
 	  }
 stndone:
 	  usname[cc++] = '\0';		/* terminate input */
-#ifndef FPBUG
+#ifdef FPBUG
 printf("input %s\n", usname);
 #endif
 	  myatof(usname);		/* convert to internal float */
+#ifdef FPBUG
+printf("after myatof input %s\n", usname);
+#endif
     	  if (option & OPT55)		/* option 55 set? */
 	    ieee=1;			/* return ieee format */
+#ifdef FPBUG
+printf("calling flconv typ %x\n", typ);
+#endif
 	  flconv(typ, ifpn.ne, ifpn.nf, hdtds, ieee);
-#ifndef FPBUG
+#ifdef FPBUG
 printf("tfn: got val %x,%x\n", hdtds[0], hdtds[1]);
 #endif
     	  return;			/* return number */
@@ -1984,7 +1995,7 @@ tfm2:
 	/* see if char is a valid terminator of . E B , or ' */
 	if (islower(tmp=chr))	 	/* is letter lower case */
 	  tmp = toupper(chr);		/* make u/c */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfm2: switching on %c\n", tmp);
 #endif
 	switch ((int)tmp) {		/* switch on the u/c chr */
@@ -2012,7 +2023,7 @@ tfm2:
 #else
 	  if ((int32)hbtfn3 >= 16) {		/* see if too many digits */
 #endif
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfm2 default: too many digits in usname |%.8s|, hbtfn3=%d\n", usname, hbtfn3);
 #endif
 	    if (yeanay()) {		/* yes, are we assembling */
@@ -2023,14 +2034,14 @@ tfm2:
 	    }
 	  } else {
 	    usname[hbtfn3++] = chr;	/* store the digit */
-#ifndef FPBUG
- printf("tfm2-d: storing in usname |%.8s|, hbtfn3=%d\n", usname, hbtfn3);
+#ifdef FPBUG
+ printf("tfm2-d: storing in usname |%s|, hbtfn3=%d\n", usname, hbtfn3);
 #endif
 	  }
 	  goto tfm2;			/* get next digit */
 	}
 tfm6:
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfm6: switch on %x\n", hbtfn1); 
 #endif
 	switch (hbtfn1) {		/* do processing on previous term */
@@ -2048,8 +2059,8 @@ tfm6:
 	}
 
 tfi:					/* do integer */
-#ifndef FPBUG
- printf("tfi: process usname %.8s\n", usname); 
+#ifdef FPBUG
+ printf("tfi: process usname %s\n", usname); 
 #endif
 	cnum(10);			/* get the number */
 	hdtds[0] = cnumval[0];		/* save low order part */
@@ -2057,8 +2068,8 @@ tfi:					/* do integer */
 	bits &= ~TFSIGN;		/* 0 = +, 1 = - */
 	if (hbcnul) 			/* was sign negative */
 	  bits |= TFSIGN;		/* set neg flag, 0 = +, 1 = - */
-#ifndef FPBUG
- printf("tfi: got val %x,%x\n", hdtds[0], hdtds[1]); 
+#ifdef FPBUG
+ printf("tfi: got val hdtds %x,%x\n", hdtds[0], hdtds[1]); 
 #endif
 	goto tfm8;			/* continue */
 
@@ -2068,7 +2079,7 @@ tfx:					/* decimal radix */
 	hhtde = cnumval[0];		/* save low order part */
 	if (hhtde)			/* if not zero */
 	  bits |= XPONENT;		/* show user entered exponent */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfx: got exp val hhtde = %x\n", hhtde); 
 #endif
 	goto tfm8;			/* continue */
@@ -2076,7 +2087,7 @@ tfx:					/* decimal radix */
 tfb:					/* binary radix */
 	cnum(10);			/* get the number */
 	hhtdb = cnumval[0];		/* save low order part */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfb: got bin exp val hhtdb = %x\n", hhtdb);
 #endif
 	goto tfm8;			/* continue */
@@ -2086,7 +2097,7 @@ tff:					/* floating pointer number */
 	for (cnt=0; cnt<16; cnt++) {	/* 16 fractional hex digits wanted */
 	  tmp = 0;			/* no carry at start */
 	  dig = 15;			/* 16 digits are here */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("ttf4: got dig %x tmp %x cnt %x chr %.2x\n", dig, tmp, cnt, usname[dig]);
 #endif
 tff4:
@@ -2106,7 +2117,7 @@ tff4:
 	    tmp += 0x01000000;		/* add in the carry */
 	  }
 	  usname[dig] = chr;		/* sto back 1 multiplied digit */
-#ifndef FPBUG
+#ifdef FPBUG
 /* printf("ttf3: got dig %x tmp %x cnt %x chr %.2x\n", dig, tmp, cnt, chr); */
 #endif
 /*      --dig;     */           /* ms to ls bit */
@@ -2120,20 +2131,20 @@ tff4:
 	    chr +=10;			/* yes, make into 1 hex digit */
 	  lefts(tmpf, 4);		/* makeroom in fraction stack */
 	  tmpf[0] |= chr;		/* put in new digit */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("ttf2: got dig %x tmp %x cnt %x chr %.2x\n", dig, tmp, cnt, chr);
 #endif
 	}
 	prop = chr;			/* save last propagation */
 	hdtdf[0] = tmpf[0];		/* save lower part */
 	hdtdf[1] = tmpf[1];		/* save upper part */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tff: got val %x,%x\n", hdtdf[0], hdtdf[1]); 
 #endif
 	/* drop throught to tfm8 */
 
 tfm8:
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfm8: hbtfn2 = %x, hntfn1 = %x\n", hbtfn2, hbtfn1);
 #endif
 	if ((int32)hbtfn2 <= (int32)hbtfn1) {		/* is new ptr gtr than old ptr */
@@ -2151,7 +2162,7 @@ tfe:					/* no, we have element sequence error */
 
 	/* got a final terminator, finish up */
 tfo:
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfo: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde);
 #endif
@@ -2163,31 +2174,40 @@ tfo:
 	    add64 (tmpf, hdtds);	/* adj integer part by -1 */
 	  }
 	}
-#ifndef FPBUG
- printf("tfo1: hhtde = %x\n", hhtde);
+#ifdef FPBUG
+ printf("tfo4: hhtde = %x hhtdbn %x\n", hhtde, hhtdbn);
 #endif
-	if (hhtde == 0)			/* do we have an exponent */
+ /* tfo4 */
+	if (hhtde == 0) {			/* do we have an exponent */
 	  /* make 31 into 63 and 63 into 63. if 63, fixed point const */
 	  if ((hhtdbn | 0x20) == 63) {	/* no, norminal binary scaling */
+ /* tfo8 */
 	    tsh(hhtdbn - hhtdb);	/* shift stack - rt, + left */
 	    goto tfo9;			/* exit this thing */
 	  }
+	}
+#ifdef FPBUG
+ printf("tfoat1: hhtde = %x hhtdbn %x\n", hhtde, hhtdbn);
+#endif
+/* tfoat1 */
 	/* we have an exponent */
-	dig = 20;			/* i don't know why */
+/*??	dig = 20;	*/		/* i don't know why */
+	dig = hbtfn1;           /* term of 4W or 5W */
 	mask = 0xf0;			/* nibble mask */
-	chr = (uint32)hdtds[1] >> 24;	/* get most sig byte */
+	chr = (uint32)hdtds[1] >> 24;   /* get most sig byte */
 	tmp = chr & mask;		/* get the nibble */
 	if (tmp != 0) {			/* pos and not normalized */
 	  if (tmp != 0xf0)		/* no, is it normalized */
 	    goto tfoat8;		/* yes, continue */
 	  tmp = 0xff;			/* neg and not normalized */
 	}
+/* tfoat6 */
 	/* + or - unnormalized, tmp has 00 or ff for pos and neg */
 	dig = -16;
 	bn = 0;				/* start at first digit */
 	nump = hdtds;			/* start with integer part */
-#ifndef FPBUG
- printf("tfo2: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfoat6:a hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde);
 #endif
 tfoat7:
@@ -2215,6 +2235,10 @@ tfoat7:
 	goto tfo9;			/* all done now */
 	
 tfoat8:
+#ifdef FPBUG
+ printf("tfoat8: dig %x mask %x hdtds %x,%x hhtde %x\n",
+ dig, mask, hdtds[0], hdtds[1], hhtde);
+#endif
 	dig = (dig + 15) << 1;		/* make positive and a digit count */
 	if (mask == 0x0f)		/* were we in digit 2 */
 	  dig++;			/* yes, add a count */
@@ -2232,6 +2256,10 @@ tfoat8:
 	  goto tfoat83;			/* go if we have fraction */
 	dig--;				/* adj bit shift value */
 tfoat83:
+#ifdef FPBUG
+ printf("tfoat83: prop %x hhtde %x hdtds %x,%x dig %x\n",
+ prop, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (prop)			/* any propagated digits */
 	  goto tfoat9;			/* if so, done */
 	if (mask == 0x0f)		/* check normalization mask */
@@ -2239,6 +2267,10 @@ tfoat83:
 	dig--;				/* adj bit shift value */
 	goto tfoat9;			/* and continue */
 tfoat9a:
+#ifdef FPBUG
+ printf("tfoat9a: tmp %x hhtde %x hdtds %x,%x dig %x\n",
+ tmp, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (!(dig & 1))			/* odd numeric value */
 	  goto tfoat9;			/* even is o.k. */
 	if (hbtdfn == 0x15)		/* check exp shift value */
@@ -2246,10 +2278,18 @@ tfoat9a:
 	dig--;				/* adj bit shift count */
 	goto tfoat9;			/* and continue */
 tfoat9b:
+#ifdef FPBUG
+ printf("tfoat9b: tmp %x hhtde %x hdtds %x,%x dig %x\n",
+ tmp, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (hdtds[0] & 0xfff)		/* check fraction portion */
 	  goto tfoat9;			/* go on if not zero */
 	dig--;				/* adjust bit shift value */
 tfoat9:
+#ifdef FPBUG
+ printf("tfoat9: tmp %x hhtde %x hdtds %x,%x dig %x\n",
+ tmp, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (hhtde)			/* did user enter exponent */
 	  goto tfoat9d;			/* yes, go */
 	if (!(bits & XPONENT))		/* is there an exponent */
@@ -2260,8 +2300,8 @@ tfoat9d:
 	  dig--;			/* and adjust bit count */
 	}
 tfoat9c:
-#ifndef FPBUG
- printf("tfo9c: hftdf %x,%x hdtds %x,%x dig %x\n",
+#ifdef FPBUG
+ printf("tfoat9c: hdtdf %x,%x hdtds %x,%x dig %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], dig); 
 #endif
 	hbtdfn = dig;			/* save bit count */
@@ -2277,8 +2317,8 @@ tfoat9c:
 	if (hhtde < -77 || hhtde > 77)	/* is exponent in range */
 	  goto tfe;			/* error if not */
 
-#ifndef FPBUG
- printf("tfo9ca: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfo9ca: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
 #endif
 	/* compute 10.D0 ** I, I is integral (pos or neg) */
@@ -2291,8 +2331,8 @@ tfoat9c:
 	else goto tftx;			/* if 0, exit with one as pp */
 	bn = 0;				/* zero bit counter */
 	while(tmp) {			/* while we have an exp */
-#ifndef FPBUG
- printf("tfo9cx: tmp loop = %x\n", tmp); 
+#ifdef FPBUG
+ printf("tfo9cx: tmp loop = %x tmpf %x,%x\n", tmp, tmpf[0], tmpf[1]); 
 #endif
 	  if (tmp & 1)			/* low order bit on */
 	    mulfp64(&base[bn*2], tmpf);	/* pp = pp*10.D0**(2**32-n)) */
@@ -2300,8 +2340,8 @@ tfoat9c:
 	  tmp = (unsigned int32)tmp >> 1;	/* shift to next bit */
 	  bn++;				/* next bit number */
 	}
-#ifndef FPBUG
- printf("tfo9cb: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfo9cb: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
 #endif
 	if (hhtde > 0) {		/* is exponent neg */
@@ -2327,16 +2367,24 @@ tfoat9c:
 	}
 	/* tmpf has the value, mult 10**E by non neg part of constant */
 tftx:
+#ifdef FPBUG
+ printf("tft: tmpf %x,%x hdtds %x,%x hhtde %x hhtdbn %x %x\n",
+ tmpf[0], tmpf[1], hdtds[0], hdtds[1], hhtde, hhtdbn, hhtdbn|0x20); 
+#endif
 	mulfp64(tmpf, hdtds);		/* do the multiply, answer in hdtds */
 tfo7:
-#ifndef FPBUG
- printf("tfo7: hftdf %x,%x hdtds %x,%x hhtde %x\n",
- hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
+#ifdef FPBUG
+ printf("tfo7: hdtdf %x,%x hdtds %x,%x hhtde %x hhtdbn %x %x\n",
+ hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde, hhtdbn, hhtdbn|0x20); 
 #endif
 
 	if ((hhtdbn | 0x20) != 63)	/* not fixed point, no unfloat */
 	  goto tfo9;			/* exit this thing */
 	/* unfloat the number */
+#ifdef FPBUG
+ printf("tfo7a: hdtdf %x,%x hdtds %x,%x hhtde %x hhtdbn %x\n",
+ hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde, hhtdbn); 
+#endif
 	if (hdtds[1] < 0) {		/* if sign neg, set byte to all 1's */
 	  tmp = (unsigned int32)hdtds[1] >> 24;  /* get sign/ exponent */
 	  tmp = ~tmp;			/* complement value */
@@ -2347,9 +2395,17 @@ tfo7:
 	}
 	tmp = tmp - 0x40 + 14;		/* remove exponent and stack bias */
 	tmp <<= 2;			/* digit to bit count */
+#ifdef FPBUG
+ printf("tfo7b: tmp %x hdtds %x,%x hhtde %x hhtdbn %x\n",
+ tmp, hdtds[0], hdtds[1], hhtde, hhtdbn); 
+#endif
 	tsh(tmp);			/* shift stack to unfloat number */
 	goto tfo9;			/* number is ready */
 tfo9:
+#ifdef FPBUG
+ printf("tfo9: hdtdf %x,%x hdtds %x,%x hhtde %x hhtdbn %x\n",
+ hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde, hhtdbn); 
+#endif
 	if (hhtdbn == 8) {		/* was the num an e type */
 	  /* num was e type, make single precision number */
 	  hdtds[0] = hdtds[1];		/* move sign, exp, and mantissa */
@@ -2357,13 +2413,13 @@ tfo9:
       /* FIXME */
 	  hdtds[0] += 0;
 	  hdtds[1] = 0;			/* into proper place for single prec */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfo9a Normalize needed hdtds %x,%x hhtde %x\n",
  hdtds[0], hdtds[1], hhtde); 
 #endif
 	}
-#ifndef FPBUG
- printf("tfo9 ret: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfo9 ret: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
 #endif
 	return;				/* return */
@@ -2806,7 +2862,7 @@ void	mulfp64(val1, val2)
 int32	*val1;
 int32	*val2;
 {
-#ifndef FPBUG
+#ifdef FPBUG
  printf("FLT: mulfp64 called %x %x\n", *val1, *val2);
 #endif
 }
@@ -2822,11 +2878,12 @@ void	divfp64(val1, val2)
 int32	*val1;
 int32	*val2;
 {
-#ifndef FPBUG
+#ifdef FPBUG
  printf("FLT: divfp64 called %x %x\n", *val1, *val2);
 #endif
 }
 
+/* Use internal floating point code, not machine code */
 #ifdef MYATOF
 
 #include "float.h"
@@ -2854,7 +2911,7 @@ static short	binexp;
 void cntofp(num)
 int *num;	/* the number */
 {
-#ifndef FPBUG
+#ifdef FPBUG
  printf("FLT: cntofp called %x\n", *num);
 #endif
 }

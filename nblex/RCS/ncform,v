@@ -22,9 +22,6 @@ log
 @
 text
 @/* ncform */
-/*	@@(#) (Gould) $Header: ncform,v 5.1.1.2 88/08/24 01:51:10 root LSE-4_0-PN $		*/
-/*	ncform	4.1	83/08/11	*/
-
 int yylineno =1;
 # define YYU(x) x
 # define NLSTATE yyprevious=YYNEWLINE

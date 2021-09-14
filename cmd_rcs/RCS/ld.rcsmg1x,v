@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.12.22.39.13;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.09.22.05.19;	author jbev;	state Exp;
@@ -16,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Add page command.
 @
 text
 @$DEFM
@@ -39,7 +44,7 @@ $A1 OT=CCOBJ.O
 $COMPRESS
 C.SRTE.O
 RCSMERGE.O
-RCSMERGER.O
+MERGER.O
 RCSUTIL.O
 RCSFNMS.O
 RCSMAP.O
@@ -47,7 +52,6 @@ RCSREV.O
 RCSSYN.O
 RCSLEX.O
 RCSKEEP.O
-RCSGEN.O
 RCSKEYS.O
 $NOTE  END OF COMPRESS
 $OPTION 19 25
@@ -68,4 +72,17 @@ $DEFN ENDJOB
 $EOJ
 $PAGE 24
 $ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d19 1
+a19 1
+RCSMERGER.O
+a26 1
+RCSGEN.O
 @

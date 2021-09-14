@@ -1,9 +1,14 @@
-head	1.4;
+head	1.5;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.5
+date	2021.07.12.23.25.18;	author jbev;	state Exp;
+branches;
+next	1.4;
 
 1.4
 date	2021.02.11.02.26.54;	author jbev;	state Exp;
@@ -31,14 +36,25 @@ desc
 @
 
 
+1.5
+log
+@Use nbcc from bin directory to build.
+@
+text
+@DEFM
+$^(BIN)NBCC -C -B^(BIN) -I^(NBINCLUDE) NBCC.C
+ENDM
+@
+
+
 1.4
 log
 @Remove line numbers
 @
 text
-@DEFM
+@d2 1
+a2 1
 $NBCC -C -B^(BIN) -I^(NBINCLUDE) NBCC.C
-ENDM
 @
 
 

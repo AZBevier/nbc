@@ -8,8 +8,8 @@ SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-#YACC = yacc
-YACC = /system/bin/nbyacc
+YACC = /usr/bin/yacc
+#YACC = /system/bin/nbyacc
 MAKEFILE = make.unix
 
 SRCS = allo.c cgram.c code.c comm1.c fixcall.c local.c local2.c \
@@ -52,7 +52,7 @@ clean:
 	-rm -f $(OBJS) $(FPOBJ) cgram.c y.tab.c version.c
 
 clobber: clean
-	-rm -f $(OBJS) $(MAIN) $(LBIN)/$(MAIN)
+	-rm -f $(OBJS) $(MAIN) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	-rm -f $(LBIN)/*.?
 
 # Copy the files into linux directory
@@ -70,4 +70,3 @@ install: all
 	$(MOVE) $(FPOBJ) $(OBJS) $(LBIN)
 	-rm -f $(OBJS) $(FPOBJ) # cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.?
-#	$(INSTALL) nbccomx $(SYSBIN)/nbccom

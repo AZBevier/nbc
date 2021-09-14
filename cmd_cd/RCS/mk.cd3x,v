@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.16.17.31.04;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.05.22.11.50;	author jbev;	state Exp;
@@ -16,12 +21,23 @@ desc
 @
 
 
+1.2
+log
+@Change build options.
+@
+text
+@$DEFM
+$NBCC -C -N -I^(NBINCLUDE) CD.C
+$ENDM
+@
+
+
 1.1
 log
 @Initial revision
 @
 text
-@$DEFM
+@d2 1
+a2 1
 $NBCC -C -N -B^(BIN) -DMPX3X -I^(NBINCLUDE) CD.C
-$ENDM
 @

@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.14.19.37.49;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.04.19.38.16;	author jbev;	state Exp;
@@ -16,12 +21,23 @@ desc
 @
 
 
+1.2
+log
+@Fix namea.
+@
+text
+@$DEFM
+$NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) LN.C
+$ENDM
+@
+
+
 1.1
 log
 @Initial revision
 @
 text
-@$DEFM
+@d2 1
+a2 1
 $NBCC -C -1 -N -B^(BIN) -DMPX1X -I^(CINCLUDE) GREP.C
-$ENDM
 @

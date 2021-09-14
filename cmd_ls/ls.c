@@ -16,15 +16,12 @@
  * (a).
  */
 
-#ident	"Makef4MPX $Id: ls.c,v 1.4 2021/07/05 01:19:44 jbev Exp $"
+#ident	"Makef4MPX $Id: ls.c,v 1.3 2021/09/13 21:30:49 jbev Exp $"
 
 /*
  * $Log: ls.c,v $
- * Revision 1.4  2021/07/05 01:19:44  jbev
- * Correct external defs.
- *
- * Revision 1.3  2021/07/05 00:18:10  jbev
- * Correct warning errors.
+ * Revision 1.3  2021/09/13 21:30:49  jbev
+ * Correct more warning errors.
  *
  * Revision 1.2  1995/04/03 23:10:40  jbev
  * Fix warning errors.
@@ -39,24 +36,29 @@
  * 	list file or directory;
  */
 
+#ifndef mpx
+#ifndef MPX
+#define MPX
+#endif
+#endif
+
 #include	<stdio.h>
 #include	<sys/param.h>
 #include	<sys/types.h>
-
 #ifndef mpx
 #include	<sys/sysmacros.h>
-#include    <stdlib.h>
-#include    <stdarg.h>
-#include    <unistd.h>
+#include	<stdlib.h>
+#include	<stdarg.h>
+#include	<unistd.h>
 #endif
 
-#include	<dirent.h>
+#include	"dirent.h"
 #include	<sys/stat.h>
 #include	<string.h>
 
 /* #define DBUG */
 
-#ifdef MPX
+#ifndef mpx
 #include <limits.h>
 #include <ctype.h>
 #endif
@@ -86,6 +88,7 @@ void pmode();
 void selectx();
 void pdirectory();
 int compar();
+struct lbuf *gstat();
 
 #define MAXN 256
 
@@ -98,7 +101,8 @@ int compar();
 #endif
 
 #ifdef MPX
-int wildmat __ARGS((char *s,char *p,char **argv));
+/*int wildmat __ARGS((char *s,char *p,char **argv));*/
+extern int wildmat();
 #endif
 
 #ifndef NULL
@@ -137,8 +141,6 @@ struct	lbuf	{
 	long	lsize;  	/* filesize or major/minor dev numbers */
 	long	lmtime;
 };
-
-struct lbuf *gstat();
 
 struct dchain {
 	char *dc_name;		/* path name */
@@ -206,12 +208,11 @@ char *argv[];
 	struct	lbuf	lb;
 	int	i, width;
 	long	time();
+/*	char *malloc(); */
 	void qsort(), exit();
 #ifdef MPX
 #ifndef mpx
 	struct stat statb;
-#else
-	char *malloc();
 #endif
 #endif
 #ifdef MPX
@@ -670,11 +671,10 @@ struct lbuf *ap;
 		else
 			curcol += printf("%5u ", p->lnum);
     }
-	if (sflg) {
+	if (sflg)
 		curcol += printf( (mflg && !lflg) ? "%ld " : "%4ld " ,
 			(p->ltype != 'b' && p->ltype != 'c') ?
 				nblock(p->lsize) : 0L );
-    }
 	if (lflg) {
 		putchar(p->ltype);
 		curcol++;
@@ -742,8 +742,7 @@ struct lbuf *ap;
 	}
 }
 
-/* print various r,w,x permissions 
- */
+/* print various r,w,x permissions */
 void pmode(aflag)
 int aflag;
 {
@@ -758,7 +757,7 @@ int aflag;
 	static int	m7[] = { 1, S_IWRITE>>6, 'w', '-' };
 	static int	m8[] = { 3, S_ISVTX|(S_IEXEC>>6),'t', S_IEXEC>>6,'x', S_ISVTX,'T', '-'};
 
-    static int  *m[] = { m0, m1, m2, m3, m4, m5, m6, m7, m8};
+        static int  *m[] = { m0, m1, m2, m3, m4, m5, m6, m7, m8};
 
 	register int **mp;
 
@@ -893,8 +892,7 @@ char *fname;
  * returns that pointer;
  * returns NULL if failed;
  */
-struct lbuf *
-gstat(file, argfl)
+struct lbuf *gstat(file, argfl)
 char *file;
 int argfl;
 {
@@ -903,9 +901,7 @@ int argfl;
 #endif
 	register struct lbuf *rep;
 	static int nomocore;
-#ifdef JUNK
-	char *malloc(), *realloc();
-#endif
+/*	char *malloc(), *realloc(); */
 
 	if (nomocore)
 		return(NULL);
@@ -1086,8 +1082,7 @@ long size;
 /* returns pathname of the form dir/file;
  *  dir is a null-terminated string;
  */
-char *
-makename(dir, file) 
+char *makename(dir, file) 
 char *dir, *file;
 {
 	static char dfile[MAXN];  /*  Maximum length of a
@@ -1117,12 +1112,12 @@ char *dir, *file;
  *  returns -1 if uid is not in file
  */
 int getname(uid, buf, type)
-unsigned uid;
+unsigned int uid;
 int type;
 char buf[];
 {
         int c;
-        int i, j, n;
+        register int i, j, n;
 
 	if (uid==(type ? lastgid : lastuid))
 		return(0);
@@ -1216,7 +1211,7 @@ char *s1, *s2;
 		}
 }
 
-#ifdef DEFED_IN_WILDMAT
+#ifdef DEFFED_IN_WILDMAT_C
 #ifdef MPX
 /*
  * @(#)wildmat.c 1.3 87/11/06	Public Domain.
@@ -1271,8 +1266,7 @@ were, I'd use the code I mentioned above.
 
 static int Star __ARGS((char *s,char *p,char **argv));
 
-static int
-Star(s,p,argv)
+static int Star(s,p,argv)
 register char *s;
 register char *p;
 register char **argv;
@@ -1284,8 +1278,7 @@ register char **argv;
 	return cp - s;
 }
 
-int
-wildmat(s,p,argv)
+int wildmat(s,p,argv)
 register char *s;
 register char *p;
 register char **argv;
@@ -1342,12 +1335,13 @@ register char **argv;
 	return *s == '\0' || *s == '/';
 }
 
+
 #ifdef	TEST
 #include <stdio.h>
 
 extern char *gets();
 
-main()
+int main()
 {
 	char pattern[80];
 	char text[80];
@@ -1377,15 +1371,14 @@ main()
 }
 #endif	/* TEST */
 #endif /* MPX */
-#endif
+#endif /* DEFED in WILDMAT */
 
 #ifdef MPX
 /* cvtfname
  * convert an arbitrary filename to a qualified unix pathname.
  * return pointer to malloc'd name or null if error.
  */
-static char *
-cvtfname(path)
+static char *cvtfname(path)
 char *path;
 {
     char *dirp, *retp;
@@ -1408,8 +1401,7 @@ char *path;
  * an absolute pathname. Memory is allocated for the result, which
  * the caller must free
  */
-static char *
-pathname(cd,path)
+static char *pathname(cd,path)
 char *cd;	/* Current working directory */
 char *path;	/* Pathname argument */
 {
@@ -1462,8 +1454,7 @@ char *path;	/* Pathname argument */
 /* Process a path name string, starting with and adding to
  * the existing buffer
  */
-static void
-crunch(buf,path)
+static void crunch(buf,path)
 char *buf;
 register char *path;
 {
@@ -1484,7 +1475,7 @@ register char *path;
     	if(strcmp(path,"..") == 0 || strncmp(path,"../",3) == 0) {
     	    /* Hop up a level */
     	    if((cp = strrchr(buf,'/')) == (char *)0)
-    		    cp = buf;	/* Don't back up beyond root */
+    		    cp = buf;		/* Don't back up beyond root */
     		*cp = '\0';		/* In case there's another .. */
     		path += 2;		/* Skip ".." */
     		while(*path == '/')	/* Skip one or more slashes */
@@ -1517,8 +1508,7 @@ register char *path;
 /* first char must be /, ., @, ^, or ( to be converted */
 /* NOTE: string supplied must be big enough for conversion */
 
-static void
-conv2unix(s)
+static void conv2unix(s)
 register char *s;
 {
     register char *os = s;
@@ -1632,10 +1622,9 @@ dodir:
 /*
  * copy string p2 to string p1, converting to l/c as we go.
  */
-static void
-strlcpy(p1, p2)
-char * p1;
-char * p2;
+static void strlcpy(p1, p2)
+char *p1;
+char *p2;
 {
     int c;
     /* copy p2 to p1 */
@@ -1650,11 +1639,10 @@ char * p2;
 /*
  * copy string b1 to l/c string b2, with overlap testing
  */
-static void
-blcpy (b1, b2, length)
-     register char *b1;
-     register char *b2;
-     register int length;
+static void blcpy (b1, b2, length)
+register char *b1;
+register char *b2;
+register int length;
 {
     register int c;
     /* handle buffer overlap case */

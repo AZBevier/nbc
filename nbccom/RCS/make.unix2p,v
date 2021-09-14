@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.09.13.22.06.17;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.01.03.20.13;	author jbev;	state Exp;
@@ -16,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Change mpxmac location.
 @
 text
 @#
@@ -31,7 +36,7 @@ SYSLIB = /system/lib
 LBIN = ./linux2p
 INSTALL = cp
 MOVE = mv
-YACC = yacc
+YACC = /usr/bin/yacc
 MAKEFILE = make.unix2p
 
 P1SRC = cgram.c code.c comm1.c fixcall.c local.c optim.c pftn.c \
@@ -81,10 +86,11 @@ clean:
 	-rm -f $(P1OBJ) $(P2OBJ) $(FPOBJ)
 
 clobber: clean
-	-rm -f $(P1OBJ) nbcp1 $(LBIN)/nbcp1
-	-rm -f $(P2OBJ) nbcp2 $(LBIN)/nbcp2
+	-rm -f $(P1OBJ) nbcp1 $(LBIN)/nbcp1 $(SYSBIN)/nbcp1
+	-rm -f $(P2OBJ) nbcp2 $(LBIN)/nbcp2 $(SYSBIN)/nbcp2
 	-rm -f $(LBIN)/*.?
 	-rm -f cgram.c y.tab.c #version.c
+	-rm -f $(SYSBIN)nbcp?
 
 # Copy the files into linuxp2 directory
 install: all
@@ -103,4 +109,20 @@ install: all
 	$(MOVE) $(FPOBJ) $(P1OBJ) $(P2OBJ) $(LBIN)
 	-rm -f cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.?
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d11 1
+a11 1
+YACC = yacc
+d61 2
+a62 2
+	-rm -f $(P1OBJ) nbcp1 $(LBIN)/nbcp1
+	-rm -f $(P2OBJ) nbcp2 $(LBIN)/nbcp2
+d65 1
 @

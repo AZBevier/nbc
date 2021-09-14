@@ -1,9 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.09.13.19.15.37;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.02.06.01.32.19;	author jbev;	state Exp;
@@ -21,9 +26,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Move objects instead of copy
+@Update mpxmac location.
 @
 text
 @#
@@ -33,8 +38,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -108,6 +113,17 @@ install: all    # build if necessary, and then copy main to system directory
 	$(MOVE) sub2.o $(LBIN)/SUB2.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.2
+log
+@Move objects instead of copy
+@
+text
+@a7 1
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d9 1
 @
 
 

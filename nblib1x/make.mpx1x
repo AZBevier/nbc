@@ -27,19 +27,18 @@ PREFIX = nb
 INCLUDE = /system/$(PREFIX)include
 SINCLUDE = $(INCLUDE)
 SBIN = /system/bin
-BIN = /system/bin
 UBIN = /system/bin
-SLIB = /system/lib
 YBIN = /system/bin
 CPP = $(SLIB)/$(PREFIX)cpp
 CPFLAGS = -C -UMPX
 CC = $(SBIN)/$(PREFIX)cc
-CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+#CFLAGS = -C -N -DMPX -Ui386 -1 -DMPX1X -M$(SBIN)/m.mpxmac1x -P$(SBIN)/mpxpre1x
+CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SBIN)/m.mpxmac1x -P$(SBIN)/mpxpre1x
 LD = $(UBIN)/$(PREFIX)nbcat
 LDFLAGS = 
 YACC = $(YBIN)/$(PREFIX)yacc
 YFLAGS =
-PRE = $(SLIB)/mpxpre1x
+PRE = $(SBIN)/mpxpre1x
 CLIBPREFIX = c
 MAKEFILE = make.mpx1x
 
@@ -128,14 +127,15 @@ ALLSRC = $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC_1X)
 ALL:	all
 
 #all:	files $(MAIN) $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC_1X)
-all:	files $(MAIN) $(ALLSRC)
-	$(BIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ_1X)
-	$(BIN)/echo clib/cdir are up to date.
+#all:	clean files $(MAIN) $(ALLSRC)
+all:	clean files $(MAIN)
+	$(SBIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ_1X)
+	$(SBIN)/echo clib/cdir are up to date.
 
 files:
 	-touch clib
@@ -160,42 +160,42 @@ clobber: clean
 DEPEND: depend
 
 depend: $(SRCS) $(HDRS) $(MAKEFILE)
-#	$(BIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
-#	$(BIN)/mv dep.out $(MAKEFILE)
+#	$(SBIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+#	$(SBIN)/mv dep.out $(MAKEFILE)
 
-	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	$(SBIN)/mkdep $(MAKEFILE) >dep.out
 	@for i in $(SRCS_A); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC1); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC2); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC3); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC4); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	$(BIN)/echo "# End of dependencies" >> dep.out;
-	$(BIN)/mv dep.out $(MAKEFILE)
+	$(SBIN)/echo "# End of dependencies" >> dep.out;
+	$(SBIN)/mv dep.out $(MAKEFILE)
 
 INSTALL: install
 
 install: all
-	$(BIN)/cp clib clb
-	$(BIN)/cp clib CLB
-	$(BIN)/cp cdir cdr
-	$(BIN)/cp cdir CDR
-#	$(BIN)/cp clib $(BIN)/clb
-#	$(BIN)/cp cdir $(BIN)/cdr
+	$(SBIN)/cp clib clb
+	$(SBIN)/cp clib CLB
+	$(SBIN)/cp cdir cdr
+	$(SBIN)/cp cdir CDR
+#	$(SBIN)/cp clib $(BIN)/clb
+#	$(SBIN)/cp cdir $(BIN)/cdr
 
 prefile:
 

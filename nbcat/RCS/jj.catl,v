@@ -1,0 +1,66 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.10.13.22.57.15;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial file check in.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@$JOB BLDUTIL SYSTEM SLOD=NU
+$PAGE 0
+$NOTE
+$NOTE  THE CATALOGER (CATALOG) IS NOW BEING BUILT.
+$NOTE
+$VOLMGR CREATE F OJ.CATL SIZE=70 REPL=Y
+$OPTI 1 3 4
+$OPTI 14 15
+$AS SI TO CATL.S BLOC=Y
+$AS BO TO OJ.CATL BLOC=Y
+$AS MAC TO @@SYSTEM(SYSTEM)M.MPXMAC BLOC=N
+$AS PRE TO DEV=NU
+$ASSEMBLE
+$IFT ABORT NOCAT
+$ALLOCATE 20000
+$AS SGO TO OJ.CATL BLOC=Y
+$OPTI 15
+$CATALOG
+ALLOCATE 8000
+AS LIS TO @@SYSTEM(SYSTEM)MPXLIB BLOC=N
+AS LID TO @@SYSTEM(SYSTEM)MPXDIR BLOC=N
+AS SYC TO SYC
+AS SLO TO SLO
+AS SGO TO SGO
+AS AID TO TEMP SIZE=500 BLOC=N
+ENVIRONMENT MULTICOPY,NOMAPOUT
+EXTDMPX MAXADDR,NOTSA
+OPTION PROMPT
+FILES 220
+BUFFERS 3
+BUILD NBCAT
+$IFF ABORT END
+$DEFN NOCAT
+$NOTE  SOURCE MODULE SJ.CATL ABORTED
+$NOTE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+$NOTE
+$NOTE              CATALOG PROCESSING ABORTED !!!
+$NOTE
+$NOTE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+$DEFN END
+$EOJ
+$$
+@

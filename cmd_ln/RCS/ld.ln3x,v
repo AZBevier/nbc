@@ -1,9 +1,19 @@
-head	1.1;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.07.11.21.29.34;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.07.11.21.26.53;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.04.19.37.28;	author jbev;	state Exp;
@@ -16,26 +26,27 @@ desc
 @
 
 
-1.1
+1.3
 log
-@Initial revision
+@Fix namae to be LN.
 @
 text
 @DEFM
+$PAGE 0
 IFT PATH=OBJ.O SKIP
 CREA OBJ.O
 %SKIP
-JOB GREP UNIX
+JOB LN UNIX
 $AS IN TO SYC
 $AS OT TO OBJ.O
 $COMPRESS
 ^(BIN)C.SRTE.O
-GREP.O
+LN.O
 $NOTE  END OF COMPRESS
-IFT PATH=GREPMAP SKIP
-CREA GREPMAP
+IFT PATH=LNMAP SKIP
+CREA LNMAP
 %SKIP
-AS SLO TO GREPMAP
+AS SLO TO LNMAP
 AS SGO TO OBJ.O
 AS LIB TO ^(BIN)CLB BLOC=N
 AS DIR TO ^(BIN)CDR BLOC=N
@@ -48,13 +59,51 @@ ALLOCATE 1000
 OPTION LOWER PROMPT
 ENVIRONMENT ,,SHARE,MAP2048
 SPACE 16
-BUILD GREP
+BUILD LN
 $IFT ABORT END
 GOTO ENDJOB
 %END
-$NOTE *** ERROR *** CATALOG OF GREP FAILED
+$NOTE *** ERROR *** CATALOG OF LN FAILED
 %ENDJOB
 PAGE
 EOJ
+$PAGE 24
 ENDM
+@
+
+
+1.2
+log
+@Add page command.
+@
+text
+@d6 1
+a6 1
+JOB GREP UNIX
+d11 1
+a11 1
+GREP.O
+d13 2
+a14 2
+IFT PATH=GREPMAP SKIP
+CREA GREPMAP
+d16 1
+a16 1
+AS SLO TO GREPMAP
+d29 1
+a29 1
+BUILD GREP
+d33 1
+a33 1
+$NOTE *** ERROR *** CATALOG OF GREP FAILED
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+d37 1
 @

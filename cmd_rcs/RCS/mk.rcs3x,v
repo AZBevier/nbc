@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.14.16.44.46;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.09.20.46.56;	author jbev;	state Exp;
@@ -16,12 +21,13 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Add page cmd.
 @
 text
 @$DEFM
+$PAGE 0
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) CI.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) CO.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) IDENT.C
@@ -45,5 +51,16 @@ $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) RCSREV.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) RCSSYN.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) RCSUTIL.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) RLOG.C
+$PAGE 24
 $ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+d26 1
 @

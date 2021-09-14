@@ -1,9 +1,14 @@
-head	1.5;
+head	1.6;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.6
+date	2021.09.13.22.10.09;	author jbev;	state Exp;
+branches;
+next	1.5;
 
 1.5
 date	2021.07.06.22.01.32;	author jbev;	state Exp;
@@ -36,9 +41,9 @@ desc
 @
 
 
-1.5
+1.6
 log
-@Add defs.h to gram.c build.
+@Change mpxmac location.
 @
 text
 @#
@@ -79,6 +84,7 @@ clobber: clean
 	-rm -f $(LBIN)/rules.c $(LBIN)/dosys.c $(LBIN)/gram.c $(LBIN)/gram.y
 	-rm -f $(LBIN)/dyndep.c $(LBIN)/docd.c $(LBIN)/files.c $(LBIN)/rules.c
 	-rm -f $(LBIN)/ar.h $(LBIN)/defs.h
+#	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@@if [ -d $(LBIN) ]; then \
@@ -87,7 +93,7 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/make $(SYSBIN)
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) main.c $(LBIN)/main.c
 	$(INSTALL) doname.c $(LBIN)/doname.c
 	$(INSTALL) files.c $(LBIN)/files.c
@@ -105,6 +111,18 @@ install: all
 	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.5
+log
+@Add defs.h to gram.c build.
+@
+text
+@d39 1
+d48 1
+a48 1
+#	$(INSTALL) $(LBIN)/make $(SYSBIN)
 @
 
 

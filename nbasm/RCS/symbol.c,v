@@ -1,10 +1,14 @@
-head	1.7;
+head	1.8;
 access;
 symbols;
-locks
-	jbev:1.7; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.8
+date	2021.09.13.20.45.05;	author jbev;	state Exp;
+branches;
+next	1.7;
 
 1.7
 date	2018.10.15.20.08.13;	author jbev;	state Exp;
@@ -47,9 +51,9 @@ desc
 @
 
 
-1.7
+1.8
 log
-@Correct form suppoert code, was failing
+@Correct warning errors.
 @
 text
 @/* symbol.c */
@@ -57,7 +61,9 @@ text
 #include "defs.h"
 #include <ctype.h>
 #include <string.h>
-#include <stdlib.h>
+/*#include <stdlib.h> */
+/*#define DBUGS*/
+/*#define SYM*/
 
 #ifdef DOS
 #include <malloc.h>
@@ -243,7 +249,7 @@ register int n;
 
 	if (s1 != s2)
 		while (--n >= 0)
-			if (diff = *s1++ - *s2++)
+			if ((diff = *s1++ - *s2++))
 				return (diff);
 	return (0);
 }
@@ -262,7 +268,7 @@ register int n;
 
 	if (s1 != s2)
 		while (--n >= 0)
-			if (diff = *s1++ - *s2++)
+			if ((diff = *s1++ - *s2++))
 				return (diff);
 	return (0);
 }
@@ -281,36 +287,38 @@ register int n;
 
 struct symbol FAR * ss(dval, name)
 struct	tval	*dval;
-char	*name;
+uint8	*name;
 {
 	int	headoff;
 	struct	symbol FAR *stp;
-	int	val;
-	longp	lval;
-	unsigned char ttype;
-	struct	strback	FAR *sbp;
-	unsigned char ntype;
+	int32	val;
+	int32	lval;
+	int16   ttype;
+	struct	strback	FAR *sbp = {0};
+	int16 ntype;
+#ifdef OLDOLD
 	int	*symp;
-	char nname[9];
+#endif
+	uint8 nname[9];
 
 	lnegate(name, nname);	/* negate name */
 	nname[8] = '\0';
 #ifdef DBUGS
 if(dval->type == TYPL)
-printf("ss entry 1 name [%0.2x%0.2x%0.2x%0.2x] flags %x type %s value %x\n",
+printf("ss entry 1 name [%.2x%.2x%.2x%.2x] flags %x type %s value %x\n",
 name[4], name[5], name[6], name[7],
 dval->flags, prtyp[dval->type], dval->value);
 else
 if(dval->type == TYFRM || dval->type == TYMACDEF || dval->type == TYMACREQ)
-printf("ss entry 2 name [%0.8s] flags %x type %s value %x\n",
+printf("ss entry 2 name [%.8s] flags %x type %s value %x\n",
     nname, dval->flags, prtyp[dval->type], dval->value);
 else
-printf("ss entry 3 name [%0.8s] flags %x type %s value %x\n",
+printf("ss entry 3 name [%.8s] flags %x type %s value %x\n",
     name, dval->flags, prtyp[dval->type], dval->value);
 prtval("ss entry 4", dval);
 #ifdef OLDOLD
 symp = (int *)name;
-printf("ss entry name [%0.8s]\n", name);
+printf("ss entry name [%.8s]\n", name);
 /* printf("ss entry %x, sym = %x,%x\n", dval, symp[0], symp[1]); */
 prtval("entry", dval);
 #endif
@@ -335,22 +343,26 @@ prtval("entry", dval);
 	  headoff = name[0];		/* character for headcell generation */
 	}
 	headoff &= 0x1f;		/* 1 of 32 only */
-	if (stp = symhead[headoff]) {	/* any entries in the head yet */
+	if ((stp = symhead[headoff])) {	/* any entries in the head yet */
 
 #ifdef DBUGS
-printf("ss head # %d has entry %x\n", headoff, symhead[headoff]);
+printf("ss head # %d has entry %x name %.2x%.2x%.2x%.2x\n", headoff, (uint32)stp,
+name[4], name[5], name[6], name[7]);
+printf("ss literal entry name [%.2x%.2x%.2x%.2x] flags %x type %s value %x\n",
+name[4], name[5], name[6], name[7],
+dval->flags, prtyp[dval->type], dval->value);
 #endif
 
 	  for(;;) {			/* do forever */
-		char ntmp[9];
+		unsigned char ntmp[9];
 		lnegate(stp->sym, ntmp);	/* negate name */
 		ntmp[8] = '\0';
 	    val = memCmp(name, stp->sym, 8);	/* test symbol */
 #ifdef DBUGS
 if(dval->type == TYFRM || dval->type == TYMACDEF || dval->type == TYMACREQ)
-	printf("ss cmp neg stp %x, val %x, comparing name = %0.8s sym = %0.8s\n", stp, val, nname, ntmp);
+	printf("ss cmp1 neg stp %x, val %x, comparing name = %.8s sym = %.8s\n", (uint32)stp, val, nname, stp->sym);
 else
-	printf("ss cmp reg stp %x, val %x, comparing name = %0.8s sym = %0.8s\n", stp, val, name, stp->sym);
+	printf("ss cmp2 reg stp %x, val %x, comparing name = %.8s sym = %.8s\n", (uint32)stp, val, name, stp->sym);
 #endif
 	    if (val == 0)goto gotsym;	/* if found, process it */
 	    if (val < 0)
@@ -362,7 +374,7 @@ else
 	  }
 	}
 #ifdef DBUGS
-printf("ss sym not found head # %d has entry %x\n", headoff, symhead[headoff]);
+printf("ss sym not found head # %d has entry %x\n", headoff, (uint32)symhead[headoff]);
 #endif
 	/* name not found in symbol table */
 	symdex = symhead[headoff];	/* save head cell */
@@ -398,9 +410,9 @@ printf("ss sym not found head # %d has entry %x\n", headoff, symhead[headoff]);
  	    abortm("** UNABLE TO ALLOCATE MEMORY FOR STRING BACK POINTERS **");
 	  stp->desc.type = dval->type;	/* mark as external */
 	  stp->desc.flags = dval->flags;  /* set sect & relocation flags */
-	  stp->desc.value = (longp)sbp;	/* set stringback pointer */
+	  stp->desc.value = (int32)sbp;	/* set stringback pointer */
 #ifdef DBUGS
-printf("ss EXT entry stp = %x, sbp = %x, sym = %0.8s\n", stp, sbp, name);
+printf("ss EXT entry stp = %x, sbp = %x, sym = %.8s\n", (uint32)stp, (uint32)sbp, name);
 prtval("TYPX 1st sb", &stp->desc);
 #endif
 	}
@@ -412,7 +424,8 @@ prtval("TYPX 1st sb", &stp->desc);
 	for (;;) {			/* scan until opening found */
 	  val = MemCmp(stp->sym, symdex->sym, 8);	/* do compare */
 #ifdef DBUGS
-printf("ss srh reg stp %x, symdex %x, comparing name %0.8s sym %0.8s\n", stp, symdex, stp->sym, symdex->sym);
+printf("ss srh reg stp %x, symdex %x, comparing name %.8s sym %.8s\n",
+    (uint32)stp, (uint32)symdex, stp->sym, symdex->sym);
 #endif
 	  if ( val < 0) {		/* new less than last, decend */
 	    if (symdex->llink) {	/* is there a link here? */
@@ -432,13 +445,13 @@ printf("ss srh reg stp %x, symdex %x, comparing name %0.8s sym %0.8s\n", stp, sy
 	  stp->rlink = (struct symbol FAR *)0;	/* clear new entry */
 #ifdef DBUGS
 if(dval->type == TYFRM || dval->type == TYMACDEF || dval->type == TYMACREQ)
-	printf("ss added new entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
- 	stp, nname, stp->desc.value, prtyp[stp->desc.type],
+	printf("ss added new entry %x, sym = %.8s, val = %x, typ = %s, flags = %s,%s\n",
+ 	(uint32)stp, nname, stp->desc.value, prtyp[stp->desc.type],
 	 (stp->desc.flags & CSDS ? "CSECT" : "DSECT"),
 	 (stp->desc.flags & ABSREL ? "REL" : "ABS"));
 else
-printf("ss added new entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
-	 stp, name, stp->desc.value, prtyp[stp->desc.type],
+printf("ss added new entry %x, sym = %.8s, val = %x, typ = %s, flags = %s,%s\n",
+	 (uint32)stp, name, stp->desc.value, prtyp[stp->desc.type],
 	 (stp->desc.flags & CSDS ? "CSECT" : "DSECT"),
 	 (stp->desc.flags & ABSREL ? "REL" : "ABS"));
 #endif
@@ -448,7 +461,7 @@ printf("ss added new entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n"
 	  sbp->dsdesc = *dval;		/* do csect */
 	  sbp->csdesc = *dval;		/* do dsect */
 #ifdef DBUGS
-printf("EXT init stp = %x, sbp = %x, sym = %0.8s\n", stp, sbp, name);
+printf("EXT init stp = %x, sbp = %x, sym = %.8s\n", (uint32)stp, (uint32)sbp, name);
 prtval("TYPX 2nd sb", &stp->desc);
 prtval("TYPX 2nd ds", &sbp->dsdesc);
 prtval("TYPX 2nd cs", &sbp->csdesc);
@@ -461,13 +474,13 @@ symret:
 
 #ifdef DBUGS
 if(dval->type == TYFRM || dval->type == TYMACDEF || dval->type == TYMACREQ)
-printf("return from ss entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
-	 stp, nname, stp->desc.value, prtyp[stp->desc.type],
+printf("return1 from ss entry %x, sym = %.8s, val = %x, typ = %s, flags = %s,%s\n",
+	 (uint32)stp, nname, stp->desc.value, prtyp[stp->desc.type],
 	 (stp->desc.flags & CSDS ? "CSECT" : "DSECT"),
 	 (stp->desc.flags & ABSREL ? "REL" : "ABS"));
 else
-printf("return from ss entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
-	 stp, name, stp->desc.value, prtyp[stp->desc.type],
+printf("return2 from ss entry %x, sym = %.8s, val = %x, typ = %s, flags = %s,%s\n",
+	 (uint32)stp, name, stp->desc.value, prtyp[stp->desc.type],
 	 (stp->desc.flags & CSDS ? "CSECT" : "DSECT"),
 	 (stp->desc.flags & ABSREL ? "REL" : "ABS"));
 #endif
@@ -475,7 +488,7 @@ printf("return from ss entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\
 
 gotsym:
 #ifdef DBUGS
-printf("gotsym found head # %d has entry %x\n", headoff, symhead[headoff]);
+printf("gotsym found head # %d has entry %x\n", headoff, (uint32)symhead[headoff]);
 #endif
 	/* entry found, stp points to it */
 	ttype = stp->desc.type;		/* just get the type */
@@ -501,11 +514,11 @@ printf("gotsym found head # %d has entry %x\n", headoff, symhead[headoff]);
 	    }
 	    dpflags |= DPFLG;		/* set dp item flag */
 	    Memcpy(dpitem, name, 8);	/* copy in symbol name */
-/*
-printf("symbol: datapool2 stp %x, name [%0.8s]\n", stp, name);
+#ifdef DBUGS
+printf("symbol: datapool2 stp %x, name [%.8s]\n", (uint32)stp, name);
 prtval("TYPDP2 dval", dval);
 prtval("TYPDP3 dval", &symval);
-*/
+#endif
 	    return(stp);		/* return symbol pointer */
 	  }
 
@@ -555,7 +568,7 @@ prtval("TYPDP3 dval", &symval);
 	    sbp->csdesc.type = TYPX;	/* set external type */
 	  }
 #ifdef SYM
-printf("EXT proc stp = %x, sbp = %x, sym = %0.8s\n", stp, sbp, name);
+printf("EXT proc stp = %x, sbp = %x, sym = %.8s\n", (uint32)stp, (uint32)sbp, name);
 prtval("TYPX 3nd sb", &stp->desc);
 prtval("TYPX 3nd ds", &sbp->dsdesc);
 prtval("TYPX 3nd cs", &sbp->csdesc);
@@ -587,7 +600,7 @@ prtval("TYPM being set", &stp->desc);
 	  stp->desc = *dval;		/* set new desc in table */
 
 /*
-printf("symbol: datapool stp = %x, sym = %0.8s\n", stp, name);
+printf("symbol: datapool stp = %x, sym = %.8s\n", stp, name);
 prtval("TYPDP dval", dval);
 */
 
@@ -620,7 +633,7 @@ prtval("TYPDP dval", dval);
 	stp->desc.type = TYPX;		/* mark as external */
 
 	lval = stp->desc.value;		/* save old stringback address */
-	stp->desc.value = (longp)sbp;	/* set new stringback pointer */
+	stp->desc.value = (int32)sbp;	/* set new stringback pointer */
 
 	sbp->dsdesc = *dval;		/* set dsect info */
 	sbp->dsdesc.value = lval;	/* set dsect info */
@@ -660,11 +673,11 @@ int	request;
 	struct	symbol FAR *nstp;
 	int	val;
 #ifdef DBUGM
-printf("macss entry %x, sym = %0.8s request = %x\n", dval, name, request);
+printf("macss entry %x, sym = %.8s request = %x\n", dval, name, request);
 prtval("macss entry dval", dval);
 #endif
 	if (request == MACLOOK || request == MACADD) {
-	  if (stp = mactab) {		/* any entries in the table yet */
+	  if ((stp = mactab)) {		/* any entries in the table yet */
 	    for(;;) {			/* do forever */
 	      val = memCmp(name, stp->sym, 8);	/* test symbol */
 	      if (val == 0)goto gotsym;	/* if found, process it */
@@ -703,9 +716,9 @@ prtval("macss entry dval", dval);
 	if (dval->value == 0) {		/* get 256 bytes of memory */
 	  /* get memory for macro storage, default to 256 bytes */
 #ifdef DOS
-	  stp->desc.value = (longp)_fmalloc(256);
+	  stp->desc.value = (int32)_fmalloc(256);
 #else
-	  stp->desc.value = (longp)malloc(256);
+	  stp->desc.value = (int32)malloc((uint32)256);
 #endif
 	  if (!stp->desc.value)		/* if no memory terminate assemble */
  	    abortm("** UNABLE TO ALLOCATE MEMORY FOR MACRO STORAGE **");
@@ -738,14 +751,13 @@ prtval("macss entry dval", dval);
 	  stp->llink = (struct symbol FAR *)0;	/* clear new entry */
 	  stp->rlink = (struct symbol FAR *)0;	/* clear new entry */
 #ifdef DBUGM
-printf("added mac %x, sym = %0.8s, val = %x, typ = %s, flags = %x, tmp = %x\n",
+printf("added mac %x, sym = %.8s, val = %x, typ = %s, flags = %x, tmp = %x\n",
  stp, name, stp->desc.value, prtyp[stp->desc.type], stp->desc.flags, stp->desc.tmp);
 prtval("macss desc", &stp->desc);
 #endif
 	  break;			/* go do next entry */
 	}				/* end of forloop for insertion */
 
-symret:
 	macval = stp->desc;		/* get old values */
 #ifdef DBUGM
 prtval("macss exit", &macval);
@@ -786,10 +798,10 @@ void	prtsymt()
 	printf("##### SYMBOL TABLE #####\n");
 	while (stp) {
 	  if (stp->desc.type == TYMACDEF || stp->desc.type == TYFRM) {
-	  printf("prtsymt: stp = %lx symbol = %0.8s\n", stp, csnegate(stp->sym));
+	  printf("prtsymt: stp = %x symbol = %.8s\n", (uint32)stp, csnegate(stp->sym));
 	  } else
 	  {
-	  printf("prtsymt: stp = %lx symbol = %0.8s\n", stp, stp->sym);
+	  printf("prtsymt: stp = %x symbol = %.8s\n", (uint32)stp, stp->sym);
 	  }
 	  prtval("prtsymt", &stp->desc);
 	  if (stp->desc.type == TYMACDEF) {
@@ -797,36 +809,185 @@ void	prtsymt()
 	    struct symbol FAR *mstp = (struct symbol FAR *)stp->desc.value;
 	    uchrfp p = (uchrfp)mstp->desc.value;
 
-	    printf("prtsymt: mstp = %x symbol = %0.8s\n", mstp, mstp->sym);
+	    printf("prtsymt: mstp = %x symbol = %.8s\n", (uint32)mstp, mstp->sym);
 	    prtval("prtsymt mstp", &mstp->desc);
-	    printf("macro %0.8s, addr = %x, count = %x\n",
-	      mstp->sym, p, mstp->desc.tmp);
+	    printf("macro %.8s, addr = %x, count = %x\n",
+	      mstp->sym, (uint32)p, mstp->desc.tmp);
 	    for (i=0; i < mstp->desc.tmp; i++) {
 	      if (isprint(*p))
 	        printf("%c", *p++);
 	      else
-	        printf("%0.2x", *p++);
+	        printf("%.2x", *p++);
 	      if (i > 0 && ((i+1)%40 == 0))
 		printf("|\n");
 	    }
 	    printf("|\n");
 	  }
 	  printf("next stp = %x llink = %x rlink = %x flink = %x\n\n",
-	  stp, stp->llink, stp->rlink, stp->flink);
+	    (uint32)stp, (uint32)stp->llink, (uint32)stp->rlink, (uint32)stp->flink);
 	  stp = stp->flink;
 	}
 
 	stp = mactab;			/* address of 1st symbol */
 	printf("##### MACRO SYMBOL TABLE #####\n");
 	while (stp) {
-	  printf("prtsymt: stp = %x symbol = %0.8s\n", stp, stp->sym);
+	  printf("prtsymt: stp = %x symbol = %.8s\n", (uint32)stp, stp->sym);
 	  prtval("prtsymt", &stp->desc);
 	  printf("next stp = %x llink = %x rlink = %x flink = %x\n\n",
-	    stp, stp->llink, stp->rlink, stp->flink);
+	    (uint32)stp, (uint32)stp->llink, (uint32)stp->rlink, (uint32)stp->flink);
 	  stp = stp->flink;
 	}
 	return;
 }
+@
+
+
+1.7
+log
+@Correct form suppoert code, was failing
+@
+text
+@d6 3
+a8 1
+#include <stdlib.h>
+d194 1
+a194 1
+			if (diff = *s1++ - *s2++)
+d213 1
+a213 1
+			if (diff = *s1++ - *s2++)
+d232 1
+a232 1
+char	*name;
+d236 6
+a241 5
+	int	val;
+	longp	lval;
+	unsigned char ttype;
+	struct	strback	FAR *sbp;
+	unsigned char ntype;
+d243 2
+a244 1
+	char nname[9];
+d250 1
+a250 1
+printf("ss entry 1 name [%0.2x%0.2x%0.2x%0.2x] flags %x type %s value %x\n",
+d255 1
+a255 1
+printf("ss entry 2 name [%0.8s] flags %x type %s value %x\n",
+d258 1
+a258 1
+printf("ss entry 3 name [%0.8s] flags %x type %s value %x\n",
+d263 1
+a263 1
+printf("ss entry name [%0.8s]\n", name);
+d288 1
+a288 1
+	if (stp = symhead[headoff]) {	/* any entries in the head yet */
+d291 5
+a295 1
+printf("ss head # %d has entry %x\n", headoff, symhead[headoff]);
+d299 1
+a299 1
+		char ntmp[9];
+d305 1
+a305 1
+	printf("ss cmp neg stp %x, val %x, comparing name = %0.8s sym = %0.8s\n", stp, val, nname, ntmp);
+d307 1
+a307 1
+	printf("ss cmp reg stp %x, val %x, comparing name = %0.8s sym = %0.8s\n", stp, val, name, stp->sym);
+d319 1
+a319 1
+printf("ss sym not found head # %d has entry %x\n", headoff, symhead[headoff]);
+d355 1
+a355 1
+	  stp->desc.value = (longp)sbp;	/* set stringback pointer */
+d357 1
+a357 1
+printf("ss EXT entry stp = %x, sbp = %x, sym = %0.8s\n", stp, sbp, name);
+d369 2
+a370 1
+printf("ss srh reg stp %x, symdex %x, comparing name %0.8s sym %0.8s\n", stp, symdex, stp->sym, symdex->sym);
+d390 2
+a391 2
+	printf("ss added new entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
+ 	stp, nname, stp->desc.value, prtyp[stp->desc.type],
+d395 2
+a396 2
+printf("ss added new entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
+	 stp, name, stp->desc.value, prtyp[stp->desc.type],
+d406 1
+a406 1
+printf("EXT init stp = %x, sbp = %x, sym = %0.8s\n", stp, sbp, name);
+d419 2
+a420 2
+printf("return from ss entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
+	 stp, nname, stp->desc.value, prtyp[stp->desc.type],
+d424 2
+a425 2
+printf("return from ss entry %x, sym = %0.8s, val = %x, typ = %s, flags = %s,%s\n",
+	 stp, name, stp->desc.value, prtyp[stp->desc.type],
+d433 1
+a433 1
+printf("gotsym found head # %d has entry %x\n", headoff, symhead[headoff]);
+d459 2
+a460 2
+/*
+printf("symbol: datapool2 stp %x, name [%0.8s]\n", stp, name);
+d463 1
+a463 1
+*/
+d513 1
+a513 1
+printf("EXT proc stp = %x, sbp = %x, sym = %0.8s\n", stp, sbp, name);
+d545 1
+a545 1
+printf("symbol: datapool stp = %x, sym = %0.8s\n", stp, name);
+d578 1
+a578 1
+	stp->desc.value = (longp)sbp;	/* set new stringback pointer */
+d618 1
+a618 1
+printf("macss entry %x, sym = %0.8s request = %x\n", dval, name, request);
+d622 1
+a622 1
+	  if (stp = mactab) {		/* any entries in the table yet */
+d661 1
+a661 1
+	  stp->desc.value = (longp)_fmalloc(256);
+d663 1
+a663 1
+	  stp->desc.value = (longp)malloc(256);
+d696 1
+a696 1
+printf("added mac %x, sym = %0.8s, val = %x, typ = %s, flags = %x, tmp = %x\n",
+a702 1
+symret:
+d743 1
+a743 1
+	  printf("prtsymt: stp = %lx symbol = %0.8s\n", stp, csnegate(stp->sym));
+d746 1
+a746 1
+	  printf("prtsymt: stp = %lx symbol = %0.8s\n", stp, stp->sym);
+d754 1
+a754 1
+	    printf("prtsymt: mstp = %x symbol = %0.8s\n", mstp, mstp->sym);
+d756 2
+a757 2
+	    printf("macro %0.8s, addr = %x, count = %x\n",
+	      mstp->sym, p, mstp->desc.tmp);
+d762 1
+a762 1
+	        printf("%0.2x", *p++);
+d769 1
+a769 1
+	  stp, stp->llink, stp->rlink, stp->flink);
+d776 1
+a776 1
+	  printf("prtsymt: stp = %x symbol = %0.8s\n", stp, stp->sym);
+d779 1
+a779 1
+	    stp, stp->llink, stp->rlink, stp->flink);
 @
 
 

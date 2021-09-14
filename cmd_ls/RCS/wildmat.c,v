@@ -6,14 +6,13 @@ comment	@ * @;
 
 
 1.1
-date	2021.07.05.00.19.54;	author jbev;	state Exp;
+date	2021.09.13.21.33.01;	author jbev;	state Exp;
 branches;
 next	;
 
 
 desc
-@Initial RCS checckin.
-Correct warning errors.
+@Initial version.
 @
 
 

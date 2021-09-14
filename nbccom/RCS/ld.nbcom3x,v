@@ -1,9 +1,14 @@
-head	1.6;
+head	1.7;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.7
+date	2021.09.13.22.07.43;	author jbev;	state Exp;
+branches;
+next	1.6;
 
 1.6
 date	2021.04.26.22.40.37;	author jbev;	state Exp;
@@ -41,12 +46,13 @@ desc
 @
 
 
-1.6
+1.7
 log
-@remove comm2 from compress file list
+@Add page commands.]
 @
 text
 @DEFM
+$PAGE 0
 IFT PATH=OBJ.O SKIP
 CREA OBJ.O
 %SKIP
@@ -102,7 +108,18 @@ $NOTE *** ERROR *** CATALOG OF NBCCOM FAILED
 %END
 PAGE 24
 EOJ
+$PAGE 24
 ENDM
+@
+
+
+1.6
+log
+@remove comm2 from compress file list
+@
+text
+@d2 1
+d58 1
 @
 
 

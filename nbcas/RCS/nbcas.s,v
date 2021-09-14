@@ -1,10 +1,14 @@
-head	1.10;
+head	1.11;
 access;
 symbols;
-locks
-	jbev:1.10; strict;
+locks; strict;
 comment	@# @;
 
+
+1.11
+date	2021.09.13.22.16.49;	author jbev;	state Exp;
+branches;
+next	1.10;
 
 1.10
 date	2019.02.27.23.23.06;	author jbev;	state Exp;
@@ -62,9 +66,9 @@ desc
 @
 
 
-1.10
+1.11
 log
-@Comment out M.VRSION macro.  It is in MPX3X not MPX1X.
+@Only use M.VRSION for mpx3x.
 @
 text
 @*MPX-32 MACRO ASSEMBLER 3.4.0  MPX-32 UTILITIES 3.4.0 HEADER    SJ.ASSM
@@ -714,7 +718,9 @@ SKIP     ANOP                                                   *JCB*
          DEF SDIRS,SORG,SEXT,SSECT,ORG,CCP1,REF,SORG3,SORG3.1
          DEF REPTM2,BFCX,XRGETI9,SETPRO
          SPACE     2
-*        M.VRSION
+         IFF       C.MPX1X,SKIP                                 *JCB*
+         M.VRSION  ONLY ON MPX3X
+SKIP     ANOP                                                   *JCB*
          SPACE 2
          LIST      NOMAC,NODATA,NONG
          IFT       UNIXF,SKIP                                   *JCB*
@@ -15518,6 +15524,17 @@ SYMBOLS  DATAD     0,0,0           FIRST ENTRY IN SYMBOL TABLE  S880752
 *****************************************************************JCB*
 *JCB* THEEND   END       A0        THE ASSM ADAPT CONTROLS START*JCB*
 THEEND   END                       THE ASSEMBLER IS A SUBROUTINE*JCB*
+@
+
+
+1.10
+log
+@Comment out M.VRSION macro.  It is in MPX3X not MPX1X.
+@
+text
+@d648 3
+a650 1
+*        M.VRSION
 @
 
 

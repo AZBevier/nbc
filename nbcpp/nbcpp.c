@@ -22,6 +22,9 @@
 
 /*
  * $Log: nbcpp.c,v $
+ * Revision 1.11  2021/09/13 22:11:47  jbev
+ * Update version to 1.4
+ *
  * Revision 1.10  2021/06/28 17:19:01  jbev
  * Correct warning error.
  *
@@ -63,7 +66,8 @@
 
 /* cpp.c 1.0  */
 /* char release[] = "J B Systems Rel 1.0.1"; */
-char release[] = "J B Systems Rel 1.0.2";
+/*char release[] = "J B Systems Rel 1.0.2"; */
+char release[] = "J B Systems NBC Rel 1.4";
 
 #ifdef FLEXNAMES
 #define NCPS       128
@@ -2214,7 +2218,7 @@ char *argv[];
   dirs[nd++] = "@system(cinclude)";
 #else
   dirs[nd++] = "@system(nbinclude)";
-  dirs[nd++] = "@system(cinclude)";
+/*  dirs[nd++] = "@system(cinclude)"; */
 #endif /* MPX1X */
 #endif
   dirs[nd++] = 0;

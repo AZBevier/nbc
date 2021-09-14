@@ -25,7 +25,7 @@ BIN = /bin
 SLIB = /system/lib
 SYSBIN = /system/bin
 LBIN = ./mpx1x
-CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 INSTALL = cp
 MOVE = mv
 YACC = nbyacc
@@ -34,8 +34,10 @@ MPXMAKE = makefile
 
 # Fill in with correct information
 
-SRCS = dcat.c ucat.c fixer.c fort.c prtinc.c obd.c caid.c summer.c cp.c ls.c mv.c rm.c kill.c oscode.c
-OBJS = dcat.o ucat.o fixer.o fort.o prtinc.o obd.o caid.o summer.o cp.o ls.o mv.o rm.o kill.o oscode.o
+SRCS = cat.c dcat.c ucat.c fixer.c fort.c prtinc.c obd.c caid.c \
+	summer.c cp.c ls.c mv.c rm.c kill.c oscode.c recmsg.c sndmsg.c
+OBJS = cat.o dcat.o ucat.o fixer.o fort.o prtinc.o obd.o caid.o \
+	summer.o cp.o ls.o mv.o rm.o kill.o oscode.o recmsg.o sndmsg.o
 HDRS = caid.h
 ALLS = $(SRCS) $(HDRS)
 
@@ -51,14 +53,30 @@ MAIN = $(OBJS)
 
 ALL:	all
 
-#all:	$(HDRS) $(SRCS) $(MAIN)
-all:	$(MAIN)
+all:	$(HDRS) $(SRCS) $(MAIN)
+#all:	$(MAIN)
 	-$(BIN)/echo $(MAIN) objects created
 
 prefile:
 
 #$(MAIN):	$(MAKEFILE) $(HDRS)
 #	$(CC) $(CFLAGS) $(SRCS)
+
+# Source file 'cat.c'
+cat.o: prefile cat.c
+	$(CC) -L $(CFLAGS) -c cat.c -o cat.o
+
+# Source file 'dcat.c'
+dcat.o: prefile dcat.c
+	$(CC) -L $(CFLAGS) -c dcat.c -o dcat.o
+
+# Source file 'ucat.c'
+ucat.o: prefile ucat.c
+	$(CC) -L $(CFLAGS) -c ucat.c -o ucat.o
+
+# Source file 'fixer.c'
+fixer.o: prefile fixer.c
+	$(CC) -L $(CFLAGS) -c fixer.c -o fixer.o
 
 # Source file 'fort.c'
 fort.o: prefile fort.c
@@ -88,6 +106,7 @@ CLEAN:  clean
 
 clean:
 	# remove obj files
+	rm -f *.o *.l
 	@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \

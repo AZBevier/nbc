@@ -25,12 +25,13 @@ clean:
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@if [ -d $(LBIN) ]; then \
-			echo "$(LBIN) already exits"; \
+		echo "$(LBIN) already exits"; \
 	else \
-			mkdir $(LBIN); \
+		mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/nbar $(SYSBIN)

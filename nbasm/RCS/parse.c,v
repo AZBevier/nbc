@@ -1,10 +1,14 @@
-head	1.8;
+head	1.9;
 access;
 symbols;
-locks
-	jbev:1.8; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.9
+date	2021.09.13.20.45.05;	author jbev;	state Exp;
+branches;
+next	1.8;
 
 1.8
 date	2018.10.15.20.08.13;	author jbev;	state Exp;
@@ -52,9 +56,9 @@ desc
 @
 
 
-1.8
+1.9
 log
-@Correct form suppoert code, was failing
+@Correct warning errors.
 @
 text
 @/* parse.c */
@@ -62,9 +66,17 @@ text
 #include	"defs.h"
 #include	<ctype.h>
 #include	<string.h>
-#include	<stdlib.h>
+/* #include	<stdlib.h> */
 
-#define FPBUG		/* if defined, no debugging */
+/*#define FPBUG*/   /* if defined, debugging */
+/*#define MACS*/
+/*#define MACP*/
+/*#define MACD*/
+/*
+#ifndef MYATOF
+#define MYATOF
+#endif
+*/
 
 #ifdef DOS
 int	runst(int32);
@@ -100,13 +112,13 @@ char	hbcnul;			/* return the sign also */
 
 char	unterm;			/* last terminator */
 int	unstnp;			/* unstring counter */
-unsigned char	mgbd[32];	/* internal label generation area */
-unsigned char	munsta[MAXCHARS];	/* name substitution generation area */
-int	munstap;		/* char counter in munsta */
+uint8	mgbd[32];	/* internal label generation area */
+uint8	munsta[MAXCHARS];	/* name substitution generation area */
+int32	munstap;		/* char counter in munsta */
 char	leftzero;		/* non-zero if ignoring leading blanks */
 char	ccset;			/* set non zero by gbyt if flag set */
 char	cc2set;			/* set non zero by gbyt if flag set */
-unsigned char	*munsts6;	/* macro pointer */
+uint8	*munsts6;	    /* macro pointer */
 char	fsts6 = 0;		/* flag for skipping blanks */
 char	insymarg;		/* save loc */
 
@@ -175,7 +187,7 @@ int32	terms;
 	unstnp = 0;			/* zero normal store pointer */
 	memset (usname, ' ', MAXCHARS);	/* blank receiving area */
 #ifdef MACP
-printf("enter cunst terms = x leftzero %x\n", terms, leftzero);
+printf("enter cunst terms = %x leftzero %x\n", terms, leftzero);
 #endif
 	if (leftzero) {			/* are we ignoring blanks */
 unstblnk:
@@ -347,8 +359,8 @@ printf("overscan return\n");
 
 unsts:
 #ifdef MACP
-printf("unsts: unstringing %0.72s\n term = %c, inscnt = %d, REUNSTF is %s, CALLUS is %s\n",
- in, unterm, inscnt, (macstate & REUNSTF) ? "ON" : "OFF", (macstate & CALLUS) ? "ON" : "OFF");
+printf("unsts: unstringing %.72s\n term = %x [%c], inscnt = %d, REUNSTF is %s, CALLUS is %s\n",
+ in, unterm, unterm, inscnt, (macstate & REUNSTF) ? "ON" : "OFF", (macstate & CALLUS) ? "ON" : "OFF");
 #endif
 	thechar = in[inscnt++];		/* get an input byte */
 #ifdef MACP
@@ -370,13 +382,13 @@ printf("fetched thechar = %c\n", thechar);
 	  cmpp = mpp->clev;		/* parameter base for this level */
 #ifdef MACD
 printf("unsts: offset = %d, thechar = %x, cmpp = %x, level = %x, inscnt = %d\n",
-  offset, thechar, cmpp, level, inscnt);
+  offset, thechar, (uint32)cmpp, level, inscnt);
 #endif
 	  cmpp += offset;		/* point to current symbol for param */
 #ifdef MACD
 printf("unsts: stackp = %x, stkp = %x, mpp = %x, cmpp = %x\n",
-  stackp, stkp, mpp, cmpp);
-printf("unsts: parameter is %c%0.7s\n",
+  (uint32)stackp, (uint32)stkp, (uint32)mpp, (uint32)cmpp);
+printf("unsts: parameter is %c%.7s\n",
  (*cmpp == 0xff ? '!' : *cmpp), &cmpp[1]);
 #endif
 	  if (*cmpp == 0xff) 		/* is internal sym defined */
@@ -389,21 +401,21 @@ printf("unsts: parameter is %c%0.7s\n",
 	      memset(mgbd, ' ', 32); 	/* preblank buffer */
 	      memset(cmpp, ' ', 24); 	/* preblank buffer */
 	      /* get symbol num of 5 digits with leading 0 and trailing blanks */
-	      sprintf(intsym, "%.5X   ", (inttag++ & 0xffffL));
+	      sprintf(intsym, "%.5X   ", (inttag++ & 0xffff));
 	      memcpy(mgbd, intsym, 8);	/* put symbol name */
 	      memcpy(cmpp, intsym, 8);	/* copy into stack */
 
 	      *mgbd = '!';		/* internal symbol lead printout char */
 	      *cmpp = 0xff;		/* int sym lead char to stack */
 #ifdef MACD
-printf("unsts: int param %c%0.7s\n",
+printf("unsts: int param %c%.7s\n",
  (*cmpp == 0xff ? '!' : *cmpp), &cmpp[1]);
 #endif
 	      macstate |= INTGEN;	/* indicate internal label generated */
 	    }
 
 #ifdef MACD
-printf("unsts: final param %c%0.7s\n",
+printf("unsts: final param %c%.7s\n",
  (*cmpp == 0xff ? '!' : *cmpp), &cmpp[1]);
 #endif
 	  if (!(spmac & INTGEN3)) {	/* has an int sym been processed */
@@ -473,8 +485,8 @@ printf("unsts: final param %c%0.7s\n",
 					/* go check out the char */
 unstl:
 #ifdef MACP
-printf("unstl: unstringing %0.72s\n term = %c, inscnt = %d, REUNSTF is %s, CALLUS is %s, UNSTFLAG is %s, ESCAPE2 is %s, INSIG is %s\n",
- in, unterm, inscnt, (macstate & REUNSTF) ? "ON" : "OFF",
+printf("unstl: unstringing %.72s\n term %x [%c], inscnt %d, REUNSTF %s, CALLUS %s, UNSTFLAG %s, ESCAPE2 %s, INSIG  %s\n",
+ in, unterm, unterm, inscnt, (macstate & REUNSTF) ? "ON" : "OFF",
  (macstate & CALLUS) ? "ON" : "OFF",
  (macstate & UNSTFLAG) ? "ON" : "OFF",
  (bits & ESCAPE2) ? "ON" : "OFF",
@@ -502,7 +514,7 @@ printf("unstll: got a %c\n", thechar);
 	    if (termchk (thechar, terms))	/* see if a terminator */
 	      ccset = 1;		/* it was terminator, tell caller */
 #ifdef MACP
-printf("termchk3 ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, thechar);
+printf("termchk3 ret ccset = %x, usname = %s, term = %c\n", ccset, usname, thechar);
 #endif
 	    bits &= ~INSIG;		/* force off insignificant flag */
 	    return(thechar);		/* return the character */
@@ -512,12 +524,12 @@ printf("termchk3 ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, th
 	  goto unstl3;			/* don't copy to macro storage */
 unstl2:
 #ifdef MACP
-printf("unstl2: char to mbyt %c\n", thechar);
+printf("unstl2: char to mbyt %x [%c]\n", thechar, thechar);
 #endif
 	mbyt(thechar);			/* copy byte to macro prototype */
 unstl3:
 #ifdef MACP
-printf("unstl3: char to pbyt %c\n", thechar);
+printf("unstl3: char to pbyt %x [%c]\n", thechar, thechar);
 #endif
 	pbyt(thechar);			/* put char to output buffer */
 	if (bits & ESCAPE2) {		/* was previous char escape */
@@ -542,7 +554,7 @@ unstsrc:			/* allow ';'and '"' in stab entries */
 	  if (termchk (thechar, terms))	/* see if a terminator */
 	    ccset = 1;			/* it was terminator, tell caller */
 #ifdef MACP
-printf("termchk ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, thechar);
+printf("termchk ret ccset = %x, usname = %s, term = %c\n", ccset, usname, thechar);
 #endif
 	  bits &= ~INSIG;		/* force off insignificant flag */
 	  return(thechar);		/* return the character */
@@ -562,8 +574,8 @@ unstby:
 	while ((inscnt < 72) && ((thechar = in[inscnt++]) == ' '));
 	if (inscnt >= 72)goto unstby;	/* get another image */
 #ifdef MACP
-printf("unstby: unstringing %0.72s\n term = %c, inscnt = %d, in[0] = %.2x, thechar = |%0.2x|,\n REUNSTF is %s, CALLUS is %s, UNSTFLAG is %s, ESCAPE2 is %s, INSIG is %s\n",
- in, unterm, inscnt, in[0], thechar, (macstate & REUNSTF) ? "ON" : "OFF",
+printf("unstby: unstringing %.72s\n term = %x [%c], inscnt = %d, in[0] = %.2x, thechar = |%.2x|,\n REUNSTF is %s, CALLUS is %s, UNSTFLAG is %s, ESCAPE2 is %s, INSIG is %s\n",
+ in, unterm, unterm, inscnt, in[0], thechar, (macstate & REUNSTF) ? "ON" : "OFF",
  (macstate & CALLUS) ? "ON" : "OFF",
  (macstate & UNSTFLAG) ? "ON" : "OFF",
  (bits & ESCAPE2) ? "ON" : "OFF",
@@ -608,7 +620,7 @@ unstb2:					/* yes, go finish dummy processing */
 	  if (termchk (thechar, terms))	/* see if a terminator */
 	    ccset = 1;			/* it was terminator, tell caller */
 #ifdef MACP
-printf("termchk2 ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, thechar);
+printf("termchk2 ret ccset = %x, usname = %s, term = %c\n", ccset, usname, thechar);
 #endif
 	  bits &= ~INSIG;		/* force off insignificant flag */
 	  return(thechar);		/* return the character */
@@ -617,7 +629,7 @@ printf("termchk2 ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, th
 	  (thechar != '%') &&		/* or start of a macro */
 	  (thechar != ':')) {		/* or concatination char */
 unstb3:					/* put char to name area */
-	  if (munstap < 8)		/* limit name to 8 chars */
+	  if ((int32)munstap < 8)		/* limit name to 8 chars */
 	    munsta[munstap] = thechar;  /* save the char */
 	  munstap++;			/* bump the count */
 	  goto scanb;			/* go get next char */
@@ -627,7 +639,7 @@ unstb3:					/* put char to name area */
 	/* see if name in stack */
 	for (tmp = macparam; tmp < macdptr; offset++, tmp += 8) {
 #ifdef MACD
-printf("unstb3: munsta = %0.8s, tmp = %0.8s, offset = %d\n", munsta, tmp, offset);
+printf("unstb3: munsta = %.8s, tmp = %.8s, offset = %d\n", munsta, tmp, offset);
 #endif
 	  if (!memcmp (munsta, tmp, 8)) /* name in stack */
 	    /* name found */
@@ -643,8 +655,8 @@ printf("unstb3: munsta = %0.8s, tmp = %0.8s, offset = %d\n", munsta, tmp, offset
 unstb4:
 #ifdef MACD
 printf("unstb4: offset = %d, stackp = %x, stkp = %x, tmp = %x, macdptr = %x, level = %d\n",
-  offset, stackp, stkp, tmp, macdptr, level);
-printf("unstb4: parameter %c%0.7s\n", (*tmp == 0xff ? '!' : *tmp), &tmp[1]);
+  offset, (uint32)stackp, (uint32)stkp, (uint32)tmp, (uint32)macdptr, level);
+printf("unstb4: parameter %c%.7s\n", (*tmp == 0xff ? '!' : *tmp), &tmp[1]);
 #endif
 	mbyt (offset);			/* put offset into prototye storage */
 	spmac |= DUMMY;			/* indicate a dummy was unstrung */
@@ -678,9 +690,9 @@ unsigned int32 terms;
 	if ((bits & ESCAPE2) || (chr < ' ') || (chr > '?')) return(0);
 #ifdef MACP
 printf("doing termcheck char = %c, terms = %x, ret = %x, inscnt = %d, macstate = %x\n",
- chr, terms, ((terms << (chr & 0x1f)) & 0x80000000L) ? 1 : 0, inscnt, macstate);
+ chr, terms, ((terms << (chr & 0x1f)) & 0x80000000) ? 1 : 0, inscnt, macstate);
 #endif
-	if ((terms << (chr & 0x1f)) & 0x80000000L) /* check for terminator */
+	if ((terms << (chr & 0x1f)) & 0x80000000) /* check for terminator */
 	  return (1);			/* the char matched a terminator */
 	return(0);			/* not a terminator */
 }
@@ -733,16 +745,22 @@ void	grps()
 	hwindr = 0;			/* clear indirect addressing flag */
 	grpw = -5;			/* set number of expressions */
 grps1:
-/* printf("grps1: calling unst\n"); */
-	unst(0x81fd0004L);		/* unstring something */
-/* printf("grps: unst called, name = %0.8s, unterm = %c,\n", usname, unterm); */
+#ifdef MACP
+    printf("grps1: calling unst\n");
+#endif
+	unst(0x81fd0004);		/* unstring something */
+#ifdef MACP
+    printf("grps: unst called, name = %.8s, unterm = %c,\n", usname, unterm);
+#endif
 	if (*usname == ' ') {		/* is name spaces */
-	  theval.value = 0x20202020L;	/* all blanks if we get to grps8 */
+	  theval.value = 0x20202020;	/* all blanks if we get to grps8 */
 	  /* see if * or = */
 	  if (unterm == '*' || unterm == '=') {
-/*printf("grps: = or * found, process literal or indirect\n"); */
+#ifdef MACP
+printf("grps: = or * found, process literal or indirect\n");
 	    /* process indirect or literal */
-/*printf("grps1: fac call grpw = %d\n", grpw); */
+printf("grps1: fac call grpw = %d\n", grpw);
+#endif
 	    if (fac(grpw))goto grps8;	/* error if not allowed */
 	    if (unterm == '*') {	/* is it indirect */
 	      /* process indirect */
@@ -755,7 +773,9 @@ grps1:
 	      theval = val (0);		/* unstring another element */
 	    } else {
 	      /* else process a literal */
-/* printf("grps: = found, process literal\n");  */
+#ifdef MACP
+printf("grps: = found, process literal\n");
+#endif
 	      tot = 4;			/* set word len for tdat */
 	      hbtttf = 8;		/* set direct data to literal area */
 	      grpss1 = hbavar;		/* save addressing type */
@@ -768,24 +788,30 @@ grps1:
 	      inacbn = 0;		/* clear common block number */
 	      for (i = 0; i < 4; i++)	/* clear terminator stack */
 		hbstac[i] = ' ';	/* to blanks */
-/* printf("grps: calling tdat\n"); */
+#ifdef MACP
+printf("grps: calling tdat\n");
+#endif
 	      tdat();			/* evaluate literal */
-/*
+#ifdef MACP
 prtval("val has currpc", &currpc);
 prtval("val has theval", &theval);
 prtval("val has inac", &inac);
-*/
+#endif 
 	      /* hdtds has the  value */
 	      theval.value = hdtds[0];	/* get the value */
 	      theval.tmp = inac.tmp;	/* get the terminator */
-/* printf("grps1: literal = %x\n", theval.value);  */
+#ifdef MACP
+printf("grps1: literal = %x\n", theval.value);
+#endif
 	      if (!yeanay())		/* are we not assembling */
 	        goto grps8;		/* don't assemble */
 	      hwerrfa |= hwerrf;	/* or in the new errors */
 	      if (hwerrf & UERROR) {	/* was there an undefined */
 	        hwerrf = hwerrfa;	/* restore updated errors */
 		if (yeanay())		/* are we assembling */
-/* printf("X error3 inac.type = %x\n", inac.type); */
+#ifdef MACP
+printf("X error3 inac.type = %x\n", inac.type);
+#endif
 	 	  seterr ('X');		/* set X error */
 	        goto grps8;		/* continue processing */
 	      }
@@ -797,18 +823,21 @@ prtval("val has inac", &inac);
 		  break;		/* o.k. */
 		default:		/* anything else is error */
 		  if (yeanay()) {	/* are we assembling */
-/* printf("X error inac.type = %x\n", inac.type); */
+#ifdef MACP
+printf("X error inac.type = %x\n", inac.type);
+#endif
 		    seterr ('X');	/* set X error */
 		  }
 		  goto grps8;		/* continue processing */
 	      }
 	      /* put block # in byte 0, type of literal in byte 3 */
 	      /* put rel info in byte 1 */
-	      hdtds[0] = (((int32)inacbn << 24) | ((int32)inac.flags << 16)
-		 | inac.type);
+	      hdtds[0] = (((int32)inacbn << 24) | ((int32)inac.flags << 16) | inac.type);
 	      hdtds[1] = theval.value;	/* the literal constant */
 	      /* put literal value into symbol table */
-/* printf("entering literal %x,%x num = %x\n", hdtds[0], hdtds[1], hwltct.value); */
+#ifdef MACP
+printf("entering literal %x,%x num = %x\n", hdtds[0], hdtds[1], hwltct.value);
+#endif
 	      i = hwltct.flags;			/* save the flags */
 #ifndef TRYIT
 	      hwltct.flags = theval.flags;	/* save type */
@@ -841,7 +870,7 @@ printf("lastval = %x, hwltct = %x\n",symval.value, hwltct.value);
 	      if (symval.value == hwltct.value)	/* new literal entered */
 		hwltct.value++;		/* no, bump count */
 	      i = ((stp->desc.value >> 16) & 0xff); /* get lpool number */
-	      lval = (symval.value & 0xffffL) << 2;	/* get literal number */
+	      lval = (symval.value & 0xffff) << 2;	/* get literal number */
 	      lval += litorgs[i].value;		/* add in literal base */
 	      theval.type = litorgs[i].type;	/* get the type */
 	      theval.flags = litorgs[i].flags;	/* get the flags */
@@ -914,17 +943,18 @@ printf("expr[0].value = %x, expr[1].value = %x\n", expr[1].value, expr[1].value)
 printf("opcode = %s, subaug = %x\n", curops->opcode, curops->subaug);
 */
 	k = curops->subaug;		/* get sub aug infor */
-	if (k & ARG1)			/* check arg 1 for even */
+	if (k & ARG1) {			/* check arg 1 for even */
 	  if (expr[0].value & 1) {	/* is arg 1 not even */
 	    if (yeanay()) 		/* are we assembling */
 	      seterr ('B');		/* set register bound error */
 	  }
-	else
-	if (k & ARG2)			/* check arg 2 for even */
+    }
+	if (k & ARG2) {			/* check arg 2 for even */
 	  if (expr[1].value & 1) {	/* is arg 2 not even */
 	    if (yeanay()) 		/* are we assembling */
 	      seterr ('B');		/* set register bound error */
 	  }
+    }
 	k &= 3;				/* just use arg indicator */
 	i = grpw + 6;			/* oper cnt converted to 0-5 */
 	if ((i > argmax[k]) || 		/* see if # arg */
@@ -1031,8 +1061,8 @@ int	unsflag;
 *        R5 CONTAINS THE NUMERIC EQUIV OF THE NON-NUMERIC TERMINATOR
 */
 	int	i,j,k,ii,jj;		/* temps */
-	int32	result;			/* temp result value */
-	struct symbol FAR *stp;		/* temp pointer */
+	int32	result = 0;		/* temp result value */
+/*	struct symbol FAR *stp;	*/	/* temp pointer */
 	char	augtype;		/* augmend 2 bit type */
 	char	acctype;		/* accumuland 2 bit type */
 	char	valterm;		/* the terminator for value unstrung */
@@ -1054,7 +1084,7 @@ int	unsflag;
 	    /* element not unstrung, go unstring it */
 	    for (i=0; i<4; i++)		/* blank terminator list */
 	     hbstac[i] = ' ';		/* blanks */
-	    unst(0x81fd0000L);		/* unstring an element */
+	    unst(0x81fd0000);		/* unstring an element */
 	  }
 	  /* latest terminator in unterm */
 val3:
@@ -1065,7 +1095,7 @@ val3:
 	  inag.tmp = unterm;		/* save the terminator */
 	  valterm = unterm;		/* save terminator */
 #ifdef MACP
-printf("val3: usname = %0.8s, unterm = %c\n", usname, unterm);
+printf("val3: usname = %s, unterm = %c\n", usname, unterm);
 #endif
 	  if ((unterm == '\'') || (unterm == '(')) /* was terminator ' or ( */
 	    goto valq;			/* go process */
@@ -1095,20 +1125,21 @@ printf("val3: usname = %0.8s, unterm = %c\n", usname, unterm);
 
 	  if (*usname >= '0' && *usname <= '9') {	/* process number */
 	    cnum(10);			/* get the number */
-	    inag.value = cnumval[0] & 0x7fffffL;  /* just get 23 bit number */
+	    inag.value = cnumval[0] & 0x7fffff;  /* just get 23 bit number */
 	    inag.tmp = cnumterm;	/* save the terminator */
 	    valterm = unterm;		/* save the terminator */
 	    goto vala;			/* continue processing */
 	  }
 
 	  if (yeanay()) {		/* are we assembling */
-/*
+#ifdef MACS
 printf("val found a symbol %s, pcmode = %d\n", usname, pcmode);
 prtval("val has currpc", &currpc);
-*/
+#endif
 	    i = currpc.type;		/* save pctype */
 	    currpc.type = TYPU;		/* show type as undefined */
-	    stp = ss (&currpc, usname);	/* find symbol */
+/*	    stp = ss (&currpc, usname); */	/* find symbol */
+	    ss (&currpc, usname);	/* find symbol */
 	    currpc.type = i;		/* restore pctype */
 	
 	    inag.type = symval.type;	/* save type */
@@ -1118,14 +1149,14 @@ prtval("val has currpc", &currpc);
 	}
 vala:
 #ifdef MACS
-printf("vala has a symbol %c%0.7s, pcmode = %d\n", ((unsigned char)*usname == 0xff ? '!':*usname), &usname[1], pcmode);
+printf("vala has a symbol %c%.7s, pcmode = %d\n", ((unsigned char)*usname == 0xff ? '!':*usname), &usname[1], pcmode);
 prtval("vala has currpc", &currpc);
 prtval("vala has inag", &inag);
 prtval("vala has inac", &inac);
 #endif
 	bits2 &= ~ALVAL; 		/* clear should we eval 1st operand */
 	/* process augmend */
-	inag.value = inag.value & 0x7fffffL;	/* get aug value */
+	inag.value = inag.value & 0x7fffff;	/* get aug value */
 	secnag = 0;			/* clear aug sect num */
 	if (inag.flags & CSDS)		/* is aug csect */
 	  secnag |= 1;			/* indicate csect section */
@@ -1140,7 +1171,7 @@ prtval("vala has inac", &inac);
 	  inag.flags &= ~ABSREL;	/* no, set absolute */
 #endif
 	/* process accumuland */
-	inac.value = inac.value & 0xffffffL;	/* get acc value */
+	inac.value = inac.value & 0xffffff;	/* get acc value */
 	secnac = 0;			/* clear acc sect num */
 	if (inac.flags & CSDS)		/* is acc csect */
 	  secnac |= 1;			/* indicate csect section */
@@ -1156,8 +1187,8 @@ prtval("vala has inac", &inac);
 #endif
 	if (augtype == TYPC2) {		/* is 2 bit code common */
 					/* processing for common only */
-	  inagbn = ((int32)(inag.value & 0xff0000L) >> 16);  /* get com blk # */
-	  inag.value = inag.value & 0xffffL;	/* just use the displacement */
+	  inagbn = ((int32)(inag.value & 0xff0000) >> 16);  /* get com blk # */
+	  inag.value = inag.value & 0xffff;	/* just use the displacement */
 	}
 
 	switch (hbstac[1]) {		/* switch on prev terminator */
@@ -1184,8 +1215,10 @@ prtval("vala has inac", &inac);
 
 	  default: 			/* not a valid terminator */
 	    if (yeanay()) {		/* are we assembling */
-/* printf("term hbstac[0] is %x\n", hbstac[0]); */
-/* printf("term hbstac[1] is %x\n", hbstac[1]); */
+#ifdef MACD
+ printf("term hbstac[0] is %x\n", hbstac[0]);
+ printf("term hbstac[1] is %x\n", hbstac[1]);
+#endif
 	      seterr ('E');		/* set element error */
 	    }
 	    goto vale;			/* finish this element */
@@ -1253,7 +1286,8 @@ vdag:
 	    if (vdap == 3) {		/* divide operator */
 	      result = 0;		/* zero quotient */
 	      if (yeanay()) {		/* are we assembling */
-		if (!inag.value) {		/* is divisor zero */
+/*      if (!inag.value) {	*/	/* is divisor zero */
+		if (inag.value == 0) {	/* is divisor zero */
 	      	  result = 0;		/* yes, zero quotient */
 	  	  seterr ('\\');	/* set divide error */
 		} else {		/* ok to divide */
@@ -1300,9 +1334,9 @@ vdaa:
 
 	/* process the result */
 valh:
-	inac.value = result & 0x7fffffL;	/* just 23 bits */
+	inac.value = result & 0x7fffff;	/* just 23 bits */
 #ifdef MACD
-printf("valh: result %x, cnumterm [%c] hbstac[0] [%c]\n", result, cnumterm, hbstac[0]);
+printf("valh: result %x, cnumterm %x [%c] hbstac [%.2x]\n", result, cnumterm, cnumterm, hbstac[0]);
 prtval("valh has inac", &inac);
 #endif
 	if (augtype == 0) {		/* program absolute */
@@ -1327,7 +1361,9 @@ prtval("valh has inac", &inac);
 	/* check terminator and leave or continue */
 vale:
 	if (hbstac[0] == ' ' || hbstac[0] == ',' || hbstac[0] == '\'') {
-	  unsigned char ttt = (unsigned char)*usname;
+#ifdef MACD
+	  int32 ttt = (uint8)(*usname);
+#endif
 
     	  /* see if processing rez or res */
     	  if (bacflag & 64) {
@@ -1335,6 +1371,9 @@ vale:
     	    /* check for negative size */
     	    if (accum.value < 0) {
 	      if (yeanay()) {		/* are we assembling */
+#ifdef MACD
+      printf("Error N @@ 1\n");
+#endif
 	        seterr ('N');		/* set number error */
 	      }
     	      /* clear value */
@@ -1351,24 +1390,34 @@ vale:
 	  inac.tmp = cnumterm;		/* save the terminator */
 	  valterm = hbstac[0];		/* save the terminator */
 #ifdef MACD
-printf("val returning, symbol %c%0.7s, pc=%x, val=%x\n",
- (ttt == 0xff ? '!' : ttt), &usname[1], currpc, inac);
+      if ((ttt & 0xff) == 0xff) {
+printf("val returning, symbol !%.7s pc %x val %x\n", &usname[1], (uint32)&currpc, (uint32)&inac);
+      } else {
+printf("val returning, symbol %c%.7s, pc=%x, val=%x\n", usname[0], &usname[1], (int32)&currpc, (int32)&inac);
+      }
+/*printf("val returning, symbol %c%.7s, pc=%x, val=%x\n", */
+/* ((uint8)ttt == 0xff ? '!' : (uint8)ttt), &usname[1], (uint32)currpc, (uint32)inac); */
+/* (usname[0] == 0xff ? '!' : usname[0]), &usname[1], (uint32)currpc, (uint32)inac); */
 prtval("vale returning inac", &inac);
 #endif
 	  return (inac);		/* return the value */
 	}
 	if (hbstac[0] != ')') {		/* if not rt parend do next element */
-	  unst(0x81fd0000L);		/* unstring an element */
+	  unst(0x81fd0000);		/* unstring an element */
 	  goto val3;			/* continue */
 	}
 
 	/* a right parenthesis found */
-/* printf("vale - rt par: usname[1] = %c,\n", usname[1]); */
+#ifdef MACD
+printf("vale - rt par: usname[1] = %c,\n", usname[1]);
+#endif
 	/* add proper f & c bits */
-	inac.value = ageq0((int32)inac.value, inac.type) & 0x7fffffL;
-/* prtval("vale returning inac", &inac); */
+	inac.value = ageq0((int32)inac.value, inac.type) & 0x7fffff;
+#ifdef MACD
+prtval("vale returning inac", &inac);
+#endif
 	hbavar = 5;			/* set new address variant */
-	runst(0x81fd0000L);		/* unstring, term on most anything */
+	runst(0x81fd0000);		/* unstring, term on most anything */
 	if (*usname == ' ') {		/* anything in name */
 	  if ((hbstac[0] == ' ') ||	/* no, is terminator a space */
 	    (hbstac[0] == ',')) {	/* or a comma, return the value */
@@ -1386,7 +1435,9 @@ prtval("vale returning inac", &inac);
 
 	/* a left parend or appost was found */
 valq:
-/* printf("valq: usname[1] = %c,\n", usname[1]); */
+#ifdef MACD
+printf("valq: usname[1] = %c,\n", usname[1]);
+#endif
 	if (usname[1] != ' ') {		/* if not space, an error */
 	  if (yeanay()) {		/* are we assembling */
 	    seterr ('W');		/* set W error */
@@ -1435,7 +1486,7 @@ valq:
 addra:
 	    if (valterm == '(')	{	/* was terminator a ( */
 	      /* an address attribute, get next element */
-	      unst(0x81fd0000L);	/* unstring an element */
+	      unst(0x81fd0000);	/* unstring an element */
 	      goto val3;		/* continue */
 	    }
 	    /* drop thru for error */
@@ -1449,7 +1500,7 @@ addra:
 	}
 	    
 	/* here to process constant in the expression */
-valg:
+/*valg:*/
 #ifdef MACD
 printf("valg: valterm [%c], hbtttf %d\n", valterm, hbtttf);
 #endif
@@ -1471,14 +1522,14 @@ printf("tmd 1: returned %x, %x for type %d\n", hdtds[0], hdtds[1], i);
 #endif
 	tot = ii;			/* restore tot value */
 	hbtttf = jj;			/* restore hbtttf value */
-	inag.value = hdtds[0] & 0x7fffffL;	/* data computed by tmd */
+	inag.value = hdtds[0] & 0x7fffff;	/* data computed by tmd */
 #ifdef MACD
-printf("tmd 1: unstringing %0.72s\n term = %c, inscnt = %d, DUMMY is %s\n",
- in, unterm, inscnt, (spmac & DUMMY) ? "ON" : "OFF");
+printf("tmd 1: unstringing %.72s\n term = %x [%c], inscnt = %d, DUMMY is %s\n",
+ in, unterm, unterm, inscnt, (spmac & DUMMY) ? "ON" : "OFF");
 #endif
-	runst(0x81fd0000L);		/* unstring without skip leading blks */
+	runst(0x81fd0000);		/* unstring without skip leading blks */
 #ifdef MACD
-printf("tmd 1: unstrung %0.72s\n term = %c, inscnt = %d, DUMMY is %s\n",
+printf("tmd 1: unstrung %.72s\n term = %c, inscnt = %d, DUMMY is %s\n",
  in, unterm, inscnt, (spmac & DUMMY) ? "ON" : "OFF");
 #endif
 	hbstac[1] = k;			/* restore previous terminator */
@@ -1495,7 +1546,7 @@ void	tdat()
 {
 	int	i;
 	int	tc;
-	int	vc;
+	int	vc = 0;
 
 #ifdef MACD
 	printf("entering tdat()\n");
@@ -1503,7 +1554,7 @@ void	tdat()
 	hdtds[0] = hdtds[1] = 0;	/* clear integer stack */
 	hdtdf[0] = hdtdf[1] = 0;	/* clear fraction stack */
 	bits &= ~TGSIGN;		/* assume positive */
-	unst (0x81fd0000L);		/* unstring descr of constant */
+	unst (0x81fd0000);		/* unstring descr of constant */
 	if ((unterm != '\'') &&		/* was last terminator a ' */
 	  (unterm != '('))		/* or is it a ( */
 	  goto tdat3;			/* no,  may be implicit numeric */
@@ -1543,7 +1594,7 @@ printf("tdat: i = %x, term = %c,\n", i, unterm);
 	    tmd(i);			/* go decode data type */
 #ifdef MACD
 printf("tdat 2: returned %x, %x for type %d\n", hdtds[0], hdtds[1], i);
-printf("tdat 2: hbtttf = %x, usname = %0.8s\n", hbtttf, usname);
+printf("tdat 2: hbtttf = %x, usname = %s\n", hbtttf, usname);
 #endif
 	    if (hbtttf >= 4)		/* processing a gen or data */
 	      goto tdat4;		/* no */
@@ -1579,11 +1630,11 @@ tdater:					/* error if anything else */
 	    seterr ('D');		/* set data error */
 	  }
 #ifdef MACD
-printf("tdater 1: unterm = %c, usname = %0.8s\n", unterm, usname);
+printf("tdater 1: unterm = %c, usname = %.8s\n", unterm, usname);
 #endif
-	  runst(0x80080000L);		/* unstring til sp or , */
+	  runst(0x80080000);		/* unstring til sp or , */
 #ifdef MACD
-printf("tdater 2: unterm = %c, usname = %0.8s\n", unterm, usname);
+printf("tdater 2: unterm = %c, usname = %.8s\n", unterm, usname);
 #endif
 	  if (*usname != ' ')		/* was there data between ' and , */
 	    goto tdater;		/* yes, we have an error */
@@ -1597,7 +1648,7 @@ tdat2a:
 	vc = 0;				/* tell unst to not skip blanks */
 tdat2b:
 #ifdef MACD
-printf("tdat2b: unterm = %c, usname = %0.8s\n", unterm, usname);
+printf("tdat2b: unterm = %c, usname = %.8s\n", unterm, usname);
 printf("tdat2b: term is [%c]\n", hbstac[0]);
 #endif
 	bits &= ~TGSIGN;		/* clear negation flag */
@@ -1611,7 +1662,7 @@ printf("tdat2b: term is [%c]\n", hbstac[0]);
 	hdtds[1] = 0;			/* set high order part to zero */
 #ifdef MACD
 printf("tdat2b: value %x, %x term is [%c]\n", hdtds[0], hdtds[1], hbstac[0]);
-printf("tdat2b: hbtttf = %x, usname = %0.8s\n", hbtttf, usname);
+printf("tdat2b: hbtttf = %x, usname = %.8s\n", hbtttf, usname);
 #endif
 	tcy();				/* allow bytes into data stream */
 	goto tdat4;			/* go check terminator */
@@ -1619,7 +1670,7 @@ printf("tdat2b: hbtttf = %x, usname = %0.8s\n", hbtttf, usname);
 	/* may be implied dec num or unattribuated expression */
 tdat3:
 #ifdef MACD
-printf("tdat3: unterm = %c, usname = %0.8s\n", unterm, usname);
+printf("tdat3: unterm = %c, usname = %.8s\n", unterm, usname);
 #endif
 	if (*usname != ' ')		/* anything unstrung */
 	  goto tdat3c;			/* yes, then we have something */
@@ -1640,11 +1691,11 @@ printf("tdat3: unterm = %c, usname = %0.8s\n", unterm, usname);
 	      goto tdater;		/* no, give out error */
 	    bits |= TGSIGN;		/* show it is a - */
 	  } 				/* a + or - found */
-	  unst(0x81fd0000L);		/* unstring something */
+	  unst(0x81fd0000);		/* unstring something */
 	}				/* terminator sp or , */
 tdat3c:					/* we have something unstrung */
 #ifdef MACD
-printf("tdat3c: unterm = %c, usname = %0.8s\n", unterm, usname);
+printf("tdat3c: unterm = %c, usname = %.8s\n", unterm, usname);
 printf("tdat3c: term is [%c]\n", hbstac[0]);
 #endif
 	vc = 1;				/* tell we have something unstrung */
@@ -1671,13 +1722,13 @@ tdat4:					/* check terminator */
 	  (hbstac[0] == ' ')) {		/* or space */
 #ifdef MACD
 printf("tdat4: returning %x, %x term is [%c]\n", hdtds[0], hdtds[1], hbstac[0]);
-printf("tdat4: hbtttf = %x, usname = %0.8s\n", hbtttf, usname);
+printf("tdat4: hbtttf = %x, usname = %.8s\n", hbtttf, usname);
 #endif
-	}
 	  return;			/* yes, return */
-	runst(0x80080000L);		/* no, unstring til sp or , */
+	}
+	runst(0x80080000);		/* no, unstring til sp or , */
 #ifdef MACD
-printf("tdat4: unterm = %c, usname = %0.8s\n", unterm, usname);
+printf("tdat4: unterm = %c, usname = %.8s\n", unterm, usname);
 #endif
 	if (*usname != ' ')		/* was there data between ' and , */
 	  goto tdater;			/* yes, we have an error */
@@ -1698,7 +1749,7 @@ int	typ;
 {
 	int	chr;
 	int	tmp;
-	int	cnt;
+	int	cnt = 0;
 
 	if (typ == 5)			/* is it e type */
     	  dblorsgl = 1;			/* show single precision */
@@ -1712,7 +1763,7 @@ printf("tmd called typ = %x, tot = %d\n", typ, tot);
 /* process C type constant */
 	  ccset = 0;
 	  while (!ccset) {		/* terminate on ' or error */
-	    chr = gbyt(0x01000000L);	/* get a char, term on ' */
+	    chr = gbyt(0x01000000);	/* get a char, term on ' */
 	    if (ccset)			/* apostrophe or error */
 	      break;			/* terminate on ' or error */
 	    tdg((int32)chr, 1, 0);	/* put out left just char */
@@ -1737,7 +1788,7 @@ tgd30:
 printf("at tgd30 - tmp = %d\n", tmp);
 #endif
 	  if (hbtttf <= 4)		/* processing gen or data */
-	    runst(0x80080000L);		/* yes, term on space or comma */
+	    runst(0x80080000);		/* yes, term on space or comma */
 	  goto tgd3;			/* get out without storing value */
 	} 
 
@@ -1745,7 +1796,7 @@ printf("at tgd30 - tmp = %d\n", tmp);
 /* process G type constant */
 	  ccset = 0;
 	  while (!ccset) {		/* terminate on ' or error */
-	    chr = gbyt(0x01000000L);	/* get a char, term on ' */
+	    chr = gbyt(0x01000000);	/* get a char, term on ' */
 	    if (ccset)			/* apostrophe or error */
 	      break;			/* terminate on ' or error */
 	    lefts(hdtds, 8);		/* make room for new char */
@@ -1757,14 +1808,14 @@ tgd2:					/* cycle out the data */
 printf("at tgd2 - tmp = %d hbtttf = %d\n", tmp, hbtttf);
 #endif
 	  if (hbtttf <= 4) {		/* processing gen or data */
-	    runst(0x81fd0000L);		/* yes, term on almost anything */
+	    runst(0x81fd0000);		/* yes, term on almost anything */
 	    if (unterm == '+' || unterm == '-' ||
 	      unterm == '*' || unterm == '/') {	/* see if arith term */
-	      inag.value = hdtds[0] & 0x7fffffL;  /* yes, just leave address */
+	      inag.value = hdtds[0] & 0x7fffff;  /* yes, just leave address */
 	      hbstac[1] = ' ';		/* show space as prev terminator */
 	      bits2 |= ALVAL;		/* tell val to skip evaluation */
 #ifdef MACD
-prtval("tgd2 returning inag, term = %c, inscnt = %d\n", unterm, inscnt);
+printf("tgd2 returning inag, term = %c, inscnt = %d\n", unterm, inscnt);
 #endif
 	      goto tgd3;		/* get out without storing value */
 	    }
@@ -1783,9 +1834,9 @@ printf("at tgd3 - tmp = %d\n", tmp);
 
 	if (typ == 2) {			/* process X type constant */
 /* process X type constant */
-	  cnt = unst(0x01000000L);	/* unstring hex number */
+	  cnt = unst(0x01000000);	/* unstring hex number */
 #ifdef MACD
-printf("tgd hex conv entered, usname = %0.8s term = %c\n", usname, unterm);
+printf("tgd hex conv entered, usname = %.8s term = %c\n", usname, unterm);
 #endif
 	  /* is this a dummy parameter or are we in cond scan */
 	  if ((spmac & DUMMY) || (macstate & CONDSCAN)) {
@@ -1811,6 +1862,9 @@ printf("tgd term = %c\n", unterm);
 	      usname[cnt] == 'W' || usname[cnt] == 'w') {
 txd16:
 	      if (yeanay()) {			/* are we assembling */
+#ifdef MACD
+      printf("Error N @@ 2\n");
+#endif
 	        seterr ('N');			/* set number error */
 	      }
 	      goto tgd2;			/* cycle out data */
@@ -1823,7 +1877,7 @@ txd17:
 	  goto tgd2;			/* go dump the number */
 	}
 /* typ is > 2 */
-/* printf("tgd n, f, e or r conversion entered, usname = %0.8s\n", usname); */
+/* printf("tgd n, f, e or r conversion entered, usname = %.8s\n", usname); */
 /* process n or f or e or r type constants */
 	if (typ == 3)			/* n type */
 	  cnt = 31;			/* bit scaling is 31 */
@@ -1839,34 +1893,34 @@ txd17:
 }
 
 int32	tdmp[] = {			/* 0x16 in digit dec inverted form */
-	0x00000000L,			/* 0 x 16 */
-	0x06010000L,			/* 1 x 16 */
-	0x02030000L,			/* 2 x 16 */
-	0x08040000L,			/* 3 x 16 */
-	0x04060000L,			/* 4 x 16 */
-	0x00080000L,			/* 5 x 16 */
-	0x06090000L,			/* 6 x 16 */
-	0x02010100L,			/* 7 x 16 */
-	0x08020100L,			/* 8 x 16 */
-	0x04040100L,			/* 9 x 16 */
+	0x00000000,			/* 0 x 16 */
+	0x06010000,			/* 1 x 16 */
+	0x02030000,			/* 2 x 16 */
+	0x08040000,			/* 3 x 16 */
+	0x04060000,			/* 4 x 16 */
+	0x00080000,			/* 5 x 16 */
+	0x06090000,			/* 6 x 16 */
+	0x02010100,			/* 7 x 16 */
+	0x08020100,			/* 8 x 16 */
+	0x04040100,			/* 9 x 16 */
 };
 
 int32	base[] = {
-	0x00000000L,	0x41a00000L,	/* 10.**1 */
-	0x00000000L,	0x42640000L,	/* 10.**2 */
-	0x00000000L,	0x44271000L,	/* 10.**4 */
-	0x00000000L,	0x475f5e10L,	/* 10.**8 */
-	0x6fc10000L,	0x4e2386f2L,	/* 10.**16 */
-	0xd415b85aL,	0x5b4ee2d6L,	/* 10.**32 */
-	0xe93ff9f4L,	0x76184f03L,	/* 10.**64 */
+	0x00000000,	0x41a00000,	/* 10.**1 */
+	0x00000000,	0x42640000,	/* 10.**2 */
+	0x00000000,	0x44271000,	/* 10.**4 */
+	0x00000000,	0x475f5e10,	/* 10.**8 */
+	0x6fc10000,	0x4e2386f2,	/* 10.**16 */
+	0xd415b85a,	0x5b4ee2d6,	/* 10.**32 */
+	0xe93ff9f4,	0x76184f03,	/* 10.**64 */
 };
 
 int32	one[] = {
-	0x00000000L,	0x41100000L	/* 1 */
+	0x00000000,	0x41100000	/* 1 */
 };
 
 short	hhtde;				/* entered decimal exponent */
-char	hbtdfn;				/* floating pt digit count */
+int32	hbtdfn;				/* floating pt digit count */
 #ifdef MYATOF
 #include "float.h"
 extern FPN ifpn;
@@ -1884,10 +1938,10 @@ int	typ;				/* exponent type */
 {
 	int	cnt;
 	int32	tmp;
-	char	chr, dig;
-	char	hbtfn1 = 0;		/* previous terminator - assume int */
-	char	hbtfn2 = 0;		/* latest terminator - assume int */
-	char	hbtfn3;			/* store counter */
+	int32	chr, dig;
+	int32   hbtfn1 = 0;		/* previous terminator - assume int */
+	int32   hbtfn2 = 0;		/* latest terminator - assume int */
+	int32	hbtfn3 = 0;		/* store counter */
 	int32	tmpf[2];		/* temp floating number */
 	int	prop = 0;		/* ???? */
 	int32	*nump;
@@ -1896,7 +1950,9 @@ int	typ;				/* exponent type */
 	hhtde = 0;			/* zero the user entered exponent */
 	bits &= ~XPONENT;		/* clear user entered exp flag */
 #ifdef MYATOF
-/* printf("tfn: typ = %d\n", typ); */
+#ifdef FPBUG
+ printf("tfn: typ = %d\n", typ);
+#endif
     	if(typ >= 5) {			/* see if e or r type */
 	  /* convert number to floating point */
 	  int cc, gdot, gote, ieee;
@@ -1906,7 +1962,7 @@ int	typ;				/* exponent type */
 	  if (bits & TFSIGN)		/* do we have a neg dec constant */
 	    usname[cc++] = '-';		/* set minus sign */
 stn:
-	  chr = gbyte(0x01000000L);	/* get a byte, term on ' */
+	  chr = gbyte(0x01000000);	/* get a byte, term on ' */
 	  if (ccset) {			/* was terminator found */
 	    hbtfn2 = 5;			/* set latest terminator */
 	    goto stndone;		/* yes, make way out */
@@ -1916,8 +1972,10 @@ stn:
 	  /* see if char is a valid terminator of . E B , or ' */
 	  if (islower(tmp=chr)) 	/* is letter lower case */
 	    tmp = toupper(chr);		/* make u/c */
-/*  printf("stn: switching on %c\n", tmp); */
-	  switch ((int)tmp) {		/* switch on the u/c chr */
+#ifdef FPBUG
+ printf("stn: switching on %c\n", tmp);
+#endif
+	  switch ((int32)tmp) {		/* switch on the u/c chr */
 	    case '.':			/* dec point */
 	      if (gdot++)
 		goto nerrx;		/* we have number error */
@@ -1947,17 +2005,30 @@ addnx:
 	  default:
 nerrx:
 	    if (yeanay()) {		/* yes, are we assembling */
+#ifdef MACD
+      printf("Error N @@ 3\n");
+#endif
 	      seterr ('N');		/* set number error */
 	    }
 	  }
 stndone:
 	  usname[cc++] = '\0';		/* terminate input */
-/* printf("input %s\n", usname); */
+#ifdef FPBUG
+printf("input %s\n", usname);
+#endif
 	  myatof(usname);		/* convert to internal float */
+#ifdef FPBUG
+printf("after myatof input %s\n", usname);
+#endif
     	  if (option & OPT55)		/* option 55 set? */
 	    ieee=1;			/* return ieee format */
+#ifdef FPBUG
+printf("calling flconv typ %x\n", typ);
+#endif
 	  flconv(typ, ifpn.ne, ifpn.nf, hdtds, ieee);
-/* printf("tfn: got val %x,%x\n", hdtds[0], hdtds[1]);  */
+#ifdef FPBUG
+printf("tfn: got val %x,%x\n", hdtds[0], hdtds[1]);
+#endif
     	  return;			/* return number */
 	}
 #endif /* MYATOF */
@@ -1977,7 +2048,7 @@ tfm1:
 	hbtfn3 = 0;			/* clear store counter */
 	memset (usname, ' ', MAXCHARS);	/* blank receiving area */
 tfm2:
-	chr = gbyte(0x01000000L);	/* get a byte, term on ' */
+	chr = gbyte(0x01000000);	/* get a byte, term on ' */
 	if (ccset) {			/* was terminator found */
 	  hbtfn2 = 5;			/* set latest terminator */
 	  goto tfm6;			/* yes, make way out */
@@ -1987,7 +2058,7 @@ tfm2:
 	/* see if char is a valid terminator of . E B , or ' */
 	if (islower(tmp=chr))	 	/* is letter lower case */
 	  tmp = toupper(chr);		/* make u/c */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfm2: switching on %c\n", tmp);
 #endif
 	switch ((int)tmp) {		/* switch on the u/c chr */
@@ -2011,24 +2082,29 @@ tfm2:
 
 	default:
 #ifdef MYATOF
-	  if (hbtfn3 >= 20) {		/* see if too many digits */
+	  if ((int32)hbtfn3 >= 20) {		/* see if too many digits */
 #else
-	  if (hbtfn3 >= 16) {		/* see if too many digits */
+	  if ((int32)hbtfn3 >= 16) {		/* see if too many digits */
+#endif
+#ifdef FPBUG
+ printf("tfm2 default: too many digits in usname |%.8s|, hbtfn3=%d\n", usname, hbtfn3);
 #endif
 	    if (yeanay()) {		/* yes, are we assembling */
+#ifdef MACD
+      printf("Error N @@ 4\n");
+#endif
 	      seterr ('N');		/* set number error */
 	    }
 	  } else {
 	    usname[hbtfn3++] = chr;	/* store the digit */
-#ifndef FPBUG
- printf("tfm2-d: storing in usname |%0.8s|, hbtfn3=%d\n",
- usname, hbtfn3);
+#ifdef FPBUG
+ printf("tfm2-d: storing in usname |%s|, hbtfn3=%d\n", usname, hbtfn3);
 #endif
 	  }
 	  goto tfm2;			/* get next digit */
 	}
 tfm6:
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfm6: switch on %x\n", hbtfn1); 
 #endif
 	switch (hbtfn1) {		/* do processing on previous term */
@@ -2046,8 +2122,8 @@ tfm6:
 	}
 
 tfi:					/* do integer */
-#ifndef FPBUG
- printf("tfi: process usname %0.8s\n", usname); 
+#ifdef FPBUG
+ printf("tfi: process usname %s\n", usname); 
 #endif
 	cnum(10);			/* get the number */
 	hdtds[0] = cnumval[0];		/* save low order part */
@@ -2055,8 +2131,8 @@ tfi:					/* do integer */
 	bits &= ~TFSIGN;		/* 0 = +, 1 = - */
 	if (hbcnul) 			/* was sign negative */
 	  bits |= TFSIGN;		/* set neg flag, 0 = +, 1 = - */
-#ifndef FPBUG
- printf("tfi: got val %x,%x\n", hdtds[0], hdtds[1]); 
+#ifdef FPBUG
+ printf("tfi: got val hdtds %x,%x\n", hdtds[0], hdtds[1]); 
 #endif
 	goto tfm8;			/* continue */
 
@@ -2066,7 +2142,7 @@ tfx:					/* decimal radix */
 	hhtde = cnumval[0];		/* save low order part */
 	if (hhtde)			/* if not zero */
 	  bits |= XPONENT;		/* show user entered exponent */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfx: got exp val hhtde = %x\n", hhtde); 
 #endif
 	goto tfm8;			/* continue */
@@ -2074,7 +2150,9 @@ tfx:					/* decimal radix */
 tfb:					/* binary radix */
 	cnum(10);			/* get the number */
 	hhtdb = cnumval[0];		/* save low order part */
-/* printf("tfb: got bin exp val hhtdb = %x\n", hhtdb); */
+#ifdef FPBUG
+ printf("tfb: got bin exp val hhtdb = %x\n", hhtdb);
+#endif
 	goto tfm8;			/* continue */
 
 tff:					/* floating pointer number */
@@ -2082,6 +2160,9 @@ tff:					/* floating pointer number */
 	for (cnt=0; cnt<16; cnt++) {	/* 16 fractional hex digits wanted */
 	  tmp = 0;			/* no carry at start */
 	  dig = 15;			/* 16 digits are here */
+#ifdef FPBUG
+ printf("ttf4: got dig %x tmp %x cnt %x chr %.2x\n", dig, tmp, cnt, usname[dig]);
+#endif
 tff4:
 	  chr = usname[dig];		/* get a digit */
 	  if (cnt == 0) 		/* 1st time through */
@@ -2091,47 +2172,61 @@ tff4:
 	  /* we have blank or num 1st time, or ? after first */
 	  chr &= 0xf;			/* convert from ascii to hex */
 	  tmp += tdmp[chr];		/* get digit times 16 */
-	  chr = (unsigned int32)tmp >> 24;	/* get l.s.d. of product */
+	  chr = (uint32)tmp >> 24;	/* get l.s.d. of product */
 	  tmp <<= 8;			/* shift up the carry */
 	  while (chr >= 10) {		/* check for dec carry */
-	    chr -= 10;			/* +10 to 0 */
-	    tmp += 0x01000000L;		/* add in the carry */
+        chr -= 10;	   	    /* +10 to 0 */
+/*	    chr = ((int32)chr - 10);	*/	/* +10 to 0 */
+	    tmp += 0x01000000;		/* add in the carry */
 	  }
 	  usname[dig] = chr;		/* sto back 1 multiplied digit */
-	  if (--dig >= 0)		/* go from ls to ms, done yet */
+#ifdef FPBUG
+/* printf("ttf3: got dig %x tmp %x cnt %x chr %.2x\n", dig, tmp, cnt, chr); */
+#endif
+/*      --dig;     */           /* ms to ls bit */
+/*    dig = ((int32)dig - 1); */             /* ms to ls bit */
+/*    if ((int32)dig >= 0) */ /* go from ls to ms, done yet */
+      if ((int32)(--dig) >= 0)	/* go from ls to ms, done yet */
 	    goto tff4;			/* not all digits done */
-	  chr = (unsigned int32)tmp >> 24;	/* get l.s.d. of product */
+	  chr = (uint32)tmp >> 24;	/* get l.s.d. of product */
 	  tmp <<= 8;			/* shift up the carry */
-	  if (tmp & 0x01000000L)	/* check for over 10 */
+	  if (tmp & 0x01000000)	/* check for over 10 */
 	    chr +=10;			/* yes, make into 1 hex digit */
 	  lefts(tmpf, 4);		/* makeroom in fraction stack */
 	  tmpf[0] |= chr;		/* put in new digit */
+#ifdef FPBUG
+ printf("ttf2: got dig %x tmp %x cnt %x chr %.2x\n", dig, tmp, cnt, chr);
+#endif
 	}
 	prop = chr;			/* save last propagation */
 	hdtdf[0] = tmpf[0];		/* save lower part */
 	hdtdf[1] = tmpf[1];		/* save upper part */
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tff: got val %x,%x\n", hdtdf[0], hdtdf[1]); 
 #endif
 	/* drop throught to tfm8 */
 
 tfm8:
-#ifndef FPBUG
+#ifdef FPBUG
  printf("tfm8: hbtfn2 = %x, hntfn1 = %x\n", hbtfn2, hbtfn1);
 #endif
-	if (hbtfn2 <= hbtfn1) {		/* is new ptr gtr than old ptr */
+	if ((int32)hbtfn2 <= (int32)hbtfn1) {		/* is new ptr gtr than old ptr */
 tfe:					/* no, we have element sequence error */
-	  if (yeanay())			/* are we assembling */
+	  if (yeanay())	{		/* are we assembling */
+#ifdef MACD
+      printf("Error N @@ 5\n");
+#endif
 	    seterr ('N');		/* set number error */
+      }
 	  return;			/* exit after error */
 	}
-	if (hbtfn2 < 4)			/* was last terminator final */
+	if ((int32)hbtfn2 < 4)		/* was last terminator final */
 	  goto tfm1;			/* no, get next item */
 
 	/* got a final terminator, finish up */
 tfo:
-#ifndef FPBUG
- printf("tfo: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfo: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde);
 #endif
 	if (bits & TFSIGN) {		/* do we have a neg dec constant */
@@ -2142,31 +2237,40 @@ tfo:
 	    add64 (tmpf, hdtds);	/* adj integer part by -1 */
 	  }
 	}
-#ifndef FPBUG
- printf("tfo1: hhtde = %x\n", hhtde);
+#ifdef FPBUG
+ printf("tfo4: hhtde = %x hhtdbn %x\n", hhtde, hhtdbn);
 #endif
-	if (hhtde == 0)			/* do we have an exponent */
+ /* tfo4 */
+	if (hhtde == 0) {			/* do we have an exponent */
 	  /* make 31 into 63 and 63 into 63. if 63, fixed point const */
 	  if ((hhtdbn | 0x20) == 63) {	/* no, norminal binary scaling */
+ /* tfo8 */
 	    tsh(hhtdbn - hhtdb);	/* shift stack - rt, + left */
 	    goto tfo9;			/* exit this thing */
 	  }
+	}
+#ifdef FPBUG
+ printf("tfoat1: hhtde = %x hhtdbn %x\n", hhtde, hhtdbn);
+#endif
+/* tfoat1 */
 	/* we have an exponent */
-	dig = 20;			/* i don't know why */
+/*??	dig = 20;	*/		/* i don't know why */
+	dig = hbtfn1;           /* term of 4W or 5W */
 	mask = 0xf0;			/* nibble mask */
-	chr = (unsigned int32)hdtds[1] >> 24;	/* get most sig byte */
+	chr = (uint32)hdtds[1] >> 24;   /* get most sig byte */
 	tmp = chr & mask;		/* get the nibble */
 	if (tmp != 0) {			/* pos and not normalized */
 	  if (tmp != 0xf0)		/* no, is it normalized */
 	    goto tfoat8;		/* yes, continue */
 	  tmp = 0xff;			/* neg and not normalized */
 	}
+/* tfoat6 */
 	/* + or - unnormalized, tmp has 00 or ff for pos and neg */
 	dig = -16;
 	bn = 0;				/* start at first digit */
 	nump = hdtds;			/* start with integer part */
-#ifndef FPBUG
- printf("tfo2: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfoat6:a hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde);
 #endif
 tfoat7:
@@ -2174,10 +2278,10 @@ tfoat7:
 	  nump = hdtdf;			/* point to fraction */
 	  bn -= 8;			/* byte offset in double word */
 	}
-/*	i =  1 - bn/4;			/* int offset */
-/*	j = bn%4;			/* byte offset */
+/*	i =  1 - bn/4;		*/	/* int offset */
+/*	j = bn%4;	*/		/* byte offset */
 	
-	chr = ((int32)((unsigned int32)nump[1 - bn/4] & (int32)(0xff000000L >>
+	chr = ((int32)((uint32)nump[1 - bn/4] & (int32)(0xff000000 >>
 	  ((bn%4)*8))) >> ((3 - (bn%4))*8));
 	mask = 0xf0;			/* digit 1 mask */
 	if (((tmp ^ chr) & mask) != 0)	/* check digit 1 of byte */
@@ -2194,6 +2298,10 @@ tfoat7:
 	goto tfo9;			/* all done now */
 	
 tfoat8:
+#ifdef FPBUG
+ printf("tfoat8: dig %x mask %x hdtds %x,%x hhtde %x\n",
+ dig, mask, hdtds[0], hdtds[1], hhtde);
+#endif
 	dig = (dig + 15) << 1;		/* make positive and a digit count */
 	if (mask == 0x0f)		/* were we in digit 2 */
 	  dig++;			/* yes, add a count */
@@ -2211,6 +2319,10 @@ tfoat8:
 	  goto tfoat83;			/* go if we have fraction */
 	dig--;				/* adj bit shift value */
 tfoat83:
+#ifdef FPBUG
+ printf("tfoat83: prop %x hhtde %x hdtds %x,%x dig %x\n",
+ prop, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (prop)			/* any propagated digits */
 	  goto tfoat9;			/* if so, done */
 	if (mask == 0x0f)		/* check normalization mask */
@@ -2218,6 +2330,10 @@ tfoat83:
 	dig--;				/* adj bit shift value */
 	goto tfoat9;			/* and continue */
 tfoat9a:
+#ifdef FPBUG
+ printf("tfoat9a: tmp %x hhtde %x hdtds %x,%x dig %x\n",
+ tmp, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (!(dig & 1))			/* odd numeric value */
 	  goto tfoat9;			/* even is o.k. */
 	if (hbtdfn == 0x15)		/* check exp shift value */
@@ -2225,10 +2341,18 @@ tfoat9a:
 	dig--;				/* adj bit shift count */
 	goto tfoat9;			/* and continue */
 tfoat9b:
+#ifdef FPBUG
+ printf("tfoat9b: tmp %x hhtde %x hdtds %x,%x dig %x\n",
+ tmp, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (hdtds[0] & 0xfff)		/* check fraction portion */
 	  goto tfoat9;			/* go on if not zero */
 	dig--;				/* adjust bit shift value */
 tfoat9:
+#ifdef FPBUG
+ printf("tfoat9: tmp %x hhtde %x hdtds %x,%x dig %x\n",
+ tmp, hhtde, hdtds[0], hdtds[1], dig); 
+#endif
 	if (hhtde)			/* did user enter exponent */
 	  goto tfoat9d;			/* yes, go */
 	if (!(bits & XPONENT))		/* is there an exponent */
@@ -2239,8 +2363,8 @@ tfoat9d:
 	  dig--;			/* and adjust bit count */
 	}
 tfoat9c:
-#ifndef FPBUG
- printf("tfo9c: hftdf %x,%x hdtds %x,%x dig %x\n",
+#ifdef FPBUG
+ printf("tfoat9c: hdtdf %x,%x hdtds %x,%x dig %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], dig); 
 #endif
 	hbtdfn = dig;			/* save bit count */
@@ -2250,14 +2374,14 @@ tfoat9c:
 	if (bits & TFSIGN)		/* 0 = +, 1 = - */
 	  tmp = ~tmp;			/* neg comp diased exponent */
 	/* set finished val */
-	hdtds[1] = (hdtds[1] & 0x00ffffffL) | (tmp << 24);
+	hdtds[1] = (hdtds[1] & 0x00ffffff) | (tmp << 24);
 	if (hhtde == 0)			/* any exponent */
 	  goto tfo7;			/* no, skip tests */
 	if (hhtde < -77 || hhtde > 77)	/* is exponent in range */
 	  goto tfe;			/* error if not */
 
-#ifndef FPBUG
- printf("tfo9ca: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfo9ca: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
 #endif
 	/* compute 10.D0 ** I, I is integral (pos or neg) */
@@ -2270,8 +2394,8 @@ tfoat9c:
 	else goto tftx;			/* if 0, exit with one as pp */
 	bn = 0;				/* zero bit counter */
 	while(tmp) {			/* while we have an exp */
-#ifndef FPBUG
- printf("tfo9cx: tmp loop = %x\n", tmp); 
+#ifdef FPBUG
+ printf("tfo9cx: tmp loop = %x tmpf %x,%x\n", tmp, tmpf[0], tmpf[1]); 
 #endif
 	  if (tmp & 1)			/* low order bit on */
 	    mulfp64(&base[bn*2], tmpf);	/* pp = pp*10.D0**(2**32-n)) */
@@ -2279,13 +2403,13 @@ tfoat9c:
 	  tmp = (unsigned int32)tmp >> 1;	/* shift to next bit */
 	  bn++;				/* next bit number */
 	}
-#ifndef FPBUG
- printf("tfo9cb: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfo9cb: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
 #endif
 	if (hhtde > 0) {		/* is exponent neg */
 	  /* exponent is positive, see if adj required */
-	  if (hdtds[0] == (int32)0xffffffffL)	/* get low 1/2 of val, can adj */
+	  if (hdtds[0] == (int32)0xffffffff)	/* get low 1/2 of val, can adj */
 	    hdtds[0]++;			/* make adj for accuracy */
 	  tmpf[0] = 0;			/* make l/o 1/2 of value zero */
 	} else {
@@ -2306,38 +2430,59 @@ tfoat9c:
 	}
 	/* tmpf has the value, mult 10**E by non neg part of constant */
 tftx:
+#ifdef FPBUG
+ printf("tft: tmpf %x,%x hdtds %x,%x hhtde %x hhtdbn %x %x\n",
+ tmpf[0], tmpf[1], hdtds[0], hdtds[1], hhtde, hhtdbn, hhtdbn|0x20); 
+#endif
 	mulfp64(tmpf, hdtds);		/* do the multiply, answer in hdtds */
 tfo7:
-#ifndef FPBUG
- printf("tfo7: hftdf %x,%x hdtds %x,%x hhtde %x\n",
- hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
+#ifdef FPBUG
+ printf("tfo7: hdtdf %x,%x hdtds %x,%x hhtde %x hhtdbn %x %x\n",
+ hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde, hhtdbn, hhtdbn|0x20); 
 #endif
 
 	if ((hhtdbn | 0x20) != 63)	/* not fixed point, no unfloat */
 	  goto tfo9;			/* exit this thing */
 	/* unfloat the number */
+#ifdef FPBUG
+ printf("tfo7a: hdtdf %x,%x hdtds %x,%x hhtde %x hhtdbn %x\n",
+ hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde, hhtdbn); 
+#endif
 	if (hdtds[1] < 0) {		/* if sign neg, set byte to all 1's */
 	  tmp = (unsigned int32)hdtds[1] >> 24;  /* get sign/ exponent */
 	  tmp = ~tmp;			/* complement value */
-	  hdtds[1] |= 0xff000000L;	/* set all the bits */
+	  hdtds[1] |= 0xff000000;	/* set all the bits */
 	} else {
-	  hdtds[1] &= 0x00ffffffL;	/* pos, clear all the bits */
+	  hdtds[1] &= 0x00ffffff;	/* pos, clear all the bits */
 	  tmp = (unsigned int32)hdtds[1] >> 24;  /* get sign, exponent */
 	}
 	tmp = tmp - 0x40 + 14;		/* remove exponent and stack bias */
 	tmp <<= 2;			/* digit to bit count */
+#ifdef FPBUG
+ printf("tfo7b: tmp %x hdtds %x,%x hhtde %x hhtdbn %x\n",
+ tmp, hdtds[0], hdtds[1], hhtde, hhtdbn); 
+#endif
 	tsh(tmp);			/* shift stack to unfloat number */
 	goto tfo9;			/* number is ready */
 tfo9:
+#ifdef FPBUG
+ printf("tfo9: hdtdf %x,%x hdtds %x,%x hhtde %x hhtdbn %x\n",
+ hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde, hhtdbn); 
+#endif
 	if (hhtdbn == 8) {		/* was the num an e type */
 	  /* num was e type, make single precision number */
 	  hdtds[0] = hdtds[1];		/* move sign, exp, and mantissa */
 	  /* normalize number by adding to zero */
+      /* FIXME */
 	  hdtds[0] += 0;
 	  hdtds[1] = 0;			/* into proper place for single prec */
+#ifdef FPBUG
+ printf("tfo9a Normalize needed hdtds %x,%x hhtde %x\n",
+ hdtds[0], hdtds[1], hhtde); 
+#endif
 	}
-#ifndef FPBUG
- printf("tfo9 ret: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+#ifdef FPBUG
+ printf("tfo9 ret: hdtdf %x,%x hdtds %x,%x hhtde %x\n",
  hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
 #endif
 	return;				/* return */
@@ -2353,7 +2498,7 @@ void	tcy()
 {
 	int	ncnt = -tot;		/* neg number of bytes */
 	int	i = 0;
-	unsigned int32 data = hdtds[0];	/* 1st word of data to go out */
+	uint32 data = hdtds[0];	/* 1st word of data to go out */
 
 	if (tot == 8) data = hdtds[1];	/* send out hi order first */
 	if (tot == 2) data <<= 16;	/* position it */
@@ -2365,7 +2510,7 @@ printf("tcy: data %x, tot %d\n", data, tot);
 	  if (i++ == 4)			/* 2nd word to go */
 	    data = hdtds[0];		/* point to second word */
 	  /* output the data rt justified, byte 0 first */
-	  tdg((int32)(data & 0xff000000L) >> 24, 0, ncnt++);
+	  tdg((uint32)(data & 0xff000000) >> 24, 0, ncnt++);
 	   /* output the data rt just */
 	  data <<= 8;			/* next byte */
 	}
@@ -2436,10 +2581,10 @@ tdg9:					/* output byte */
 	}
 	else
 	if (hbtttf == 4) {		/* process gen */
-/*
+#ifdef MACD
 printf("tdg: process gen hhvfgb = %d, hhvfs = %d, hhvff = %d\n",
 hhvfgb, hhvfs, hhvff);
-*/
+#endif
 	  if (ljust) {			/* do left justified data */
 	    int	numbits = 8;		/* default # bits out */
 
@@ -2456,9 +2601,9 @@ hhvfgb, hhvfs, hhvff);
 	    /* issue rt justified data */
 	    int	numbits = 8;		/* default to full byte */
 	    int	i;
-/*
+#ifdef MACD
 printf("tdg rt just: hhvff %d, hhvfs %d, i = %d\n", hhvff, hhvfs, (64-hhvfs));
-*/
+#endif
 	    if (hhvff)			/* any bits out yet */
 	      goto tdg5;		/* yes, go do it */
 	    if ((i = (64 - hhvfs)) >= 0)  /* max size of usable data */
@@ -2466,24 +2611,24 @@ printf("tdg rt just: hhvff %d, hhvfs %d, i = %d\n", hhvff, hhvfs, (64-hhvfs));
 	    numbits = 8 - (i & 7);	/* get number of bits */
 	    i /= 8;			/* convert from bit cnt to byte cnt */
 	    if (numbits != 8) {		/* extra bits */
-/*
+#ifdef MACD
 printf("tgd rt2: i %d, numbits %d\n", i, numbits);
-*/
+#endif
 	      vfdo((int32)0, numbits);	/* output the bits */
 	      numbits = 8;		/* all the rest are full bytes */
 	    }
-/*
+#ifdef MACD
 printf("tgd rt2: i %d, numbits %d\n", i, numbits);
-*/
+#endif
 	    while (i < 0) {		/* pad fields with zeros */
 	      vfdo((int32)0, numbits);	/* output the bits */
 	      i++;			/* next byte */
 	    }
 tdg5:
-/*
+#ifdef MACD
 printf("tdg5 rt just: hhvfs = %d, hhvff = %d, i = %d\n", hhvfs, hhvff,
 (64 - hhvfs - hhvff));
-*/
+#endif
 	    numbits = 8;		/* default to 8 bits out */
 	    if ((i = (64 - hhvfs - hhvff)) < 0) { /* are we into a field */
 	      vfdo(data, numbits);	/* yes, emit the byte */
@@ -2503,11 +2648,11 @@ printf("tdg5 rt just: hhvfs = %d, hhvff = %d, i = %d\n", hhvfs, hhvff,
 	  if (ljust == 0)		/* is data to be right justified */
 	    return;			/* yes, its o.k. where it is */
 	  if (tot == 4)			/* 1st time thru */
-	    hdtds[0] = 0x20202020L;	/* blank the buffer */
+	    hdtds[0] = 0x20202020;	/* blank the buffer */
 	  if (tot >= 8)			/* are we at end */
 	    return;			/* max reached, return */
 	  /* clear byte position where byte is to go */
-	  hdtds[0] &= ~(0xffL << ((7 - tot) << 3));
+	  hdtds[0] &= ~(0xff << ((7 - tot) << 3));
 	  /* put the data in */
 	  hdtds[0] |= (data << ((7 - tot) << 3)); /* put in the data */
 	  tot++;			/* bump the count */
@@ -2565,12 +2710,15 @@ loop:
 	  /* see if totally invalid character */
 	  if ((num < '0') || (num > '9' && num < 'A')) {  /* is it a number */
 	    /* can not be a number, set number error and get out */
+#ifdef MACD
+      printf("Error N @@ 6\n");
+#endif
 	    seterr('N');		/* yes, error */
 	    goto cnuu;			/* get out */
 	  }
 	  if (num <= 'F') {		/* no, is it dec or hex number */
 	    /* we have a dec or hex number, it it greater than radix */
-	    int tmp;
+	    int tmp = 0;
 	    if (num >= '0' && num <= '9')tmp=num- '0';  /* make a number */
 	    else
 	    if (num >= 'A' && num <= 'F')tmp=num- 'A' + 10;  /* make a num */
@@ -2600,6 +2748,9 @@ loop:
 	  }
 	  /* not a valid number, is next char a ' ' terminator */
 	  if (usname[bcnt] != ' ') {	/* is terminator a ' ' */
+#ifdef MACD
+      printf("Error N @@ 7\n");
+#endif
 	    seterr ('N');		/* no, go number error */
 	    goto cnuu;			/* get out */
 	  }
@@ -2628,6 +2779,9 @@ loop:
 	    break;
 
 	  default:			/* not a valid multiplier */
+#ifdef MACD
+      printf("Error N @@ 8\n");
+#endif
 	    seterr ('N');		/* no, go number error */
 	    goto cnuu;			/* get out */
 	}
@@ -2669,12 +2823,12 @@ int32	*num;
  */
 
 void	lefts(nump, count)
-int32	*nump;
+uint32	*nump;
 int	count;
 {
 	while (count--) {		/* for number of bits to shift */
 	  nump[1] <<= 1;		/* shift upper 32 bits */
-	  if (nump[0] & 0x80000000L)	/* is lower 32 bits sign bit on */
+	  if (nump[0] & 0x80000000)	/* is lower 32 bits sign bit on */
 	    nump[1] |= 1;		/* propagate to upper 32 bits */
 	  nump[0] <<= 1;		/* shift lower 32 bits */
 	}
@@ -2689,15 +2843,15 @@ int	count;
  */
 
 void	rights(nump, count)
-unsigned int32	*nump;
+uint32	*nump;
 int	count;
 {
-	int32	sign = nump[1] & 0x80000000L;	/* get sign bit */
+	int32	sign = nump[1] & 0x80000000;	/* get sign bit */
 
 	while (count--) {		/* for number of bits to shift */
 	  nump[0] >>= 1;		/* shift lower 32 bits */
 	  if (nump[1] & 1)		/* is low order bit on */
-	    nump[0] |= 0x80000000L;	/* propagate to lower 32 bits */
+	    nump[0] |= 0x80000000;	/* propagate to lower 32 bits */
 	  nump[1] >>= 1;		/* shift upper 32 bits */
 	  nump[1] |= sign;		/* propagate the sign bit */
 	}
@@ -2725,24 +2879,24 @@ int32	*result;
 
 	carry = 0;			/* no carry yet */
 	for (i=0; i<2; i++) {		/* for both 32 bit words */
-	  a1 = val[i] & 0x7fffffffL;	/* strip sign bit */
-	  a2 = result[i] & 0x7fffffffL;	/* strip sign bit */
+	  a1 = val[i] & 0x7fffffff;	/* strip sign bit */
+	  a2 = result[i] & 0x7fffffff;	/* strip sign bit */
 	  temp[i] = a1 + a2 + carry;	/* add the unsigned numbers */
 	  ssum = 0;			/* init sign sum */
-	  if (val[i] & 0x80000000L)	/* test sign of 1st number */
+	  if (val[i] & 0x80000000)	/* test sign of 1st number */
 	    ssum++;			/* got a sign */
-	  if (result[i] & 0x80000000L)	/* test sign of 1st number */
+	  if (result[i] & 0x80000000)	/* test sign of 1st number */
 	    ssum++;			/* got a sign */
-	  if (temp[i] & 0x80000000L)	/* test sign of 1st number */
+	  if (temp[i] & 0x80000000)	/* test sign of 1st number */
 	    ssum++;			/* got a sign */
 	  if (ssum == 0)		/* check sign sum */
 	    carry = 0;			/* no carry */
 	  else if (ssum == 1) {		/* check sign sum */
 	    carry = 0;			/* no carry */
-	    temp[i] |= 0x80000000L;	/* but we need a sign bit */
+	    temp[i] |= 0x80000000;	/* but we need a sign bit */
 	  } else if (ssum == 2) {	/* check sign sum */
 	    carry = 1;			/* we have a carry */
-	    temp[i] &= 0x7fffffffL;	/* turn it off in number */
+	    temp[i] &= 0x7fffffff;	/* turn it off in number */
 	  } else 			/* ssum == 3 */
 	    carry = 1;			/* we have carry */
 	}
@@ -2771,6 +2925,9 @@ void	mulfp64(val1, val2)
 int32	*val1;
 int32	*val2;
 {
+#ifdef FPBUG
+ printf("FLT: mulfp64 called %x %x\n", *val1, *val2);
+#endif
 }
 
 /*
@@ -2784,8 +2941,12 @@ void	divfp64(val1, val2)
 int32	*val1;
 int32	*val2;
 {
+#ifdef FPBUG
+ printf("FLT: divfp64 called %x %x\n", *val1, *val2);
+#endif
 }
 
+/* Use internal floating point code, not machine code */
 #ifdef MYATOF
 
 #include "float.h"
@@ -2813,6 +2974,9 @@ static short	binexp;
 void cntofp(num)
 int *num;	/* the number */
 {
+#ifdef FPBUG
+ printf("FLT: cntofp called %x\n", *num);
+#endif
 }
 
 #ifdef DEBUG_FP
@@ -2938,10 +3102,10 @@ int ieee;
 	for( i=NF-1; i>=NF-4; i-- ) fvhigh = (fvhigh << 8) | fr[i];
 #endif
 	if (ieee) {
-		fvhigh &= 0x000fffffL;		/* clear out 12 bits */
+		fvhigh &= 0x000fffff;		/* clear out 12 bits */
 		fvhigh |= (int32)((binexp + 1085) & 0x7ff) << 20;
 	} else {
-		fvhigh &= 0x00ffffffL;		/* clear out 8 bits */
+		fvhigh &= 0x00ffffff;		/* clear out 8 bits */
 #ifdef ENCORE
 		fvhigh |= (int32)((binexp + 126) & 0x7f) << 24;
 #else
@@ -2985,9 +3149,8 @@ void pflsh()
 
 void pfrsh8()
 {
-	register int	i,j;
+	int	i;
 
-	j = 0;
 	for( i=0; i<NF-1; i++ )
 		fr[i] = fr[i+1];
 	fr[NF-1] = 0;
@@ -3050,15 +3213,15 @@ int ieee;
 	int32	sign;
 
 	if (ieee) {
-		sign = rnum[0] & 0x80000000L;	/* save sign */
+		sign = rnum[0] & 0x80000000;	/* save sign */
 		i = (unsigned int)rnum[1] >> 29;	/* get three bits */
 		i &= 7;
-		rnum[0] -= 0x40000000L;	/* remove exponent bias	*/
+		rnum[0] -= 0x40000000;	/* remove exponent bias	*/
 		rnum[0] <<= 3;		/* make room for three bits */
 		rnum[0] += i;		/* put in bottom three bits */
 		rnum[1] = 0;
 		rnum[0] += 0x40000000L;	/* restore exponent bias */
-		rnum[0] &= 0x7fffffffL;	/* turn off sign	 */
+		rnum[0] &= 0x7fffffff;	/* turn off sign	 */
 		rnum[0] |= sign;	/* restore sign */
 	} else {
 		rnum[1] = 0;		/* simply truncate	*/
@@ -3074,15 +3237,15 @@ int ieee;
 	int32	sign;
 
 	if (ieee) {
-		sign = rnum[0] & 0x80000000L;
+		sign = rnum[0] & 0x80000000;
 		i = rnum[0];
 		i &= 7;
 		rnum[1] = (int32)i << 29;
-		rnum[0] -= 0x40000000L;	/* remove exponent bias	*/
+		rnum[0] -= 0x40000000;	/* remove exponent bias	*/
 		rnum[0] <<= 1;		/* exponent sign to sign position */
 		rnum[0] >>= 4;		/* extend it */
-		rnum[0] &= 0x7fffffffL;	/* and clear sign bit */
-		rnum[0] += 0x40000000L;	/* restore exponent bias*/
+		rnum[0] &= 0x7fffffff;	/* and clear sign bit */
+		rnum[0] += 0x40000000;	/* restore exponent bias*/
 		rnum[0] |= sign;	/* restore sign */
 	} else {
 		rnum[1] = 0;		/* simply guarantee zero */
@@ -3115,7 +3278,7 @@ cvitof( p )reg NODE *p;{		/* convert to float		*/
 	p->nd_fval = fvhigh;
 	p->nd_fvl2 = fvlow;
 pret:	p->nd_type = TYREAL|(8<<5);
-	if( sign ) p->nd_fval |= 0x80000000L;
+	if( sign ) p->nd_fval |= 0x80000000;
 }
 
 cvftoi( p ) reg NODE *p; {		/* float to int */
@@ -3136,12 +3299,12 @@ cvftoi( p ) reg NODE *p; {		/* float to int */
 		i -= 1027;			/* remove bias */
 		p->nd_fvl2 >>= 20;
 		p->nd_fvl2 &= 0xfff;
-		p->nd_fval = (p->nd_fval << 12) | p->nd_fvl2 | 0x80000000L;
+		p->nd_fval = (p->nd_fval << 12) | p->nd_fvl2 | 0x80000000;
 		p->nd_fvl2 = 0;
 	} else {
 		i = (i >> 3) & 0xff;		/* exponent is 8 bits */
 		i -= 127;			/* remove bias */
-		p->nd_fval = (p->nd_fval << 23 ) | 0x80000000L;
+		p->nd_fval = (p->nd_fval << 23 ) | 0x80000000;
 	}
 #else		/* use the UNIFORM format	*/
 	if( sign ) fneg( p );
@@ -3159,7 +3322,7 @@ cvftoi( p ) reg NODE *p; {		/* float to int */
 	}
 	while( i < 31 ){
 		p->nd_fval >>= 1;
-		p->nd_fval &= 0x7fffffffL;
+		p->nd_fval &= 0x7fffffff;
 		i++;
 	}
 	if( sign ) p->nd_fval = -p->nd_fval;
@@ -3187,6 +3350,637 @@ char *s;
 }
 
 #endif /* MYATOF */
+@
+
+
+1.8
+log
+@Correct form suppoert code, was failing
+@
+text
+@d6 1
+a6 1
+#include	<stdlib.h>
+d8 9
+a16 1
+#define FPBUG		/* if defined, no debugging */
+d52 3
+a54 3
+unsigned char	mgbd[32];	/* internal label generation area */
+unsigned char	munsta[MAXCHARS];	/* name substitution generation area */
+int	munstap;		/* char counter in munsta */
+d58 1
+a58 1
+unsigned char	*munsts6;	/* macro pointer */
+d127 1
+a127 1
+printf("enter cunst terms = x leftzero %x\n", terms, leftzero);
+d299 2
+a300 2
+printf("unsts: unstringing %0.72s\n term = %c, inscnt = %d, REUNSTF is %s, CALLUS is %s\n",
+ in, unterm, inscnt, (macstate & REUNSTF) ? "ON" : "OFF", (macstate & CALLUS) ? "ON" : "OFF");
+d322 1
+a322 1
+  offset, thechar, cmpp, level, inscnt);
+d327 2
+a328 2
+  stackp, stkp, mpp, cmpp);
+printf("unsts: parameter is %c%0.7s\n",
+d341 1
+a341 1
+	      sprintf(intsym, "%.5X   ", (inttag++ & 0xffffL));
+d348 1
+a348 1
+printf("unsts: int param %c%0.7s\n",
+d355 1
+a355 1
+printf("unsts: final param %c%0.7s\n",
+d425 2
+a426 2
+printf("unstl: unstringing %0.72s\n term = %c, inscnt = %d, REUNSTF is %s, CALLUS is %s, UNSTFLAG is %s, ESCAPE2 is %s, INSIG is %s\n",
+ in, unterm, inscnt, (macstate & REUNSTF) ? "ON" : "OFF",
+d454 1
+a454 1
+printf("termchk3 ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, thechar);
+d464 1
+a464 1
+printf("unstl2: char to mbyt %c\n", thechar);
+d469 1
+a469 1
+printf("unstl3: char to pbyt %c\n", thechar);
+d494 1
+a494 1
+printf("termchk ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, thechar);
+d514 2
+a515 2
+printf("unstby: unstringing %0.72s\n term = %c, inscnt = %d, in[0] = %.2x, thechar = |%0.2x|,\n REUNSTF is %s, CALLUS is %s, UNSTFLAG is %s, ESCAPE2 is %s, INSIG is %s\n",
+ in, unterm, inscnt, in[0], thechar, (macstate & REUNSTF) ? "ON" : "OFF",
+d560 1
+a560 1
+printf("termchk2 ret ccset = %x, usname = %0.8s, term = %c\n", ccset, usname, thechar);
+d569 1
+a569 1
+	  if (munstap < 8)		/* limit name to 8 chars */
+d579 1
+a579 1
+printf("unstb3: munsta = %0.8s, tmp = %0.8s, offset = %d\n", munsta, tmp, offset);
+d595 2
+a596 2
+  offset, stackp, stkp, tmp, macdptr, level);
+printf("unstb4: parameter %c%0.7s\n", (*tmp == 0xff ? '!' : *tmp), &tmp[1]);
+d630 1
+a630 1
+ chr, terms, ((terms << (chr & 0x1f)) & 0x80000000L) ? 1 : 0, inscnt, macstate);
+d632 1
+a632 1
+	if ((terms << (chr & 0x1f)) & 0x80000000L) /* check for terminator */
+d685 7
+a691 3
+/* printf("grps1: calling unst\n"); */
+	unst(0x81fd0004L);		/* unstring something */
+/* printf("grps: unst called, name = %0.8s, unterm = %c,\n", usname, unterm); */
+d693 1
+a693 1
+	  theval.value = 0x20202020L;	/* all blanks if we get to grps8 */
+d696 2
+a697 1
+/*printf("grps: = or * found, process literal or indirect\n"); */
+d699 2
+a700 1
+/*printf("grps1: fac call grpw = %d\n", grpw); */
+d713 3
+a715 1
+/* printf("grps: = found, process literal\n");  */
+d728 3
+a730 1
+/* printf("grps: calling tdat\n"); */
+d732 1
+a732 1
+/*
+d736 1
+a736 1
+*/
+d740 3
+a742 1
+/* printf("grps1: literal = %x\n", theval.value);  */
+d749 3
+a751 1
+/* printf("X error3 inac.type = %x\n", inac.type); */
+d763 3
+a765 1
+/* printf("X error inac.type = %x\n", inac.type); */
+d772 1
+a772 2
+	      hdtds[0] = (((int32)inacbn << 24) | ((int32)inac.flags << 16)
+		 | inac.type);
+d775 3
+a777 1
+/* printf("entering literal %x,%x num = %x\n", hdtds[0], hdtds[1], hwltct.value); */
+d810 1
+a810 1
+	      lval = (symval.value & 0xffffL) << 2;	/* get literal number */
+d883 1
+a883 1
+	if (k & ARG1)			/* check arg 1 for even */
+d888 2
+a889 2
+	else
+	if (k & ARG2)			/* check arg 2 for even */
+d894 1
+d1001 2
+a1002 2
+	int32	result;			/* temp result value */
+	struct symbol FAR *stp;		/* temp pointer */
+d1024 1
+a1024 1
+	    unst(0x81fd0000L);		/* unstring an element */
+d1035 1
+a1035 1
+printf("val3: usname = %0.8s, unterm = %c\n", usname, unterm);
+d1065 1
+a1065 1
+	    inag.value = cnumval[0] & 0x7fffffL;  /* just get 23 bit number */
+d1072 1
+a1072 1
+/*
+d1075 1
+a1075 1
+*/
+d1078 2
+a1079 1
+	    stp = ss (&currpc, usname);	/* find symbol */
+d1089 1
+a1089 1
+printf("vala has a symbol %c%0.7s, pcmode = %d\n", ((unsigned char)*usname == 0xff ? '!':*usname), &usname[1], pcmode);
+d1096 1
+a1096 1
+	inag.value = inag.value & 0x7fffffL;	/* get aug value */
+d1111 1
+a1111 1
+	inac.value = inac.value & 0xffffffL;	/* get acc value */
+d1127 2
+a1128 2
+	  inagbn = ((int32)(inag.value & 0xff0000L) >> 16);  /* get com blk # */
+	  inag.value = inag.value & 0xffffL;	/* just use the displacement */
+d1155 4
+a1158 2
+/* printf("term hbstac[0] is %x\n", hbstac[0]); */
+/* printf("term hbstac[1] is %x\n", hbstac[1]); */
+d1226 2
+a1227 1
+		if (!inag.value) {		/* is divisor zero */
+d1274 1
+a1274 1
+	inac.value = result & 0x7fffffL;	/* just 23 bits */
+d1276 1
+a1276 1
+printf("valh: result %x, cnumterm [%c] hbstac[0] [%c]\n", result, cnumterm, hbstac[0]);
+d1301 3
+a1303 1
+	  unsigned char ttt = (unsigned char)*usname;
+d1311 3
+d1330 8
+a1337 2
+printf("val returning, symbol %c%0.7s, pc=%x, val=%x\n",
+ (ttt == 0xff ? '!' : ttt), &usname[1], currpc, inac);
+d1343 1
+a1343 1
+	  unst(0x81fd0000L);		/* unstring an element */
+d1348 3
+a1350 1
+/* printf("vale - rt par: usname[1] = %c,\n", usname[1]); */
+d1352 4
+a1355 2
+	inac.value = ageq0((int32)inac.value, inac.type) & 0x7fffffL;
+/* prtval("vale returning inac", &inac); */
+d1357 1
+a1357 1
+	runst(0x81fd0000L);		/* unstring, term on most anything */
+d1375 3
+a1377 1
+/* printf("valq: usname[1] = %c,\n", usname[1]); */
+d1426 1
+a1426 1
+	      unst(0x81fd0000L);	/* unstring an element */
+d1440 1
+a1440 1
+valg:
+d1462 1
+a1462 1
+	inag.value = hdtds[0] & 0x7fffffL;	/* data computed by tmd */
+d1464 2
+a1465 2
+printf("tmd 1: unstringing %0.72s\n term = %c, inscnt = %d, DUMMY is %s\n",
+ in, unterm, inscnt, (spmac & DUMMY) ? "ON" : "OFF");
+d1467 1
+a1467 1
+	runst(0x81fd0000L);		/* unstring without skip leading blks */
+d1469 1
+a1469 1
+printf("tmd 1: unstrung %0.72s\n term = %c, inscnt = %d, DUMMY is %s\n",
+d1486 1
+a1486 1
+	int	vc;
+d1494 1
+a1494 1
+	unst (0x81fd0000L);		/* unstring descr of constant */
+d1534 1
+a1534 1
+printf("tdat 2: hbtttf = %x, usname = %0.8s\n", hbtttf, usname);
+d1570 1
+a1570 1
+printf("tdater 1: unterm = %c, usname = %0.8s\n", unterm, usname);
+d1572 1
+a1572 1
+	  runst(0x80080000L);		/* unstring til sp or , */
+d1574 1
+a1574 1
+printf("tdater 2: unterm = %c, usname = %0.8s\n", unterm, usname);
+d1588 1
+a1588 1
+printf("tdat2b: unterm = %c, usname = %0.8s\n", unterm, usname);
+d1602 1
+a1602 1
+printf("tdat2b: hbtttf = %x, usname = %0.8s\n", hbtttf, usname);
+d1610 1
+a1610 1
+printf("tdat3: unterm = %c, usname = %0.8s\n", unterm, usname);
+d1631 1
+a1631 1
+	  unst(0x81fd0000L);		/* unstring something */
+d1635 1
+a1635 1
+printf("tdat3c: unterm = %c, usname = %0.8s\n", unterm, usname);
+d1662 1
+a1662 1
+printf("tdat4: hbtttf = %x, usname = %0.8s\n", hbtttf, usname);
+d1664 1
+d1666 1
+a1666 2
+	  return;			/* yes, return */
+	runst(0x80080000L);		/* no, unstring til sp or , */
+d1668 1
+a1668 1
+printf("tdat4: unterm = %c, usname = %0.8s\n", unterm, usname);
+d1689 1
+a1689 1
+	int	cnt;
+d1703 1
+a1703 1
+	    chr = gbyt(0x01000000L);	/* get a char, term on ' */
+d1728 1
+a1728 1
+	    runst(0x80080000L);		/* yes, term on space or comma */
+d1736 1
+a1736 1
+	    chr = gbyt(0x01000000L);	/* get a char, term on ' */
+d1748 1
+a1748 1
+	    runst(0x81fd0000L);		/* yes, term on almost anything */
+d1751 1
+a1751 1
+	      inag.value = hdtds[0] & 0x7fffffL;  /* yes, just leave address */
+d1755 1
+a1755 1
+prtval("tgd2 returning inag, term = %c, inscnt = %d\n", unterm, inscnt);
+d1774 1
+a1774 1
+	  cnt = unst(0x01000000L);	/* unstring hex number */
+d1776 1
+a1776 1
+printf("tgd hex conv entered, usname = %0.8s term = %c\n", usname, unterm);
+d1802 3
+d1817 1
+a1817 1
+/* printf("tgd n, f, e or r conversion entered, usname = %0.8s\n", usname); */
+d1833 10
+a1842 10
+	0x00000000L,			/* 0 x 16 */
+	0x06010000L,			/* 1 x 16 */
+	0x02030000L,			/* 2 x 16 */
+	0x08040000L,			/* 3 x 16 */
+	0x04060000L,			/* 4 x 16 */
+	0x00080000L,			/* 5 x 16 */
+	0x06090000L,			/* 6 x 16 */
+	0x02010100L,			/* 7 x 16 */
+	0x08020100L,			/* 8 x 16 */
+	0x04040100L,			/* 9 x 16 */
+d1846 7
+a1852 7
+	0x00000000L,	0x41a00000L,	/* 10.**1 */
+	0x00000000L,	0x42640000L,	/* 10.**2 */
+	0x00000000L,	0x44271000L,	/* 10.**4 */
+	0x00000000L,	0x475f5e10L,	/* 10.**8 */
+	0x6fc10000L,	0x4e2386f2L,	/* 10.**16 */
+	0xd415b85aL,	0x5b4ee2d6L,	/* 10.**32 */
+	0xe93ff9f4L,	0x76184f03L,	/* 10.**64 */
+d1856 1
+a1856 1
+	0x00000000L,	0x41100000L	/* 1 */
+d1860 1
+a1860 1
+char	hbtdfn;				/* floating pt digit count */
+d1878 4
+a1881 4
+	char	chr, dig;
+	char	hbtfn1 = 0;		/* previous terminator - assume int */
+	char	hbtfn2 = 0;		/* latest terminator - assume int */
+	char	hbtfn3;			/* store counter */
+d1890 3
+a1892 1
+/* printf("tfn: typ = %d\n", typ); */
+d1902 1
+a1902 1
+	  chr = gbyte(0x01000000L);	/* get a byte, term on ' */
+d1912 4
+a1915 2
+/*  printf("stn: switching on %c\n", tmp); */
+	  switch ((int)tmp) {		/* switch on the u/c chr */
+d1945 3
+d1953 3
+a1955 1
+/* printf("input %s\n", usname); */
+d1957 3
+d1962 3
+d1966 3
+a1968 1
+/* printf("tfn: got val %x,%x\n", hdtds[0], hdtds[1]);  */
+d1988 1
+a1988 1
+	chr = gbyte(0x01000000L);	/* get a byte, term on ' */
+d1998 1
+a1998 1
+#ifndef FPBUG
+d2022 1
+a2022 1
+	  if (hbtfn3 >= 20) {		/* see if too many digits */
+d2024 4
+a2027 1
+	  if (hbtfn3 >= 16) {		/* see if too many digits */
+d2030 3
+d2037 2
+a2038 3
+#ifndef FPBUG
+ printf("tfm2-d: storing in usname |%0.8s|, hbtfn3=%d\n",
+ usname, hbtfn3);
+d2044 1
+a2044 1
+#ifndef FPBUG
+d2062 2
+a2063 2
+#ifndef FPBUG
+ printf("tfi: process usname %0.8s\n", usname); 
+d2071 2
+a2072 2
+#ifndef FPBUG
+ printf("tfi: got val %x,%x\n", hdtds[0], hdtds[1]); 
+d2082 1
+a2082 1
+#ifndef FPBUG
+d2090 3
+a2092 1
+/* printf("tfb: got bin exp val hhtdb = %x\n", hhtdb); */
+d2100 3
+d2112 1
+a2112 1
+	  chr = (unsigned int32)tmp >> 24;	/* get l.s.d. of product */
+d2115 3
+a2117 2
+	    chr -= 10;			/* +10 to 0 */
+	    tmp += 0x01000000L;		/* add in the carry */
+d2120 7
+a2126 1
+	  if (--dig >= 0)		/* go from ls to ms, done yet */
+d2128 1
+a2128 1
+	  chr = (unsigned int32)tmp >> 24;	/* get l.s.d. of product */
+d2130 1
+a2130 1
+	  if (tmp & 0x01000000L)	/* check for over 10 */
+d2134 3
+d2141 1
+a2141 1
+#ifndef FPBUG
+d2147 1
+a2147 1
+#ifndef FPBUG
+d2150 1
+a2150 1
+	if (hbtfn2 <= hbtfn1) {		/* is new ptr gtr than old ptr */
+d2152 4
+a2155 1
+	  if (yeanay())			/* are we assembling */
+d2157 1
+d2160 1
+a2160 1
+	if (hbtfn2 < 4)			/* was last terminator final */
+d2165 2
+a2166 2
+#ifndef FPBUG
+ printf("tfo: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+d2177 2
+a2178 2
+#ifndef FPBUG
+ printf("tfo1: hhtde = %x\n", hhtde);
+d2180 2
+a2181 1
+	if (hhtde == 0)			/* do we have an exponent */
+d2184 1
+d2188 5
+d2194 2
+a2195 1
+	dig = 20;			/* i don't know why */
+d2197 1
+a2197 1
+	chr = (unsigned int32)hdtds[1] >> 24;	/* get most sig byte */
+d2204 1
+d2209 2
+a2210 2
+#ifndef FPBUG
+ printf("tfo2: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+d2218 2
+a2219 2
+/*	i =  1 - bn/4;			/* int offset */
+/*	j = bn%4;			/* byte offset */
+d2221 1
+a2221 1
+	chr = ((int32)((unsigned int32)nump[1 - bn/4] & (int32)(0xff000000L >>
+d2238 4
+d2259 4
+d2270 4
+d2281 4
+d2289 4
+d2303 2
+a2304 2
+#ifndef FPBUG
+ printf("tfo9c: hftdf %x,%x hdtds %x,%x dig %x\n",
+d2314 1
+a2314 1
+	hdtds[1] = (hdtds[1] & 0x00ffffffL) | (tmp << 24);
+d2320 2
+a2321 2
+#ifndef FPBUG
+ printf("tfo9ca: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+d2334 2
+a2335 2
+#ifndef FPBUG
+ printf("tfo9cx: tmp loop = %x\n", tmp); 
+d2343 2
+a2344 2
+#ifndef FPBUG
+ printf("tfo9cb: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+d2349 1
+a2349 1
+	  if (hdtds[0] == (int32)0xffffffffL)	/* get low 1/2 of val, can adj */
+d2370 4
+d2376 3
+a2378 3
+#ifndef FPBUG
+ printf("tfo7: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+ hdtdf[0], hdtdf[1], hdtds[0], hdtds[1], hhtde); 
+d2384 4
+d2391 1
+a2391 1
+	  hdtds[1] |= 0xff000000L;	/* set all the bits */
+d2393 1
+a2393 1
+	  hdtds[1] &= 0x00ffffffL;	/* pos, clear all the bits */
+d2398 4
+d2405 4
+d2413 1
+d2416 4
+d2421 2
+a2422 2
+#ifndef FPBUG
+ printf("tfo9 ret: hftdf %x,%x hdtds %x,%x hhtde %x\n",
+d2438 1
+a2438 1
+	unsigned int32 data = hdtds[0];	/* 1st word of data to go out */
+d2450 1
+a2450 1
+	  tdg((int32)(data & 0xff000000L) >> 24, 0, ncnt++);
+d2521 1
+a2521 1
+/*
+d2524 1
+a2524 1
+*/
+d2541 1
+a2541 1
+/*
+d2543 1
+a2543 1
+*/
+d2551 1
+a2551 1
+/*
+d2553 1
+a2553 1
+*/
+d2557 1
+a2557 1
+/*
+d2559 1
+a2559 1
+*/
+d2565 1
+a2565 1
+/*
+d2568 1
+a2568 1
+*/
+d2588 1
+a2588 1
+	    hdtds[0] = 0x20202020L;	/* blank the buffer */
+d2592 1
+a2592 1
+	  hdtds[0] &= ~(0xffL << ((7 - tot) << 3));
+d2650 3
+d2658 1
+a2658 1
+	    int tmp;
+d2688 3
+d2719 3
+d2763 1
+a2763 1
+int32	*nump;
+d2768 1
+a2768 1
+	  if (nump[0] & 0x80000000L)	/* is lower 32 bits sign bit on */
+d2783 1
+a2783 1
+unsigned int32	*nump;
+d2786 1
+a2786 1
+	int32	sign = nump[1] & 0x80000000L;	/* get sign bit */
+d2791 1
+a2791 1
+	    nump[0] |= 0x80000000L;	/* propagate to lower 32 bits */
+d2819 2
+a2820 2
+	  a1 = val[i] & 0x7fffffffL;	/* strip sign bit */
+	  a2 = result[i] & 0x7fffffffL;	/* strip sign bit */
+d2823 1
+a2823 1
+	  if (val[i] & 0x80000000L)	/* test sign of 1st number */
+d2825 1
+a2825 1
+	  if (result[i] & 0x80000000L)	/* test sign of 1st number */
+d2827 1
+a2827 1
+	  if (temp[i] & 0x80000000L)	/* test sign of 1st number */
+d2833 1
+a2833 1
+	    temp[i] |= 0x80000000L;	/* but we need a sign bit */
+d2836 1
+a2836 1
+	    temp[i] &= 0x7fffffffL;	/* turn it off in number */
+d2865 3
+d2881 3
+d2886 1
+d2914 3
+d3042 1
+a3042 1
+		fvhigh &= 0x000fffffL;		/* clear out 12 bits */
+d3045 1
+a3045 1
+		fvhigh &= 0x00ffffffL;		/* clear out 8 bits */
+d3089 1
+a3089 1
+	register int	i,j;
+a3090 1
+	j = 0;
+d3153 1
+a3153 1
+		sign = rnum[0] & 0x80000000L;	/* save sign */
+d3156 1
+a3156 1
+		rnum[0] -= 0x40000000L;	/* remove exponent bias	*/
+d3161 1
+a3161 1
+		rnum[0] &= 0x7fffffffL;	/* turn off sign	 */
+d3177 1
+a3177 1
+		sign = rnum[0] & 0x80000000L;
+d3181 1
+a3181 1
+		rnum[0] -= 0x40000000L;	/* remove exponent bias	*/
+d3184 2
+a3185 2
+		rnum[0] &= 0x7fffffffL;	/* and clear sign bit */
+		rnum[0] += 0x40000000L;	/* restore exponent bias*/
+d3218 1
+a3218 1
+	if( sign ) p->nd_fval |= 0x80000000L;
+d3239 1
+a3239 1
+		p->nd_fval = (p->nd_fval << 12) | p->nd_fvl2 | 0x80000000L;
+d3244 1
+a3244 1
+		p->nd_fval = (p->nd_fval << 23 ) | 0x80000000L;
+d3262 1
+a3262 1
+		p->nd_fval &= 0x7fffffffL;
 @
 
 

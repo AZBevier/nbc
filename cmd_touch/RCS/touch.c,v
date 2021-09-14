@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.13.21.52.53;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.03.14.02.56.42;	author jbev;	state Exp;
@@ -17,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Fix warning errors.
 @
 text
 @/*~!touch.c*/
@@ -48,6 +52,11 @@ text
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#endif
 
 int utime();
 
@@ -73,10 +82,12 @@ int status;
 int dmsize[12] = {
     31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
+int isnumber();
+int gpair();
 char *cbp;
 long timbuf, time();
 
-lgtime()
+int lgtime()
 {
     register int i, y, t;
     int d, h, m;
@@ -126,7 +137,7 @@ lgtime()
 }
 
 
-gpair()
+int gpair()
 {
     register int c, d;
     register char *cp;
@@ -146,10 +157,11 @@ gpair()
 }
 
 
-main(argc, argv)
+int main(argc, argv)
+int argc;
 char *argv[];
 {
-    register c;
+    register int c;
     char *ip;
     struct utbuf { 
     	long actime, modtime; 
@@ -241,12 +253,12 @@ char *argv[];
 }
 
 
-isnumber(s)
+int isnumber(s)
 char *s;
 {
-    register c;
+    register int c;
 
-    while (c = *s++)
+    while ((c = *s++))
     	if (!isdigit(c))
     	    return(0);
     return(1);
@@ -357,7 +369,7 @@ register char *path;
     	if(strcmp(path,"..") == 0 || strncmp(path,"../",3) == 0) {
     	    /* Hop up a level */
     	    if((cp = strrchr(buf,'/')) == (char *)0)
-    		cp = buf;		/* Don't back up beyond root */
+    		    cp = buf;	/* Don't back up beyond root */
     		*cp = '\0';		/* In case there's another .. */
     		path += 2;		/* Skip ".." */
     		while(*path == '/')	/* Skip one or more slashes */
@@ -373,12 +385,13 @@ register char *path;
     	} else {
     	    /* Ordinary name, copy up to next '/' or end of path */
 #ifdef mpx
-    if(cp == buf && (*path == '@@' || *path == '^' || *path == '(')) {
-    } else
+            if((cp == buf) && ((*path == '@@') || (*path == '^') ||
+                (*path == '('))) {
+            } else
 #endif
-    	    *cp++ = '/';
+    	        *cp++ = '/';
     	    while(*path != '/' && *path != '\0')
-    		*cp++ = *path++;
+    		    *cp++ = *path++;
     	}
     }
     *cp++ = '\0';
@@ -548,4 +561,48 @@ blcpy (b1, b2, length)
 }
 
 #endif /* mpx */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d27 5
+d57 2
+d62 1
+a62 1
+lgtime()
+d112 1
+a112 1
+gpair()
+d132 2
+a133 1
+main(argc, argv)
+d136 1
+a136 1
+    register c;
+d228 1
+a228 1
+isnumber(s)
+d231 1
+a231 1
+    register c;
+d233 1
+a233 1
+    while (c = *s++)
+d344 1
+a344 1
+    		cp = buf;		/* Don't back up beyond root */
+d360 3
+a362 2
+    if(cp == buf && (*path == '@@' || *path == '^' || *path == '(')) {
+    } else
+d364 1
+a364 1
+    	    *cp++ = '/';
+d366 1
+a366 1
+    		*cp++ = *path++;
 @

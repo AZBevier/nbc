@@ -1,9 +1,19 @@
-head	1.1;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.09.13.22.14.14;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.07.14.22.27.43;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.01.02.31.27;	author jbev;	state Exp;
@@ -16,9 +26,9 @@ desc
 @
 
 
-1.1
+1.3
 log
-@Initial revision
+@Change mpxpre location.
 @
 text
 @#
@@ -28,8 +38,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -63,7 +73,6 @@ clobber: clean
 	-rm -f $(LBIN)/NBCPP.O $(LBIN)/NBCPP.C $(LBIN)/$(LD)
 	-rm -f $(LBIN)/NBCPY.O $(LBIN)/NBCPY.C $(LBIN)/$(MK)
 	-rm -f $(LBIN)/NBCPY.Y $(LBIN)/YYLEX.C
-	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 
 install: all
 	@@if [ -d $(LBIN) ]; then \
@@ -82,4 +91,25 @@ install: all
 	$(MOVE) nbcpy.o $(LBIN)/NBCPY.O
 	/bin/chmod 664 $(LBIN)/*.?
 	-rm -f $(OBJS)
+@
+
+
+1.2
+log
+@Fix double delete.
+@
+text
+@a7 1
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d9 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a42 1
+	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
 @

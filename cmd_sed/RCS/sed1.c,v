@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.13.21.48.53;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.03.14.03.11.11;	author jbev;	state Exp;
@@ -17,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Correct warning errors.
 @
 text
 @/*~!sed1.c*/
@@ -40,14 +44,30 @@ text
  * (a).
  */
 
-#ident	"Make4MPX $Id$"
+#ident	"Make4MPX $Id: sed1.c,v 1.1 1995/03/14 03:11:11 jbev Exp jbev $"
 
-/* $Log: $
+/*
+ * $Log: sed1.c,v $
+ * Revision 1.1  1995/03/14 03:11:11  jbev
+ * Initial revision
+ *
  */
 
 #include <stdio.h>
 #include "sed.h"
 #include "regexp.h"
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#endif
+
+void execute();
+int match();
+void command();
+void arout();
+int substitute();
+void dosub();
 
 union reptr *abuf[ABUFSIZE];
 union reptr **aptr;
@@ -109,7 +129,7 @@ char rub[] = {
     "\\177"};
 
 
-execute(file)
+void execute(file)
 char *file;
 {
     register char *p1, *p2;
@@ -230,10 +250,12 @@ yes:
 }
 
 
-match(expbuf, gf)
+int match(expbuf, gf)
 char *expbuf;
+int gf;
 {
-    register char *p1, *p2;
+/*  register char *p1, *p2; */
+    register char *p1;
 
     if (gf) {
     	if (*expbuf)	
@@ -252,7 +274,7 @@ char *expbuf;
 }
 
 
-substitute(ipc)
+int substitute(ipc)
 union reptr *ipc;
 {
     if (match(ipc->r1.re1, 0) == 0)	
@@ -273,7 +295,7 @@ union reptr *ipc;
 }
 
 
-dosub(rhsbuf, n)
+void dosub(rhsbuf, n)
 char *rhsbuf;
 int n;
 {
@@ -291,7 +313,7 @@ int n;
     rp = rhsbuf;
     while (lp < loc1)
     	*sp++ = *lp++;
-    while (c = *rp++) {
+    while ((c = *rp++)) {
     	if (c == '&') {
     	    sp = place(sp, loc1, loc2);
     	    continue;
@@ -305,13 +327,13 @@ int n;
     }
     lp = loc2;
     loc2 = sp - genbuf + linebuf;
-    while (*sp++ = *lp++)
+    while ((*sp++ = *lp++))
     	if (sp >= &genbuf[LBSIZE]) {
     	    fprintf(stderr, "Output line too long.\n");
     	}
     lp = linebuf;
     sp = genbuf;
-    while (*lp++ = *sp++)
+    while ((*lp++ = *sp++))
     	;
     spend = lp - 1;
 }
@@ -334,7 +356,7 @@ char *asp, *al1, *al2;
 }
 
 
-command(ipc)
+void command(ipc)
 union reptr *ipc;
 {
     register int i;
@@ -375,7 +397,7 @@ union reptr *ipc;
     	}
 
     	p1++;
-    	while (*p2++ = *p1++)
+    	while ((*p2++ = *p1++))
     	    ;
     	spend = p2 - 1;
     	jflag++;
@@ -388,7 +410,7 @@ union reptr *ipc;
     case GCOM:
     	p1 = linebuf;
     	p2 = holdsp;
-    	while (*p1++ = *p2++)
+    	while ((*p1++ = *p2++))
     	    ;
     	spend = p1 - 1;
     	break;
@@ -397,7 +419,7 @@ union reptr *ipc;
     	*spend++ = '\n';
     	p1 = spend;
     	p2 = holdsp;
-    	while (*p1++ = *p2++)
+    	while ((*p1++ = *p2++))
     	    ;
     	spend = p1 - 1;
     	break;
@@ -405,7 +427,7 @@ union reptr *ipc;
     case HCOM:
     	p1 = holdsp;
     	p2 = linebuf;
-    	while (*p1++ = *p2++)
+    	while ((*p1++ = *p2++))
     	    ;
     	hspend = p1 - 1;
     	break;
@@ -414,7 +436,7 @@ union reptr *ipc;
     	*hspend++ = '\n';
     	p1 = hspend;
     	p2 = linebuf;
-    	while (*p1++ = *p2++)
+    	while ((*p1++ = *p2++))
     	    ;
     	hspend = p1 - 1;
     	break;
@@ -438,7 +460,7 @@ union reptr *ipc;
     	    if (*p1 >= 040 || *p1 & 0200) {
     	    	if (*p1 == 0177) {
     	    	    p3 = rub;
-    	    	    while (*p2++ = *p3++)
+    	    	    while ((*p2++ = *p3++))
     	    	    	if (p2 >= lcomend) {
     	    	    	    *p2 = '\\';
     	    	    	    fprintf(stdout, "%s\n", genbuf);
@@ -457,7 +479,7 @@ union reptr *ipc;
     	    } 
     	    else {
     	    	p3 = trans[*p1-1];
-    	    	while (*p2++ = *p3++)
+    	    	while ((*p2++ = *p3++))
     	    	    if (p2 >= lcomend) {
     	    	    	*p2 = '\\';
     	    	    	fprintf(stdout, "%s\n", genbuf);
@@ -534,7 +556,7 @@ cpcom:
 
     case SCOM:
     	i = substitute(ipc);
-    	if (ipc->r1.pfl && nflag && i)
+    	if (ipc->r1.pfl && nflag && i) {
     	    if (ipc->r1.pfl == 1) {
     	    	for (p1 = linebuf; p1 < spend; p1++)
     	    	    putc(*p1, stdout);
@@ -542,6 +564,7 @@ cpcom:
     	    }
     	    else
     	    	goto cpcom;
+        }
     	if (i && ipc->r1.fcode)
     	    goto wcom;
     	break;
@@ -560,16 +583,16 @@ wcom:
     case XCOM:
     	p1 = linebuf;
     	p2 = genbuf;
-    	while (*p2++ = *p1++)
+    	while ((*p2++ = *p1++))
     	    ;
     	p1 = holdsp;
     	p2 = linebuf;
-    	while (*p2++ = *p1++)
+    	while ((*p2++ = *p1++))
     	    ;
     	spend = p2 - 1;
     	p1 = genbuf;
     	p2 = holdsp;
-    	while (*p2++ = *p1++)
+    	while ((*p2++ = *p1++))
     	    ;
     	hspend = p2 - 1;
     	break;
@@ -577,7 +600,7 @@ wcom:
     case YCOM:
     	p1 = linebuf;
     	p2 = ipc->r1.re1;
-    	while (*p1 = p2[*p1])	
+    	while ((*p1 = p2[(int)*p1]))	
     	    p1++;
     	break;
     }
@@ -589,7 +612,7 @@ char *gline(addr)
 char *addr;
 {
     register char *p1, *p2;
-    register c;
+    register int c;
     p1 = addr;
     p2 = cbp;
     for (; ; ) {
@@ -640,7 +663,7 @@ register char *ep;
 }
 
 
-arout()
+void arout()
 {
     register char *p1;
     FILE	 * fi;
@@ -668,4 +691,90 @@ arout()
 }
 
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d19 1
+a19 1
+#ident	"Make4MPX $Id$"
+d21 5
+a25 1
+/* $Log: $
+d31 12
+d104 1
+a104 1
+execute(file)
+d225 1
+a225 1
+match(expbuf, gf)
+d227 1
+d229 2
+a230 1
+    register char *p1, *p2;
+d249 1
+a249 1
+substitute(ipc)
+d270 1
+a270 1
+dosub(rhsbuf, n)
+d288 1
+a288 1
+    while (c = *rp++) {
+d302 1
+a302 1
+    while (*sp++ = *lp++)
+d308 1
+a308 1
+    while (*lp++ = *sp++)
+d331 1
+a331 1
+command(ipc)
+d372 1
+a372 1
+    	while (*p2++ = *p1++)
+d385 1
+a385 1
+    	while (*p1++ = *p2++)
+d394 1
+a394 1
+    	while (*p1++ = *p2++)
+d402 1
+a402 1
+    	while (*p1++ = *p2++)
+d411 1
+a411 1
+    	while (*p1++ = *p2++)
+d435 1
+a435 1
+    	    	    while (*p2++ = *p3++)
+d454 1
+a454 1
+    	    	while (*p2++ = *p3++)
+d531 1
+a531 1
+    	if (ipc->r1.pfl && nflag && i)
+d539 1
+d558 1
+a558 1
+    	while (*p2++ = *p1++)
+d562 1
+a562 1
+    	while (*p2++ = *p1++)
+d567 1
+a567 1
+    	while (*p2++ = *p1++)
+d575 1
+a575 1
+    	while (*p1 = p2[*p1])	
+d587 1
+a587 1
+    register c;
+d638 1
+a638 1
+arout()
 @

@@ -32,10 +32,11 @@ clean:
 	-rm -f $(OBJS)
 
 clobber:	clean		# delete main from current directory
-	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/y1.c
-	/bin/rm -f $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
+	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	/bin/rm -f $(LBIN)/y1.c $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
 	/bin/rm -f $(LBIN)/y1.o $(LBIN)/y2.o $(LBIN)/y3.o $(LBIN)/y4.o
 	/bin/rm -f $(LBIN)/dextern $(LBIN)/files $(LBIN)/yaccpar
+	/bin/rm -f $(SYSLIB)/$(PAR)
 
 install:	all		# build if necessary, and then copy main to system directory
 	@if [ -d $(LBIN) ]; then \

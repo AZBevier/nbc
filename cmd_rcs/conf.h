@@ -5,7 +5,7 @@
 #ifndef CONF_H
 #define CONF_H
 
-/* $Id: conf.h,v 1.11 2021/07/09 23:41:36 jbev Exp $ */
+/* $Id: conf.h,v 1.12 2021/09/13 21:43:02 jbev Exp $ */
 
 /*
  * This RCS compile-time configuration describes a host that conforms
@@ -110,7 +110,7 @@ typedef int mode_t;
 typedef int pid_t;
 typedef int sig_atomic_t;
 /*typedef unsigned size_t; */
-typedef int size_t;
+/*typedef int size_t;*/
 typedef int ssize_t;
 typedef long time_t;
 typedef int uid_t;

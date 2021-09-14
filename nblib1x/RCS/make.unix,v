@@ -1,10 +1,14 @@
-head	1.5;
+head	1.6;
 access;
 symbols;
-locks
-	jbev:1.5; strict;
+locks; strict;
 comment	@# @;
 
+
+1.6
+date	2021.09.13.22.34.46;	author jbev;	state Exp;
+branches;
+next	1.5;
 
 1.5
 date	2019.02.25.22.56.05;	author jbev;	state Exp;
@@ -37,12 +41,12 @@ desc
 @
 
 
-1.5
+1.6
 log
-@Add nb prefix for ar program to be nbar.
+@Revise for building on Linux.
 @
 text
-@#~!Makefile for nblib when building for MPX on Linux
+@#~!Makefile for nblib when building for MPX1X on Linux
 # Name:  make.unix Part No.: _______-____r
 #
 # Copyright 1995 - J B Systems, Morrison, CO
@@ -78,7 +82,8 @@ YBIN = /system/bin
 CPP = $(LIB)/$(PREFIX)cpp
 CPFLAGS = -N -UMPX
 CC = $(UBIN)/$(PREFIX)cc
-CFLAGS = -DMPX -Ui386
+#CFLAGS = -DMPX -Ui386
+CFLAGS = -Ui386 -DMPX1X
 LD = $(UBIN)/$(PREFIX)nbcat
 LDFLAGS = #-YXXXXmap
 YACC = $(YBIN)/$(PREFIX)yacc
@@ -164,7 +169,7 @@ SRC4 = strspn.c strtod.c strtok.c strtol.c swab.c sweekday.c sync.c tan.c \
 	ungetc.c unix2mpx.c unixio.c unlink.c vfprintf.c vprintf.c vsprintf.c \
 	wait.c weekday.c
 
-MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
+MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ_1X)
 
 ALL:	all
 
@@ -174,26 +179,29 @@ all:	files $(MAIN)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
-	$(BIN)/echo clib/cdir are up to date.
+	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ_1X)
+	echo clib/cdir are up to date.
 
 files:
-	$(BIN)/touch clib
-	$(BIN)/touch cdir
+	-touch clib
+	-touch cdir
 
 CLEAN:  clean
 
 clean:
-	$(BIN)/rm -f $(OBJS_A)
-	$(BIN)/rm -f $(OBJ1)
-	$(BIN)/rm -f $(OBJ2)
-	$(BIN)/rm -f $(OBJ3)
-	$(BIN)/rm -f $(OBJ4)
-#	$(BIN)/rm -f $(OBJ_1X)
+	-rm -f $(OBJS_A)
+	-rm -f $(OBJ1)
+	-rm -f $(OBJ2)
+	-rm -f $(OBJ3)
+	-rm -f $(OBJ4)
+	-rm -f $(OBJ_1X)
 
 CLOBBER: clobber
 
 clobber: clean
-	$(BIN)/rm -f clib cdir
+	-rm -f clib cdir
+	-rm $(BIN)/clb1x
+	-rm $(BIN)/cdr1x
 
 DEPEND: depend
 
@@ -203,33 +211,33 @@ depend: $(SRCS) $(HDRS) $(MAKEFILE)
 
 	$(BIN)/mkdep $(MAKEFILE) >dep.out
 	@@for i in $(SRCS_A); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC1); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC2); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC3); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC4); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	-echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	$(BIN)/echo "# End of dependencies" >> dep.out;
-	$(BIN)/mv dep.out $(MAKEFILE)
+	-echo "# End of dependencies" >> dep.out;
+	-mv dep.out $(MAKEFILE)
 
 INSTALL: install
 
 install: all
-	$(BIN)/cp clib $(BIN)/clb
-	$(BIN)/cp cdir $(BIN)/cdr
+	-cp clib $(BIN)/clb1x
+	-cp cdir $(BIN)/cdr1x
 
 prefile:
 
@@ -254,6 +262,64 @@ pnpars.o: prefile pnpars.s
 	$(CC) -Pprefile -c pnpars.s -o pnpars.o
 
 # DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.5
+log
+@Add nb prefix for ar program to be nbar.
+@
+text
+@d1 1
+a1 1
+#~!Makefile for nblib when building for MPX on Linux
+d37 2
+a38 1
+CFLAGS = -DMPX -Ui386
+d124 1
+a124 1
+MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
+d134 2
+a135 1
+	$(BIN)/echo clib/cdir are up to date.
+d138 2
+a139 2
+	$(BIN)/touch clib
+	$(BIN)/touch cdir
+d144 6
+a149 6
+	$(BIN)/rm -f $(OBJS_A)
+	$(BIN)/rm -f $(OBJ1)
+	$(BIN)/rm -f $(OBJ2)
+	$(BIN)/rm -f $(OBJ3)
+	$(BIN)/rm -f $(OBJ4)
+#	$(BIN)/rm -f $(OBJ_1X)
+d154 3
+a156 1
+	$(BIN)/rm -f clib cdir
+d166 1
+a166 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d170 1
+a170 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d174 1
+a174 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d178 1
+a178 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d182 1
+a182 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d185 2
+a186 2
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+d191 2
+a192 2
+	$(BIN)/cp clib $(BIN)/clb
+	$(BIN)/cp cdir $(BIN)/cdr
 @
 
 

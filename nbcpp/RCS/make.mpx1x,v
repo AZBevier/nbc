@@ -1,9 +1,14 @@
-head	1.3;
+head	1.4;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.4
+date	2021.09.13.22.14.14;	author jbev;	state Exp;
+branches;
+next	1.3;
 
 1.3
 date	2021.07.01.02.27.32;	author jbev;	state Exp;
@@ -26,9 +31,9 @@ desc
 @
 
 
-1.3
+1.4
 log
-@Correct nbcpy processing.
+@Change mpxpre location.
 @
 text
 @#
@@ -38,8 +43,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 LBIN = ./mpx1x
 INSTALL = cp
 MOVE = mv
@@ -92,6 +97,17 @@ install: all
 	$(MOVE) nbcpy.o $(LBIN)/NBCPY.O
 	/bin/chmod 664 $(LBIN)/*.?
 	-rm -f $(OBJS)
+@
+
+
+1.3
+log
+@Correct nbcpy processing.
+@
+text
+@a7 1
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+d9 1
 @
 
 

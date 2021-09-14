@@ -35,7 +35,7 @@ extern int  unlink();
 #define	int32	int		    /* must be 32 bits */
 #else
 
-#define	int64	long	    /* must be 64 bits */
+#define	int64	long long	    /* must be 64 bits */
 #define	int32	int		    /* must be 32 bits */
 #define	uint32	unsigned int32		/* must be 32 bits */
 /* #define longp	long */ /* 32 bits on everything else */

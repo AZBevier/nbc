@@ -42,11 +42,11 @@ tmpfile()
 
 #ifdef mpx
     if((p = fopen("TEMP", "w+")) == NULL)
-      return NULL;
+      return (FILE *)0;
 #else
     (void) tmpnam(tfname);
     if((p = fopen(tfname, "w+")) == NULL)
-      return NULL;
+      return (FILE *)0;
     else
       (void) unlink(tfname);
 #endif

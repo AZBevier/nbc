@@ -1,10 +1,14 @@
-head	1.3;
+head	1.4;
 access;
 symbols;
-locks
-	jbev:1.3; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.4
+date	2021.09.13.20.45.05;	author jbev;	state Exp;
+branches;
+next	1.3;
 
 1.3
 date	2018.10.12.21.47.53;	author jbev;	state Exp;
@@ -27,9 +31,9 @@ desc
 @
 
 
-1.3
+1.4
 log
-@Correct warning errors
+@Correct warning errors.
 @
 text
 @/*~!myatof.c*/
@@ -57,6 +61,7 @@ text
 #include <ctype.h>
 #include "float.h"
 #include <string.h>
+#include <stdio.h>
 
 /*  Note : this atof() generates an internal floating point representation
  *	   of a number.  If we are in IEEE mode, the number is translated
@@ -64,18 +69,15 @@ text
  */
 
 FPN ifpn;	/* internal floating point number */
-extern void zerof();
-extern void negf();
-extern int dodig();
 
-/* #define FLOATDEB */
+/*#define FLOATDEB*/
 
 #ifdef FLOATDEB
 extern int sdump();
-unsigned char sss[100];
-#else
-unsigned char sss[100];
 #endif
+extern void zerof();
+extern void negf();
+extern int dodig();
 
 FPN * myatof(s)
 register  unsigned char  *s;
@@ -85,25 +87,28 @@ register  unsigned char  *s;
 	int	exp;
 	int	sign;
 	int	esign;
+/*
+    unsigned char ss[200];
+*/
 
 #ifdef FLOATDEB
 	printf("myatof entry: %s\n", s);
-	strcpy(sss,s);
-	s = sss;
-#else
-	*sss='\0';
-	strcpy(sss,s);
-	s = sss;
+    fflush(stdout);
 #endif
+/*
+	*ss='\0';
+	strcpy((char *)ss, (char *)s);
+	s = ss;
+*/
 	zerof( &ifpn );		/* clear destination number */
 	esign = sign = exp = tz = 0;	/* and local variables */
-
 	i = *s++;		/* get 1st char */
 
 #ifdef FLOATDEB
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof start: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* skip any leading white spaces */
 	while( i == ' ' || i == '\t') i = *s++;
@@ -125,6 +130,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 1: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	}
 	/* now process a fraction, if present */
@@ -141,6 +147,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 2: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* now see if exponent */
 	exp = (tz + exp);
@@ -151,6 +158,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 3: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* now process an exponent, if present */
 	if( i == 'e' || i == 'E' ){
@@ -173,6 +181,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 4: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* we are done with number */
 	if (esign) tz = -tz;
@@ -182,6 +191,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 5: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* if negative, negate the value */
 	if( sign ) negf( &ifpn );
@@ -189,11 +199,52 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("ret myatof: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	return (&ifpn);
 }
 
 #endif /* MYATOF */
+@
+
+
+1.3
+log
+@Correct warning errors
+@
+text
+@d26 1
+a33 3
+extern void zerof();
+extern void negf();
+extern int dodig();
+d35 1
+a35 1
+/* #define FLOATDEB */
+a38 3
+unsigned char sss[100];
+#else
+unsigned char sss[100];
+d40 3
+d52 3
+d58 1
+a58 6
+	strcpy(sss,s);
+	s = sss;
+#else
+	*sss='\0';
+	strcpy(sss,s);
+	s = sss;
+d60 5
+a66 1
+
+d73 1
+d95 1
+d112 1
+d123 1
+d146 1
+d156 1
+d164 1
 @
 
 

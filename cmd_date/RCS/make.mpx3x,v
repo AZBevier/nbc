@@ -1,0 +1,90 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2021.09.13.21.19.40;	author jbev;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2021.07.14.19.55.30;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@New build.
+@
+
+
+1.2
+log
+@Change mpxmac location.
+@
+text
+@#
+# Makefile for date for running date on mpx3x
+# Object files must be produced and then cataloged
+# on MPX3.X using the LD.DATE command file.
+#
+CC = nbcc
+SLIB = /system/lib
+SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
+LBIN = ./mpx3x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx3x
+
+OBJS = date.o
+HDRS =
+SRCS= date.c
+MAIN = $(OBJS)
+SLD = ld.date3x
+LD = LD.DATE
+SMK = mk.date3x
+MK = MK.DATE
+SDOC = date.m
+DOC = DATE.M
+
+all:	$(SLD) $(SMK) $(SDOC) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/DATE.O $(LBIN)/DATE.C $(LBIN)/$(LD)
+	-rm -f $(LBIN)/$(MK) $(LBIN)/$(DOC)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <date.c >$(LBIN)/DATE.C
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	$(MOVE) date.o $(LBIN)/DATE.O
+	/bin/chmod 664 $(LBIN)/*.?
+
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a7 1
+CFLAGS = -C -1 -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d9 1
+@

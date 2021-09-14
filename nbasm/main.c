@@ -86,6 +86,26 @@ extern int mktemp();
 extern struct tval max;			/* defined in io.c */
 
 /*
+void prexec(n, v, si, so)
+int n;
+char *v[], *si, *so;
+{
+  int i;
+  char *f;
+
+  f = v[0];
+  printf("%s ", f);
+  for(i=1; i < n; i++) {
+    printf("%s ", v[i]);
+  }
+  if(si) printf(" <%s ", si);
+  if(so) printf(" >%s ", so);
+  printf("\n");
+  fflush(stdout);
+}
+*/
+
+/*
  * main - main procedure for non-base register assembler
  * if no input source file is named, standard input is assumed.
  * A temporary file is created in this case for all input from
@@ -102,6 +122,10 @@ char	**argv;
 #ifndef DOS
 	void	siexit();
 #endif
+
+/*
+prexec(argc, argv, 0, 0);
+*/
 
 #ifndef DEBUG
 setbuf(stdout, NULL);
@@ -274,9 +298,17 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 	errfound = 0;		/* indicate no errors yet */
 	optsav = option;	/* save option word for pass 2 */
 
+/*
+  printf("nbasm do opinit\n");
+  fflush(stdout);
+*/
 	/* perform opcode table initialization */
 	opinit();		/* initializes base and non base tables */
 
+/*
+  printf("nbasm do macinit\n");
+  fflush(stdout);
+*/
 	/* open macro library */
 	macinit();
 
@@ -320,6 +352,11 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 	  ppt = BRL;		/* set bo rec cnt to 120 */
 	}
 
+/*
+  printf("nbasm start assemble\n");
+  fflush(stdout);
+*/
+
 	/* start assembling */
 	memset(PBL, '\0', BRL);	/* initialize BO buffer */
 	memset(tcwd, ' ', TCWSIZE);	/* initialize LO buffer */
@@ -362,14 +399,9 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 printf ("going to goasm\n");
 fflush (stdout);
 */
-
-/*printf("");*/
-/*fflush (stdout);*/
-
 	/* go start assembling */
 	if (goasm((char)PASS)) {	/* returns non zero on EOF, EOM */
 /*
-fflush (stdout);
 printf ("return from goasm\n");
 fflush (stdout);
 */

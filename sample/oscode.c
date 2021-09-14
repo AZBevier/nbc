@@ -159,7 +159,7 @@ static  struct smt * smtptr;      /* static pointer to smt */
 
 /* routine to handle clock interrupts */
 /* entered at each clock int */
-rtclk()
+void rtclk()
 {
   int     progn;           /* client program index */
   int     index;           /* index to first entry */
@@ -339,7 +339,7 @@ instrt()
 
 /* init done SVC */
 /* routine to handle svc 1,7 init complete processing */
-indone()
+void indone()
 {
     if (initDone == FALSE)
         initDone = TRUE;		/* show init done now */
@@ -355,7 +355,7 @@ indone()
 /* r7 returns current node number */
 /* r6 returns timer ticks per second */
 
-intask()
+void intask()
 {
     if (initDone) {
         TSAP->regp->reg[6] = ticksx1;   /* return ticks per second in r6 */

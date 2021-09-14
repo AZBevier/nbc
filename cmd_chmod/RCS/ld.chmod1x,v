@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.11.20.56.50;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.02.19.46.27;	author jbev;	state Exp;
@@ -16,14 +21,14 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Fix name to be chmod.
 @
 text
 @$DEFM
 $PAGE 0
-$JOB CHGRP
+$JOB CHMOD
 $IFT FILE CCOBJ.O OBJSKIP
 $FILEMGR
 CREATE CCOBJ.O,DM,100
@@ -38,7 +43,7 @@ $A2 IN=SYC
 $A1 OT=CCOBJ.O
 $COMPRESS
 C.SRTE.O
-CHGRP.O
+CHMOD.O
 $NOTE  END OF COMPRESS
 $OPTION 19 25
 $A1 SLO=CGMAP
@@ -51,11 +56,31 @@ FILES 8
 BUFFERS 8
 OPTION LOWER PROMPT
 ENVIRONMENT ,,SHARED,MAP2048
-CATALOG CHGRP
+CATALOG CHMOD
 $IFF ABORT ENDJOB
-$NOTE *** ERROR *** CATALOG OF CHGRP FAILED
+$NOTE *** ERROR *** CATALOG OF CHMOD FAILED
 $DEFN ENDJOB
 $EOJ
 $PAGE 24
 $ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d3 1
+a3 1
+$JOB CHGRP
+d18 1
+a18 1
+CHGRP.O
+d31 1
+a31 1
+CATALOG CHGRP
+d33 1
+a33 1
+$NOTE *** ERROR *** CATALOG OF CHGRP FAILED
 @

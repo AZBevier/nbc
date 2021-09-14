@@ -5,8 +5,8 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -21,7 +21,7 @@ LD = LD.NBCC
 SMK = mk.nbcc3x
 MK = MK.NBCC
 
-all:	$(SLD) $(MAIN)
+all:	$(SLD) $(SMK) $(MAIN)
 
 $(MAIN):	$(MAKEFILE) $(SRCS)
 	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)

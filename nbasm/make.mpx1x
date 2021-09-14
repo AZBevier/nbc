@@ -5,8 +5,8 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
+CFLAGS = -C -1 -DMPX -DMPX1X -DMYATOF -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 BIN = /bin
 LBIN = ./mpx1x
 INSTALL = cp
@@ -48,6 +48,7 @@ clobber: clean		# delete main from current directory
 		/bin/rm -f $(LBIN)/$$nn ; \
 	done
 	-rm -f $(LBIN)/$(LD) $(LBIN)/$(MK)
+	-rm -f $(LBIN)/MPXPRE $(LBIN)/M.MPXMAC
 
 install: all 		# build and then copy main to install directory
 	@if [ -d $(LBIN) ]; then \
@@ -61,6 +62,8 @@ install: all 		# build and then copy main to install directory
 	done
 	mpxblk <$(SLD) >$(LBIN)/$(LD)
 	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <mpxpre1x >$(LBIN)/MPXPRE
+	mpxblk <m.mpxmac1x >$(LBIN)/M.MPXMAC
 	@for n in $(ALLS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \

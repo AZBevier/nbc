@@ -16,10 +16,14 @@
  * (a).
  */
 
-#ident	"Make4MPX $Id: cp.c,v 1.4 1995/10/17 23:23:24 jbev Exp $"
+#ident	"Make4MPX $Id: cp.c,v 1.5 2021/07/02 23:55:06 jbev Exp $"
 
-/* $Log: cp.c,v $
- * Revision 1.4  1995/10/17  23:23:24  jbev
+/*
+ * $Log: cp.c,v $
+ * Revision 1.5  2021/07/02 23:55:06  jbev
+ * Correct warning errors.
+ *
+ * Revision 1.4  1995/10/17 23:23:24  jbev
  * Bad test in determining file type.  Should be 768 instead of 255.
  * Caused files to be created as unblocked file when really blocked.
  *
@@ -48,7 +52,13 @@
 
 #include <string.h>
 #include <ctype.h>
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#endif
 
+extern int usage();
+extern int move();
 char *dname();
 extern char *getcwd();
 static char *cvtdname();
@@ -83,7 +93,7 @@ int aflg = 0;		/* copy in ascii mode (default) */
 int oflg = 0;		/* copy in object mode */
 int uflg = 0;		/* copy in unblocked mode */
 
-main(argc, argv)
+int main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -186,12 +196,14 @@ char *argv[];
 }
 
 
-move(source, target)
+int move(source, target)
 char *source, *target;
 {
     char buf[MAXN];
     int from, to, cnt, mflg;
+#ifdef mpx
     int size, type;
+#endif
     int iflag = O_RDONLY;
     int oflag = O_WRONLY | O_TRUNC | O_CREAT;
     int udflag = (aflg | oflg | uflg);
@@ -215,10 +227,10 @@ char *source, *target;
     	fprintf(stderr, "cp: <%s> directory\n", source);
     	return(1);
     }
+#ifdef mpx
     /* from is a file, so get its type/size for to file creation */
     type = s1.st_nlink;
     size = s1.st_size/768;	/* disk blocks */
-#ifdef mpx
     setdft(type);		/* set new creat type */
     setsiz(size,size/16,size/16);	/* set default size */
 
@@ -293,7 +305,7 @@ char *source, *target;
     	if (cnt < 0 || write(to, fbuf, cnt) != cnt) {
     	    fprintf(stderr, "cp: bad copy to %s\n", target);
     	    if ((s2.st_mode & S_IFMT) == S_IFREG)
-    		unlink(target);
+    		    unlink(target);
     		return 1;
         }
     close(from), close(to);
@@ -322,7 +334,7 @@ register char *name;
 }
 
 
-usage()
+int usage()
 {
     fprintf(stderr, "Usage: cp [-aou] f1 f2\n       cp [-aou] f1 ... fn d1\n");
     exit(2);

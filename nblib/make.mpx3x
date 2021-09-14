@@ -27,15 +27,13 @@ PREFIX = nb
 INCLUDE = /system/$(PREFIX)include
 SINCLUDE = $(INCLUDE)
 SBIN = /system/bin
-BIN = /system/bin
 UBIN = /system/bin
-LIB = /system/lib
 YBIN = /system/bin
 CPP = $(LIB)/$(PREFIX)cpp
 CPFLAGS = -C -UMPX
 CC = $(UBIN)/$(PREFIX)cc
-#CFLAGS = -C -N -DMPX -Ui386 -M$(LIB)/m.mpxmac3x -P$(LIB)/mpxpre3x
-CFLAGS = -C -DMPX -Ui386 -M$(LIB)/m.mpxmac3x -P$(LIB)/mpxpre3x
+#CFLAGS = -C -N -DMPX -Ui386 -M$(SBIN)/m.mpxmac3x -P$(SBIN)/mpxpre3x
+CFLAGS = -C -DMPX -Ui386 -M$(SBIN)/m.mpxmac3x -P$(SBIN)/mpxpre3x
 LD = $(UBIN)/$(PREFIX)nbcat
 LDFLAGS = #-YXXXXmap
 YACC = $(YBIN)/$(PREFIX)yacc
@@ -125,13 +123,13 @@ MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
 
 ALL:	all
 
-all:	files $(MAIN)
-	$(BIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
-	$(BIN)/echo clib/cdir are up to date.
+all:	clean files $(MAIN)
+	$(SBIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
+	$(SBIN)/echo clib/cdir are up to date.
 
 files:
 	-touch clib
@@ -151,35 +149,36 @@ CLOBBER: clobber
 
 clobber: clean
 	-rm -f clib cdir
+	-rm -f clb cdr CLB CDR
 
 DEPEND: depend
 
 depend: $(SRCS) $(HDRS) $(MAKEFILE)
-#	$(BIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
-#	$(BIN)/mv dep.out $(MAKEFILE)
+#	$(SBIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+#	$(SBIN)/mv dep.out $(MAKEFILE)
 
-	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	$(SBIN)/mkdep $(MAKEFILE) >dep.out
 	@for i in $(SRCS_A); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC1); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC2); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC3); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@for i in $(SRC4); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(SBIN)/echo "# End of dependencies" >> dep.out;
 	-mv dep.out $(MAKEFILE)
 
 INSTALL: install
@@ -187,6 +186,39 @@ INSTALL: install
 install: all
 	-cp clib clb
 	-cp cdir cdr
+	-cp clb BLOCKED/CLB
+	-cp cdr BLOCKED/CDR
+	@for n in $(HDRS) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@for n in $(MAIN) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		cp $$n BLOCKED/$$nn ; \
+	done
+	@for n in $(SRCS_A) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@for n in $(SRC1) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@for n in $(SRC2) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@for n in $(SRC3) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	@for n in $(SRC4) ; do \
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		mpxblk <$$n >BLOCKED/$$nn ; \
+	done
+	mpxblk <prefile >BLOCKED/PREFILE
+	mpxblk <mak.nblib >BLOCKED/MAK.NBLIB
+	mpxblk <mak.nbobj >BLOCKED/MAK.NBOBJ
 
 prefile:
 

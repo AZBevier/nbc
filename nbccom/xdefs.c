@@ -8,7 +8,7 @@
  */
 
 #ifndef lint
-static char *rcsid = "$Id: xdefs.c,v 1.6 2019/01/31 22:03:56 jbev Exp $";
+static char *rcsid = "$Id: xdefs.c,v 1.7 2021/09/12 00:59:26 jbev Exp $";
 #endif
 
 /*
@@ -18,6 +18,9 @@ static char *rcsid = "$Id: xdefs.c,v 1.6 2019/01/31 22:03:56 jbev Exp $";
 
 /*
  * $Log: xdefs.c,v $
+ * Revision 1.7  2021/09/12 00:59:26  jbev
+ * Remove constant in test warning
+ *
  * Revision 1.6  2019/01/31 22:03:56  jbev
  * Update for Linux
  *
@@ -113,7 +116,10 @@ int         hflag = 0;	/* do we check for various heuristics
 int         pflag = 0;	/* do we check for portable constructions */
 #else
 int         cflag = 0;	/* do we check for funny casts */
-int         hflag = 1;	/* do we check for various heuristics 
+/* remove undeeded warning */
+/*int         hflag = 1;*/	/* do we check for various heuristics  */
+/*				which may indicate errors */
+int         hflag = 0;	/* do we check for various heuristics 
 				which may indicate errors */
 int         pflag = 1;	/* do we check for portable constructions */
 #endif

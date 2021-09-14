@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.15.23.05.35;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.02.11.02.34.18;	author jbev;	state Exp;
@@ -16,16 +21,14 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Update program list.
 @
 text
 @$DEFM
 $PAGE 0
 $NOTE OPTI NOCO
-$NBCC -N -V -C -DMPX -DMYATOF FLOAT.C
-$NBCC -N -V -C -DMPX -DMYATOF MYATOF.C
 $NBCC -N -V -C -DMPX -DMYATOF ALLO.C
 $NBYACC CGRAM.Y
 $DCAT <Y.TAB.C >CGRAM.C
@@ -33,9 +36,12 @@ $NBCC -N -V -C -DMPX -DMYATOF CGRAM.C
 $NBCC -N -V -C -DMPX -DMYATOF CODE.C
 $NBCC -N -V -C -DMPX -DMYATOF COMM1.C
 $NBCC -N -V -C -DMPX -DMYATOF FIXCALL.C
+$NBCC -N -V -C -DMPX -DMYATOF FLOAT.C
+$NBCC -N -V -C -DMPX -DMYATOF FPARITH.C
 $NBCC -N -V -C -DMPX -DMYATOF LOCAL.C
 $NBCC -N -V -C -DMPX -DMYATOF LOCAL2.C
 $NBCC -N -V -C -DMPX -DMYATOF MATCH.C
+$NBCC -N -V -C -DMPX -DMYATOF MYATOF.C
 $NBCC -N -V -C -DMPX -DMYATOF OPTIM.C
 $NBCC -N -V -C -DMPX -DMYATOF ORDER.C
 $NBCC -N -V -C -DMPX -DMYATOF PFTN.C
@@ -47,7 +53,21 @@ $NBCC -N -V -C -DMPX -DMYATOF TABLE.C
 $NBCC -N -V -C -DMPX -DMYATOF TREES.C
 $NBCC -N -V -C -DMPX -DMYATOF VERSION.C
 $NBCC -N -V -C -DMPX -DMYATOF XDEFS.C
-$NBCC -N -V -C -DMPX -DMYATOF FPARITH.C
 $PAGE 24
 $ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a3 2
+$NBCC -N -V -C -DMPX -DMYATOF FLOAT.C
+$NBCC -N -V -C -DMPX -DMYATOF MYATOF.C
+d11 2
+d16 1
+a27 1
+$NBCC -N -V -C -DMPX -DMYATOF FPARITH.C
 @

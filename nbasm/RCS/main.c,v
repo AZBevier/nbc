@@ -1,10 +1,14 @@
-head	1.5;
+head	1.6;
 access;
 symbols;
-locks
-	jbev:1.5; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.6
+date	2021.09.13.20.45.05;	author jbev;	state Exp;
+branches;
+next	1.5;
 
 1.5
 date	2018.10.12.20.26.39;	author jbev;	state Exp;
@@ -37,9 +41,9 @@ desc
 @
 
 
-1.5
+1.6
 log
-@Add unistd.h to include files
+@Correct warning errors.
 @
 text
 @/* main.c */
@@ -53,9 +57,6 @@ text
  */
 
 #include "defs.h"
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
 #ifndef DOS
 #include <signal.h>
 #endif
@@ -129,7 +130,28 @@ char	pass;
 /* extern int deflab(); */
 /* extern int checklab(); */
 
+extern int mktemp();
 extern struct tval max;			/* defined in io.c */
+
+/*
+void prexec(n, v, si, so)
+int n;
+char *v[], *si, *so;
+{
+  int i;
+  char *f;
+
+  f = v[0];
+  printf("%s ", f);
+  for(i=1; i < n; i++) {
+    printf("%s ", v[i]);
+  }
+  if(si) printf(" <%s ", si);
+  if(so) printf(" >%s ", so);
+  printf("\n");
+  fflush(stdout);
+}
+*/
 
 /*
  * main - main procedure for non-base register assembler
@@ -144,10 +166,14 @@ char	**argv;
 {
 	register char **ap;
 	register int c;
-	char *tp;	/* temp pointer */
+/*	char *tp; */	/* temp pointer */
 #ifndef DOS
 	void	siexit();
 #endif
+
+/*
+prexec(argc, argv, 0, 0);
+*/
 
 #ifndef DEBUG
 setbuf(stdout, NULL);
@@ -200,7 +226,7 @@ NBCAS -LFILE -G -X -A -D -E -1 -OFILE -TFILE -MFILE INPUT0 INPUT1 .. INPUTN
 	/* user specified temp file */
 	    case 't':
 	    case 'T':
-		tp = tempfile;		/* save default name */
+/*		tp = tempfile; */		/* save default name */
 		if (cp[2] != 0) {
 		  tempfile = &cp[2];
     		  tflag++;
@@ -210,7 +236,7 @@ NBCAS -LFILE -G -X -A -D -E -1 -OFILE -TFILE -MFILE INPUT0 INPUT1 .. INPUTN
 	/* user specified macro file */
 	    case 'm':
 	    case 'M':
-		tp = macfile;		/* save default name */
+/*		tp = macfile; */		/* save default name */
 		if (cp[2] != 0)
 		  macfile = &cp[2];
 		break;
@@ -297,8 +323,8 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 	}
     }
 
-    	if (!tflag)
-	  mktemp(tempfile);
+    if (!tflag)
+	    mktemp(tempfile);
 	inputf[numinf] = '\0';	/* zero terminate file list */
 	infile = *inputf;	/* get first to process */
 
@@ -320,9 +346,17 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 	errfound = 0;		/* indicate no errors yet */
 	optsav = option;	/* save option word for pass 2 */
 
+/*
+  printf("nbasm do opinit\n");
+  fflush(stdout);
+*/
 	/* perform opcode table initialization */
 	opinit();		/* initializes base and non base tables */
 
+/*
+  printf("nbasm do macinit\n");
+  fflush(stdout);
+*/
 	/* open macro library */
 	macinit();
 
@@ -366,11 +400,17 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 	  ppt = BRL;		/* set bo rec cnt to 120 */
 	}
 
+/*
+  printf("nbasm start assemble\n");
+  fflush(stdout);
+*/
+
 	/* start assembling */
 	memset(PBL, '\0', BRL);	/* initialize BO buffer */
 	memset(tcwd, ' ', TCWSIZE);	/* initialize LO buffer */
 	getdt();	/* set date time information */
 	if (XREF & option) {		/* see if xref required */
+	    xref_cmd(DOXREF);		/* start xref */
 #ifdef NO_XREF_WRITES
 	    mktemp(ut2file);		/* create xref file */
 #ifdef DOS
@@ -386,20 +426,17 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 		error ("Fatal assembler error (ut2file file %s)", ut2file);
 		xrer();
 	    }
-	    ut2flag = 1;		/* ut2 opened */
 #endif /* NO_XREF_WRITES */
+	    ut2flag = 1;		/* ut2 opened */
 	    /* get memory for xref storage, default to 153,600 bytes */
-	    xref_cmd(DOXREF);		/* start xref */
-#ifdef NOW_IN_XREF
 #ifdef DOS
 	    xrbuf = (char *)_fmalloc(768*200);
 #else
 	    /* enought for 12800 symbol references */
-	    xrbuf = (char *)malloc(768*200);
+	    xrbuf = (char *)malloc((unsigned int)(768*200));
 #endif
 	    if (!xrbuf)		/* if no memory terminate assemble */
 		abortm("** UNABLE TO ALLOCATE MEMORY FOR XREF STORAGE **");
-#endif
 	} else
 	    xref_cmd(NOXREF);		/* no xref wanted */
 	cpas(pass = 1);			/* set up for pass 1 */
@@ -410,14 +447,9 @@ fprintf(stderr,"-Mfile	macro file name, default: m.mpxmac\n");
 printf ("going to goasm\n");
 fflush (stdout);
 */
-
-printf("");
-fflush (stdout);
-
 	/* go start assembling */
 	if (goasm((char)PASS)) {	/* returns non zero on EOF, EOM */
 /*
-fflush (stdout);
 printf ("return from goasm\n");
 fflush (stdout);
 */
@@ -471,7 +503,7 @@ char	pasnum;
    	  }
 	}
 	option = optsav;		/* restore original options */
-	fseek (tempfd, (longp)0, 0);	/* rewind temp file */
+	fseek (tempfd, (int32)0, 0);	/* rewind temp file */
 	return;				/* return */
 }
 
@@ -559,8 +591,8 @@ char	*args;
 /* routine to setup date and time in header and object */
 #include <time.h>
 
-/* char	datetime[16];	/* date and time in ascii */
-char	FMTD_DT[22];	/* mpx date & time for object */
+/* char	datetime[16]; */	/* date and time in ascii */
+char	FMTD_DT[40];	/* mpx date & time for object */
 
 void	getdt()
 {
@@ -570,7 +602,7 @@ void	getdt()
 	time(&curt);		/* get current time */
 	memcpy(TCWDATE, ctime(&curt), 24);	/* set date/time in header */
 	ct = localtime(&curt);
-	sprintf(FMTD_DT, "%.2d/%.2d/%2d%.2d:%.2d:%.2d",
+	sprintf(FMTD_DT, "%.2d/%.2d/%.2d %.2d:%.2d:%.2d",
 		ct->tm_mon+1, ct->tm_mday, ct->tm_year,
 		ct->tm_hour, ct->tm_min, ct->tm_sec);
 	return;
@@ -625,6 +657,66 @@ char	*errorv;
 	dexit(2);		/* exit with abort status */
 	/* no return */
 }
+@
+
+
+1.5
+log
+@Add unistd.h to include files
+@
+text
+@a11 3
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+d85 1
+d89 20
+d121 1
+a121 1
+	char *tp;	/* temp pointer */
+d126 4
+d181 1
+a181 1
+		tp = tempfile;		/* save default name */
+d191 1
+a191 1
+		tp = macfile;		/* save default name */
+d278 2
+a279 2
+    	if (!tflag)
+	  mktemp(tempfile);
+d301 4
+d308 4
+d355 5
+d365 1
+d381 1
+a382 1
+#endif /* NO_XREF_WRITES */
+a383 2
+	    xref_cmd(DOXREF);		/* start xref */
+#ifdef NOW_IN_XREF
+d388 1
+a388 1
+	    xrbuf = (char *)malloc(768*200);
+a391 1
+#endif
+a401 4
+
+printf("");
+fflush (stdout);
+
+a404 1
+fflush (stdout);
+d458 1
+a458 1
+	fseek (tempfd, (longp)0, 0);	/* rewind temp file */
+d546 2
+a547 2
+/* char	datetime[16];	/* date and time in ascii */
+char	FMTD_DT[22];	/* mpx date & time for object */
+d557 1
+a557 1
+	sprintf(FMTD_DT, "%.2d/%.2d/%2d%.2d:%.2d:%.2d",
 @
 
 

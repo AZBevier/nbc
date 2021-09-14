@@ -22,8 +22,8 @@ cd lib
 mkvmtape -at -dLIB ../nbctape3x.tap NCFORM NRFORM YACCPAR
 cd ..
 cd sample/mpx3x
-mkvmtape -ap -dSAMPLE ../../nbctape3x.tap DCAT FIXER
-mkvmtape -at -dSAMPLE ../../nbctape3x.tap *.C *MAP M*SAMP NBLD
+mkvmtape -ap -dSAMPLE ../../nbctape3x.tap DCAT FIXER CAID MV OBD CP RM LS UCAT SUMMER
+mkvmtape -at -dSAMPLE ../../nbctape3x.tap *.C *.H *MAP *SAMP NBLD
 mkvmtape -ao -dSAMPLE ../../nbctape3x.tap *.O
 cd ../..
 cd nbar/mpx3x
@@ -32,7 +32,7 @@ mkvmtape -ao -dNBAR ../../nbctape3x.tap *.O
 mkvmtape -ap -dNBAR ../../nbctape3x.tap NBAR
 cd ../..
 cd nbyacc/mpx3x
-mkvmtape -at -dNBYACC ../../nbctape3x.tap DEXTERN YACC* M* FILES Y?.C LD.*
+mkvmtape -at -dNBYACC ../../nbctape3x.tap DEXTERN MK* YACC* FILES Y?.C LD.*
 mkvmtape -ao -dNBYACC ../../nbctape3x.tap Y?.O
 mkvmtape -ap -dNBYACC ../../nbctape3x.tap NBYACC 
 mkvmtape -at -dLIB ../../nbctape3x.tap YACCPAR
@@ -53,9 +53,14 @@ mkvmtape -ao -dNBCPP ../../nbctape3x.tap *.O
 mkvmtape -ap -dNBCPP ../../nbctape3x.tap NBCPP
 cd ../..
 cd nbccom/mpx3x
-mkvmtape -at -dNBCCOM ../../nbctape3x.tap *.C *.H *.Y *.NBCOM NBCOMMAP
+mkvmtape -at -dNBCCOM ../../nbctape3x.tap *.C *.H *.Y LD.* MK.* NBCOMMAP
 mkvmtape -ao -dNBCCOM ../../nbctape3x.tap *.O 
 mkvmtape -ap -dNBCCOM ../../nbctape3x.tap NBCCOM
+cd ../..
+cd nbccom/mpx3x2p
+mkvmtape -at -dNBCCOM2 ../../nbctape3x.tap *.C *.H *.Y LD.* MK.* NBCOMMAP
+mkvmtape -ao -dNBCCOM2 ../../nbctape3x.tap *.O 
+mkvmtape -ap -dNBCCOM2 ../../nbctape3x.tap NBCP1 NBCP2
 cd ../..
 cd nbcas/mpx3x
 mkvmtape -at -dNBCAS ../../nbctape3x.tap *.S ??.NBCAS NBCASMAP
@@ -72,6 +77,9 @@ mkvmtape -at -dNBLIB ../../nbctape3x.tap MAK.* PREFILE *.H *.S
 mkvmtape -at -dNBLIB ../../nbctape3x.tap [A-F]*.C
 mkvmtape -at -dNBLIB ../../nbctape3x.tap [G-R]*.C
 mkvmtape -at -dNBLIB ../../nbctape3x.tap [S-Z]*.C
+mkvmtape -at -dNBLIB ../../nbctape3x.tap [A-F]*.O
+mkvmtape -at -dNBLIB ../../nbctape3x.tap [G-R]*.O
+mkvmtape -at -dNBLIB ../../nbctape3x.tap [S-Z]*.O
 mkvmtape -al -dNBLIB ../../nbctape3x.tap CLB CDR
 cd ../..
 cd cmd_ar/mpx3x
@@ -160,7 +168,7 @@ mkvmtape -ao -dLS ../../nbctape3x.tap *.O
 mkvmtape -ap -dLS ../../nbctape3x.tap LS
 cd ../..
 cd cmd_make/mpx3x
-mkvmtape -at -dMAKE ../../nbctape3x.tap MK.* LD.* *.M *.C *.H MAKEMAP
+mkvmtape -at -dMAKE ../../nbctape3x.tap MK.* LD.* *.Y *.M *.C *.H MAKEMAP
 mkvmtape -ao -dMAKE ../../nbctape3x.tap *.O 
 mkvmtape -ap -dMAKE ../../nbctape3x.tap MAKE
 cd ../..
@@ -195,7 +203,7 @@ mkvmtape -ao -dPWD ../../nbctape3x.tap *.O
 mkvmtape -ap -dPWD ../../nbctape3x.tap PWD
 cd ../..
 cd cmd_rcs/mpx3x
-mkvmtape -at -dRCS ../../nbctape3x.tap MK.* LD.* *.M *.C
+mkvmtape -at -dRCS ../../nbctape3x.tap MK.* LD.* *.H *.M *.C
 mkvmtape -ao -dRCS ../../nbctape3x.tap *.O 
 mkvmtape -ap -dRCS ../../nbctape3x.tap CI CO IDENT MERGE RCS RCSDIFF RCSMERGE RLOG
 cd ../..
@@ -218,6 +226,11 @@ cd cmd_sh/mpx3x
 mkvmtape -at -dSH ../../nbctape3x.tap MK.* LD.* *.M *.C *.H SHMAP
 mkvmtape -ao -dSH ../../nbctape3x.tap *.O 
 mkvmtape -ap -dSH ../../nbctape3x.tap SH
+cd ../..
+cd cmd_sum/mpx3x
+mkvmtape -at -dSUM ../../nbctape3x.tap MK.* LD.* *.M *.C SUMMAP
+mkvmtape -ao -dSUM ../../nbctape3x.tap *.O 
+mkvmtape -ap -dSUM ../../nbctape3x.tap SUM
 cd ../..
 cd cmd_touch/mpx3x
 mkvmtape -at -dTOUCH ../../nbctape3x.tap MK.* LD.* *.M *.C TOUCHMAP

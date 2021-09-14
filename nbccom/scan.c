@@ -7,7 +7,7 @@
  */
 
 #ifndef lint
-static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp jbev $";
+static char *rcsid = "$Id: scan.c,v 1.21 2021/09/13 22:03:21 jbev Exp $";
 #endif
 
 /*
@@ -17,6 +17,9 @@ static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp jbev $";
 
 /*
  * $Log: scan.c,v $
+ * Revision 1.21  2021/09/13 22:03:21  jbev
+ * Change version to 1.4.
+ *
  * Revision 1.20  2019/02/24 19:33:29  jbev
  * Remove stdlib.h include for mpx
  *
@@ -231,19 +234,29 @@ char       *argv[];
 /* char       *release = "NBCC Version: 1.2.0p6 State: Released"; */
 /* char       *release = "NBCC Version: 1.2.0p7 State: Released"; */
 /* char       *release = "NBCC Version: 1.2.8 State: Released"; */
-    char       *release = "NBCC Version: 1.3.0 State: Released";
+/*  char       *release = "NBCC Version: 1.3.0 State: Released"; */
+    char       *release = "NBCC Version: 1.4.0 State: Released";
     extern int MAXOBJSIZE;
 
+/* #define LNX */
 #define LNX
+#ifndef LNX
+	++ddebug;
+	++idebug;
+	++bdebug;
+	++tdebug;
+	++edebug;
+	++xdebug;
+#endif
 #ifndef LNX
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
-    printf("main entry\n");
+    fprintf(stderr, "main entry\n");
 #endif
     dobuiltins = 1;		/* default to builtins */
     offsz = caloff();
 #ifndef LNX
-    printf("offsz = %x\n", offsz);
+    fprintf(stderr, "offsz = %x\n", offsz);
 #endif
     SYMTSZ = SYMTSZDEF;
     DIMTABSZ = DIMTSZDEF;	/* MPX */
@@ -257,6 +270,9 @@ char       *argv[];
 	     */
 
 	    while (*++cp) {	/* scan pass 1 debug options */
+#ifndef LNX
+    fprintf(stderr, "option char '%c' [%x]\n", *cp, *cp);
+#endif
 		switch (*cp) {
 
 		    /* For Single Pass Compilation */
@@ -277,7 +293,7 @@ char       *argv[];
 
 		    case 'r': 
 #ifndef LNX
-    printf("option Xr\n");
+    fprintf(stderr, "option Xr\n");
 #endif
 			fprintf(stderr, "%s\n%s\n",
 				release,version);
@@ -346,7 +362,7 @@ char       *argv[];
 		    case 'F':	/* next arg is input file name */
 			sourcefile = argv[++i];
 #ifndef LNX
-    printf("option XF sourcefile [%s]\n", sourcefile);
+    fprintf(stderr, "option XF sourcefile [%s]\n", sourcefile);
 #endif
 			if(sourcefile == NULL)
 				uerror("input file name expected");
@@ -363,7 +379,7 @@ char       *argv[];
 
 		    case 'D': 
 #ifndef LNX
-    printf("option XD\n");
+    fprintf(stderr, "option XD\n");
 #endif
 #ifndef BUG1
 			++ddebug;
@@ -418,7 +434,7 @@ char       *argv[];
 			break;
 		    case 'l': 	/* control pass2 line listing & stabs */
 #ifndef LNX
-    printf("option Xl\n");
+    fprintf(stderr, "option Xl\n");
 #endif
 			{
 			    extern      int lflag;
@@ -434,30 +450,30 @@ char       *argv[];
 		switch (fdef++) {
 		    case 0: 
 #ifndef LNX
-    printf("def = 0 sourcefile [%s] argv[%d] [%s]\n",
-    sourcefile, i, argv[i]);
+    fprintf(stderr, "fdef = %x sourcefile [%s] argv[%d] [%s]\n",
+    fdef, sourcefile, i, argv[i]);
 #endif
 			if (sourcefile == NULL)
 			    sourcefile = argv[i];
 		    case 1: 
 #ifndef LNX
-    printf("def = 1 sourcefile [%s] argv[%d] [%s]\n",
-    sourcefile, i, argv[i]);
+    fprintf(stderr, "fdef = %x sourcefile [%s] argv[%d] [%s]\n",
+    fdef, sourcefile, i, argv[i]);
 #endif
 #ifndef LNX
 			if (fdef == 1) {
 			  if (freopen(argv[i], "r", stdin) == NULL) {
-			    fprintf(stderr, "ccom:can't open %s\n", argv[i]);
+			    fprintf(stderr, "ccomr fdef %x:can't open %s\n", fdef, argv[i]);
 			    exit(1);
 			  }
 			} else if (freopen(argv[i], "w", stdout) == NULL) {
-			    fprintf(stderr, "ccom:can't open %s\n", argv[i]);
+			    fprintf(stderr, "ccomw fdef %x:can't open %s\n", fdef, argv[i]);
 			    exit(1);
 			  }
 #else
 			if (freopen(argv[i], fdef == 1 ? "r" : "w",
 			    fdef == 1 ? stdin : stdout) == NULL) {
-			    fprintf(stderr, "ccom:can't open %s\n", argv[i]);
+			    fprintf(stderr, "ccomrw fdef %x:can't open %s\n", fdef, argv[i]);
 			    exit(1);
 			}
 #endif
@@ -467,7 +483,7 @@ char       *argv[];
 #endif
 #ifndef LNX
     setbuf(stdout, NULL);
-    printf("xdef = 1 sourcefile [%s] argv[%d] [%s]\n",
+    fprintf(stderr, "xdef = 1 sourcefile [%s] argv[%d] [%s]\n",
     sourcefile, i, argv[i]);
 #endif
 			break;
@@ -484,7 +500,7 @@ char       *argv[];
 	}
     }
 #ifndef LNX
-    printf("end of options\n");
+    fprintf(stderr, "end of options\n");
 #endif
     nodep = (NODE *)domalloc(sizeof(NODE) * TREESIZE);
     if ((int)nodep <= 0)
@@ -502,6 +518,9 @@ char       *argv[];
     strcat(ftitle, ".c\"");	/* append .c to file name */
     sourcefile = ftitle;	/* set the name */
     cp = sourcefile;
+#ifndef LNX
+    fprintf(stderr, "starting file %s\n", cp);
+#endif
 #ifdef BAD_WAY
     do {
       if(isupper(*cp))
@@ -510,12 +529,17 @@ char       *argv[];
 #endif
 #ifdef ONEPASS
     p2init(argc, argv);
+#ifndef LNX
+    fprintf(stderr, "* %s %s\n* call init\n", sourcefile, version);
+#endif
 #endif
 
     for (i = 0; i < SYMTSZ; ++i)
 	stab[i].stype = TNULL;
 
-    printf("* %s %s\n*	\n", sourcefile, version);
+#ifndef LNX
+    fprintf(stderr, "* %s %s\n*	\n", sourcefile, version);
+#endif
 
     p1init();		/* p1init in local.c */
 
@@ -548,6 +572,7 @@ char       *argv[];
 	printf("mainp1():\n");
     }
 #endif
+/*	printf("mainp1():\n"); */
 
     yyparse();
     yyaccpt();

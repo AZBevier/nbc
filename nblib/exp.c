@@ -41,9 +41,13 @@ static double p[] = {
     0.50000000000000000000e0,
 };
 
+/*
 #ifdef ieee
+*/
 static double rval;
+/*
 #endif
+*/
 
 double
 exp(x)
@@ -69,7 +73,17 @@ register double x;
 			return (rval);	/* causing ldexp to underflow */
 			}
 #else
+#ifdef USE_ASM
+            /* for gould, min double value */
+			{
+			asm (" lw 0,=x'00100000'");
+			asm (" lw 1,=x'000000ca'");
+			asm (" std 0,_rval");
+			return (rval);	/* causing ldexp to underflow */
+			}
+#else
 			return (MINDOUBLE); /* causing ldexp to underflow */
+#endif
 #endif
 		exc.type = UNDERFLOW;
 		exc.retval = 0.0;

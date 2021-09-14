@@ -1,10 +1,14 @@
-head	1.6;
+head	1.7;
 access;
 symbols;
-locks
-	jbev:1.6; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.7
+date	2021.09.13.20.45.05;	author jbev;	state Exp;
+branches;
+next	1.6;
 
 1.6
 date	2018.10.15.20.08.13;	author jbev;	state Exp;
@@ -42,9 +46,9 @@ desc
 @
 
 
-1.6
+1.7
 log
-@Correct form suppoert code, was failing
+@Correct warning errors.
 @
 text
 @/* macro.c */
@@ -58,8 +62,12 @@ text
 /* #define DBUGM1X */
 /* #define DBUGM2 */
 /* #define DBUGIF */
-/* #define SETD */
+/* #define SETD *//*X*/
 /* #define DEBUG */
+/* #define MACS */
+/*#define FIX_LINUX */
+/* #define MACD */
+/* #define MACP */
 
 #ifdef DOS
 #include <io.h>
@@ -112,7 +120,7 @@ void	macinit()
 	    macer();
    	  }
 	  macopen++;			/* show mac open */
-	  fseek (macfd, (longp)0, 0);	/* rewind mac file */
+	  fseek (macfd, (long)0, 0);	/* rewind mac file */
 	  return;			/* return */
 	}
 
@@ -161,7 +169,7 @@ char	*name;
 	memcpy(ucname, name, 8);	/* copyin macro name */
 	ucname[8] = '\0';		/* null terminate string */
 	str2upr(ucname);		/* make uppercase */
-	fseek (macfd, (longp)0, 0);	/* rewind mac file */
+	fseek (macfd, (long)0, 0);	/* rewind mac file */
 #ifdef DBUGM1X
 printf("looking for macro %0.8s\n", ucname);
 #endif
@@ -174,7 +182,7 @@ printf("buffer primed\n");
 #ifdef DOS
 	chrp = (uchrfp)_fmalloc(256);	/* get some memory */
 #else
-	chrp = (uchrfp)malloc(256);	/* get some memory */
+	chrp = (uchrfp)malloc((uint32)256);	/* get some memory */
 #endif
 	if (!chrp)			/* did we get it */
  	  abortm("** UNABLE TO ALLOCATE MEMORY FOR MACRO STORAGE **");
@@ -182,7 +190,7 @@ printf("buffer primed\n");
 	chrcnt = 256;			/* chars allocated */
 	protoflg = 0;			/* not in prototype yet */
 	maccnt = 0;			/* macro chars processed */
-reread:
+/*reread:*/
 	while (readrec() != EOF) {	/* read a record,search till EOF */
 	  if (*libbuf == 0xef)		/* 1st byte of a record */
 	    goto libsc3;		/* either 1st or middle record */
@@ -270,7 +278,7 @@ printf("about to move %x bytes\n", rcnt);
 #endif
 	    macd.tmp = maccnt;		/* set macro byte count */
 	    macd.flags = libcnt;	/* set parameter count */
-	    macd.value = (longp)chrp;	/* set prototype address */
+	    macd.value = (int32)chrp;	/* set prototype address */
 	    /* put new macro definition if macro symbol table */
 #ifdef DBUGM1X
 printf("macro %0.8s defined with %d params, %x chars read into %x\n",
@@ -360,7 +368,7 @@ uchrfp	hwrepsp;		/* repeat prototype storage pointer */
 
 uchrfp	hwcmac; 		 /* holds ptr to body of latest form/macro */
 uchrfp	hwcmacp;  		/* holds a chaining pointer to form list */
-/* struct macro *macp;		/* address of macros */
+/* struct macro *macp;	*/	/* address of macros */
 char	*stkp;			/* pointer to parameter expansion area in stk */
 char	stk[8000];		/* macro parameter substitution area */
 /* stk contains multiple 24 char parameter names used during expansion */
@@ -424,7 +432,7 @@ printf("defmpro1: calling ss label = %0.8s\n", label);
 	 lnegate (label, nlabel);	/* make negative version for macros/forms */
 	 nlabel[8] = '\0';
 	 dmstp = ss (&macx, nlabel);		/* enter macro name */
-//	 dmstp = ss (&macx, csnegate(label));  /* enter macro name */
+/*	 dmstp = ss (&macx, csnegate(label)); */ /* enter macro name */
 #ifdef MACD
 printf("defmpro1: ss return dmstp = %x\n", dmstp);
 #endif
@@ -460,7 +468,7 @@ printf("defmpro3 entry unstrung usname = %0.8s\n", usname);
 	  /* now update macro symbol entry for number of parameters */
 	  head->desc.flags = defcnt;	/* set the count */
         /* and update symbol table entry with macro symbol table address */
-        dmstp->desc.value = (longp)head; /* macro def entry addr */
+        dmstp->desc.value = (int32)head; /* macro def entry addr */
 	  maccnt = 0;			/* zero number of chars in macro */
 #ifdef MACD
 printf("defmpro3: dmstp = %x, head = %x\n", dmstp, head);
@@ -499,7 +507,7 @@ printf("endmpro: entry\n");
 	  goto endm11;			/* yes, no error */
 	if (macstate & (CONDSCAN | RSCAN))	/* skipping src or rept scan */
 	  return;			/* yes, just return */
-endm5:					/* addressing error */
+/*endm5:*/					/* addressing error */
 	seterr ('A');			/* set addressing error */
 	goto endm10;			/* reset flags, and exit */
 
@@ -583,11 +591,11 @@ prtsymt();				/* dump the symbol table */
 	    for (i = 0; i < maccnt; i++) 
 	      work[i] = work1[i];	/* copy the char */
 	    _ffree((uchrfp)work1);	/* deallocate the old */
-	    head->desc.value = (longp)work;	/* set the new addr */
+	    head->desc.value = (int32)work;	/* set the new addr */
 	    }
 #else
 	head->desc.value = 
-	  (longp)realloc((uchrfp)head->desc.value, maccnt);
+	  (int32)realloc((uchrfp)head->desc.value, (uint32)maccnt);
 #endif
 #ifdef DEBUG
 {
@@ -671,7 +679,7 @@ void	formp()
 	  lnegate (label, nlabel);	/* make negative version for macros/forms */
 	  nlabel[8] = '\0';
 	  dmstp = ss (&formx, nlabel);		/* enter macro name */
-//	  dmstp = ss (&formx, csnegate(label));  /* enter macro name */
+/*	  dmstp = ss (&formx, csnegate(label)); */ /* enter macro name */
 	  /* insure zero description */
 	  formx.value = formx.tmp = formx.flags = 0;
 	  head = macss (&formx, label, MACADD);	/* enter in macro storage */
@@ -680,9 +688,9 @@ void	formp()
 	  macsp = (uchrfp)head->desc.value;	/* where storage is */
 	  maccnt = 0;			/* number of chars stored */
 	  high = head->desc.tmp;	/* count of chars allocated */
-	/* FIXME - added next statement to fixed map failt */
+	/* FIXME - added next statement to fix map failt */
 	/* and update symbol table entry with macro symbol table address */
-	dmstp->desc.value = (longp)head; /* macro def entry addr */
+	dmstp->desc.value = (int32)head; /* macro def entry addr */
 #ifdef MACD
 	printf("formp: maccnt = %x high = %x\n", maccnt, high);
 #endif
@@ -736,11 +744,11 @@ formp3:					/* pass 2 merge point */
 	    for (i = 0; i < maccnt; i++) 
 	      work[i] = work1[i];	/* copy the char */
 	    _ffree((uchrfp)work1);	/* deallocate the old */
-	    head->desc.value = (longp)work;	/* set the new addr */
+	    head->desc.value = (int32)work;	/* set the new addr */
 	    }
 #else
 	head->desc.value =
-	  (longp)realloc((uchrfp)head->desc.value, maccnt);
+	  (int32)realloc((uchrfp)head->desc.value, maccnt);
 #endif
 #endif
 #ifdef MACD
@@ -766,16 +774,17 @@ formp3:					/* pass 2 merge point */
 
 void	formexp()
 {
-	int32 bitv;
 #ifdef MACD
+	int32 bitv;
 	printf("Entering formexp()\n");
 #endif
 	inptstat |= FORMGET;		/* indicate stripping down a form */
 	/* get where it is stored */
 	hwcmac = (uchrfp)dmstp->desc.value;		/* head */
-	head = (struct symbol FAR *)dmstp->desc.value;		/* head */
+/*	head = (struct symbol FAR *)dmstp->desc.value;*/		/* head */
 	hwcmacp = hwcmac;			/* save pointer for form prototype */
 #ifdef MACD
+	head = (struct symbol FAR *)dmstp->desc.value;		/* head */
 	printf("formexp: data %x%x%x\n", hwcmacp[0], hwcmacp[1], hwcmacp[2]);
 	printf("formexp: dmstp %x charp %x\n", (int)dmstp, (int)hwcmacp);
 	prtval("formexp dmstp", &dmstp->desc);
@@ -864,7 +873,7 @@ void	ifpro()
 	struct	symbol	FAR *stp;
 
 #ifdef DBUGIF
-printf("ifpro: label = %0.8s, usname = %0.8s binop = %x\n",
+printf("ifpro: label '%.8s' usname '%.8s' binop %x\n",
  label, usname, curops->binop);
 #endif
 	prevrelo = 0;			/* clear out pointer to prev rel op */
@@ -875,7 +884,9 @@ printf("ifpro: label = %0.8s, usname = %0.8s binop = %x\n",
 	    /* we are in pass 2, check delim flag */
 	    if (unstk) {		/* should end in param, not delim */
 	      seterr ('E');		/* set faulty parm list error */
-/* printf("1E\n"); */
+#ifdef DBUGIF
+   printf("1E\n");
+#endif
 	      unstk = 0;		/* clear the flag */
 	    }
 	  unstk = 0;			/* clear the flag */
@@ -888,12 +899,14 @@ printf("ifpro: label = %0.8s, usname = %0.8s binop = %x\n",
 ifpro2:
 	  unst(0x81fd0000L);		/* unstring a term */
 #ifdef DBUGIF
-printf("ifpro2: label = %0.8s, usname = %0.8s\n", label, usname);
+printf("ifpro2: label '%.8s' usname '%.8s'\n", label, usname);
 #endif
 	  if (!(PASS & 1)) {		/* are we pass 2 */
 	    if (unstk) {		/* should end in param, not delim */
 	      seterr ('E');		/* set faulty parm list error */
-/* printf("2E\n"); */
+#ifdef DBUGIF
+   printf("2E\n");   
+#endif
 	      unstk = 0;		/* clear the flag */
 	    }
 	  }
@@ -940,7 +953,7 @@ printf("ifpro2: label = %0.8s, usname = %0.8s\n", label, usname);
 	  val(1);			/* evaluate unstrung element */
 	  temp = (int)inac.value;	/* get the value */
 #ifdef DBUGIF
-printf("ifpro: prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifpro: prevrelo %d, ifet %d i %d temp %d\n", prevrelo, ifet, i, temp);
 prtval("ifpro val", &inac);
 #endif
 	  switch (prevrelo) {		/* switch on condition */
@@ -986,7 +999,7 @@ ifpro5:
 
 find:
 #ifdef DBUGIF
-printf("find: label = %0.8s, usname = %0.8s i = %d\n", label, usname, i);
+printf("find: label = %.8s, usname = %.8s i = %d\n", label, usname, i);
 #endif
 	  prevrelo = i;			/* save the cond operator */
 ifpro9:
@@ -1004,23 +1017,27 @@ iferr:
 
 ifprod:
 #ifdef DBUGIF
-printf("ifprod: prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifprod: prevrelo %d, ifet %d i %d macstate %x\n", prevrelo, ifet, i, macstate);
 #endif
 	  macstate &= ~INTGEN2;		/* clear flag initially */
 	  if (macstate & INTGEN)	/* internal label in exp */
 	    macstate |= INTGEN2;	/* yes, copy the flag */
 #ifdef DBUGIF
-printf("ifprod:a prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifprod:a prevrelo %d, ifet %d i %d macstate %x\n", prevrelo, ifet, i, macstate);
 #endif
 #ifdef FIX_LINUX
-{ int dummy[5];		/* this fixes a stack overwrite problem */
+{ int dummy[15];		/* this fixes a stack overwrite problem */
 #endif
 	  unst(0x80080000L);		/* unstring a term, term on sp or , */
 #ifdef FIX_LINUX
 }
 #endif
 #ifdef DBUGIF
-printf("ifprod:b prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifprod:b label '%.8s' usname '%.8s'\n", label, usname);
+#endif
+#ifdef DBUGIF
+printf("ifprod:c prevrelo %d, ifet %d i %d macstate %x unstk %x\n",
+        prevrelo, ifet, i, macstate, unstk);
 #endif
 	  if (!(PASS & 1)) {		/* are we pass 2 */
 	    if (unstk) {		/* should end in param, not delim */
@@ -1044,22 +1061,33 @@ printf("ifprod1: INTGEN2 is %s, binop = %x\n",
 	  } else
 	  if (curops->binop ^ (ifet & 0xff)) { /* comp to t/f case of expr */
 #ifdef DBUGIF
-printf("nomatch, return\n");
+printf("ifprod1:a nomatch, return res %x\n", curops->binop ^ (ifet & 0xff));
 #endif
 	    return;			/* no match, get next statement */
 	  }
 ifpro8:
 #ifdef DBUGIF
-printf("ifpro8: usname = %0.8s, ifet = %d, binop = %d\n",
+printf("ifpro8: usname = %.8s, ifet = %d, binop = %d\n",
  usname, ifet, curops->binop);
 #endif
 	  /* save name where we can resume assemble */
 	  memcpy (hwscnhp, usname, 8);	/* move 8 bytes of label */
+#ifdef DBUGIF
+printf("ifpro8:a resume execution label %.8sbinop = %d\n",
+ usname, curops->binop);
+#endif
 	  if (!yeanay()) return;	/* if not assembling return */
 	  memcpy (lablscan, hwscnhp, 8); /* save label to scan for */
 	  macstate |= CONDSCAN;		/* show we are in a conditional scan */
+#ifdef DBUGIF
+printf("ifpro8:b scan for label %.8sbinop = %d macstate %x\n",
+ usname, curops->binop, macstate);
+#endif
 	  return;			/* do next input line */
 	}		/* must be iftdef/iffdef ops */
+#ifdef DBUGIF
+printf("ifpro8:c not doing IFT/IFF\n");
+#endif
 	ifflg = 0;			/* clear symbol found flag */
 	unst(0x00080000L);		/* terminate on comma */
 	stp = symtab;			/* get address of symbol table */
@@ -1090,7 +1118,6 @@ static	char	*mact;			/* end of parameter storage in stk */
 
 void	macexp()
 {
-	struct	symbol	FAR *mstp;	/* temp macro symbol entry pointer */
 	unsigned	i, j;
 
 	if (yeanay()) {			/* are we assembling */
@@ -1119,7 +1146,7 @@ printf("macexp: EXPAND set 1\n");
 	  mact = (char *)stackp->clev;	/* parameter expansion stack address */
 	  /* get macro prototype address */
 	  stackp->maca = (uchrfp)dmstp->desc.value;
-/*XXX	  mpp = stackp;			/* macro expans entry for this level */
+/*XXX	  mpp = stackp;	*/		/* macro expans entry for this level */
 #ifdef MACD
 printf("macexp: %d parameters found, stkp = %x, level = %x\n",stackp->pcnt, stkp, level);
 #endif
@@ -1133,11 +1160,13 @@ printf("macexp: clearing param %d, stkp = %x, mact = %x\n",i, stkp,mact);
 	}
 	do {				/* get all the parameters, term on , */
 	  unsigned char theff = 0xff;
+#ifdef MACD
 	  unsigned char ttt;
+#endif
 
 	  unst(0x80080000L);		/* unstring param, term on sp & comma */
-	  ttt = *usname;
 #ifdef MACD
+	  ttt = *usname;
 printf("macexp: unstrung |%c%0.11s| stkp = %x, mact = %x\n",
 (ttt == 0xff ? '!' : ttt), &usname[1], stkp, mact);
 #endif
@@ -1232,11 +1261,11 @@ prtval("mbyt1head", &head->desc);
 	    for (i = 0; i < high; i++) 
 	      work[i] = work1[i];	/* copy the char */
 	    _ffree((uchrfp)work1);	/* deallocate the old */
-	    head->desc.value = (longp)work;	/* set the new addr */
+	    head->desc.value = (int32)work;	/* set the new addr */
 	    }
 #else
 	  head->desc.value =
-	    (longp)realloc((uchrfp)head->desc.value, high + 256);
+	    (int32)realloc((uchrfp)head->desc.value, (uint32)(high + 256));
 #endif
 	  macsp = (uchrfp)head->desc.value;	/* new buffer address */
 	  macsp += high;		/* where to start storing */
@@ -1273,7 +1302,7 @@ struct	symbol	dumrept = {		/* dummy repeat header */
 	(struct symbol FAR *)0,		/* zero llink, rlink, flink */
 	"REP",				/* no symbol */
 	0,0,0,				/* zero type, flags, tmp & value */
-	(longp)0
+	(int32)0
 };
 #else
 static	struct	symbol	FAR * dumrept;
@@ -1312,9 +1341,9 @@ void	reptp()
 	if (!dumrept)			/* if no memory terminate assemble */
  	  abortm("** UNABLE TO ALLOCATE MEMORY FOR REPT STORAGE **");
 #ifdef DOS
-	dumrept->desc.value = (longp)_fmalloc(256);
+	dumrept->desc.value = (int32)_fmalloc(256);
 #else
-	dumrept->desc.value = (longp)malloc(256);
+	dumrept->desc.value = (int32)malloc((uint32)256);
 #endif
 	if (!dumrept->desc.value)	/* if no memory terminate assemble */
  	  abortm("** UNABLE TO ALLOCATE MEMORY FOR REPT STORAGE **");
@@ -1480,6 +1509,137 @@ prtval("setpro final val", &setp);
 	return;				/* done */
 }
 
+@
+
+
+1.6
+log
+@Correct form suppoert code, was failing
+@
+text
+@d12 1
+a12 1
+/* #define SETD */
+d14 4
+d70 1
+a70 1
+	  fseek (macfd, (longp)0, 0);	/* rewind mac file */
+d119 1
+a119 1
+	fseek (macfd, (longp)0, 0);	/* rewind mac file */
+d132 1
+a132 1
+	chrp = (uchrfp)malloc(256);	/* get some memory */
+d140 1
+a140 1
+reread:
+d228 1
+a228 1
+	    macd.value = (longp)chrp;	/* set prototype address */
+d318 1
+a318 1
+/* struct macro *macp;		/* address of macros */
+d382 1
+a382 1
+//	 dmstp = ss (&macx, csnegate(label));  /* enter macro name */
+d418 1
+a418 1
+        dmstp->desc.value = (longp)head; /* macro def entry addr */
+d457 1
+a457 1
+endm5:					/* addressing error */
+d541 1
+a541 1
+	    head->desc.value = (longp)work;	/* set the new addr */
+d545 1
+a545 1
+	  (longp)realloc((uchrfp)head->desc.value, maccnt);
+d629 1
+a629 1
+//	  dmstp = ss (&formx, csnegate(label));  /* enter macro name */
+d638 1
+a638 1
+	/* FIXME - added next statement to fixed map failt */
+d640 1
+a640 1
+	dmstp->desc.value = (longp)head; /* macro def entry addr */
+d694 1
+a694 1
+	    head->desc.value = (longp)work;	/* set the new addr */
+d698 1
+a698 1
+	  (longp)realloc((uchrfp)head->desc.value, maccnt);
+d724 1
+a725 1
+#ifdef MACD
+d731 1
+a731 1
+	head = (struct symbol FAR *)dmstp->desc.value;		/* head */
+d734 1
+d823 1
+a823 1
+printf("ifpro: label = %0.8s, usname = %0.8s binop = %x\n",
+d834 3
+a836 1
+/* printf("1E\n"); */
+d849 1
+a849 1
+printf("ifpro2: label = %0.8s, usname = %0.8s\n", label, usname);
+d854 3
+a856 1
+/* printf("2E\n"); */
+d903 1
+a903 1
+printf("ifpro: prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+d949 1
+a949 1
+printf("find: label = %0.8s, usname = %0.8s i = %d\n", label, usname, i);
+d967 1
+a967 1
+printf("ifprod: prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+d973 1
+a973 1
+printf("ifprod:a prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+d976 1
+a976 1
+{ int dummy[5];		/* this fixes a stack overwrite problem */
+d983 5
+a987 1
+printf("ifprod:b prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+d1011 1
+a1011 1
+printf("nomatch, return\n");
+d1017 1
+a1017 1
+printf("ifpro8: usname = %0.8s, ifet = %d, binop = %d\n",
+d1022 4
+d1029 4
+d1035 3
+a1067 1
+	struct	symbol	FAR *mstp;	/* temp macro symbol entry pointer */
+d1096 1
+a1096 1
+/*XXX	  mpp = stackp;			/* macro expans entry for this level */
+d1110 1
+d1112 1
+d1115 1
+a1116 1
+#ifdef MACD
+d1211 1
+a1211 1
+	    head->desc.value = (longp)work;	/* set the new addr */
+d1215 1
+a1215 1
+	    (longp)realloc((uchrfp)head->desc.value, high + 256);
+d1252 1
+a1252 1
+	(longp)0
+d1291 1
+a1291 1
+	dumrept->desc.value = (longp)_fmalloc(256);
+d1293 1
+a1293 1
+	dumrept->desc.value = (longp)malloc(256);
 @
 
 

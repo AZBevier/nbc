@@ -1,9 +1,19 @@
-head	1.2;
+head	1.4;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.4
+date	2021.09.13.21.04.30;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2021.09.13.20.51.40;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.07.05.20.38.33;	author jbev;	state Exp;
@@ -21,9 +31,9 @@ desc
 @
 
 
-1.2
+1.4
 log
-@Remove doc file on make clobber.
+@Correct install.
 @
 text
 @#
@@ -54,6 +64,7 @@ clean:
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS) $(LBIN)/$(DOC)
+#	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@@if [ -d $(LBIN) ]; then \
@@ -62,11 +73,35 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/basename $(SYSBIN)
-	$(INSTALL) $(SRCS) $(LBIN)
-	$(INSTALL) $(DOC) $(SRCS) $(LBIN)
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.3
+log
+@Change mpxmac location.
+@
+text
+@d39 2
+a40 2
+	$(INSTALL) $(SRCS) $(LBIN)
+	$(INSTALL) $(DOC) $(SRCS) $(LBIN)
+@
+
+
+1.2
+log
+@Remove doc file on make clobber.
+@
+text
+@d29 1
+d38 1
+a38 1
+#	$(INSTALL) $(LBIN)/basename $(SYSBIN)
 @
 
 

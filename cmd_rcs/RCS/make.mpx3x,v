@@ -1,9 +1,29 @@
-head	1.2;
+head	1.6;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.6
+date	2021.09.13.21.43.41;	author jbev;	state Exp;
+branches;
+next	1.5;
+
+1.5
+date	2021.07.13.15.54.36;	author jbev;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2021.07.13.00.34.08;	author jbev;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2021.07.12.22.39.13;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.07.09.23.10.36;	author jbev;	state Exp;
@@ -21,9 +41,9 @@ desc
 @
 
 
-1.2
+1.6
 log
-@Correct doc handling.
+@Change mpxmac location.
 @
 text
 @#
@@ -33,8 +53,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -57,7 +77,7 @@ DOCS = ci.m co.m ident.m merge.m rcsclean.m rcsdiff.m rcsfile.m \
 
 MAIN = $(OBJS)
 
-SLD = ld.ci3x ld.co3x ld.ident3x ld.merge3x ld.rcs1x ld.rcscl3x \
+SLD = ld.ci3x ld.co3x ld.ident3x ld.merge3x ld.rcs3x ld.rcscl3x \
 	ld.rcsdf3x ld.rcsmg3x ld.rlog3x
 
 #LD = LD.RCS
@@ -93,7 +113,7 @@ install: all
 	done
 #	mpxblk <$(HDRS) >$(LBIN)/$(HD)
 	@@for n in $(SLD) ; do \
-		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		nn=`echo $$n | sed 's/3x//' | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 #	mpxblk <$(SLD) >$(LBIN)/$(LD)
@@ -104,10 +124,61 @@ install: all
 	done
 	@@for n in $(DOCS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
-		$(MOVE) $$n $(LBIN)/$$nn ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.5
+log
+@Make documentation files blocked for MPX.
+@
+text
+@a7 1
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d9 1
+d32 1
+a32 1
+SLD = ld.ci3x ld.co3x ld.ident3x ld.merge3x ld.rcs1x ld.rcscl3x \
+d68 1
+a68 1
+		nn=`echo $$n | sed 's/1x//' | tr "[a-z]" "[A-Z]"` ; \
+@
+
+
+1.4
+log
+@Fix mk filenames.
+/
+@
+text
+@d79 1
+a79 1
+		$(MOVE) $$n $(LBIN)/$$nn ; \
+@
+
+
+1.3
+log
+@Fix module names.
+@
+text
+@d68 1
+a68 1
+		nn=`echo $$n | tr -t 3x "\n\n" | tr -s "\n" | tr "[a-z]" "[A-Z]"` ; \
+@
+
+
+1.2
+log
+@Correct doc handling.
+@
+text
+@d68 1
+a68 1
+		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 @
 
 

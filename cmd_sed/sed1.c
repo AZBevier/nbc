@@ -16,10 +16,13 @@
  * (a).
  */
 
-#ident	"Make4MPX $Id: sed1.c,v 1.1 1995/03/14 03:11:11 jbev Exp jbev $"
+#ident	"Make4MPX $Id: sed1.c,v 1.2 2021/09/13 21:48:53 jbev Exp $"
 
 /*
  * $Log: sed1.c,v $
+ * Revision 1.2  2021/09/13 21:48:53  jbev
+ * Correct warning errors.
+ *
  * Revision 1.1  1995/03/14 03:11:11  jbev
  * Initial revision
  *

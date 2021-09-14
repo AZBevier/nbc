@@ -4,11 +4,12 @@
 CC = cc
 CFLAGS = -O -DMPX -m32
 SYSBIN = /system/bin
+SYSLIB = /system/lib
 LBIN = ./linux
-INSTALL = cp
+INSTALL = cp -p
 MOVE = mv
-#YACC = yacc
-YACC = /system/bin/nbyacc
+YACC = /usr/bin/yacc
+#YACC = /system/bin/nbyacc
 MAKEFILE = make.unix
 
 OBJS = lmain.o sub1.o sub2.o header.o parser.o
@@ -36,23 +37,36 @@ parser.c:	parser.y
 clean:				# delete object files
 	/bin/rm -f $(OBJS) $(LBIN)/*.o $(LBIN)/parser.c
 
-clobber: clean			# delete main from current directory
+clobber: clean		# delete main from current directory
 	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/lmain.c
 	/bin/rm -f $(LBIN)/sub1.c $(LBIN)/sub2.c $(LBIN)/header.c
 	/bin/rm -f $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/ldefs.c
 	/bin/rm -f $(LBIN)/once.c $(LBIN)/parser.y $(LBIN)/parser.c
+	/bin/rm -f /$(SYSBIN)/$(MAIN)
+	/bin/rm -f $(SYSLIB)/nrform $(SYSLIB)/ncform
 
 install: all	# build if necessary, and then copy main to system directory
 	@if [ -d $(LBIN) ]; then \
-			echo "$(LBIN) already exits"; \
+		echo "$(LBIN) already exits"; \
 	else \
-			mkdir $(LBIN); \
+		mkdir $(LBIN); \
+	fi;
+	@if [ -f $(SYSLIB)/nrform ]; then \
+		/bin/chmod 664 $(SYSLIB)/nrform; \
+		echo "Fix $(SYSLIB)/nrform"; \
+	fi;
+	@if [ -f $(SYSLIB)/ncform ]; then \
+		/bin/chmod 664 $(SYSLIB)/ncform; \
+		echo "Fix $(SYSLIB)/ncform"; \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	$(INSTALL) $(DEPS) $(LBIN)
+	$(INSTALL) ncform $(SYSLIB)
+	$(INSTALL) nrform $(SYSLIB)
 	$(INSTALL) parser.y $(LBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	$(MOVE) parser.c $(LBIN)
 	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/*.?
+	/bin/chmod 664 $(SYSLIB)/nrform $(SYSLIB)/ncform

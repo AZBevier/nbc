@@ -1,9 +1,19 @@
-head	1.1;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.09.13.21.50.21;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.07.12.22.55.05;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.07.23.12.45;	author jbev;	state Exp;
@@ -16,14 +26,15 @@ desc
 @
 
 
-1.1
+1.3
 log
-@Initial revision
+@Change page command.
 @
 text
 @$DEFM
+$PAGE 0
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) SETBRK.C
-$NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) BLOC.C
+$NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) BLOK.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) STAK.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) CMD.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) FAULT.C
@@ -49,5 +60,30 @@ $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) PWD.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) FUNC.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) ECHO.C
 $NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) HOMEDR.C
+$PAGE 24
 $ENDM
+@
+
+
+1.2
+log
+@Fix file name.
+@
+text
+@d30 1
+a30 1
+$page 24
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+d4 1
+a4 1
+$NBCC -C -N -B^(BIN) -DMPX -I^(NBINCLUDE) BLOC.C
+d30 1
 @

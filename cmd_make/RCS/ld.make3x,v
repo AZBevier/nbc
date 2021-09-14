@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.11.23.32.02;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.06.21.49.24;	author jbev;	state Exp;
@@ -16,12 +21,13 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Add page command.
 @
 text
 @DEFM
+$PAGE 0
 IFT PATH=OBJ.O SKIP
 CREA OBJ.O
 %SKIP
@@ -64,5 +70,16 @@ $NOTE *** ERROR *** CATALOG OF MAKE FAILED
 %ENDJOB
 PAGE
 EOJ
+$PAGE 24
 ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+d45 1
 @

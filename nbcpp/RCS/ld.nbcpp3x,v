@@ -1,9 +1,14 @@
-head	1.3;
+head	1.4;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.4
+date	2021.07.14.17.34.29;	author jbev;	state Exp;
+branches;
+next	1.3;
 
 1.3
 date	2021.02.07.16.27.12;	author jbev;	state Exp;
@@ -26,12 +31,13 @@ desc
 @
 
 
-1.3
+1.4
 log
-@Remove unused label
+@Add page cmd.
 @
 text
 @DEFM                                                                            
+$PAGE 0
 IFT PATH=OBJ.O SKIP                                                             
 CREA OBJ.O                                                                      
 %SKIP                                                                           
@@ -63,8 +69,21 @@ GOTO END
 NOTE *** ERROR ***  CATALOG FAILED                                              
 %END                                                                            
 PAGE
-EOJ                                                                             
+EOJ
+$PAGE 24
 ENDM                                                                            
+@
+
+
+1.3
+log
+@Remove unused label
+@
+text
+@d2 1
+d34 2
+a35 1
+EOJ                                                                             
 @
 
 

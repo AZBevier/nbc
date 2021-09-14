@@ -16,10 +16,13 @@
  * (a).
  */
 
-#ident	"Make4MPX $Id: rm.c,v 1.1 1995/03/14 03:07:55 jbev Exp $"
+#ident	"Make4MPX $Id: rm.c,v 1.2 2021/07/05 20:05:34 jbev Exp $"
 
 /* $Log: rm.c,v $
- * Revision 1.1  1995/03/14  03:07:55  jbev
+ * Revision 1.2  2021/07/05 20:05:34  jbev
+ * Fix warning erors *
+ *
+ * Revision 1.1  1995/03/14 03:07:55  jbev
  * Initial revision
  *
  */
@@ -36,16 +39,26 @@
 #include <dirent.h>
 #include <limits.h>
 
+#ifndef mpx
+#ifndef _NFILE
+#define _NFILE	20
+#endif
+#ifndef DIRBUF
+#define DIRBUF	2047
+#endif
+#ifndef MAXNAMLEN
+#define MAXNAMLEN	512
+#endif
+#endif
+
 #define	DIRECTORY	((buffer.st_mode&S_IFMT) == S_IFDIR)
 #define	FAIL		-1
 #define MAXFILES        _NFILE - 2	/* Maximum number of open files */
 #define	MAXLEN		DIRBUF-24  	/* Name length (1024) is limited */
     					/* stat(2).  DIRBUF (1048) is defined */
     					/* in dirent.h as the max path length */
-#ifndef mpx
-#define MAXNAMLEN	255
-#endif
 #define	NAMESIZE	MAXNAMLEN + 1	/* "/" + (file name size) */
+
 #define TRUE		1
 #define	WRITE		02
 static int errcode;
@@ -67,7 +80,7 @@ static void undir();
 static int yes();
 static int mypath();
 
-main(argc, argv)
+int main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -208,7 +221,7 @@ dev_t	dev;
 ino_t	ino;
 {
     char *newpath;
-    DIR	 * name;
+    DIR	 *name;
     struct dirent *direct;
 
     /*
@@ -281,7 +294,12 @@ ino_t	ino;
     	 * "rm" function with the file name; otherwise close the
     	 * directory and reopen it when the child is removed.
     	 */
+#ifdef mpx
     	if (name->dd_fd >= MAXFILES) {
+#else
+        /* this is only to make cc happy, we do not run this ls on Linux */
+        if (dirfd(name) >= MAXFILES) {
+#endif
     	    closedir(name);
     	    rm(newpath);
     	    if ((name = opendir(path)) == (DIR * )NULL) {
@@ -372,11 +390,12 @@ ino_t	ino;
     	}
 
     	strcpy(path, ".");
-    	for (j = 1; j < i; j++)
+    	for (j = 1; j < i; j++) {
     	    if (j == 1)
     	    	strcpy(path, "..");
     	    else
     	    	strcat(path, "/..");
+        }
     	stat(path, &buffer);
     	/*
     	 * If we find a match, the directory (dev, ino) passed to mypath()
@@ -386,12 +405,12 @@ ino_t	ino;
     	 * current working directory. Indicated by return 2;
     	 * 
     	 */
-    	if (buffer.st_dev == dev && buffer.st_ino == ino)
+    	if ((buffer.st_dev == dev) && (buffer.st_ino == ino)) {
     	    if (i == 1)
     	    	return 2;
     	    else
     	    	return 1;
-
+        }
     	/*
     	 * If we reach the root without a match, the given
     	 * directory is not in our path.

@@ -84,8 +84,8 @@ static int y1752_upto[] =
 */
 
 void
-to_date(day, pmonth, pday, pyear)
-long day;				/* input ordinal day */
+to_date(dayn, pmonth, pday, pyear)
+long dayn;				/* input ordinal day */
 int * pmonth;				/* output month */
 int * pday;				/* output day */
 int * pyear;				/* output year */
@@ -109,13 +109,13 @@ int * pyear;				/* output year */
     ** by subtracting 1.
     */
 
-    day--;
+    dayn--;
 
     /* Years up to 1752 */
 
-    if (day < ((1752-1)*365L + (1752-1)/4))
+    if (dayn < ((1752-1)*365L + (1752-1)/4))
     {
-	doleap(&day, &year, 3);		/* simple Julian procedure; first
+	doleap(&dayn, &year, 3);		/* simple Julian procedure; first
 					** leap year is 3 hence
 					*/
 	if( year%4 == 3 )		/* leap year (zero-based) */
@@ -124,23 +124,23 @@ int * pyear;				/* output year */
 
     /* Year 1752 only (remember the correction before end of year) */
 
-    else if ( day < ((1753-1)*365L + (1753-1)/4 - 11) )
+    else if ( dayn < ((1753-1)*365L + (1753-1)/4 - 11) )
     {
-	day -= (1752-1)*365L + (1752-1)/4;
+	dayn -= (1752-1)*365L + (1752-1)/4;
 	year = 1752 - 1;		/* years are zero-based */
 	upto = y1752_upto;
     }
 
     /* Years 1753 to 1800 */
 
-    else if ( day < ((1800-1)*365L + (1800-1)/4 - 11))
+    else if ( dayn < ((1800-1)*365L + (1800-1)/4 - 11))
     {
 	/* Treat this like pre-1752, since no funny leap year until 1800.
 	** Therefore, cheat by adding back missing 11 days.
 	*/
 
-	day += 11;
-	doleap(&day, &year, 1756-1753);	/* first leap year is 1756 */
+	dayn += 11;
+	doleap(&dayn, &year, 1756-1753);	/* first leap year is 1756 */
 	if ( year%4 == 3 )		/* use leap year table */
 	    upto = leap_upto;
     }
@@ -149,13 +149,13 @@ int * pyear;				/* output year */
     ** correction.
     */
 
-    else if ( day < ((2000-1)*365L + (2000-1)/4 - 2 - 11) )
+    else if ( dayn < ((2000-1)*365L + (2000-1)/4 - 2 - 11) )
     {
 	/* Change basis to be first day of 1800 */
 
-	day -= (1800-1)*365L + (1800-1)/4 - 11;
+	dayn -= (1800-1)*365L + (1800-1)/4 - 11;
 	year = 1799;			/* zero-based, remember */
-	do100(&day, &year);		/* handle centuries */
+	do100(&dayn, &year);		/* handle centuries */
 	if (year%4 == 3 && year%100 != 99)
 	    upto = leap_upto;		/* year is a leap year */
     }
@@ -164,9 +164,9 @@ int * pyear;				/* output year */
 
     else
     {
-	day -= (2000-1)*365L + (2000-1)/4 - 2 - 11;
+	dayn -= (2000-1)*365L + (2000-1)/4 - 2 - 11;
 	year = 1999;
-	do400(&day, &year);		/* get accurate year, day */
+	do400(&dayn, &year);		/* get accurate year, day */
 	/* check for leap year */
 
 	if (year%4 == 3 && (year%100 != 99 || year%400 == 399))
@@ -178,7 +178,7 @@ int * pyear;				/* output year */
 ** 1/1 is zero).  Get month, correct day and year, and return.
 */
 
-    for (month = 2; day >= upto[month] ; month++)
+    for (month = 2; dayn >= upto[month] ; month++)
 	;
 
     month--;				/* went one too far */
@@ -187,7 +187,7 @@ int * pyear;				/* output year */
 
     *pyear = year+1;
     *pmonth = month;
-    *pday = day - upto[month] + 1;
+    *pday = dayn - upto[month] + 1;
     if (year == 1751 && month == 9 && *pday > 2)
 	*pday += 11;
     return;
@@ -316,7 +316,7 @@ int d;					/* day of month (1-31) */
 int y;					/* year (1-9999) */
 {
     int * upto = norm_upto;		/* array for normal months */
-    long day;				/* ordinal day */
+    long lday;				/* ordinal day */
 
     /* check inputs */
 
@@ -326,16 +326,16 @@ int y;					/* year (1-9999) */
 	)
 	return( -1L );
 
-    day = (y-1) * 365L;			/* Well, most years have at least
+    lday = (y-1) * 365L;			/* Well, most years have at least
 					** this many days
 					*/
-    day += (y-1)/4;			/* account for all leap years */
+    lday += (y-1)/4;			/* account for all leap years */
     if (y > 1800)			/* take care of post-Gregorian
 					** correction
 					*/
     {
-	day -= (y-1701)/100;		/* less 1 day per century */
-	day += (y-1601)/400;		/* but one more per 400 years */
+	lday -= (y-1701)/100;		/* less 1 day per century */
+	lday += (y-1601)/400;		/* but one more per 400 years */
     }
 
     /* Now choose table for months and such */
@@ -349,7 +349,7 @@ int y;					/* year (1-9999) */
     {
 	if (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0))
 	    upto = leap_upto;		/* new leap year */
-	day -= 11;			/* account for 1752 strangeness */
+	lday -= 11;			/* account for 1752 strangeness */
     }
     else				/* year must be 1752 */
     {
@@ -365,5 +365,5 @@ int y;					/* year (1-9999) */
     if ( d > (upto[m+1] - upto[m]))	/* check for bad day of month */
 	return( -1L );
 
-    return( day + upto[m] + d );	/* return ordinal day */
+    return( lday + upto[m] + d );	/* return ordinal day */
 }

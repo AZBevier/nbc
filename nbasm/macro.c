@@ -9,9 +9,12 @@
 /* #define DBUGM1X */
 /* #define DBUGM2 */
 /* #define DBUGIF */
-/* #define SETD */
+/* #define SETD *//*X*/
 /* #define DEBUG */
-/*#define MACS*/
+/* #define MACS */
+/*#define FIX_LINUX */
+/* #define MACD */
+/* #define MACP */
 
 #ifdef DOS
 #include <io.h>
@@ -64,7 +67,7 @@ void	macinit()
 	    macer();
    	  }
 	  macopen++;			/* show mac open */
-	  fseek (macfd, (int64)0, 0);	/* rewind mac file */
+	  fseek (macfd, (long)0, 0);	/* rewind mac file */
 	  return;			/* return */
 	}
 
@@ -113,7 +116,7 @@ char	*name;
 	memcpy(ucname, name, 8);	/* copyin macro name */
 	ucname[8] = '\0';		/* null terminate string */
 	str2upr(ucname);		/* make uppercase */
-	fseek (macfd, (int64)0, 0);	/* rewind mac file */
+	fseek (macfd, (long)0, 0);	/* rewind mac file */
 #ifdef DBUGM1X
 printf("looking for macro %0.8s\n", ucname);
 #endif
@@ -632,7 +635,7 @@ void	formp()
 	  macsp = (uchrfp)head->desc.value;	/* where storage is */
 	  maccnt = 0;			/* number of chars stored */
 	  high = head->desc.tmp;	/* count of chars allocated */
-	/* FIXME - added next statement to fixed map failt */
+	/* FIXME - added next statement to fix map failt */
 	/* and update symbol table entry with macro symbol table address */
 	dmstp->desc.value = (int32)head; /* macro def entry addr */
 #ifdef MACD
@@ -817,7 +820,7 @@ void	ifpro()
 	struct	symbol	FAR *stp;
 
 #ifdef DBUGIF
-printf("ifpro: label = %0.8s, usname = %0.8s binop = %x\n",
+printf("ifpro: label '%.8s' usname '%.8s' binop %x\n",
  label, usname, curops->binop);
 #endif
 	prevrelo = 0;			/* clear out pointer to prev rel op */
@@ -828,7 +831,9 @@ printf("ifpro: label = %0.8s, usname = %0.8s binop = %x\n",
 	    /* we are in pass 2, check delim flag */
 	    if (unstk) {		/* should end in param, not delim */
 	      seterr ('E');		/* set faulty parm list error */
-/* printf("1E\n"); */
+#ifdef DBUGIF
+   printf("1E\n");
+#endif
 	      unstk = 0;		/* clear the flag */
 	    }
 	  unstk = 0;			/* clear the flag */
@@ -841,12 +846,14 @@ printf("ifpro: label = %0.8s, usname = %0.8s binop = %x\n",
 ifpro2:
 	  unst(0x81fd0000L);		/* unstring a term */
 #ifdef DBUGIF
-printf("ifpro2: label = %0.8s, usname = %0.8s\n", label, usname);
+printf("ifpro2: label '%.8s' usname '%.8s'\n", label, usname);
 #endif
 	  if (!(PASS & 1)) {		/* are we pass 2 */
 	    if (unstk) {		/* should end in param, not delim */
 	      seterr ('E');		/* set faulty parm list error */
-/* printf("2E\n"); */
+#ifdef DBUGIF
+   printf("2E\n");   
+#endif
 	      unstk = 0;		/* clear the flag */
 	    }
 	  }
@@ -893,7 +900,7 @@ printf("ifpro2: label = %0.8s, usname = %0.8s\n", label, usname);
 	  val(1);			/* evaluate unstrung element */
 	  temp = (int)inac.value;	/* get the value */
 #ifdef DBUGIF
-printf("ifpro: prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifpro: prevrelo %d, ifet %d i %d temp %d\n", prevrelo, ifet, i, temp);
 prtval("ifpro val", &inac);
 #endif
 	  switch (prevrelo) {		/* switch on condition */
@@ -939,7 +946,7 @@ ifpro5:
 
 find:
 #ifdef DBUGIF
-printf("find: label = %0.8s, usname = %0.8s i = %d\n", label, usname, i);
+printf("find: label = %.8s, usname = %.8s i = %d\n", label, usname, i);
 #endif
 	  prevrelo = i;			/* save the cond operator */
 ifpro9:
@@ -957,23 +964,27 @@ iferr:
 
 ifprod:
 #ifdef DBUGIF
-printf("ifprod: prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifprod: prevrelo %d, ifet %d i %d macstate %x\n", prevrelo, ifet, i, macstate);
 #endif
 	  macstate &= ~INTGEN2;		/* clear flag initially */
 	  if (macstate & INTGEN)	/* internal label in exp */
 	    macstate |= INTGEN2;	/* yes, copy the flag */
 #ifdef DBUGIF
-printf("ifprod:a prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifprod:a prevrelo %d, ifet %d i %d macstate %x\n", prevrelo, ifet, i, macstate);
 #endif
 #ifdef FIX_LINUX
-{ int dummy[5];		/* this fixes a stack overwrite problem */
+{ int dummy[15];		/* this fixes a stack overwrite problem */
 #endif
 	  unst(0x80080000L);		/* unstring a term, term on sp or , */
 #ifdef FIX_LINUX
 }
 #endif
 #ifdef DBUGIF
-printf("ifprod:b prevrelo = %d, ifet = %d i = %d\n", prevrelo, ifet, i);
+printf("ifprod:b label '%.8s' usname '%.8s'\n", label, usname);
+#endif
+#ifdef DBUGIF
+printf("ifprod:c prevrelo %d, ifet %d i %d macstate %x unstk %x\n",
+        prevrelo, ifet, i, macstate, unstk);
 #endif
 	  if (!(PASS & 1)) {		/* are we pass 2 */
 	    if (unstk) {		/* should end in param, not delim */
@@ -997,22 +1008,33 @@ printf("ifprod1: INTGEN2 is %s, binop = %x\n",
 	  } else
 	  if (curops->binop ^ (ifet & 0xff)) { /* comp to t/f case of expr */
 #ifdef DBUGIF
-printf("nomatch, return\n");
+printf("ifprod1:a nomatch, return res %x\n", curops->binop ^ (ifet & 0xff));
 #endif
 	    return;			/* no match, get next statement */
 	  }
 ifpro8:
 #ifdef DBUGIF
-printf("ifpro8: usname = %0.8s, ifet = %d, binop = %d\n",
+printf("ifpro8: usname = %.8s, ifet = %d, binop = %d\n",
  usname, ifet, curops->binop);
 #endif
 	  /* save name where we can resume assemble */
 	  memcpy (hwscnhp, usname, 8);	/* move 8 bytes of label */
+#ifdef DBUGIF
+printf("ifpro8:a resume execution label %.8sbinop = %d\n",
+ usname, curops->binop);
+#endif
 	  if (!yeanay()) return;	/* if not assembling return */
 	  memcpy (lablscan, hwscnhp, 8); /* save label to scan for */
 	  macstate |= CONDSCAN;		/* show we are in a conditional scan */
+#ifdef DBUGIF
+printf("ifpro8:b scan for label %.8sbinop = %d macstate %x\n",
+ usname, curops->binop, macstate);
+#endif
 	  return;			/* do next input line */
 	}		/* must be iftdef/iffdef ops */
+#ifdef DBUGIF
+printf("ifpro8:c not doing IFT/IFF\n");
+#endif
 	ifflg = 0;			/* clear symbol found flag */
 	unst(0x00080000L);		/* terminate on comma */
 	stp = symtab;			/* get address of symbol table */

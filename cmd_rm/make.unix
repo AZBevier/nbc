@@ -27,6 +27,7 @@ clean:
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
 	-rm -f $(LBIN)/$(DOC) # $(LBIN)/$(HDRS)
+#	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@if [ -d $(LBIN) ]; then \
@@ -35,7 +36,7 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/rm $(SYSBIN)
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
 #	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
 	$(INSTALL) $(DOC) $(LBIN)/$(DOC)

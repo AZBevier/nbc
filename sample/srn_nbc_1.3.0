@@ -1,0 +1,1336 @@
+ 
+		    MPX-32(tm) C Compiler
+                       Revision 1.3.0
+ 
+ 
+               READ BEFORE USING REVISION 1.3.0
+ 
+ 
+These Software Release Notes contain information specific to
+this release, including usage information that is not included
+in the online documentation set.
+ 
+ 
+ 
+July 1997
+ 
+ 
+ 
+ 
+ 
+ 
+324-008150-300
+ 
+ 
+ 
+This document is supplied without representation or warranty of
+any kind. Encore Computer Corporation assumes no responsibility
+and shall have no liability of any kind arising from supply or
+use of this publication or any material contained herein.
+ 
+The information contained herein is proprietary to Encore
+Computer Corporation and/or its vendors, and its use or
+disclosure is subject to the restrictions stated in the standard
+Encore Computer Corporation License terms and conditions or the
+appropriate third-party sublicense agreement.
+ 
+Use, duplication or disclosure by the Government is subject to
+restrictions as set forth in subdivision (c) (1) (ii) of the
+Rights in Technical Data and Computer Software clause at
+252.227.7013.
+ 
+UNIX is a registered trademark in the United States and other
+countries licensed exclusively through X/Open Company Ltd.
+ 
+MPX-32 and Encore RSX are trademarks of Encore Computer Corporation. 
+ 
+(r)CONCEPT/32 is a registered trademark of Encore Computer
+Corporation.
+ 
+Encore Computer Corporation
+6901 West Sunrise Boulevard
+Fort Lauderdale, Florida 33313
+ 
+(c) 1992-1997 by Encore Computer Corporation and J B Systems
+ALL RIGHTS RESERVED
+Printed in U.S.A.
+ 
+ 
+ 
+Contents
+_______________________________________________________________
+ 
+ 
+1 Overview
+ 
+  INTRODUCTION 
+  SUMMARY OF CONTENTS	
+  DOCUMENTATIONS CONVENTIONS
+ 
+2 Contents of this Revision
+ 
+  INTRODUCTION	
+  BINARY DISTRIBUTION 
+    Model Numbers
+    Revision Date
+  PREREQUISITE 
+  DOCUMENTATION DELIVERED WITH THIS PRODUCT
+  RELATED DOCUMENTATION
+ 
+3 Product Information
+ 
+  PRODUCT DESCRIPTION
+  RELEASE HISTORY
+  BINARY PACKAGE DISK SPACE REQUIREMENTS
+  BINARY TAPE FORMAT 
+  INSTALLATION ENVIRONMENT REQUIREMENTS	
+ 
+4 Differences Between Revisions 1.2.0 and 1.3.0
+ 
+  INTRODUCTION	
+  REVISION DIFFERENCES	
+ 
+5 Installation and Configuration
+ 
+  BINARY INSTALLATION INSTRUCTIONS
+    Automatic Installation Instructions
+    Manual Installation Instructions
+  SOFTWARE CONFIGURATION
+ 
+6 Product Hints
+ 
+  GENERAL HINTS
+ 
+7 Known Problems
+ 
+  INTRODUCTION	
+ 
+8 Problem Report Summary
+ 
+  INTRODUCTION
+ 
+A Binary Tape Contents
+ 
+ 
+ 
+1 Overview
+________________________________________________________________
+ 
+ 
+INTRODUCTION      
+_______________________
+ 
+This document is provided to customers purchasing MPX-32 C
+Compiler Revision 1.3.0 for use with the MPX-32 Operating System
+Revision 3.0 or later. It describes the MPX-32 C Compiler as
+well as providing other revision-specific information.
+ 
+IMPORTANT: Read the Software Release Notes before attempting to
+install or use the Revision 1.3.0 software. Besides providing an
+overview of the revision, this document contains critical,
+late-breaking information about the product that is not
+documented elsewhere.
+ 
+This information appears on the product tape as SRN_NBC_1.3.0.
+This upper/lowercase file can be printed from TSM or examined
+online. Note that the hard copy and installation-tape versions
+may differ because of last minute changes.
+ 
+ 
+SUMMARY OF CONTENTS      
+________________________
+ 
+This document contains the following information:
+ 
+o Overview of this document
+ 
+o Contents of this Revision
+ 
+o Product Information
+ 
+o Installation and Configuration
+ 
+o Product Hints
+ 
+o Known Problems
+ 
+o Problem Report Summary
+ 
+o Binary Tape Contents
+ 
+ 
+DOCUMENTATION CONVENTIONS     
+------------------------------
+ 
+The typographic conventions apply only to the hardcopy version 
+of this document. 
+ 
+lineprinter and lineprinter bold
+           Lineprinter and lineprinter bold are used in
+           examples. Lineprinter indicates system output and
+           lineprinter bold indicates user input. 
+           For example:
+ 
+           TSM>INSTALL_NBCC
+ 
+italics    In examples and running text, italic words
+           represent variable expressions that must be replaced 
+           with a value or name. In the following example, 
+           the mnemonic of a device must be substituted for devmnc.
+ 
+	   TSM>AS TAP TO DEV=devmnc BLOC=N
+ 
+           Italics are also used to introduce new terms, for
+           titles of documents, and for emphasis.
+ 
+ 
+2  Contents of this Revision
+______________________________________________________________
+ 
+ 
+INTRODUCTION     
+-----------------
+ 
+Information on various MPX-32 C Compiler distribution components
+is given in this chapter, as are model numbers.  The following
+are the components of the distribution:
+ 
+o Binary tape
+ 
+o Documentation
+ 
+ 
+BINARY DISTRIBUTION     
+------------------------
+ 
+Model Numbers    
+-----------------
+ 
+The following model number applies to the binary distribution.
+ 
+Tape	                Model Number	System
+ 
+Binary Single System	1012-330(3/7)	32/27*, 32/67, SelCONNECTION
+                                        running MPX-32 3.x
+ 
+Binary Single System	1012-430(3/7)	32/87*, 32/97
+                                        running MPX-32 3.x
+ 
+Binary Single System	1012-530(3/7)	32/2030, 32/2040
+                                        running MPX-32 3.x
+ 
+Binary Single System	1012-630(3/7)	32/2050, RSX
+                                        running MPX-32 3.x
+ 
+Notes:
+ 
+o Media Type of 3 = 9 track/1600 bpi Magnetic Tape
+ 
+o Media Type of 7 = 1/4" Cartridge Tape (only available for Rev.
+  3.6.0 and later of MPX-32 OS)
+ 
+o * = 1/4" Cartridge Tape is not supported on the CONCEPT 32/27 or 
+  CONCEPT 32/87
+ 
+ 
+Revision Date    
+-----------------
+ 
+July 1997
+ 
+ 
+PREREQUISITE     
+-----------------
+ 
+Encore Proprietary Software License. 
+ 
+Also see the installation requirements in Chapter 3. 
+ 
+ 
+DOCUMENTATION DELIVERED WITH THIS PRODUCT     
+-----------------------------------------
+ 
+One set of the following documentation is supplied with Model
+No. 1012-(3/4/5/6)30(3/7).  Additional copies of these documents
+can be ordered by part number.
+ 
+Part No.	Description
+ 
+DS-1012-3	MPX-32 C Compiler for MPX-32 Revision 3.x 
+                Documentation Set which includes:
+ 
+324-008150-300 	MPX-32 C Compiler Revision 1.3.0 
+                Software Release Notes
+ 
+Online documentation for the MPX-32 C Compiler Revision 1.3.0 is
+provided on the product tape.
+ 
+ 
+RELATED DOCUMENTATION    
+-------------------------
+ 
+The C Programming Language by Kernighan & Ritchie.
+ 
+MPX-32 Revision 3.x Reference Manual, Volumes I through IV,
+323-00155(1/2/3/4)
+ 
+MPX-32 Revision 3.x Technical Manual, Volumes I and II,
+322-00155(1/2)
+ 
+ 
+ 
+3  Product Information
+___________________________________________________________
+ 
+ 
+PRODUCT DESCRIPTION     
+------------------------
+ 
+The MPX-32 C Compiler operates in one or two pass mode. It
+generates assembler language instructions which can optionally
+have the source C code intermixed as comments. Compile time
+options allow support for register to register floating point
+instructions or only register to memory instructions to support
+32/27 systems. The debug option allows symbols to be passed
+through to the cataloger for display with the task debugger or
+Aid for C source debugger.  Support is provided for IEEE floating
+point and mapped out mode on RSX machines.
+ 
+The C runtime library provides an emulated UNIX System V
+interface to MPX-32. Most of the standard library functions are
+provided where emulation was possible without OS modifications.
+Functions are also provided to directly access MPX-32 SVCs where
+UNIX compatibility is not desired. MPX-32 SVCs can also be
+called as in-line assembler instructions. An additional option
+also allows nonsectioned code to be generated. This allows
+functions written in C to be SYSGENed into the MPX-32 operating
+system.
+ 
+ 
+RELEASE HISTORY     
+--------------------
+ 
+The following is the release history of this product:
+ 
+Description		Level		 Date
+ 
+Original Release	Revision 1.0.0	 September 1992
+Aid for C Support	Revision 1.1.0	 November  1993
+Maintenance Update	Revision 1.2.0	 September 1994 
+Maintenance Update	Revision 1.3.0	 July	   1997 
+ 
+ 
+BINARY PACKAGE DISK SPACE REQUIREMENTS     
+-------------------------------------------
+ 
+To use this binary installation package, adequate disk space
+must be available on the system. A minimum of approximately
+18,000 blocks of available disk space are required for this
+installation. (Space for temporary and SLO files is not
+included.) 
+ 
+ 
+BINARY TAPE FORMAT     
+-----------------------
+ 
+The binary tape contains 435 files in eight Volume Manager save
+images. Refer to Appendix A of this document for a complete list
+of the files contained on the binary tape.
+ 
+ 
+INSTALLATION ENVIRONMENT REQUIREMENTS     
+------------------------------------------
+ 
+The following are physical requirements for installation.
+ 
+o One compatible input device for the distribution medium:
+ 
+   - 1/2" 9-track Magnetic Tape drive
+ 
+     -or- 
+ 
+   - 1/4" Cartridge Tape drive (for Revision 3.6.0 and later of 
+     MPX-32 OS)
+ 
+o One compatible auxiliary input device for batch processing:
+ 
+   - One TSM terminal (with lowercase capability)
+ 
+ 
+The following software must be installed:
+ 
+o The following operating system:
+ 
+   - 1401 MPX-32 Revision 3.0 or later.
+ 
+o The following product installed on that system:
+ 
+   - 1407 MPX-32 Utilities Revision 1.3 or later or the minimum
+     revision supported on the revision of the operating system
+     in use
+ 
+ 
+ 
+4  Differences Between Revisions 1.2.0 and 1.3.0
+________________________________________________
+ 
+ 
+INTRODUCTION    
+----------------
+ 
+Online documentation for the MPX-32 C Compiler Revision 1.3.0 is
+provided on the product tape. New or revised documentation has
+been provided for the following commands:
+ 
+ieeelib.m  moelib.m   molib.m    nbcas.m
+nbcat.m    nbcc.m     nbccom.m   nblex.m
+ 
+ 
+REVISION DIFFERENCES    
+------------------------
+ 
+Differences between revisions 1.2.0 and 1.3.0 of the MPX-32 C
+Compiler include:
+ 
+o Move compiler tables to extended memory and allocate them
+  at execution time.  This reduces the size of NBCCOM that
+  caused RM65 errors on systems running a large OS without
+  TXPM.  It is no longer necessary to use the two pass version
+  of the compiler.  Tables can also be sized by options to
+  the compiler.  See nbcc.m and nbccom.m.
+ 
+o Correct operation of ATAN2 function.  Compiler now generates
+  correct code and correct values.  (SPR 94000438)
+ 
+o Modify ATOF function to eliminate variations of 32/?7 and
+  RSX machines floating point hardware.  (SPR 94000440)
+ 
+o Correct initialization of a union with a floating point
+  number.  (SPR 94000439)
+ 
+o Display error messages independent of mode of operation,
+  batch or TSM.  Error information that is output from the
+  various compiler phases, NBCPP, NBCCOM, etc., now is output
+  to the SLO file when NBCC is executed in batch mode.
+  (SPR 93000027)
+ 
+o Allow processing of .f files by NBCC.  The FORTRAN compiler
+  "@SYSTEM(BIN)FORT77" is invoked to compile the program.  The
+  "fdirs" file in the BIN directory is the default directives
+  file for FORTRAN.  The "cdirs" file is still the default
+  directive file for C.  The -R option can be used to override
+  the default.  The -OF option to NBCC specifies a FORTRAN
+  load module is to be built.  The cataloger @SYSTEM(BIN)CATALOG
+  is used instead of NBCAT.   See nbcc.m and nbccom.m.
+ 
+o The -Z option no longer destroys the compressed file provided
+  to NBCC.  An EOF was being written to the file.
+ 
+o A blocked file is now correctly read after a rewind operation.
+  The file had to be longer than 8 sectors.
+ 
+o Correct spelling error in art.h header file.
+ 
+o Add NBLEX to NBCC program suite.  Add NRFORM and NCFORM
+  to LIB directory.
+ 
+o Cleanup now called from _exit on program termination.  The
+  call was commented out by mistake.  This caused output to
+  buffered files to not be purged in all cases on exit.
+ 
+o Output to stderr and stdout, which used to go to the NULL
+  device are now sent to the parent task for output to its
+  assigned device.  This uses messages and may effect some
+  user applications.  (See SPR 93000027)
+ 
+o Correct fcall to save and restore extended status when
+  calling FORTRAN functions.  Allows C code to run extended
+  and FORTRAN code non-extended.
+ 
+o Emit cequ/dequ pseudo-ops from the compiler.  Also, emit
+  all floating point numbers in E or F format, not hex.
+  This allows all number conversions to take place in the
+  Assembler, not the compiler.  This allows IEEE support.
+ 
+o Correct emulation of UNIX file access on MPX-32.  Modes are
+  now set and displayed correctly.
+ 
+o The -J option has been added to eliminate the '_' from variable
+  names.  This is used when accessing FORTRAN variables from C.
+ 
+o Provide support for IEEE and/or mapped out mode on RSX machines.
+  Optional libraries elib, molib, and moelib are provided.  
+  Directive files modirs is provided for cataloging directives.
+  See ieeelib.m, molib.m, and moelib.m for additional information.
+ 
+o OPENDIR can not assign the root directory of a volume. MPX-32
+  does not allow assignment by pathname to the root directory.
+ 
+o Several SPR's have been addressed in revision 1.3.0. Refer to
+  Chapter 8 for a list of SPRs that have been closed.
+ 
+o There are also some minor changes included in this distribution to
+  support the latest revisions of MAKE4MPX (a make facility for MPX-32)
+  and RCS4MPX (revision control software for MPX-32) available from
+  JB Systems.  Some compiler and cataloger modifications were also
+  made to support the latest revision of Aid for C, the source level
+  debugger for non-based C code.
+ 
+ 
+5  Installation and Configuration
+_____________________________________________________________
+ 
+ 
+BINARY INSTALLATION INSTRUCTIONS     
+-------------------------------------
+ 
+Two methods are available for installing the MPX-32 C Compiler
+Revision 1.3.0 binary tape on your system:
+ 
+o automatically installing the compiler using INSTALL_NBCC
+ 
+o manually installing the compiler
+ 
+The instructions for these methods are listed in the following
+sections.
+ 
+ 
+Automatic Installation Instructions    
+---------------------------------------
+ 
+To automatically install the compiler, use the following
+instructions:
+ 
+1.  Mount the installation tape on the appropriate unit and
+    restore the first image.
+ 
+      TSM>AS TAP TO DEV=devmnc BLOC=N
+ 
+    devmnc	specifies the installation device.
+ 
+2.  Invoke the Volume Manager and ensure that the tape is
+    positioned by rewinding the tape.
+ 
+      TSM>VOLMGR 
+      VOL>REWIND
+ 
+3.  Restore the first image.
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+      VOL>EXIT
+ 
+4.  Execute the install macro.
+ 
+      TSM>INSTALL_NBCC
+ 
+5.  The macro will prompt you for the tape device and whether
+    you wish to install the optional seventh and eight images.
+ 
+The MPX-32 C Compiler is installed and you can proceed to the
+"Software Configuration" section.
+ 
+ 
+Manual Installation Instructions    
+------------------------------------
+ 
+To manually install the compiler, use the following instructions:
+ 
+1.  Mount the installation tape on the appropriate unit.
+ 
+      TSM>AS TAP TO DEV=devmnc BLOC=N
+ 
+    devmnc	specifies the installation device.
+ 
+2.  Invoke the Volume Manager and ensure that the tape is
+    positioned by rewinding the tape.
+ 
+      TSM>VOLMGR 
+      VOL>REWIND
+ 
+3.  Skip the first image which contains this SRN file.
+ 
+      VOL>SKIP I
+ 
+4.  Restore the system programs and command files.
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+ 
+5.  Restore the compiler programs, utilities and command files.
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+ 
+6.  Restore the include files.
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+ 
+7.  Restore the C runtime libraries.
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+ 
+8.  Restore the skeleton parser driver.
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+ 
+9.  Optionally, restore the sample C code and programs. 
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+ 
+    If this image is not desired, skip to the next image.
+ 
+      VOL>SKIP I
+ 
+10. Optionally, restore the online documentation files.
+ 
+      VOL>RESTORE VOLUME=SYSTEM
+ 
+11. Rewind the tape and exit the Volume Manager.
+ 
+      VOL>REWIND 
+      VOL>EXIT
+ 
+ 
+ 
+SOFTWARE CONFIGURATION     
+---------------------------
+ 
+The MPX-32 C Compiler is ready to run after installation is
+complete. The file TIMEZONE should be edited to reflect the
+local time zone information. It must be present in the SYSTEM
+directory to be read by the runtime library. If the file
+TIMEZONE is not present, the default of EST and EDT is used.
+ 
+The documentation files (in the DOC directory) may be viewed by
+the following:
+ 
+ 	TSM>^(bin)dcat <^(DOC)xxxx.m
+ 
+ 	or
+ 
+        TSM>^(bin)dcat /system/doc/xxxx.m
+ 
+This displays the selected documentation file.
+ 
+The SAMPLE directory and the source code for the sample programs
+should be reviewed to see some of the capabilities of the MPX-32
+C Compiler. The TSM macro MAK.SAMP should be run to see if the
+compiler operates properly on your system. The TSM macro LD.SAMP
+should be run to see if the sample programs will catalog
+correctly. The programs CAID, DCAT, FIXER, OBD, SUMMER, and UCAT
+are built by the LD.SAMP macro or can be cataloged one at a time
+using the TSM macro NBLD or the new cataloging capabilities of
+NBCC as follows:
+ 
+        TSM>NBLD caid caidmap
+ 
+        or 
+ 
+        TSM>NBCC -o caid -Ycaidmap ^(bin)c.srte.o caid.o
+ 
+This builds the program CAID in the local directory.
+ 
+ 
+        TSM>NBLD dcat dcatmap 
+ 
+        or 
+ 
+        TSM>NBCC -o dcat -Ydcatmap ^(bin)c.srte.o dcat.o
+ 
+This builds the program DCAT in the local directory.
+ 
+ 
+        TSM>NBLD fixer fixermap 
+ 
+        or 
+ 
+        TSM>NBCC -o fixer -Yfixermap ^(bin)c.srte.o fixer.o
+ 
+This builds the program FIXER in the local directory.
+ 
+ 
+        TSM>NBLD obd obdmap 
+ 
+        or 
+ 
+        TSM>NBCC -o obd -Yobdmap ^(bin)c.srte.o obd.o
+ 
+This builds the program OBD in the local directory.
+ 
+ 
+        TSM>NBLD summer summermap 
+ 
+        or 
+ 
+        TSM>NBCC -o summer -Ysummermap ^(bin)c.srte.o summer.o
+ 
+This builds the program SUMMER in the local directory.
+ 
+ 
+        TSM>NBLD ucat ucatmap 
+ 
+        or 
+ 
+        TSM>NBCC -o ucat -Yucatmap ^(bin)c.srte.o ucat.o
+ 
+This builds the program UCAT in the local directory.
+ 
+The file CDIRS in the BIN directory contains the default
+cataloger directives used by NBCAT. This file should be reviewed
+and modified for local requirements. If MPX-32 3.6.0 is used, the
+debugger name to be used for C tasks should be changed to reflect
+the installed name of the debugger.  AIDCDB is the default name
+for the AID for C source level debugger.
+ 
+ 
+ 
+6  Product Hints
+______________________________________________________________
+ 
+ 
+GENERAL HINTS     
+------------------
+ 
+The NBLD macro should be modified when several programs are to
+be combined to form a load module. Add the names of the object
+files that are to be included after the COMPRESS directive. This
+combines all of the non-runtime library objects for cataloging.
+Another method is to use NBCC to combine the various object
+files and libraries for creation of a load module. See NBCC.M
+and NBCAT.M in the DOC directory for information and examples.
+ 
+The default startup code is C.SRTE.O. It allocates the stack and
+I/O area in extended memory starting at 0x80000. The program
+starts in extended mode. If it is desirable to run in
+nonextended mode, the object module C.SRT.O should be included
+to allow the program to startup in nonextended mode. This would
+usually be the case when interfacing with FORTRAN subroutines.
+ 
+The source code for C.SRT.C and C.SRTE.C are included. These are
+the nonextended and extended mode versions of the startup code.
+They assume a 12KW stack. If a larger or smaller stack is
+desired, modify these programs for your specific needs.
+ 
+The source code for FCALL.S is also included. Due to variations
+in FORTRAN calling conventions, it may be necessary to modify
+this interface subroutine.
+ 
+The C runtime library is implemented using the UNIX System V
+interface. Consult any System V reference manual for calling
+conventions. Also, review the include files in the NBINCLUDE
+directory.
+ 
+The preprocessor, NBCPP, searches both the NBINCLUDE and
+CINCLUDE directories for include files (other versions of the
+MPX-32 C Compiler use the CINCLUDE directory for include files).
+Make sure the CINCLUDE directory is empty or does not contain
+any outdated include files. See NBCPP.M in the DOC directory.
+ 
+The load module, NBYACC, is included with the MPX-32 C Compiler
+as an unsupported utility. It may or may not be removed in
+future releases of this product. No Problem Reports
+(SPRs) will be accepted for this utility.
+ 
+The load module, NBLEX, is included with the MPX-32 C Compiler
+as an unsupported utility. It may or may not be removed in
+future releases of this product. No Problem Reports
+(SPRs) will be accepted for this utility.
+ 
+Object code generated by the MPX-32 C Compiler Revision 1.3.0
+has not been tested with the Instruction Scheduler. Therefore, C
+object is not supported by the Instruction Scheduler as input to
+be scheduled and optimized.
+ 
+The one pass version of the MPX-32 C Compiler, NBCCOM, is quite
+large and may not run on systems with limited task execution
+space. If this is the case, use the -2 option to NBCC to invoke
+the two pass version of the compiler.
+ 
+The file, TIMEZONE, is provided in the BIN directory. It
+should be edited to reflect the local timezone information.
+It must be present in the SYSTEM directory to be read by the
+runtime library. If the file TIMEZONE is not present, the
+default of EST and EDT is used. Look at the comments in the
+TIMEZONE file.
+ 
+New NBCC options have been added to allow activation of NBCAT
+by NBCC. This allows one step compilation and cataloging. A
+new file in the BIN directory (CDIRS) contains the default
+directives for NBCAT. Other options are available to specify
+another directive file, libraries to be searched, a file of
+compressed programs, and the file for NBCAT to output SLO
+information. See NBCC.M and NBCAT.M in the DOC directory for
+more information and examples.
+ 
+The file CDIRS in the BIN directory contains the default
+cataloger directives used by NBCAT. This file should be
+reviewed and modified for local requirements. If MPX-32 3.6.0
+is used, the debugger name to be used for C tasks should be
+changed to reflect the installed name of the debugger. AIDCDB
+is the default name for the AID for C source level debugger.
+Review FDIRS and MODIRS if using these optional features.
+ 
+NBCAT must be used when the -G option (Debug option) is used.
+It contains support for generating symbolic debug information
+for the AID for C debugger (Revision 1.1.0). NBCAT is
+compatible with Revision 3.4.0 of the MPX-32 Utilities and can
+be used in place of the standard CATALOGer. The CLB/CDR
+library is now searched by default.
+ 
+NBCAS is compatible with MPX-32 Utilities Revision 3.4.0.
+ 
+NBCAT is compatible with MPX-32 Utilities Revision 3.4.0.
+ 
+ 
+ 
+7  Known Problems
+_____________________________________________________________
+ 
+ 
+INTRODUCTION     
+-----------------
+ 
+OPENDIR can not assign the root directory of a volume. MPX-32
+does not allow assignment by pathname to the root directory.
+ 
+There are no other known problems with Revision 1.3.0 of the
+MPX-32 C Compiler.
+ 
+ 
+ 
+8  Problem Report Summary
+_____________________________________________________________
+ 
+ 
+INTRODUCTION     
+-----------------
+ 
+The following Problem Reports (SPRs) have been addressed since 
+Revision 1.0.0 of the MPX-32 C Compiler.
+ 
+ 
+Number          Description
+------          -----------
+93000026 	The MPX-32 C Compiler has no available revision
+                information. (Closed in 1.1.0) 	
+ 
+93000027 	MPX-32 C Compiler reports errors differently
+                interactively versus batch. (Closed in 1.3.0)
+ 
+93000109	OPENDIR runtime routine ALWAYS returns an error. 
+        	(Closed in 1.1.0)
+ 
+93000157 	Calls to time, or ftime, is not correctly returning
+                the local time. (Closed in 1.1.0)
+ 
+94000219	Bad code generation. Error #1.(Closed in 1.2.0)
+ 
+94000220 	Compiler error, cannot reclaim. (Closed in 1.2.0)
+ 
+94000221	Compiler loop - simplify expression. Error #1.
+                (Closed in 1.2.0)
+ 
+94000222 	Assembler error caused by improper compiler code
+                generation. (Closed in 1.2.0)
+ 
+94000223 	Structure variable increment overflow error for char
+                or short variable. (Closed in 1.2.0)
+ 
+94000224 	File opened in append mode deletes the last record of
+                the file. (Closed in 1.2.0)
+ 
+94000225 	Poor code generation for unsigned short variable
+                comparison. (Closed in 1.2.0)
+ 
+94000226        File type not available with stat library call.
+                (Closed in 1.2.0)
+ 
+94000228        rxb structure incorrectly named prb in rxb.h include
+                file. (Closed in 1.2.0)
+ 
+94000235        Two dimensional array assignment causes compiler loop.
+        	(Closed in 1.2.0)
+ 
+94000438        Correct operation of ATAN2 function. Compiler now generates
+                correct code and correct values.  (Closed in 1.3.0)
+ 
+94000439        Correct initialization of a union with a floating point
+                number.  (Closed in 1.3.0)
+ 
+94000440        Modify ATOF function to eliminate variations between 32/?7 and
+                RSX machines floating point hardware.  (Closed in 1.3.0)
+ 
+ 
+ 
+A Binary Tape Contents
+________________________________________________________________
+ 
+ 
+  The eight Volume Manager save images are as follows:
+ 
+  o Image 1 contains this SRN, install macro
+  o Image 2 contains system programs and command files 
+  o Image 3 contains compiler programs, utilities and command files
+  o Image 4 contains include files
+  o Image 5 contains the C runtime library
+  o Image 6 contains the skeleton parser driver
+  o Image 7 contains sample C code and programs
+  o Image 8 contains online documentation files
+ 
+  Following is the truncated VOLMGR output of the contents
+  of the binary tape.  
+ 
+ 
+-                      *** V O L U M E   M A N A G E R  3.6.2.05 ***
+ SAVE             @RAP1            (BIN             )SRN_NBC_1.3.0           160
+ SAVE             @RAP1            (BIN             )INSTALL_NBCC             32
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @RAP1            (SYSTEM          )NBCC                    160
+ SAVE             @RAP1            (SYSTEM          )NBLD                     32
+ SAVE             @RAP1            (SYSTEM          )NBCAT                   160
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @RAP1            (BIN             )C.SRT.O                  32
+ SAVE             @RAP1            (BIN             )C.SRTE.O                 32
+ SAVE             @RAP1            (BIN             )CAID                    128
+ SAVE             @RAP1            (BIN             )CATALOG                 160
+ SAVE             @RAP1            (BIN             )CDIRS                    32
+ SAVE             @RAP1            (BIN             )CDR                      32
+ SAVE             @RAP1            (BIN             )CLB                     448
+ SAVE             @RAP1            (BIN             )CMP                     128
+ SAVE             @RAP1            (BIN             )DCAT                    128
+ SAVE             @RAP1            (BIN             )EDIR                     16
+ SAVE             @RAP1            (BIN             )ELIB                    464
+ SAVE             @RAP1            (BIN             )FDIRS                    16
+ SAVE             @RAP1            (BIN             )FIXER                   128
+ SAVE             @RAP1            (BIN             )MODIR                    16
+ SAVE             @RAP1            (BIN             )MODIRS                   16
+ SAVE             @RAP1            (BIN             )MOEDIR                   16
+ SAVE             @RAP1            (BIN             )MOELIB                  144
+ SAVE             @RAP1            (BIN             )MOLIB                   144
+ SAVE             @RAP1            (BIN             )NBCAS                   256
+ SAVE             @RAP1            (BIN             )NBCAT                   160
+ SAVE             @RAP1            (BIN             )NBCC                    160
+ SAVE             @RAP1            (BIN             )NBCCOM                  416
+ SAVE             @RAP1            (BIN             )NBCP1                   320
+ SAVE             @RAP1            (BIN             )NBCP2                   256
+ SAVE             @RAP1            (BIN             )NBCPP                   288
+ SAVE             @RAP1            (BIN             )NBLD                     32
+ SAVE             @RAP1            (BIN             )NBLEX                   192
+ SAVE             @RAP1            (BIN             )NBYACC                  288
+ SAVE             @RAP1            (BIN             )OBD                     256
+ SAVE             @RAP1            (BIN             )TIMEZONE                 32
+ SAVE             @RAP1            (BIN             )UCAT                    128
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @RAP1            (NBINCLUDE       )A.OUT.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )ART.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )ASSERT.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )CDOTS.H                  80
+ SAVE             @RAP1            (NBINCLUDE       )CTYPE.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )DCA.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )DIR.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )DIRENT.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )DQE.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )ERRNO.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )FAT.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )FCB.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )FCNTL.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )FINFO.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )IDENT.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )IOQ.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )LIMITS.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )MATH.H                   16
+ SAVE             @RAP1            (NBINCLUDE       )MOSDE.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )MPXDEF.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )MPXSVC.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )NAN.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )PARAM.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )PRB.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )PSB.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )RXB.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )SEARCH.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )SETJMP.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )SIGNAL.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )SMT.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )STAB.H                   16
+ SAVE             @RAP1            (NBINCLUDE       )STAT.H                   16
+ SAVE             @RAP1            (NBINCLUDE       )STDIO.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )STRING.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )TERMIO.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )TIME.H                   16
+ SAVE             @RAP1            (NBINCLUDE       )TIMEB.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )TIMES.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )TSA.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )TYPES.H                  16
+ SAVE             @RAP1            (NBINCLUDE       )UDT.H                    16
+ SAVE             @RAP1            (NBINCLUDE       )UNIXIO.H                 80
+ SAVE             @RAP1            (NBINCLUDE       )UTMP.H                   16
+ SAVE             @RAP1            (NBINCLUDE       )VALUES.H                 16
+ SAVE             @RAP1            (NBINCLUDE       )VARARGS.H                16
+ SAVE             @RAP1            (NBINCLUDE       )VERSION.H                16
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @RAP1            (ELIB            )C.SRT.O                  16
+ SAVE             @RAP1            (ELIB            )C.SRT.S                  16
+ SAVE             @RAP1            (ELIB            )C.SRTE.O                 16
+ SAVE             @RAP1            (ELIB            )C.SRTE.S                 16
+ SAVE             @RAP1            (MOELIB          )C.SRT.O                  16
+ SAVE             @RAP1            (MOELIB          )C.SRT.S                  16
+ SAVE             @RAP1            (MOELIB          )C.SRTE.O                 16
+ SAVE             @RAP1            (MOELIB          )C.SRTE.S                 16
+ SAVE             @RAP1            (MOLIB           )C.SRT.O                  16
+ SAVE             @RAP1            (MOLIB           )C.SRT.S                  16
+ SAVE             @RAP1            (MOLIB           )C.SRTE.O                 16
+ SAVE             @RAP1            (MOLIB           )C.SRTE.S                 16
+ SAVE             @RAP1            (NBLIB           )C.SRT.O                  16
+ SAVE             @RAP1            (NBLIB           )C.SRT.S                  16
+ SAVE             @RAP1            (NBLIB           )C.SRTE.O                 16
+ SAVE             @RAP1            (NBLIB           )C.SRTE.S                 16
+ SAVE             @RAP1            (NBLIB           )FCALL.S                  16
+ SAVE             @RAP1            (NBLIB           )FPS.C                    16
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @RAP1            (LIB             )NCFORM                   16
+ SAVE             @RAP1            (LIB             )NRFORM                   16
+ SAVE             @RAP1            (LIB             )YACCPAR                  20
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @RAP1            (SAMPLE          )CAID                    120
+ SAVE             @RAP1            (SAMPLE          )CAID.C                   36
+ SAVE             @RAP1            (SAMPLE          )CAID.H                   36
+ SAVE             @RAP1            (SAMPLE          )CAID.L                  144
+ SAVE             @RAP1            (SAMPLE          )CAID.O                   80
+ SAVE             @RAP1            (SAMPLE          )CAIDMAP                  16
+ SAVE             @RAP1            (SAMPLE          )CAT.C                    16
+ SAVE             @RAP1            (SAMPLE          )DCAT                    112
+ SAVE             @RAP1            (SAMPLE          )DCAT.C                   36
+ SAVE             @RAP1            (SAMPLE          )DCAT.L                   80
+ SAVE             @RAP1            (SAMPLE          )DCAT.O                   16
+ SAVE             @RAP1            (SAMPLE          )DCATMAP                  16
+ SAVE             @RAP1            (SAMPLE          )FIXER                   120
+ SAVE             @RAP1            (SAMPLE          )FIXER.C                  36
+ SAVE             @RAP1            (SAMPLE          )FIXER.L                 144
+ SAVE             @RAP1            (SAMPLE          )FIXER.O                  80
+ SAVE             @RAP1            (SAMPLE          )FIXERMAP                 16
+ SAVE             @RAP1            (SAMPLE          )FORT.C                   36
+ SAVE             @RAP1            (SAMPLE          )KILL.C                   36
+ SAVE             @RAP1            (SAMPLE          )LD.SAMP                  36
+ SAVE             @RAP1            (SAMPLE          )MAK.SAMP                 20
+ SAVE             @RAP1            (SAMPLE          )MAKEFILE                 16
+ SAVE             @RAP1            (SAMPLE          )NBLD                     20
+ SAVE             @RAP1            (SAMPLE          )OBD                     232
+ SAVE             @RAP1            (SAMPLE          )OBD.C                    80
+ SAVE             @RAP1            (SAMPLE          )OBD.L                  1552
+ SAVE             @RAP1            (SAMPLE          )OBD.O                   272
+ SAVE             @RAP1            (SAMPLE          )OBDMAP                   16
+ SAVE             @RAP1            (SAMPLE          )OBJ.DOC                  80
+ SAVE             @RAP1            (SAMPLE          )OSCODE.C                 80
+ SAVE             @RAP1            (SAMPLE          )PRTINC.C                 36
+ SAVE             @RAP1            (SAMPLE          )RECMSG.C                 36
+ SAVE             @RAP1            (SAMPLE          )SNDMSG.C                 36
+ SAVE             @RAP1            (SAMPLE          )SUMMER                  104
+ SAVE             @RAP1            (SAMPLE          )SUMMER.C                 20
+ SAVE             @RAP1            (SAMPLE          )SUMMER.L                 80
+ SAVE             @RAP1            (SAMPLE          )SUMMER.O                 16
+ SAVE             @RAP1            (SAMPLE          )SUMMERMAP                16
+ SAVE             @RAP1            (SAMPLE          )UCAT                    116
+ SAVE             @RAP1            (SAMPLE          )UCAT.C                   36
+ SAVE             @RAP1            (SAMPLE          )UCAT.L                  144
+ SAVE             @RAP1            (SAMPLE          )UCAT.O                   80
+ SAVE             @RAP1            (SAMPLE          )UCATMAP                  16
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ SAVE             @RAP1            (DOC             )A64L.M                   36
+ SAVE             @RAP1            (DOC             )ABORT.M                  36
+ SAVE             @RAP1            (DOC             )ABS.M                    36
+ SAVE             @RAP1            (DOC             )ACCESS.M                 36
+ SAVE             @RAP1            (DOC             )ACOS.M                   36
+ SAVE             @RAP1            (DOC             )ALARM.M                  36
+ SAVE             @RAP1            (DOC             )ASCTIME.M                36
+ SAVE             @RAP1            (DOC             )ASIN.M                   36
+ SAVE             @RAP1            (DOC             )ASSERT.M                 36
+ SAVE             @RAP1            (DOC             )ATAN.M                   36
+ SAVE             @RAP1            (DOC             )ATAN2.M                  36
+ SAVE             @RAP1            (DOC             )ATOF.M                   36
+ SAVE             @RAP1            (DOC             )ATOI.M                   36
+ SAVE             @RAP1            (DOC             )ATOL.M                   36
+ SAVE             @RAP1            (DOC             )BCMP.M                   36
+ SAVE             @RAP1            (DOC             )BCOPY.M                  36
+ SAVE             @RAP1            (DOC             )BESSEL.M                 36
+ SAVE             @RAP1            (DOC             )BRK.M                    36
+ SAVE             @RAP1            (DOC             )BSEARCH.M                36
+ SAVE             @RAP1            (DOC             )CALLOC.M                 36
+ SAVE             @RAP1            (DOC             )CEIL.M                   36
+ SAVE             @RAP1            (DOC             )CHDIR.M                  36
+ SAVE             @RAP1            (DOC             )CHMOD.M                  36
+ SAVE             @RAP1            (DOC             )CHOWN.M                  36
+ SAVE             @RAP1            (DOC             )CHOWNM.M                 16
+ SAVE             @RAP1            (DOC             )CHROOT.M                 36
+ SAVE             @RAP1            (DOC             )CHTYPE.M                 16
+ SAVE             @RAP1            (DOC             )CLEARERR.M               36
+ SAVE             @RAP1            (DOC             )CLOCK.M                  36
+ SAVE             @RAP1            (DOC             )CLOSE.M                  36
+ SAVE             @RAP1            (DOC             )CLOSEDIR.M               36
+ SAVE             @RAP1            (DOC             )CONV.M                   36
+ SAVE             @RAP1            (DOC             )COS.M                    36
+ SAVE             @RAP1            (DOC             )COSH.M                   36
+ SAVE             @RAP1            (DOC             )CREAT.M                  36
+ SAVE             @RAP1            (DOC             )CREATD.M                 36
+ SAVE             @RAP1            (DOC             )CTIME.M                  36
+ SAVE             @RAP1            (DOC             )CTYPE.M                  36
+ SAVE             @RAP1            (DOC             )DELETE.M                 36
+ SAVE             @RAP1            (DOC             )DIRECTORY.M              36
+ SAVE             @RAP1            (DOC             )DRAND48.M                36
+ SAVE             @RAP1            (DOC             )DUP.M                    36
+ SAVE             @RAP1            (DOC             )ECVT.M                   36
+ SAVE             @RAP1            (DOC             )ERAND48.M                36
+ SAVE             @RAP1            (DOC             )ERF.M                    36
+ SAVE             @RAP1            (DOC             )ERFC.M                   36
+ SAVE             @RAP1            (DOC             )ERRNO.M                  36
+ SAVE             @RAP1            (DOC             )EXEC.M                   36
+ SAVE             @RAP1            (DOC             )EXECL.M                  36
+ SAVE             @RAP1            (DOC             )EXECLE.M                 36
+ SAVE             @RAP1            (DOC             )EXECLP.M                 36
+ SAVE             @RAP1            (DOC             )EXECV.M                  36
+ SAVE             @RAP1            (DOC             )EXECVE.M                 36
+ SAVE             @RAP1            (DOC             )EXECVP.M                 36
+ SAVE             @RAP1            (DOC             )EXIT.M                   36
+ SAVE             @RAP1            (DOC             )EXP.M                    36
+ SAVE             @RAP1            (DOC             )FABS.M                   36
+ SAVE             @RAP1            (DOC             )FCBADR.M                 36
+ SAVE             @RAP1            (DOC             )FCLOSE.M                 36
+ SAVE             @RAP1            (DOC             )FCVT.M                   36
+ SAVE             @RAP1            (DOC             )FDOPEN.M                 36
+ SAVE             @RAP1            (DOC             )FEOF.M                   36
+ SAVE             @RAP1            (DOC             )FERROR.M                 36
+ SAVE             @RAP1            (DOC             )FFLUSH.M                 36
+ SAVE             @RAP1            (DOC             )FGETC.M                  36
+ SAVE             @RAP1            (DOC             )FGETS.M                  36
+ SAVE             @RAP1            (DOC             )FILENO.M                 36
+ SAVE             @RAP1            (DOC             )FLOOR.M                  36
+ SAVE             @RAP1            (DOC             )FMOD.M                   36
+ SAVE             @RAP1            (DOC             )FOPEN.M                  36
+ SAVE             @RAP1            (DOC             )FORK.M                   36
+ SAVE             @RAP1            (DOC             )FPRINTF.M                36
+ SAVE             @RAP1            (DOC             )FPUTC.M                  36
+ SAVE             @RAP1            (DOC             )FPUTS.M                  36
+ SAVE             @RAP1            (DOC             )FREAD.M                  36
+ SAVE             @RAP1            (DOC             )FREE.M                   36
+ SAVE             @RAP1            (DOC             )FREOPEN.M                36
+ SAVE             @RAP1            (DOC             )FREXP.M                  36
+ SAVE             @RAP1            (DOC             )FSCANF.M                 36
+ SAVE             @RAP1            (DOC             )FSEEK.M                  36
+ SAVE             @RAP1            (DOC             )FSTAT.M                  36
+ SAVE             @RAP1            (DOC             )FTELL.M                  36
+ SAVE             @RAP1            (DOC             )FWRITE.M                 36
+ SAVE             @RAP1            (DOC             )GAMMA.M                  36
+ SAVE             @RAP1            (DOC             )GCVT.M                   36
+ SAVE             @RAP1            (DOC             )GETACC.M                 36
+ SAVE             @RAP1            (DOC             )GETC.M                   36
+ SAVE             @RAP1            (DOC             )GETCHAR.M                36
+ SAVE             @RAP1            (DOC             )GETCWD.M                 36
+ SAVE             @RAP1            (DOC             )GETENV.M                 36
+ SAVE             @RAP1            (DOC             )GETGID.M                 36
+ SAVE             @RAP1            (DOC             )GETOPT.M                 36
+ SAVE             @RAP1            (DOC             )GETPGRP.M                36
+ SAVE             @RAP1            (DOC             )GETPID.M                 36
+ SAVE             @RAP1            (DOC             )GETPPID.M                36
+ SAVE             @RAP1            (DOC             )GETS.M                   36
+ SAVE             @RAP1            (DOC             )GETUID.M                 36
+ SAVE             @RAP1            (DOC             )GETW.M                   36
+ SAVE             @RAP1            (DOC             )GMTIME.M                 36
+ SAVE             @RAP1            (DOC             )HCREATE.M                36
+ SAVE             @RAP1            (DOC             )HDESTROY.M               36
+ SAVE             @RAP1            (DOC             )HSEARCH.M                36
+ SAVE             @RAP1            (DOC             )HYPOT.M                  36
+ SAVE             @RAP1            (DOC             )IEEELIB.M                16
+ SAVE             @RAP1            (DOC             )IOCTL.M                  36
+ SAVE             @RAP1            (DOC             )ISALNUM.M                36
+ SAVE             @RAP1            (DOC             )ISALPHA.M                36
+ SAVE             @RAP1            (DOC             )ISASCII.M                36
+ SAVE             @RAP1            (DOC             )ISATTY.M                 36
+ SAVE             @RAP1            (DOC             )ISCNTRL.M                36
+ SAVE             @RAP1            (DOC             )ISDIGIT.M                36
+ SAVE             @RAP1            (DOC             )ISGRAPH.M                36
+ SAVE             @RAP1            (DOC             )ISLOWER.M                36
+ SAVE             @RAP1            (DOC             )ISPRINT.M                36
+ SAVE             @RAP1            (DOC             )ISPUNCT.M                36
+ SAVE             @RAP1            (DOC             )ISSPACE.M                36
+ SAVE             @RAP1            (DOC             )ISUPPER.M                36
+ SAVE             @RAP1            (DOC             )ISXDIGIT.M               36
+ SAVE             @RAP1            (DOC             )J0.M                     36
+ SAVE             @RAP1            (DOC             )J1.M                     36
+ SAVE             @RAP1            (DOC             )JN.M                     36
+ SAVE             @RAP1            (DOC             )JRAND48.M                36
+ SAVE             @RAP1            (DOC             )KILL.M                   36
+ SAVE             @RAP1            (DOC             )L3TOL.M                  36
+ SAVE             @RAP1            (DOC             )L64A.M                   36
+ SAVE             @RAP1            (DOC             )LCONG48.M                36
+ SAVE             @RAP1            (DOC             )LDEXP.M                  36
+ SAVE             @RAP1            (DOC             )LINK.M                   36
+ SAVE             @RAP1            (DOC             )LOCALTIME.M              36
+ SAVE             @RAP1            (DOC             )LOG.M                    36
+ SAVE             @RAP1            (DOC             )LOG10.M                  36
+ SAVE             @RAP1            (DOC             )LONGJMP.M                36
+ SAVE             @RAP1            (DOC             )LRAND48.M                36
+ SAVE             @RAP1            (DOC             )LSEARCH.M                36
+ SAVE             @RAP1            (DOC             )LSEEK.M                  36
+ SAVE             @RAP1            (DOC             )LTOL3.M                  36
+ SAVE             @RAP1            (DOC             )MALLOC.M                 36
+ SAVE             @RAP1            (DOC             )MATH.M                   36
+ SAVE             @RAP1            (DOC             )MATHERR.M                36
+ SAVE             @RAP1            (DOC             )MEMCCPY.M                36
+ SAVE             @RAP1            (DOC             )MEMCHR.M                 36
+ SAVE             @RAP1            (DOC             )MEMCMP.M                 36
+ SAVE             @RAP1            (DOC             )MEMCPY.M                 36
+ SAVE             @RAP1            (DOC             )MEMORY.M                 36
+ SAVE             @RAP1            (DOC             )MEMSET.M                 36
+ SAVE             @RAP1            (DOC             )MKDIR.M                  36
+ SAVE             @RAP1            (DOC             )MKTEMP.M                 36
+ SAVE             @RAP1            (DOC             )MODF.M                   36
+ SAVE             @RAP1            (DOC             )MOELIB.M                 16
+ SAVE             @RAP1            (DOC             )MOLIB.M                  16
+ SAVE             @RAP1            (DOC             )MPXCCSET.M               36
+ SAVE             @RAP1            (DOC             )MPXSVC.M                 36
+ SAVE             @RAP1            (DOC             )MRAND48.M                36
+ SAVE             @RAP1            (DOC             )NBCAS.M                  36
+ SAVE             @RAP1            (DOC             )NBCAT.M                  16
+ SAVE             @RAP1            (DOC             )NBCC.M                   36
+ SAVE             @RAP1            (DOC             )NBCCOM.M                 36
+ SAVE             @RAP1            (DOC             )NBCPP.M                  36
+ SAVE             @RAP1            (DOC             )NBLEX.M                  16
+ SAVE             @RAP1            (DOC             )NBYACC.M                 36
+ SAVE             @RAP1            (DOC             )NICE.M                   36
+ SAVE             @RAP1            (DOC             )NRAND48.M                36
+ SAVE             @RAP1            (DOC             )OPEN.M                   36
+ SAVE             @RAP1            (DOC             )OPENDIR.M                36
+ SAVE             @RAP1            (DOC             )PAUSE.M                  36
+ SAVE             @RAP1            (DOC             )PERROR.M                 36
+ SAVE             @RAP1            (DOC             )PIPE.M                   36
+ SAVE             @RAP1            (DOC             )POW.M                    36
+ SAVE             @RAP1            (DOC             )PRINTF.M                 36
+ SAVE             @RAP1            (DOC             )PUTC.M                   36
+ SAVE             @RAP1            (DOC             )PUTCHAR.M                36
+ SAVE             @RAP1            (DOC             )PUTENV.M                 36
+ SAVE             @RAP1            (DOC             )PUTS.M                   36
+ SAVE             @RAP1            (DOC             )PUTW.M                   36
+ SAVE             @RAP1            (DOC             )QSORT.M                  36
+ SAVE             @RAP1            (DOC             )RAND.M                   36
+ SAVE             @RAP1            (DOC             )READ.M                   36
+ SAVE             @RAP1            (DOC             )READ1LN.M                36
+ SAVE             @RAP1            (DOC             )READDIR.M                36
+ SAVE             @RAP1            (DOC             )READMDIR.M               36
+ SAVE             @RAP1            (DOC             )READRAW.M                36
+ SAVE             @RAP1            (DOC             )REALLOC.M                36
+ SAVE             @RAP1            (DOC             )REWIND.M                 36
+ SAVE             @RAP1            (DOC             )REWINDDIR.M              36
+ SAVE             @RAP1            (DOC             )RMDIR.M                  36
+ SAVE             @RAP1            (DOC             )SBRK.M                   36
+ SAVE             @RAP1            (DOC             )SCANF.M                  36
+ SAVE             @RAP1            (DOC             )SEED48.M                 36
+ SAVE             @RAP1            (DOC             )SEEK.M                   36
+ SAVE             @RAP1            (DOC             )SEEKDIR.M                36
+ SAVE             @RAP1            (DOC             )SETACC.M                 36
+ SAVE             @RAP1            (DOC             )SETBUF.M                 36
+ SAVE             @RAP1            (DOC             )SETDFT.M                 16
+ SAVE             @RAP1            (DOC             )SETGID.M                 36
+ SAVE             @RAP1            (DOC             )SETJMP.M                 36
+ SAVE             @RAP1            (DOC             )SETPGRP.M                36
+ SAVE             @RAP1            (DOC             )SETSIZ.M                 36
+ SAVE             @RAP1            (DOC             )SETUID.M                 36
+ SAVE             @RAP1            (DOC             )SETVBUF.M                36
+ SAVE             @RAP1            (DOC             )SIGNAL.M                 36
+ SAVE             @RAP1            (DOC             )SIN.M                    36
+ SAVE             @RAP1            (DOC             )SINH.M                   36
+ SAVE             @RAP1            (DOC             )SLEEP.M                  36
+ SAVE             @RAP1            (DOC             )SPRINTF.M                36
+ SAVE             @RAP1            (DOC             )SQRT.M                   36
+ SAVE             @RAP1            (DOC             )SRAND.M                  36
+ SAVE             @RAP1            (DOC             )SRAND48.M                36
+ SAVE             @RAP1            (DOC             )SSCANF.M                 36
+ SAVE             @RAP1            (DOC             )STACK.M                  36
+ SAVE             @RAP1            (DOC             )STAT.M                   36
+ SAVE             @RAP1            (DOC             )STAT1X.M                 36
+ SAVE             @RAP1            (DOC             )STATS.M                  36
+ SAVE             @RAP1            (DOC             )STDIO.M                  36
+ SAVE             @RAP1            (DOC             )STIME.M                  36
+ SAVE             @RAP1            (DOC             )STR2LC.M                 16
+ SAVE             @RAP1            (DOC             )STR2UP.M                 16
+ SAVE             @RAP1            (DOC             )STRADD.M                 16
+ SAVE             @RAP1            (DOC             )STRCASECMP.M             16
+ SAVE             @RAP1            (DOC             )STRCAT.M                 36
+ SAVE             @RAP1            (DOC             )STRCCPY.M                16
+ SAVE             @RAP1            (DOC             )STRCHR.M                 36
+ SAVE             @RAP1            (DOC             )STRCMP.M                 36
+ SAVE             @RAP1            (DOC             )STRCPY.M                 36
+ SAVE             @RAP1            (DOC             )STRCSPN.M                36
+ SAVE             @RAP1            (DOC             )STRDUP.M                 16
+ SAVE             @RAP1            (DOC             )STRECNT.M                16
+ SAVE             @RAP1            (DOC             )STRECPY.M                16
+ SAVE             @RAP1            (DOC             )STRICMP.M                16
+ SAVE             @RAP1            (DOC             )STRING.M                 36
+ SAVE             @RAP1            (DOC             )STRINGS.M                36
+ SAVE             @RAP1            (DOC             )STRLEN.M                 36
+ SAVE             @RAP1            (DOC             )STRNCASECMP.M            16
+ SAVE             @RAP1            (DOC             )STRNCAT.M                36
+ SAVE             @RAP1            (DOC             )STRNCMP.M                36
+ SAVE             @RAP1            (DOC             )STRNCPY.M                36
+ SAVE             @RAP1            (DOC             )STRNLEN.M                16
+ SAVE             @RAP1            (DOC             )STRPBRK.M                36
+ SAVE             @RAP1            (DOC             )STRPOS.M                 16
+ SAVE             @RAP1            (DOC             )STRRCHR.M                36
+ SAVE             @RAP1            (DOC             )STRRPOS.M                16
+ SAVE             @RAP1            (DOC             )STRSPN.M                 36
+ SAVE             @RAP1            (DOC             )STRTOD.M                 36
+ SAVE             @RAP1            (DOC             )STRTOK.M                 36
+ SAVE             @RAP1            (DOC             )STRTOL.M                 36
+ SAVE             @RAP1            (DOC             )SWAB.M                   36
+ SAVE             @RAP1            (DOC             )SYNC.M                   36
+ SAVE             @RAP1            (DOC             )SYS_ERRLIST.M            36
+ SAVE             @RAP1            (DOC             )SYS_NERR.M               36
+ SAVE             @RAP1            (DOC             )TAN.M                    36
+ SAVE             @RAP1            (DOC             )TANH.M                   36
+ SAVE             @RAP1            (DOC             )TDELETE.M                36
+ SAVE             @RAP1            (DOC             )TELLDIR.M                36
+ SAVE             @RAP1            (DOC             )TEMPNAM.M                36
+ SAVE             @RAP1            (DOC             )TFIND.M                  36
+ SAVE             @RAP1            (DOC             )TIME.M                   36
+ SAVE             @RAP1            (DOC             )TIMES.M                  36
+ SAVE             @RAP1            (DOC             )TMPFILE.M                36
+ SAVE             @RAP1            (DOC             )TMPNAM.M                 36
+ SAVE             @RAP1            (DOC             )TOASCII.M                36
+ SAVE             @RAP1            (DOC             )TOLOWER.M                36
+ SAVE             @RAP1            (DOC             )TOUPPER.M                36
+ SAVE             @RAP1            (DOC             )TRIG.M                   36
+ SAVE             @RAP1            (DOC             )TSEARCH.M                36
+ SAVE             @RAP1            (DOC             )TWALK.M                  36
+ SAVE             @RAP1            (DOC             )TYPES.M                  36
+ SAVE             @RAP1            (DOC             )TZSET.M                  36
+ SAVE             @RAP1            (DOC             )UMASK.M                  36
+ SAVE             @RAP1            (DOC             )UNGETC.M                 36
+ SAVE             @RAP1            (DOC             )UNIX2MPX.M               36
+ SAVE             @RAP1            (DOC             )UNIXIO.M                 36
+ SAVE             @RAP1            (DOC             )UNLINK.M                 36
+ SAVE             @RAP1            (DOC             )UTIME.M                  36
+ SAVE             @RAP1            (DOC             )VALUES.M                 36
+ SAVE             @RAP1            (DOC             )VARARGS.M                36
+ SAVE             @RAP1            (DOC             )VEXECL.M                 36
+ SAVE             @RAP1            (DOC             )VEXECV.M                 36
+ SAVE             @RAP1            (DOC             )VFPRINTF.M               36
+ SAVE             @RAP1            (DOC             )VPRINTF.M                36
+ SAVE             @RAP1            (DOC             )VSPRINTF.M               36
+ SAVE             @RAP1            (DOC             )WAIT.M                   36
+ SAVE             @RAP1            (DOC             )WRITE.M                  36
+ SAVE             @RAP1            (DOC             )WRITRAW.M                36
+ SAVE             @RAP1            (DOC             )Y0.M                     36
+ SAVE             @RAP1            (DOC             )Y1.M                     36
+ SAVE             @RAP1            (DOC             )YN.M                     36
+ SAVE             @RAP1            (DOC             )_EXIT.M                  16
+ SAVE             @RAP1            (DOC             )_EXITMPX.M               16
+ SAVE             @RAP1            (DOC             )_TOLOWER.M               16
+ SAVE             @RAP1            (DOC             )_TOUPPER.M               16
+ SAVE      *** EOF ***
+ SAVE      *** EOF ***
+ REWIND         (TAP)
+ *****  BOT  *****
+ 

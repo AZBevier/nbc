@@ -8,6 +8,8 @@
 extern struct tval symval;		/* defined in symbol.c */
 
 /* #define DSPACE */
+/* #define BUGB */
+/* #define BUGT */
 
 #ifdef DOS
 void	arel();
@@ -52,12 +54,12 @@ void	arel()
 	if (!yeanay())return;		/* are we assembling */
 	if (pcmode == PCCOM) {		/* are we processing common */
 	  /* get common # and see if it is an ssect */
-	  temp = (int32)(sectpc[PCCOM].value & 0x00ff0000L) >> 24;
-	  if ( hwcmsize[temp] & 0x80000000L)
+	  temp = (int32)(sectpc[PCCOM].value & 0x00ff0000) >> 24;
+	  if ( hwcmsize[temp] & 0x80000000)
 	      /* it is ssect, is it bigger than old */
-	      if ((sectpc[PCCOM].value & 0xffffL) > (hwcmsize[temp] & 0xffffL)) 
+	      if ((sectpc[PCCOM].value & 0xffff) > (hwcmsize[temp] & 0xffff)) 
 		/* save new size */
-		hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000L) |
+		hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000) |
 		  (sectpc[PCCOM].value & 0xffff));	/* set new size */
 	}
 	/* get augment and save as section type, see if csect */
@@ -84,7 +86,15 @@ int32	val;
 	int	tmp = 0;
 	int32	retv;
 
+#ifdef BUGB
+printf("bounc entry val %x dsect %x csect %x\n", val, hwcmpb[0], hwcmpb[1]);
+fflush(stdout);
+#endif
 	if (!yeanay()) return;			/* return if not assembling */
+#ifdef BUGB
+printf("bounc entry val %x dsect %x csect %x\n", val, hwcmpb[0], hwcmpb[1]);
+fflush(stdout);
+#endif
 	retv = tbou(val);			/* bound the pc */
 	if (retv != 0) {
 	  sectpc[pcmode].value += (val - retv);	/* set new pc */
@@ -95,10 +105,13 @@ int32	val;
 	if ((pcmode == PCDS) || (pcmode == PCCS)) {
 	  if (currpc.flags & CSDS) tmp = 1;	/* it is csect, use its index */
 	  val &= 0xfffff;			/* limit bound to 1mb */
-/*
+  
+#ifdef BUGB
 printf("bounding %s old val = %x new val = %x\n", tmp == 1?"csect":"dsect",
     hwcmpb[tmp], val);
-*/
+fflush(stdout);
+#endif
+   
 	  if (hwcmpb[tmp] <= val)		/* see if new max bound */
 	    hwcmpb[tmp] = val;			/* set new bounding max */
     	}
@@ -117,7 +130,7 @@ int	bound;
 {
 	int32	tmp;
 
-	tmp = (sectpc[pcmode].value & 0x7fffffL);	/* bound PC */
+	tmp = (sectpc[pcmode].value & 0x7fffff);	/* bound PC */
 	if (bound == 0)return (0);
 	return ((tmp - (bound * (tmp / bound))));
 }
@@ -135,16 +148,16 @@ void	bound ()
 
 	theval = val (0);		/* skip leading spaces */
 	if (!yeanay()) return;		/* if not assembling, return */
-	if ((theval.value & 0x7fffffL) == 0)	/* see if bound to small */
+	if ((theval.value & 0x7fffff) == 0)	/* see if bound to small */
 	  goto boune;			/* error if zero */
-	tmp = theval.value = theval.value & 0x7fffffL;	/* limit the value */
+	tmp = theval.value = theval.value & 0x7fffff;	/* limit the value */
 	for (nb = 0; nb < 32; nb++) {	/* loop for all 32 bits */
-	  if (tmp & (unsigned int32)0x80000000L)	/* see if sign bit on */
+	  if (tmp & (unsigned int32)0x80000000)	/* see if sign bit on */
 	    break;			/* exit loop done */
 	  tmp <<= 1;			/* shift it left one */
 	}
 	tmp <<= 1;			/* shift it left one */
-	tmp &= 0xffffffffL;		/* mask for alpha */
+	tmp &= 0xffffffff;		/* mask for alpha */
 	if (tmp != 0)			/* is value zero */
 	  goto boune;			/* error if not zero */
 	if (nb >= 26)			/* see if within range */
@@ -216,7 +229,7 @@ printf("entering ccp1 usname = %0.8s, dummy = %0.8s\n", usname, dummy);
 	if (spmac & INTSS) {		/* was symbol internally generated */
 	  seterr ('I');			/* set section definition error */
 	  do {				/* unstring the symbol names */
-	    unst(0x80c8000L);		/* unstring 1 symbol */
+	    unst(0x80c8000);		/* unstring 1 symbol */
 	  } while (hbstac[0] != ' ');	/* loop till blank terminator */
 	  return;			/* exit */
 	}
@@ -241,7 +254,7 @@ CCP8     TBM       7,PASS        FIRST PASS?                  84-587
 	  if (EXPAND & macstate) {	/* expanding a macro */
 	    /* yes, then we must unstring rest of line */
 	    do {			/* unstring the symbol names */
-	      unst(0x80c8000L);		/* unstring 1 symbol */
+	      unst(0x80c8000);		/* unstring 1 symbol */
 	    } while (hbstac[0] != ' ');	/* loop till blank terminator */
 	  }
 	  return;			/* exit */
@@ -263,7 +276,7 @@ printf("ccp9 blknum = %x, val = %d\n", blknum, (tdef.value >> 16));
 	tdef.type = TYPC;		/* common type symbol */
 	tdef.flags = 0;			/* absrel/csds are zero for common */
 ccp3:
-	unst(0x80c80000L);		/* unstring, term on sp , ( ) */
+	unst(0x80c80000);		/* unstring, term on sp , ( ) */
 	if (yeanay()) {			/* are we assembling */
 	  /* yes, allow a common definition */
 	  if (PASS & 1)			/* if pass 2, don't alloc symbol */
@@ -272,13 +285,13 @@ ccp3:
 	temp = 1;			/* default to 1 word for size */
 	if (hbstac[0] == '(') {		/* was terminator a ( */
 	  /* yes, get the dimension size of this element */
-	  unst(0x80c80000L);		/* unstring, term on sp , ( ) */
+	  unst(0x80c80000);		/* unstring, term on sp , ( ) */
 	  tnum = cnum(10);		/* convert the size (in words) */
 	  temp = tnum[0];		/* just get l/o part */
 	}
 	temp <<= 2;			/* make number of words into bytes */
 	/* see if size is too big ( > 0xffff) */
-	if (((temp + (tdef.value & 0xffff)) & 0xffff0000L)) {
+	if (((temp + (tdef.value & 0xffff)) & 0xffff0000)) {
 	  temp = 0;			/* yes, reset to zero */
 	  seterr ('R');			/* set relocation error */
 	}
@@ -287,7 +300,7 @@ ccp5:
 	if (hbstac[0] == ',')		/* was terminator a , */
 	  goto ccp3;			/* yes, more symbols to do */
 	if (hbstac[0] != ' ') {		/* was terminator a sp */
-	  runst(0x80c80000L);		/* no, unstring, term on sp , ( ) */
+	  runst(0x80c80000);		/* no, unstring, term on sp , ( ) */
 	  goto ccp5;			/* without skipping sp, see if done */
 	}
 	/* we are done, finish up */
@@ -318,7 +331,7 @@ printf("entering dpcom usname = %0.8s\n", usname);
 	dpd.flags = 0;			/* zero flags */
 	dpd.type = TYPDP;		/* datapool definition */
 ccp7:
-	unst(0x80c80000L);		/* unstring one symbol */
+	unst(0x80c80000);		/* unstring one symbol */
 /*
 printf("dpcom unst1 usname = %0.8s\n", usname);
 */
@@ -336,7 +349,7 @@ prtval("dpcom dpd", &dpd);
 	if (hbstac[0] != '(')		/* was it a '(' */
 	  goto ccp7;			/* no, don't ignore data to comma */
 ccp8:
-	unst(0x80c80000L);		/* unstring one symbol */
+	unst(0x80c80000);		/* unstring one symbol */
 /*
 printf("dpcom unst2 usname = %0.8s\n", usname);
 */
@@ -354,7 +367,9 @@ printf("dpcom unst2 usname = %0.8s\n", usname);
 
 void	equ()
 {
-/* prtval("equ 1", &currpc); */
+#ifdef BUGB
+ prtval("equ 1", &currpc); 
+#endif
 	if (ASECT & option) {		/* are auto sectioning? */
 	  usname[4] = '\0';		/* null terminate */
 	  str2upr(usname);		/* set opcode to uppercase */
@@ -364,7 +379,9 @@ void	equ()
 					/* evaluate expression */
 					/* set new pc value */
 	currpc = val (0);		/* tell val to skip leading spaces */
-/* prtval("equ 2", &currpc); */
+#ifdef BUGB
+ prtval("equ 2", &currpc);
+#endif
 	/* see if type is common */
 	if (currpc.type == TYPC) {	/* see if type common */
 					/* set block number if it is */
@@ -375,10 +392,17 @@ void	equ()
 	if (DPFLG & dpflags) 		/* datapool ? */
 	  seterr ('V');			/* if datapool, set VFD error */
 	}
-/*
+
+#ifdef BUGB
 printf("calling tall from equ with label %.8s, pcmode = %x\n",label, pcmode);
-*/
+fflush(stdout);
+#endif
+
 	tall();				/* allocate current label */
+#ifdef BUGB
+printf("return from calling tall from equ with label %.8s, pcmode = %x\n",label, pcmode);
+fflush(stdout);
+#endif
 	if (yeanay()) {			/* are we assembling */
 	  bits |= CVFL;			/* set flag to print prog cntr */
 	}
@@ -403,7 +427,7 @@ void	list()
 	if ((macstate & RPTGEN) && (bits2 & REPPRINT))
 	  bits &= ~IMIN;		/* no, suppress p/o of list directive */
 list0:
-	unst(0x80080000L);		/* unstring one item */
+	unst(0x80080000);		/* unstring one item */
 	usname[4] = 0;			/* null terminate 4 char directive */
 	str2upr(usname);		/* force to uppercase */
 	if (!strncmp(usname, "REP ", 4))  /* list rept expansions */
@@ -538,28 +562,28 @@ ORG.1    CEQU      $                                            ESCT-32
 
 org3:					/* process common org */
 	temp = (int32)(sectpc[PCCOM].value >> 16) & 0xff;  /* common blk # */
-	if (hwcmsize[temp] & 0x80000000L) {	/* is this ssect */
+	if (hwcmsize[temp] & 0x80000000) {	/* is this ssect */
 	  /* it is, see if we need to save size */
-	  if ((sectpc[PCCOM].value & 0xffffL) > (hwcmsize[temp] & 0xffffL))
-	    hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000L) | 
-	      (sectpc[PCCOM].value & 0xffffL));	/* or in new size */
+	  if ((sectpc[PCCOM].value & 0xffff) > (hwcmsize[temp] & 0xffff))
+	    hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000) | 
+	      (sectpc[PCCOM].value & 0xffff));	/* or in new size */
 	}
 	if (!(PASS & 1)) {		/* is this pass 2 */
 	  /* pass 2 - check new common size */
 	  if (hwcmsize[inacbn] < inac.value)	/* input is greater, error */
 	    goto org2;			/* go report error */
 	}
-	if (hwcmsize[inacbn] & 0x80000000L)	/* is this an ssect */
+	if (hwcmsize[inacbn] & 0x80000000)	/* is this an ssect */
 	  goto org2;			/* yes, org invalid, error */
 	sectpc[PCCOM] = inac;		/* save new definition */
-	sectpc[PCCOM].value = ((sectpc[PCCOM].value & 0xffff0000L) |
+	sectpc[PCCOM].value = ((sectpc[PCCOM].value & 0xffff0000) |
 	  ((int32)inacbn << 16));	/* or in block number */
 	pcmode = PCCOM;			/* set the PC pointer to common */
 	goto org0;			/* finish up and exit */
 
 org4:
 	sectpc[pcmode] = inac;		/* save new definition */
-	sectpc[PCCOM].value = ((sectpc[PCCOM].value & 0xff00ffffL) |
+	sectpc[PCCOM].value = ((sectpc[PCCOM].value & 0xff00ffff) |
 	  ((int32)inacbn << 16));	/* or in block number */
 	goto org0;			/* finish up and exit */
 }
@@ -604,7 +628,7 @@ void	prog()
     	}
     	bits |= PROGF;		/* set program statement found */
     }
-    unst (0x80080000L);		/* terminate on space or comma */
+    unst (0x80080000);		/* terminate on space or comma */
     memcpy(dummy, usname, 8);	/* get the program name */
     dummy[8] = '\0';		/* null terminate it */
 /*    str2upr(dummy);*/		/* make upper case */
@@ -614,7 +638,7 @@ printf("program usname = %0.16s, TCWPROG = %0.16s\n", usname, TCWPROG);
 */
     prodidl = 0;		/* clear id length */
     if (option & ID) {
-    	unst (0x80000000L);	/* unstring product id */
+    	unst (0x80000000);	/* unstring product id */
     	if (yeanay()) {		/* are we assembling */
     	    /* round up to words */
     	    unstnp = ((unstnp+3) >> 2) << 2;
@@ -647,7 +671,7 @@ void	ref()
 	else				/* else it is a def (or sdef) */
 	  refd.type = TYPU;		/* default to undefined for def */
 	do {				/* process ext/def while term is , */
-	  unst(0x80080000L);		/* term on sp or comma */
+	  unst(0x80080000);		/* term on sp or comma */
 	  if (!yeanay())		/* are we assembling */
 	    continue;			/* process next element */
 
@@ -678,10 +702,10 @@ void	ref()
 	    temp = symval.value;	/* get the address */
 #ifdef OLD_BAD_WAY
 	    if (symval.flags & CSDS)	/* test cs/ds flag */
-	      temp |= 0x800000L;	/* set csect flag */
+	      temp |= 0x800000;	/* set csect flag */
 #else
 	    if (symval.flags & ABSREL)	/* test abs/rel flag */
-	      temp |= 0x800000L;	/* set rel flag */
+	      temp |= 0x800000;	/* set rel flag */
 #endif
 	    bfa (temp);			/* put address on bo stream */
 	    pb (hbbs, PTED, 0);		/* output entry point def */
@@ -694,7 +718,7 @@ void	ref()
 	  /* common, publish definition */
 	  temp = ((symval.value >> 16) & 0xff);	/* get comm blk # */
 	  /* if common block not ssect or sext, error */
-	  if (!((hwcmsize[temp] & 0x80000000L) || (curops->aug & 2))) {
+	  if (!((hwcmsize[temp] & 0x80000000) || (curops->aug & 2))) {
 	    seterr ('F');		/* set symbol definition error */
 	    continue;			/* do next entry */
 	  }
@@ -712,7 +736,7 @@ expout:					/* generate expanded loader codes */
 	    /* output section number (dsec/csect) */
 	    bfb ((symval.flags & CSDS) ? 1 : 0);
 	    temp = symval.value;	/* get the offset address */
-	    temp |= ((symval.flags & ABSREL) ? 0x800000L : 0); /* set abs/rel */
+	    temp |= ((symval.flags & ABSREL) ? 0x800000 : 0); /* set abs/rel */
 	  }
 	  bfa (temp);			/* output 3 bytes to bo stack */
 	  bfn0 ();			/* output name to bo from usname */
@@ -748,8 +772,8 @@ printf("res 1 expr[0].value = %x\n", expr[0].value);
 /* printf("res 1 pc = %x\n", pc); */
 	/* retain type code and add res value to pc */
 /* printf("res 1 before sectpc[pcmode].value = %x\n", sectpc[pcmode].value); */
-	sectpc[pcmode].value = (((expr[0].value & 0x3fffffL) +
-	  (pc & 0x3fffffL)) & 0x3fffffL);
+	sectpc[pcmode].value = (((expr[0].value & 0x3fffff) +
+	  (pc & 0x3fffff)) & 0x3fffff);
 /*
 printf("res 1 after sectpc[pcmode].value = %x\n", sectpc[pcmode].value);
 prtval("res 2 sectpc", &sectpc[pcmode]);
@@ -785,7 +809,7 @@ prtval("rez 1 expr[1]", &expr[1]);
 prtval("rez 2 currpc", &currpc);
 */
 	tall();				/* allocate current label */
-	if ((expr[0].value & 0x7fffffL) == 0)  /* largest num of bytes to rez */
+	if ((expr[0].value & 0x7fffff) == 0)  /* largest num of bytes to rez */
 	  return;			/* zero bytes to rez, return */
 	if (expr[0].value < 0) {  	/* if neg bytes, error */
 	  if (yeanay())			/* are we assembling */
@@ -895,14 +919,14 @@ void	sdirs()
 	  return;			/* return if not assembling */
 	if (inac.type == TYPC) {	/* is val type common */
 	  /* type is common, see if same block # */
-	  if (((int32)(sectpc[PCCOM].value & 0xff0000L) >> 16) != inacbn)
+	  if (((int32)(sectpc[PCCOM].value & 0xff0000) >> 16) != inacbn)
 	    /* not same block, error */
 	    goto sorg2;			/* it is an error */
 	}
 	if (pcmode == PCCOM) {		/* is curr sect common */
 	  /* yes, is it an ssect */
-	  if (hwcmsize[(int32)(sectpc[PCCOM].value & 0xff0000L) >> 16]
-	    & 0x80000000L)
+	  if (hwcmsize[(int32)(sectpc[PCCOM].value & 0xff0000) >> 16]
+	    & 0x80000000)
 	    /* yes, process it */
 	    goto sorg3;			/* process sorg */
 	}
@@ -923,36 +947,36 @@ sorg3:					/* process common type */
 	  hbstac[1] = ' ';		/* prev was blank */
 /*	  cnts = inscnt;    */	/* reset count */
 	  inag = sectpc[PCCOM];		/* get common sect info */
-	  inag.value &= 0xffff0000L;	/* with offset zero */
+	  inag.value &= 0xffff0000;	/* with offset zero */
 	  bits2 |= ALVAL;		/* indicate 1st operand evaluation */
 	  val(0);			/* tell val unstrung */
 	}
 	temp = (sectpc[PCCOM].value >> 16) & 0xff;	/* common blk # */
 	/* see if we need to save size */
 	if ((sectpc[PCCOM].value & 0xffff) > (hwcmsize[temp] & 0xffff))
-	  hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000L) | 
+	  hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000) | 
 	    (sectpc[PCCOM].value & 0xffff));	/* or in new size */
 
 	/* force inac to have type common and abs/dsect flags */
 	inac.flags = 0;			/* abs/dsect */
 	inac.type = TYPC;		/* type of common */
 	/* set section # to that in pc */
-	inacbn = ((int32)(sectpc[PCCOM].value & 0x00ff0000L) >> 24);
+	inacbn = ((int32)(sectpc[PCCOM].value & 0x00ff0000) >> 24);
 	sectpc[PCCOM] = inac;		/* save new definition */
-	sectpc[PCCOM].value = ((sectpc[PCCOM].value & 0xffff0000L) |
+	sectpc[PCCOM].value = ((sectpc[PCCOM].value & 0xffff0000) |
 	  ((int32)inacbn << 16));	/* or in block number */
 	goto sorg0;			/* finish up and exit */
 	
 	  case 1:			/* ssect directive */
 
 	if (yeanay()) {			/* are we assembling */
-	  unst(0x80c80000L);		/* yes, unstring on sp , ( ) */
+	  unst(0x80c80000);		/* yes, unstring on sp , ( ) */
 	  if ((hbstac[0] = ' '))	/* space terminator */
 	    goto ssect1;		/* only 1 symbol, o.k. */
 /* printf("ssect: X error\n"); */
 	  seterr ('X');			/* set section error */
 	}
-	unst(0x80000000L);		/* unstring, term on space */
+	unst(0x80000000);		/* unstring, term on space */
 	return;				/* done */
 
 ssect1:
@@ -961,7 +985,7 @@ ssect1:
 	ss (&ud, dummy);		/* search symbol table */
 	if (symval.type == TYPC) {	/* is type common */
 	  /* symbol is common, see if ssect */
-	  if (hwcmsize[(int32)(symval.value & 0xff0000l) >> 16] & 0x80000000L) {
+	  if (hwcmsize[(int32)(symval.value & 0xff0000l) >> 16] & 0x80000000) {
 	    /* yes, process it */
 	    if (usname[7] != ' ')	/* is name <= 7 chars */
 /* printf("ssect1: X error\n"); */
@@ -983,7 +1007,7 @@ ssect1:
 	  seterr ('Z');			/* set section definition error */
 	  return;
 	}
-	hwcmsize[hbccct] &= 0x80000000L;	/* make it into ssect */
+	hwcmsize[hbccct] &= 0x80000000;	/* make it into ssect */
 	sdef.type = TYPC;		/* set type for common */
 	sdef.flags = 0;			/* no flags for common */
 	sdef.value = (int32)hbccct << 16;	/* set blk # with 0 offset */
@@ -1006,15 +1030,15 @@ ssect21:
 	    goto sorg0;			/* yes, go finish up */
 
 	/* not the same, fixup some stuff */
-	if (hwcmsize[temp] & 0x80000000L) {	/* is section an ssect */
+	if (hwcmsize[temp] & 0x80000000) {	/* is section an ssect */
 	  /* see if we need to save size */
-	  if ((sectpc[PCCOM].value & 0xffff) > (hwcmsize[temp] & 0xffffL))
-	    hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000L) | 
-	      (sectpc[PCCOM].value & 0xffffL));	/* or in new size */
+	  if ((sectpc[PCCOM].value & 0xffff) > (hwcmsize[temp] & 0xffff))
+	    hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000) | 
+	      (sectpc[PCCOM].value & 0xffff));	/* or in new size */
 	}
 	sectpc[PCCOM].type = inac.type;	/* set new type */
-	sectpc[PCCOM].value = ((((hwcmsize[inacbn] & 0xffffL) + inac.value)
-	  & 0xffffL) | ((int32)inacbn << 16));	/* or in block number */
+	sectpc[PCCOM].value = ((((hwcmsize[inacbn] & 0xffff) + inac.value)
+	  & 0xffff) | ((int32)inacbn << 16));	/* or in block number */
 	pcmode = PCCOM;			/* set the PC pointer to common */
 	goto sorg0;			/* go finish up */
 
@@ -1025,7 +1049,7 @@ ssect21:
 	  dpcom();			/* go process as datapool */
 	  return;			/* exit */
 	}	/* not assembling */
-	unst(0x80000000L);		/* unstring, term on space */
+	unst(0x80000000);		/* unstring, term on space */
 	return;				/* next statement */
 	}	/* end of switch */
 	return;
@@ -1050,7 +1074,7 @@ char cpass;
 printf("space: enter\n");
 #endif
 	val(0);				/* get number of lines to space */
-	lines = inac.value & 0x7fffffL;	/* the value */
+	lines = inac.value & 0x7fffff;	/* the value */
 #ifdef DSPACE
 printf("space: lines = %d\n", lines);
 #endif
@@ -1107,7 +1131,7 @@ void	titl()
 
 	memset(TCWTITL, ' ',TCWTTLE-TCWTITL);	/* clear title buffer */
 	do {
-	  chr = gbyt(0x80800000L);	/* get a byte */
+	  chr = gbyt(0x80800000);	/* get a byte */
 	}
 	 while ((inscnt < 72) && (chr == ' '));
 	/* non blank char found */
@@ -1117,7 +1141,7 @@ void	titl()
 	}
 	
 	while ((inscnt < 72) && (hbtitm < (TCWTTLE-TCWTITL))) {
-	  chr = gbyt(0x80800000L);	/* get a byte */
+	  chr = gbyt(0x80800000);	/* get a byte */
 	  if (!(PASS & 1)) {		/* if pass 2 store char */
 	    if (yeanay()) {		/* are we assembling */
 	      til[hbtitm++] = chr;	/* store the char */    
@@ -1168,7 +1192,7 @@ void stab()
     	case 0x4:	/* .sym */
     	    /* unstring one element skipping leading blanks. */
     	    /* Name in usname. Get _symbol we are defining */
-    	    unst(0x80000000L);		/* unstring, term on space */
+    	    unst(0x80000000);		/* unstring, term on space */
     	    /* was a name entered */
     	    if (*usname == ' '){
     		seterr ('F');		/* no, set blank name error */
@@ -1177,7 +1201,7 @@ void stab()
     	    memcpy(dummy, usname, 8);	/* get the symbol, if any */
     	    dummy[8] = '\0';		/* null terminate it */
 loopy:
-    	    unst(0x80000000L);		/* unstring item, term on space */
+    	    unst(0x80000000);		/* unstring item, term on space */
     	    if (*usname == ' ')		/* see if done */
     		goto wedone;		/* no more info, build symbol */
     	    usname[8] = 0;		/* null terminate 5 char directive */
@@ -1217,7 +1241,7 @@ loopy:
     	    else
     	    if (!strncmp(usname, "STRUCT", 6)) {  /* struct variable */
     		type = 6;
-    		unst(0x80000000L);	/* unstring structure name */
+    		unst(0x80000000);	/* unstring structure name */
     					/* term on space */
     		usname[8] = 0;		/* null terminate 8 char name */
     		memcpy(suname, usname, 8);	/* save the name */
@@ -1226,7 +1250,7 @@ loopy:
     	    } else
     	    if (!strncmp(usname, "UNION", 5)) {  /* union variable */
     		type = 7;
-    		unst(0x80000000L);	/* unstring union name */
+    		unst(0x80000000);	/* unstring union name */
     					/* term on space */
     		usname[8] = 0;		/* null terminate 8 char name */
     		memcpy(suname, usname, 8);	/* save the name */
@@ -1247,7 +1271,7 @@ loopy:
     	    else
     	    if (!strncmp((char *)usname, "ENUM", 4)) {  /* enum variable */
     		type = 12;
-    		unst(0x80000000L);	/* unstring enum name */
+    		unst(0x80000000);	/* unstring enum name */
     					/* term on space */
     		usname[8] = 0;		/* null terminate 8 char name */
     		memcpy(suname, usname, 8);	/* save the name */
@@ -1424,7 +1448,7 @@ loopy:
     	case 0x6:	/* .xeq */
     	    /* unstring one element skipping leading blanks. */
     	    /* Name in usname. Get S.nn or C.nn or E.nn */
-    	    unst(0x80000000L);		/* unstring, term on space */
+    	    unst(0x80000000);		/* unstring, term on space */
     	    /* was a name entered */
     	    if (*usname != 's') {
     		seterr ('F');		/* no, set blank name error */
@@ -1440,7 +1464,7 @@ loopy:
     	bits |= INSTAB;			/* ignore ';' and '"' chars */
     	sudo = 1;			/* do tabs mod 8 */
 	do {
-	  chr = gbyt(0x80800000L);	/* get a byte */
+	  chr = gbyt(0x80800000);	/* get a byte */
 	}
 	 while ((inscnt < 72) && (chr == ' ') && ++blnkcnt);
     	/* blnkcnt has count of leading blanks */
@@ -1452,7 +1476,7 @@ loopy:
 	
     	/* now get the rest of the line */
 	while ((inscnt < 72) && (charcnt < 80)) {
-	  chr = gbyt(0x80800000L);	/* get a byte */
+	  chr = gbyt(0x80800000);	/* get a byte */
 	  if (!(PASS & 1)) {		/* if pass 2 store char */
 	    if (yeanay()) {		/* are we assembling */
 	      sline[charcnt++] = chr;	/* store the char */    

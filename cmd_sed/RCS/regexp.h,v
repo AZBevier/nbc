@@ -1,10 +1,14 @@
-head	1.3;
+head	1.4;
 access;
 symbols;
-locks
-	jbev:1.3; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.4
+date	2021.09.13.21.48.53;	author jbev;	state Exp;
+branches;
+next	1.3;
 
 1.3
 date	2021.07.05.23.30.42;	author jbev;	state Exp;
@@ -27,9 +31,9 @@ desc
 @
 
 
-1.3
+1.4
 log
-@Correct warnings.
+@Correct warning errors.
 @
 text
 @/*~!regexp.h*/
@@ -50,10 +54,13 @@ text
  * (a).
  */
 
-#ident	"Makef4MPX $Id: regexp.h,v 1.2 1995/03/14 04:07:23 jbev Exp jbev $"
+#ident	"Makef4MPX $Id: regexp.h,v 1.3 2021/07/05 23:30:42 jbev Exp jbev $"
 
 /*
  * $Log: regexp.h,v $
+ * Revision 1.3  2021/07/05 23:30:42  jbev
+ * Correct warnings.
+ *
  * Revision 1.2  1995/03/14 04:07:23  jbev
  * Correct static definitions.
  *
@@ -64,6 +71,8 @@ text
 
 #ifndef	REGEXP_H
 #define	REGEXP_H
+
+#include <string.h>
 
 #define	CBRA	2
 #define	CCHR	4
@@ -83,13 +92,16 @@ text
 #define ISTHERE(c)	(ep[c >> 3] & bittab[c & 07])
 #define ecmp(s1, s2, n)	(!strncmp(s1, s2, n))
 
+int step();
+int advance();
+static void getrnge();
+
 static char *braslist[NBRA];
 static char *braelist[NBRA];
 static int ebra;
 int sed, nbra;
 char *loc1, *loc2, *locs;
 static int nodelim;
-static int getrnge();
 
 int circf;
 static int low;
@@ -103,10 +115,11 @@ char *
 compile(instring, ep, endbuf, seof)
 register char *ep;
 char *instring, *endbuf;
+int seof;
 {
     INIT	/* Dependent declarations and initializations */
-    register c;
-    register eof = seof;
+    register int c;
+    register int eof = seof;
     char *lastep = instring;
     int cclcnt;
     char bracket[NBRA], *bracketp;
@@ -292,10 +305,10 @@ defchar:
 }
 
 
-step(p1, p2)
+int step(p1, p2)
 register char *p1, *p2;
 {
-    register c;
+    register int c;
 
     if (circf) {
     	loc1 = p1;
@@ -325,7 +338,7 @@ register char *p1, *p2;
 }
 
 
-advance(lp, ep)
+int advance(lp, ep)
 register char *lp, *ep;
 {
     register char *curlp;
@@ -363,11 +376,11 @@ register char *lp, *ep;
     	    }
     	    return(0);
     	case CBRA:
-    	    braslist[*ep++] = lp;
+    	    braslist[(int)*ep++] = lp;
     	    continue;
 
     	case CKET:
-    	    braelist[*ep++] = lp;
+    	    braelist[(int)*ep++] = lp;
     	    continue;
 
     	case CCHR | RNGE:
@@ -418,8 +431,8 @@ register char *lp, *ep;
     	    goto star;
 
     	case CBACK:
-    	    bbeg = braslist[*ep];
-    	    ct = braelist[*ep++] - bbeg;
+    	    bbeg = braslist[(int)*ep];
+    	    ct = braelist[(int)*ep++] - bbeg;
 
     	    if (ecmp(bbeg, lp, ct)) {
     	    	lp += ct;
@@ -428,8 +441,8 @@ register char *lp, *ep;
     	    return(0);
 
     	case CBACK | STAR:
-    	    bbeg = braslist[*ep];
-    	    ct = braelist[*ep++] - bbeg;
+    	    bbeg = braslist[(int)*ep];
+    	    ct = braelist[(int)*ep++] - bbeg;
     	    curlp = lp;
     	    while (ecmp(bbeg, lp, ct))
     	    	lp += ct;
@@ -478,8 +491,7 @@ star:
 }
 
 
-static
-getrnge(str)
+static void getrnge(str)
 register unsigned char *str;
 {
     low = *str++ & 0377;
@@ -487,6 +499,54 @@ register unsigned char *str;
 }
 
 #endif	/* REGEXP_H */
+@
+
+
+1.3
+log
+@Correct warnings.
+@
+text
+@d19 1
+a19 1
+#ident	"Makef4MPX $Id: regexp.h,v 1.2 1995/03/14 04:07:23 jbev Exp jbev $"
+d23 3
+d37 2
+d57 4
+a66 1
+static int getrnge();
+d80 1
+d83 2
+a84 2
+    register c;
+    register eof = seof;
+d270 1
+a270 1
+step(p1, p2)
+d273 1
+a273 1
+    register c;
+d303 1
+a303 1
+advance(lp, ep)
+d341 1
+a341 1
+    	    braslist[*ep++] = lp;
+d345 1
+a345 1
+    	    braelist[*ep++] = lp;
+d396 2
+a397 2
+    	    bbeg = braslist[*ep];
+    	    ct = braelist[*ep++] - bbeg;
+d406 2
+a407 2
+    	    bbeg = braslist[*ep];
+    	    ct = braelist[*ep++] - bbeg;
+d456 1
+a456 2
+static
+getrnge(str)
 @
 
 

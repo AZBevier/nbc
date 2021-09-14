@@ -1,10 +1,14 @@
-head	1.7;
+head	1.8;
 access;
 symbols;
-locks
-	jbev:1.7; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.8
+date	2021.09.13.19.34.08;	author jbev;	state Exp;
+branches;
+next	1.7;
 
 1.7
 date	2021.06.28.21.43.16;	author jbev;	state Exp;
@@ -47,9 +51,9 @@ desc
 @
 
 
-1.7
+1.8
 log
-@make longp an int32.  Add uint8 type.
+@Fix warning errors.
 @
 text
 @/* defs.h */
@@ -60,7 +64,7 @@ text
 #endif
 #undef BIN
 
-#ifdef MPX
+#ifdef mpx
 #include <types.h>
 #endif
 
@@ -71,6 +75,8 @@ extern void *malloc();
 extern void *realloc();
 extern void free();
 extern void exit();
+extern void *calloc();
+extern int  unlink();
 
 #ifdef DOS
 #define longp	long		/* 32 bits on everything else */
@@ -84,13 +90,14 @@ extern void exit();
 #else
 #ifdef __alpha
 #define longp	long		/* 64 bits on alpha */
-#define	int32	int		/* must be 32 bits */
+#define	int32	int		    /* must be 32 bits */
 #else
 
-#define longp	long	/* 32 bits on everything else */
-/*#define longp	int		*/ /* 32 bits on everything else */
-#define	int32	int		/* must be 32 bits */
+#define	int64	long long	    /* must be 64 bits */
+#define	int32	int		    /* must be 32 bits */
 #define	uint32	unsigned int32		/* must be 32 bits */
+/* #define longp	long */ /* 32 bits on everything else */
+#define longp	int32		/* 32 bits on everything else */
 #endif
 #define	uint8	unsigned char		/* must be 8 bits */
 #define	int16	unsigned short	/* must be 16 bits */
@@ -297,8 +304,8 @@ struct	tval {			/* structure containing type, flags, value */
 	unsigned  type:8;	/* its type */
 	unsigned  flags:8;	/* misc flags */
 	unsigned  tmp:16;	/* filler */
-	longp value;		/* and value */
-/*	unsigned  int32 value;	/* and value */
+/* ngp value;		*/  /* and value */
+	uint32    value;	/* and value */
 };
 
 extern	struct	tval	val ();
@@ -607,8 +614,8 @@ extern	char	lablscan[];	/* label we are scanning for */
 extern	char	prnt[];		/* the print buffer */
 extern	struct	tval	ud;	/* undefined value entry */
 /***************************************************/
-extern	char	hwmspbuf;	/* count of chars in print buffer */
-#define	TCWSIZE	108		/* title buffer size */
+extern	uint8	hwmspbuf;	/* count of chars in print buffer */
+#define	TCWSIZE	108		    /* title buffer size */
 extern	char 	tcwd[];		/* title buffer */
 #define	TCWPROG	&tcwd[3]	/* program name 8 chars + 4 filler */
 #define	TCWDATE	&tcwd[15]	/* date & time 24 chars */
@@ -616,9 +623,9 @@ extern	char 	tcwd[];		/* title buffer */
 #define	TCWTTLE	&tcwd[107]	/* 4 char filler */
 extern	char	FMTD_DT[];	/* object date and time */
 
-#define BRL	120		/* length of binary record */
-extern	char	ppt;		/* binary record length (120) */
-extern	unsigned char	PBL[];	/* binary buffer */
+#define BRL	120		        /* length of binary record */
+extern  uint8	ppt;		/* binary record length (120) */
+extern	uint8 	PBL[];	    /* binary buffer */
 #define PBLF	PBL[0]		/* function code location */
 #define PBLB	PBL[1]		/* record byte count */
 extern	short	*pblc;
@@ -631,14 +638,14 @@ extern	unsigned char	*pblp;
 extern	int32	lice;		/* line count */
 extern	int32	lict;		/* current line number */
 extern	struct	tval	max;	/* maximum program size */
-/* extern	char	imip;		/* image in progress flag */
+/* extern	char	imip; */ /* image in progress flag */
 
 extern	char	unterm;		/* last unstring terminator */
 extern	int	unstnp;		/* store pointer for unst */
 extern	char	label[];	/* the unstrung label, any */
 #define MAXCHARS	24	/* maximum chars in usname */
-extern	uint8	usname[];	/* contains last 24 char name unstrung */
-extern	char	pcmode;		/* current program mode */
+extern	char	usname[];	/* contains last 24 char name unstrung */
+extern	uint8   pcmode;		/* current program mode */
 #define PCABS	0		/* 0 - prog in abs mode */
 #define PCDS	1		/* 1 - prog in dsect mode */
 #define PCCOM	2		/* 2 - prog in common mode */
@@ -759,7 +766,7 @@ extern	struct optab *curops;	/* current opcode table pointer */
 extern	struct symbol FAR *libsch();
 
 extern	int32	inttag;		/* internal tag number */
-extern	char	inscnt;		/* input scanner count */
+extern	uint8   inscnt;		/* input scanner count */
 extern	int32	hwact;		/* current state information */
 
 extern	struct tval currpc;	/* address of leftmost byte in this line */
@@ -801,7 +808,7 @@ extern	struct tval expr[];	/* expression variable information */
 extern	short	hbccct;		/* next common block count */
 extern	char	tot;		/* length constant for tdat */
 extern	char	hbtttf;		/* type of data being translated */
-extern	char	hbavar;		/* holds addr variant to be used */
+extern	uint8   hbavar;		/* holds addr variant to be used */
 extern	char	hbbn;		/* common block/section number */
 extern	char	hbbbfb;		/* 0 means no data bytes output */
 extern	char	hbbbct;		/* NUMBER OF BYTES GENERATED FOR THIS  */
@@ -811,11 +818,11 @@ extern	struct tval inag;	/* AUGEND TYPE AND VALUE */
 extern	struct tval inac;	/* ACCUMULAND TYPE AND VALUE */
 extern	struct tval accum;	/* 2nd ACCUMULAND TYPE AND VALUE */
 extern	char	valundf;	/* undefined val returned from val */
-extern	char	inagbn;		/* block # for common */
-extern	char	inacbn;		/* block # for common */
+extern	uint8	inagbn;		/* block # for common */
+extern	uint8	inacbn;		/* block # for common */
 
 
-/*struct	tval	dval;		/* descriptor for the value unstrung */
+/*struct	tval	dval;	*/	/* descriptor for the value unstrung */
 
 extern	short	hhvfx;		/* this is a right to left bit stack */
 extern	short	hhvfo;		/* the number of bits in the stack */
@@ -905,7 +912,7 @@ extern	char	stk[];		/* 4k macro parameter substitution area */
 /* stk contains multiple 24 char parameter names used during expansion */
 /* it is pointed to by the level pointers in stackp->clev */
 
-/* extern	struct macro *macp;		/* address of macros */
+/* extern	struct macro *macp;	*/	/* address of macros */
 
 /********************************/
 /* variables defined in xref.c */
@@ -920,6 +927,63 @@ extern void writerpt();		/* output xref report */
 extern FILE*ut2fd;		/* UT2 */
 extern char *xrbuf;		/* xref buffer 768*20 */
 extern void writerep();		/* output cross reference */
+@
+
+
+1.7
+log
+@make longp an int32.  Add uint8 type.
+@
+text
+@d9 1
+a9 1
+#ifdef MPX
+d20 2
+d35 1
+a35 1
+#define	int32	int		/* must be 32 bits */
+d38 2
+a39 3
+#define longp	long	/* 32 bits on everything else */
+/*#define longp	int		*/ /* 32 bits on everything else */
+#define	int32	int		/* must be 32 bits */
+d41 2
+d249 2
+a250 2
+	longp value;		/* and value */
+/*	unsigned  int32 value;	/* and value */
+d559 2
+a560 2
+extern	char	hwmspbuf;	/* count of chars in print buffer */
+#define	TCWSIZE	108		/* title buffer size */
+d568 3
+a570 3
+#define BRL	120		/* length of binary record */
+extern	char	ppt;		/* binary record length (120) */
+extern	unsigned char	PBL[];	/* binary buffer */
+d583 1
+a583 1
+/* extern	char	imip;		/* image in progress flag */
+d589 2
+a590 2
+extern	uint8	usname[];	/* contains last 24 char name unstrung */
+extern	char	pcmode;		/* current program mode */
+d711 1
+a711 1
+extern	char	inscnt;		/* input scanner count */
+d753 1
+a753 1
+extern	char	hbavar;		/* holds addr variant to be used */
+d763 2
+a764 2
+extern	char	inagbn;		/* block # for common */
+extern	char	inacbn;		/* block # for common */
+d767 1
+a767 1
+/*struct	tval	dval;		/* descriptor for the value unstrung */
+d857 1
+a857 1
+/* extern	struct macro *macp;		/* address of macros */
 @
 
 

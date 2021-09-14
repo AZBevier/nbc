@@ -30,6 +30,7 @@ clobber: clean
 	-rm -f $(LBIN)/ls.o $(LBIN)/ls.c
 	-rm -f $(LBIN)/dirutil.o $(LBIN)/dirutil.c
 	-rm -f $(LBIN)/wildmat.o $(LBIN)/wildmat.c
+	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@if [ -d $(LBIN) ]; then \
@@ -38,7 +39,7 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/ls $(SYSBIN)
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) ls.c $(LBIN)/ls.c
 	$(INSTALL) dirutil.c $(LBIN)/dirutil.c
 	$(INSTALL) wildmat.c $(LBIN)/wildmat.c

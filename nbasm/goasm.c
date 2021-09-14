@@ -5,6 +5,12 @@
 /* #define DBUG1 */
 /* #define DDUMP */
 
+/* #define DBUG */
+/* #define DBUGT */
+/* #define DBUGA */
+/* #define DBUGX */
+/* #define MACD */
+
 #ifdef DOS
 #include <string.h>
 #include <io.h>
@@ -93,7 +99,7 @@ char	end2flag;		/* non zero when pass2 end processed */
 char	usname[MAXCHARS];	/* contains 24 chars of ascii name that was */
 				/* last unstrung by main unstringer routine */
 char	prnt[41];		/* printf buffer */
-uint8	in[81];		/* input line buffer */
+uint8	in[81];	        /* input line buffer */
 
 uint8	hwbyte[4];	/* this word contains the generated code */
 				/* for the current line of assembly broken */
@@ -420,19 +426,29 @@ int n;
 #endif
 
 /*
- * lnegate - routine to negate 8 char name for for macro lookup
+ * lnegate - routine to negate 8 char name for macro lookup
  * input - 8 char name pointer
  * output - 8 char negative name pointer
  */
 
 void lnegate (name, negname)
-register char * name;
-register char * negname;
+uint8 *name;
+uint8 *negname;
 {
 	int	i;
+#ifdef mpx
+    union {long val; uint8 c[8];} bigv;
+#else
+    union {int64 val; uint8 c[8];} bigv;
+#endif
 
 	for (i=0; i<8; i++)
-	  negname[i] = (char)(-(int)(name[i]));
+        bigv.c[i] = name[i];
+    bigv.val = -bigv.val;
+	for (i=0; i<8; i++)
+	  negname[i] = bigv.c[i];
+/*	for (i=0; i<8; i++)  */
+/* negname[i] = (char)(-(int)(name[i])); */
 }
 
 /*
@@ -450,9 +466,9 @@ char	cpass;
 	struct optab *ops;		/* opcode table entry pointer */
 	struct symbol FAR *stp;	/* symbol table entry pointer */
 	int	tvar;				/* just a temp */
-	char	nusname[9];		/* negative of label value for macros/forms */
+	uint8 nusname[32];		/* negative of label value for macros/forms */
 
-#ifdef DBUG
+#ifdef DBUGY
 	printf("goasm: entry pass %x\n", cpass);
 #endif
 #ifdef DDUMP
@@ -467,14 +483,14 @@ char	cpass;
 	/* all routines must return here for next directive */
 	for(;;) {			/* loop forever */
 	  if (end2flag) {		/* pass2 ended, return */
-#ifdef DBUG
+#ifdef DBUGY
 printf("returning to main from goasm, got end2flag\n");
 #endif
 	    return(0);			/* pass2 ended, return */
     	  }
 	  if (!(lict = inpt())) {	/* get line of input */
 	    if (endflag) {		/* if last card end, O.K. */
-#ifdef DBUG
+#ifdef DBUGY
 printf("returning to main from goasm, got endflag\n");
 #endif
     		return(0);		/* if last card end, O.K. */
@@ -508,32 +524,40 @@ doone:
     	    continue;
     	  }
 	  macstate |= NOCOMMT;		/* not a comment line */
-	  runst(0x80000000L);		/* unstring label, terminate on space */
+	  runst(0x80000000);		/* unstring label, terminate on space */
 #ifdef DBUG
-printf("goasm: returning from runst 0 label = %0.8s, currpc.value = %x\n", usname, currpc.value);
+printf("goasm: returning from runst 0 label = %.8s, currpc.value = %x\n", usname, currpc.value);
+fflush(stdout);
 #endif
 	  memcpy (label, usname, 8);	/* move 8 bytes of label */
 	  label[8] = '\0';
 	  macstate &= ~INTGEN;		/* not generating an internal label */
 	  if (!strncmp(lablscan, label, 8))	/* see if this is the label */
 	    macstate &= ~CONDSCAN;	/* we found it, clear cond scan */
-	  unst(0x80000000L);		/* unstring operator, term on space */
+	  unst(0x80000000);		/* unstring operator, term on space */
 #ifdef DBUG
-printf("goasm: returning from unst 1 opcode = %0.8s, currpc = %x\n", usname, currpc.value);
+printf("goasm: returning from unst 1 opcode = %.8s, currpc = %x\n", usname, currpc.value);
+printf("goasm: usname %02x%02x%02x%02x%02x%02x%02x%02x\n",
+ usname[0], usname[1], usname[2], usname[3], usname[4], usname[5], usname[6], usname[7]);
+fflush(stdout);
 #endif
 	  /* go see if macro defined in symbol table */
 	  lnegate (usname, nusname);	/* make negative version for macros/forms */
 	  nusname[8] = '\0';
 #ifdef DBUG
-	  printf("goasm: calling ss with TMMACREQ type for name %s\n", usname);
+printf("goasm: calling ss with TMMACREQ type for name %s\n", usname);
+printf("goasm: nusname %02x%02x%02x%02x%02x%02x%02x%02x\n",
+  nusname[0], nusname[1], nusname[2], nusname[3], nusname[4], nusname[5], nusname[6], nusname[7]);
+fflush(stdout);
 #endif
 /*	  stp = ss (&macr, csnegate(usname));  *//* go lookup macro name */
 	  stp = ss (&macr, nusname);  /* go lookup macro name */
 #ifdef DBUG
-printf("goasm: returning from ss 1, stp = %x, value = %x\n", stp, (stp ? stp->desc.value : -1));
+printf("goasm: returning from ss 1, stp = %x, value = %x\n", stp, (stp ? (uint32)stp->desc.value : -1));
+fflush(stdout);
 #endif
 	  if (stp) {			/* the macro was found, check type */
-#ifdef DBUG
+#ifdef DBUGX
 printf("goasm: macro %0.8s found\n", usname);
 printf("goasm: returning from ss 2, macro = %0.8s, stp = %x, value = %x\n", usname, stp, (stp ? stp->desc.value : -1));
 #endif
@@ -551,10 +575,14 @@ printf("goasm: returning from ss 2, macro = %0.8s, stp = %x, value = %x\n", usna
 #ifdef MACD
 printf("goasm: returning from opscan, ops = %x, opcode = %s, opproc = %d, currpc = %x\n",
  ops, ops->opcode, ops->opproc, currpc.value);
+fflush(stdout);
 #endif
 	    /* we have a valid opcode */
 	    if (option & ASECT) ascttst(ops); /* if auto mode, do setup */
-/* printf("option = %x\n", option); */
+        /*
+printf("option = %x\n", option);
+fflush(stdout);
+*/
 	    curops = ops;		/* save opcode table pointer for all */
 #ifdef __alpha
 	    hwact = (((unsigned int)ops->binop) << 24) |
@@ -580,8 +608,9 @@ printf("goasm: returning from opscan, ops = %x, opcode = %s, opproc = %d, currpc
 	    /* see if we need to allocate label */
 	    if (tvar < KINTL3 || tvar >= KINTL4) {	/* allocate label */
 	      bndw();			/* adj to proper boundry for opcode */
-#ifdef DBUG
-printf("goasm: calling tall from main with label %0.8s, pcmode = %x\n",label, pcmode);
+#ifdef DBUGX
+printf("goasm: calling tall from main with label %.8s, pcmode = %x\n",label, pcmode);
+fflush(stdout);
 #endif
 	      tall();			/* allocate current label */
 	      if ((tvar >= KINTL1 && tvar < KINTL2) ||
@@ -608,11 +637,11 @@ DumpStk(Sptr,64);
 	      continue;			/* do next line of input */
 	  }
 	  /* valid opcode not found */
-#ifdef DBUG
+#ifdef DBUGX
 printf ("goasm: opcode not found %0.8s, ops = %x\n", usname, ops);
 #endif
 	  aerr();			/* go see if a macro */
-#ifdef DBUG
+#ifdef DBUGX
 printf ("goasm: return from aerr()\n");
 #endif
 	  continue;			/* go do next line */
@@ -634,8 +663,8 @@ struct	tval	ud = {		/* undefined value entry */
 void	pcchk()
 {
     	/* see if pc exceeds 0x80000 in dsect or csect */
-    	if (sectpc[PCDS].value >= 0x80000L ||
-    	  sectpc[PCCS].value >= 0x80000L) {
+    	if (sectpc[PCDS].value >= 0x80000 ||
+    	  sectpc[PCCS].value >= 0x80000) {
     	  /* we have, abort this assemble */
 	  abortm("PROGRAM COUNTER OVERFLOW, CSECT or DSECT exceeds .5MB");
 	  /* no return */
@@ -656,23 +685,23 @@ void	tall()
 
 	if (!yeanay())return;		/* return if not assembling */
 	if (PASS & 1) {			/* are we in pass 1 */
-#ifdef DBUG
+#ifdef DBUGT
 prtval("tall pass1", &currpc);
-printf("tall pass1: label = [%0.8s], pcmode = %d\n", label, pcmode);
+printf("tall pass1: label = [%.8s], pcmode = %d\n", label, pcmode);
 #endif
 	  /* define this label in symbol table */
 	  stp = ss (&currpc, label);  	/* put in sym tab */	
-#ifdef DBUG
-printf("returning from ss, stp = %x\n", stp);
+#ifdef DBUGT
+printf("returning from ss, stp = %x\n", (uint32)stp);
 prtval("tall pass1 stp ret", &stp->desc);
 #endif
 	  return;			/* just return */
 	} 				/* pass 2, check */
 
 	stp = ss (&ud, label);		/* check label against symbol tbl */
-#ifdef DBUG
+#ifdef DBUGT
 prtval("tall pass2 ud", &ud);
-printf("tall pass2: label = [%0.8s], pcmode = %d\n", label, pcmode);
+printf("tall pass2: label = [%.8s], pcmode = %d\n", label, pcmode);
 prtval("tall pass2 currpc", &currpc);
 prtval("tall pass2 stp", &stp->desc);
 #endif
@@ -680,10 +709,10 @@ prtval("tall pass2 stp", &stp->desc);
 	  (stp->desc.type == currpc.type) &&
 	  (stp->desc.flags == currpc.flags))
 	  return;			/* return if same */
-#ifdef DBUG
+#ifdef DBUGT
 printf("tallX error\n");
 prtval("tallX pass2 ud", &ud);
-printf("tallX pass2: label = %0.8s, pcmode = %d\n", label, pcmode);
+printf("tallX pass2: label = %.8s, pcmode = %d\n", label, pcmode);
 prtval("tallX pass2 currpc", &currpc);
 prtval("tallX pass2 stp", &stp->desc);
 #endif
@@ -705,6 +734,7 @@ printf("%s: val = %x, typ = %s, tmp = %x, flags = %s,%s\n",
  s, (uint32)dvp->value, prtyp[dvp->type], dvp->tmp,
  (dvp->flags & CSDS ? "CSECT" : "DSECT"),
  (dvp->flags & ABSREL ? "REL" : "ABS"));
+fflush(stdout);
 }
 
 /*
@@ -731,7 +761,7 @@ void	aerr()
 {
 	struct symbol FAR *mep;		/* macro entry pointer */
 	struct symbol FAR *stp;		/* symbol table entry pointer */
-	char nusname[8];			/* negative name */
+	uint8 nusname[16];			/* negative name */
 
 	if (yeanay()) {			/* are we assembling */
 	  mep = libsch(usname);		/* go search macro library */
@@ -753,7 +783,7 @@ printf("returning from ss, macro = %0.8s, stp = %x, value = %x\n",
  usname, stp, (stp ? stp->desc.value : -1));
 #endif
 	    macexp();			/* expand the macro */
-#ifdef DBUG
+#ifdef DBUGA
 printf("goasm: return from macexp\n");
 #endif
 	    return;			/* back to caller */
@@ -1087,8 +1117,8 @@ int	yeanay()
 void	clrerr (err)
 char	err;
 {
-	if (hwerrf & (1L << (err - 0x40))) {	/* see if error on */
-	  hwerrf &= ~(1L << (err - 0x40));
+	if (hwerrf & (1 << (err - 0x40))) {	/* see if error on */
+	  hwerrf &= ~(1 << (err - 0x40));
 	  hwerct--;				/* decrement count */
 	}
 }
@@ -1104,7 +1134,7 @@ char	err;
 void	seterr (err)
 char	err;
 {
-	hwerrf |= (1L << (err - 0x40));
+	hwerrf |= (1 << (err - 0x40));
 	hwerct++;				/* bump count */
 /*
 printf("ERROR %c found\n", err);
@@ -1537,7 +1567,7 @@ printf("agem3 argmax[i] - grpw - 6 = %d\n", argmax[i]-grpw-6);
 	  xr &= 3;			/* clamp to 0-3 */
 	  if (BM & option) {		/* is base mode in effect */
 	    /* we must fix xr for base mode */
-	    newadr &= 0xfffffL;		/* lop off indirect bit */
+	    newadr &= 0xfffff;		/* lop off indirect bit */
 	    newadr |= ((int32)(xr & 1) << 20);	/* bit now low bit of xr # */
 	    xr >>= 1;			/* shift over xr # */
 	  }
@@ -1585,8 +1615,8 @@ int32	addr;
 	  }
 	}
 	if (gr == 0) {			/* if gr = 0, see if bct or bcf instr */
-/*	  if (hwact == 0xee01230fL || hwact == 0xf201230fL) { */
-	  if (hwact == (int32)0xee01230fL || hwact == (int32)0xf201230fL) {
+/*	  if (hwact == 0xee01230f || hwact == 0xf201230f) { */
+	  if (hwact == (int32)0xee01230f || hwact == (int32)0xf201230f) {
 	    /* we have bct or bcf and no condition codes were set, error */
 	    if (yeanay()) {		/* are we assembling */
 	      seterr ('B');		/* set bounding error */
@@ -1600,16 +1630,16 @@ int32	addr;
 	  eisflg |= EISOPC;		/* set flag */
 	}
 	/* now put instruction together */
-	inst = (addr & 0x1fffffL) | ((int32)(xr & 3) << 21) |
+	inst = (addr & 0x1fffff) | ((int32)(xr & 3) << 21) |
 	  ((int32)(gr & 7) << 23) | ((int32)(curops->binop >> 2) << 26);
 /*
 printf("gen32 gr = %x, xr = %x, addr = %lx, inst = %lx\n", gr,xr,addr,inst);
 */
 	/* now gen the bytes */
 	igen ((int)((unsigned int32)inst >> 24));	/* gen 1 byte */
-	igen ((int)((int32)(inst & 0xff0000L) >> 16));	/* gen 1 byte */
-	igen ((int)((inst & 0xff00L) >> 8));	/* gen 1 byte */
-	igen ((int)(inst & 0xffL));		/* gen 1 byte */
+	igen ((int)((int32)(inst & 0xff0000) >> 16));	/* gen 1 byte */
+	igen ((int)((inst & 0xff00) >> 8));	/* gen 1 byte */
+	igen ((int)(inst & 0xff));		/* gen 1 byte */
 }
 
 /*
@@ -1677,7 +1707,7 @@ void	bacx()
     	/* see if bac of an external address */
     	if (bacflag & 4) {
     	  expr[0].type = TYPX;		/* external type address */
-    	  expr[0].value |= 0x8ffffL;	/* terminator value */
+    	  expr[0].value |= 0x8ffff;	/* terminator value */
     	}
 	expr[2] = expr[1];		/* put xr number in correct field */
 	expr[1] = expr[0];		/* put address in correct field */
@@ -1686,12 +1716,12 @@ void	bacx()
 	/* put address word together */
 	newadr = ageq ((int32)expr[1].value, expr[1].type);
 	/* go have agen do it for up */
-    	newadr &= 0xffffffL;		/* 24 bit address */
+    	newadr &= 0xffffff;		/* 24 bit address */
 	/* now gen the bytes */
 	igen ((int)((unsigned int32)newadr >> 24));	/* gen 1 byte */
-	igen ((int)((int32)(newadr & 0xff0000L) >> 16)); /* gen 1 byte */
-	igen ((int)((newadr & 0xff00L) >> 8));	/* gen 1 byte */
-	igen ((int)(newadr & 0xffL));		/* gen 1 byte */
+	igen ((int)((int32)(newadr & 0xff0000) >> 16)); /* gen 1 byte */
+	igen ((int)((newadr & 0xff00) >> 8));	/* gen 1 byte */
+	igen ((int)(newadr & 0xff));		/* gen 1 byte */
 }
 
 /*
@@ -1728,7 +1758,7 @@ void	fpp()
 	/* put address word together */
 	newadr = ageq ((int32)expr[1].value, expr[1].type);
 	/* set aug code for proper instruction type */
-	newadr = (newadr & 0x17ffffL) | ((int32)(curops->aug & 3) << 19);
+	newadr = (newadr & 0x17ffff) | ((int32)(curops->aug & 3) << 19);
 	agem(newadr);			/* have agem complete */
 	return;
 }
@@ -1788,7 +1818,7 @@ void	imop()
 	if (curops->aug == 0xa) {		/* is this a rintv instr */
 	  newadr = (expr[1].value & 0xff) << 8;	/* get 8 bit imm value */
 	} else					/* and fill with zero */
-	  newadr = expr[1].value & 0xffffL;	/* get 16 bit imm value */
+	  newadr = expr[1].value & 0xffff;	/* get 16 bit imm value */
 	newadr |= ((int32)curops->aug << 16);	/* merge in aug */
 	gen32 ((int)expr[0].value, 0, newadr);	/* go gen 4 bytes of data */
 /* printf("returning after gen32 call\n"); */
@@ -1810,7 +1840,7 @@ void	io()
 printf("io e0 %x e1 %x aug %x\n",
   expr[0].value, expr[1].value, curops->aug);
 */
-	newadr = expr[1].value & 0xffffL;	/* get 16 bit command code */
+	newadr = expr[1].value & 0xffff;	/* get 16 bit command code */
 	newadr |= (((int32)curops->aug) << 16);		/* merge in aug */
 	/* merge in l/o 2 bits of dev */
 	newadr |= ((int32)(expr[0].value & 3) << 19);
@@ -1830,7 +1860,7 @@ void	svc()
 {
 	int32	newadr;
 
-	newadr = expr[1].value & 0xfffL;	/* get 12 bit call number */
+	newadr = expr[1].value & 0xfff;	/* get 12 bit call number */
 	if ((grpw + 6) != 1) {			/* is there only 1 arg */
 	  newadr |= ((expr[0].value & 0xf) << 12); /* no, get svc index value */
 	}
@@ -1868,7 +1898,7 @@ void	extio()
 {
 	int32	newadr;
 
-	newadr = expr[1].value & 0xffffL;	/* get 16 bit chan/subadr */
+	newadr = expr[1].value & 0xffff;	/* get 16 bit chan/subadr */
 						/* or 8 bit channel number */
 	if ((grpw + 6) != 2) {			/* only 2 args present */
  	  /* get 8 bit subaddress */
@@ -1963,7 +1993,7 @@ printf("ageq0 ADDRERR set\n");
 	  }
 	}
         if (bacflag & 4) {		/* BAC to an external */
-	  retval = 0x8ffffL;		/* yes, fill with terminal value */
+	  retval = 0x8ffff;		/* yes, fill with terminal value */
     	} else {
 	  retval = adr;			/* get the address */
     	  retval &= mask;		/* eliminate unused address bits */
@@ -1995,8 +2025,8 @@ int	typ;
 	
 	if (typ == TYPC) {		/* is type common */
 	  /* we have common, get block # and see if ssect */
-	  if (hwcmsize[(int32)(adr & 0xff0000L) >> 16] & 0x8000000L) {
-	    adr &= 0xffffL;		/* clear block # if ssect */
+	  if (hwcmsize[(int32)(adr & 0xff0000) >> 16] & 0x8000000) {
+	    adr &= 0xffff;		/* clear block # if ssect */
 	  }
 	}
 	mask = ager[hbavar];		/* get mask for varient code */
@@ -2064,13 +2094,13 @@ fflush(stdout);
 	val(0);				/* indicate nothing unstrung */
 					/* this will take care of ; and xref */
 	/* get common # and see if it is an ssect */
-	temp = (int32)(sectpc[PCCOM].value & 0x00ff0000L) >> 24;
-	if ( hwcmsize[temp] & 0x80000000L)
+	temp = (int32)(sectpc[PCCOM].value & 0x00ff0000) >> 24;
+	if ( hwcmsize[temp] & 0x80000000)
 	  /* it is ssect, is it bigger than old */
-	  if ((sectpc[PCCOM].value & 0xffffL) > (hwcmsize[temp] & 0xffffL)) 
+	  if ((sectpc[PCCOM].value & 0xffff) > (hwcmsize[temp] & 0xffff)) 
 	    /* save new size */
-	    hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000L) |
-	      (sectpc[PCCOM].value & 0xffffL));	/* set new size */
+	    hwcmsize[temp] = ((hwcmsize[temp] & 0xffff0000) |
+	      (sectpc[PCCOM].value & 0xffff));	/* set new size */
 	if (!(bits3 & EXPLFC)) {	/* check for csect or non zero dsect */
 	  /* put in xref */
 	  /* data section name and size */
@@ -2141,12 +2171,12 @@ prtsymt();				/* dump the symbol table */
 	  if (stp->desc.type == TYPD) {		/* is symbol type common */
 	    /* process common block definition */
 	    temp = stp->desc.value;		/* get block # and size */
-	    temp2 = ((int32)(temp & 0xff0000L) >> 16);	/* get block number */
-	    if (hwcmsize[temp2] & 0x80000000L)   /* is it ssect */
+	    temp2 = ((int32)(temp & 0xff0000) >> 16);	/* get block number */
+	    if (hwcmsize[temp2] & 0x80000000)   /* is it ssect */
 	      /* get size of section and block number */
-	      temp = (hwcmsize[temp2] & 0xffffL) & (temp2 << 16);
+	      temp = (hwcmsize[temp2] & 0xffff) & (temp2 << 16);
 	    if (stp->desc.flags & ABSREL)	/* see if abs or rel */
-	      temp |= 0x00800000L;	/* put in abs/rel flag value */
+	      temp |= 0x00800000;	/* put in abs/rel flag value */
 	    bfo (stp);			/* put common name on stack */
 	    bfa (temp);			/* put block # and size in stack */
 	    pb (hbbs, PTCD, 0);		/* put common block def on bo */
@@ -2160,7 +2190,7 @@ fflush(stdout);
 */
 	/* initialize ssect save area */
 	for (temp = 0; temp < 256; temp++)  /* clear common pc area */
-	  hwcmsize[temp] &= 0xffff0000L;	/* just the offset value */
+	  hwcmsize[temp] &= 0xffff0000;	/* just the offset value */
 	sectpc[PCCOM].value = 0;	/* clear current common pc */
 
 	/* put date and time into object file */
@@ -2210,24 +2240,24 @@ void	prlit()
 	}
 	bndw();				/* force pc to word boundary */
 	tmp = sectpc[pcmode];		/* get curr pc pointer */
-	tmp.value = (tmp.value + 3) & 0xfffffffcL;	/* and word bound */
+	tmp.value = (tmp.value + 3) & 0xfffffffc;	/* and word bound */
 	litorgs[hwltct.value >> 16] = tmp;	/* set lpool def & number */
 	/* get num of literals and word adjust and add to literal base */
-	currpc.value = (hwltct.value & 0xffffL) + tmp.value;
+	currpc.value = (hwltct.value & 0xffff) + tmp.value;
 	if (PASS & 1) {			/* is this pass 1 */
 	  /* do pass 1 literal processing */
 					/* aloc lpool or end card label */
 	  tall();			/* allocate current label */
 	  /* add number of literals to pc */
-	  sectpc[pcmode].value += ((int32)(hwltct.value & 0xffffL) << 2);
+	  sectpc[pcmode].value += ((int32)(hwltct.value & 0xffff) << 2);
     	  pcchk();			/* check for pc overflow */
 #ifdef DEBUG
 prtval("pass 1 hwltct", &hwltct);
 #endif
-	  hwltct.value += 0x10000L;	/* bump lpool number */
-	  if (((int32)(hwltct.value & 0xff0000L) >> 16) == 0x1f) /* 31 done */
+	  hwltct.value += 0x10000;	/* bump lpool number */
+	  if (((int32)(hwltct.value & 0xff0000) >> 16) == 0x1f) /* 31 done */
 	    bits |= LPOOL31;		/* indicate 31 lpools processed */
-	  hwltct.value &= 0xff0000L;	/* zero literal count */
+	  hwltct.value &= 0xff0000;	/* zero literal count */
 #ifdef DEBUG
 prtval("pass 1 hwltct @ return", &hwltct);
 #endif
@@ -2250,7 +2280,7 @@ prtval("pass 1 hwltct @ return", &hwltct);
 prtval("pass2 prlit entered", &hwltct);
 /* prtsymt();	*/	/* dump the symbol table */
 #endif
-	hwendl = hwltct.value & 0xff0000L;	/* get lpoop # and lit # 0 */
+	hwendl = hwltct.value & 0xff0000;	/* get lpoop # and lit # 0 */
 	while (stp) {
 
 	  if (stp->desc.type == TYPL && hwendl == stp->desc.value) {
@@ -2278,13 +2308,13 @@ printf ("literal is %x,%x, type = %d\n", xxx[0], xxx[1], stp->desc.type);
 #endif
 	    lpn = (int32)hwendl >> 16;			/* get lpool number */
 	    /* add literal disp to base to get curr pc of literal */
-	    currpc.value = ((hwendl & 0xffffL) << 2) + litorgs[lpn].value;
+	    currpc.value = ((hwendl & 0xffff) << 2) + litorgs[lpn].value;
 	    /* set address of next word */
 	    sectpc[pcmode].value = currpc.value + 4;
     	    pcchk();			/* check for pc overflow */
 	    for ( i = 0; i < 4; i++) {		/* copy in 4 bytes of literal */
 	      /* 2nd word is literal value */
-	      hwbyte[i] = ((int32)(xxx[1]&((unsigned int32)0xff000000L >> i*8))
+	      hwbyte[i] = ((int32)(xxx[1]&((unsigned int32)0xff000000 >> i*8))
 		 >> ((3-i)*8));
 	      hwbytf[i] =  1;		/* set flag for byte to be gen'd */
 	    }
@@ -2312,9 +2342,9 @@ printf ("literal is %x,%x, type = %d\n", xxx[0], xxx[1], stp->desc.type);
 	        if (hweval.type == TYPC) {	/* is type common */
 		  /* yes, merge block # and offset */
 #ifndef alpha_fix
-		  hweval.value = (((int32)hbbn << 16) & (xxx[1] & 0xffffL));
+		  hweval.value = (((int32)hbbn << 16) & (xxx[1] & 0xffff));
 #else
-		  hweval.value = (((int32)hbbn << 16) & (tdp[1] & 0xffffL));
+		  hweval.value = (((int32)hbbn << 16) & (tdp[1] & 0xffff));
 #endif
 	        } else {
 		  /* not legal type, mark error */
@@ -2338,10 +2368,10 @@ printf("next stp = %x llink = %x rlink = %x flink = %x\n",
 	}
 /* printf("return\n"); */
 	/* literal not found, must be done with this lpool */
-	hwltct.value += 0x10000L;	/* next literal pool numner */
-	if (((int32)(hwltct.value & 0xff0000L) >> 16) == 0x1f) /* all 31 done */
+	hwltct.value += 0x10000;	/* next literal pool numner */
+	if (((int32)(hwltct.value & 0xff0000) >> 16) == 0x1f) /* all 31 done */
 	  bits |= LPOOL31;		/* indicate 31 lpools processed */
-	hwltct.value &= 0xff0000L;	/* zero literal count */
+	hwltct.value &= 0xff0000;	/* zero literal count */
 	}
 	return;				/* get out */
 }
@@ -2370,7 +2400,7 @@ prtsymt();				/* dump the symbol table */
 		/* symbol is not absolute output it */
 		*hbbs = 0;		/* reset binary output stack count */
 #ifdef OLD_DEBUG
-		temp = 0x0b1200L;	/* first 3 bytes of debugger obj rec */
+		temp = 0x0b1200;	/* first 3 bytes of debugger obj rec */
 		if (stp->desc.flags & CSDS)	/* is symbol in csect */
 		  temp |= 1;		/* yes, set csect flag */
 		bfa (temp);		/* put 3 bytes in stack */
@@ -2382,7 +2412,7 @@ prtsymt();				/* dump the symbol table */
 	        bfn0a ();		/* output 8 bytes from usname */
 	        pb (hbbs, EXPFUNC, 0);	/* put common block def on bo */
 #else
-		temp = 0x0e1400L;	/* first 3 bytes of debugger obj rec */
+		temp = 0x0e1400;	/* first 3 bytes of debugger obj rec */
 		if (stp->desc.flags & CSDS)	/* is symbol in csect */
 		  temp |= 1;		/* yes, set csect flag */
 		bfa (temp);		/* put 3 bytes in stack */
@@ -2408,7 +2438,7 @@ prtsymt();				/* dump the symbol table */
 	      sbp = (struct strback FAR *)stp->desc.value;  /* get sb addr */
 	      temp = (int32)sbp->dsdesc.value;	/* get dsect stringback */
 	      if (sbp->dsdesc.flags & ABSREL)  /* is value rel */
-		temp |= 0x00800000L;	/* yes, set rel flag */
+		temp |= 0x00800000;	/* yes, set rel flag */
 	      bfa (temp);		/* output sb address */
 	      pb (hbbs, PTEX, 0);	/* publish binary stack */
 	    } else {			/* use expanded function codes */
@@ -2420,7 +2450,7 @@ prtsymt();				/* dump the symbol table */
 	      sbp = (struct strback FAR *)stp->desc.value;  /* get sb addr */
 	      temp = (int32)sbp->dsdesc.value;	/* get dsect stringback */
 	      if (sbp->dsdesc.flags & ABSREL)  /* is value rel */
-		temp |= 0x00800000L;	/* yes, set rel flag */
+		temp |= 0x00800000;	/* yes, set rel flag */
 #ifdef MACS
 memCpy (usname, stp->sym, 8);	/* move 8 bytes of sym name */
 usname[8] = '\0';
@@ -2435,7 +2465,7 @@ prtval("end2 ds sbp", &sbp->dsdesc);
 		else
 		  bfb (0);		/* output dsect reference */
 	        if (sbp->dsdesc.flags & ABSREL)  /* is value rel */
-		  temp |= 0x00800000L;	/* yes, set rel flag */
+		  temp |= 0x00800000;	/* yes, set rel flag */
 	        bfa (temp);		/* output sb address */
 	        memCpy (usname, stp->sym, 8);	/* move 8 bytes of sym name */
 	        bfn0 ();		/* output 8 bytes from usname */
@@ -2450,7 +2480,7 @@ prtval("end2 ds sbp", &sbp->dsdesc);
 	      sbp = (struct strback FAR *)stp->desc.value;  /* get sb addr */
 	      temp = (int32)sbp->csdesc.value;	/* get csect stringback */
 	      if (sbp->csdesc.flags & ABSREL)  /* is value rel */
-		temp |= 0x00800000L;	/* yes, set rel flag */
+		temp |= 0x00800000;	/* yes, set rel flag */
 #ifdef MACS
 memCpy (usname, stp->sym, 8);	/* move 8 bytes of sym name */
 usname[8] = '\0';
@@ -2465,7 +2495,7 @@ prtval("end2 cs sbp", &sbp->csdesc);
 		else
 		  bfb (0);		/* output dsect reference */
 	        if (sbp->csdesc.flags & ABSREL)  /* is value rel */
-		  temp |= 0x00800000L;	/* yes, set rel flag */
+		  temp |= 0x00800000;	/* yes, set rel flag */
 	        bfa (temp);		/* output sb address */
 	        memCpy (usname, stp->sym, 8);	/* move 8 bytes of sym name */
 	        bfn0 ();		/* output 8 bytes from usname */
@@ -2481,7 +2511,7 @@ printf("end2 process end address\n");
 fflush(stdout);
 */
 	/* compute transfer address from end statement */
-	unst (0x81fd0000L);		/* unstring something */
+	unst (0x81fd0000);		/* unstring something */
 	if (*usname != ' ') {		/* anything unstrung */
 	  /* yes, we have a transfer address */
 	  hweval = val (1);		/* evaluate unstrung name */
@@ -2497,7 +2527,7 @@ prtval("end: hweval", &hweval);
 	    hbbn = 0;			/* show dsect section */
 	  *hbbs = 0;			/* reset binary output stream */
 	  if (hweval.flags & ABSREL) {	/* is address relative */
-	    hweval.value |= 0x800000L;	/* addr is rel, set abs/rel flag */
+	    hweval.value |= 0x800000;	/* addr is rel, set abs/rel flag */
 	    if (bits3 & EXPLFC) {	/* are we using exp funct codes */
 	      /* yes, generate expanded function codes */
 	      bfb (LFTRANS);		/* output loader funct sub code */
@@ -2533,7 +2563,7 @@ fflush(stdout);
 	  /* no, use std loader code, put end addr in binary output */
 	  temp = currpc.value;		/* save for output */
 	  if (currpc.flags & ABSREL)	/* current sect abs or rel */
-	    temp |= 0x800000L;		/* set rel flag */
+	    temp |= 0x800000;		/* set rel flag */
 	  bfa (temp);			/* put end address in stack */
 	  pb (hbbs, PTO, 0);		/* publish it */
 	}
@@ -2663,7 +2693,7 @@ void	bfn0a()
 void	bfa0 (val1)
 int32	val1;
 {
-	bfa (val1 & 0x7fffffL);		/* use bfa to output data */
+	bfa (val1 & 0x7fffff);		/* use bfa to output data */
 	return;
 }
 
@@ -2678,10 +2708,10 @@ int32	val1;
 void	bfw (val2)
 int32	val2;
 {
-	bfb ((int32)(val2 & 0xff000000L) >> 24); /* output 1st byte */
-	bfb ((int32)(val2 & 0xff0000L) >> 16);	/* output 2nd byte */
-	bfb ((int32)(val2 & 0xff00L) >> 8);	/* output 3rd byte */
-	bfb (val2 & 0xffL);			/* output 4th byte */
+	bfb ((int32)(val2 & 0xff000000) >> 24); /* output 1st byte */
+	bfb ((int32)(val2 & 0xff0000) >> 16);	/* output 2nd byte */
+	bfb ((int32)(val2 & 0xff00) >> 8);	/* output 3rd byte */
+	bfb (val2 & 0xff);			/* output 4th byte */
 	return;
 }
 #endif
@@ -2696,9 +2726,9 @@ int32	val2;
 void	bfa (val2)
 int32	val2;
 {
-	bfb ((int32)(val2 & 0xff0000L) >> 16);	/* output 1st byte */
-	bfb ((int32)(val2 & 0xff00L) >> 8);	/* output 2nd byte */
-	bfb (val2 & 0xffL);		/* output 3rd byte */
+	bfb ((int32)(val2 & 0xff0000) >> 16);	/* output 1st byte */
+	bfb ((int32)(val2 & 0xff00) >> 8);	/* output 2nd byte */
+	bfb (val2 & 0xff);		/* output 3rd byte */
 	return;
 }
 
@@ -2713,8 +2743,8 @@ int32	val2;
 void	bfh (val2)
 int	val2;
 {
-	bfb ((int32)(val2 & 0xff00L) >> 8);	/* output 1st byte */
-	bfb (val2 & 0xffL);		/* output 2nd byte */
+	bfb ((int32)(val2 & 0xff00) >> 8);	/* output 1st byte */
+	bfb (val2 & 0xff);		/* output 2nd byte */
 	return;
 }
 #endif
@@ -2739,16 +2769,18 @@ int	val3;
 void	data()
 {
 again:
-/* printf("data: calling tdat\n"); */
+/* printf("data: calling tdat\n");  */
 	hwindr = 0;			/* clear indirect addr flag */
 	tot = (1 << curops->binop);	/* 0-3 becomes 1-8 */
 	hbtttf = 0;			/* indicate data statement */
 	inac.value = 0;			/* clear address attribute area */
 	inac.flags = 0;			/* clear flags attribute area */
 	inac.type = 0;			/* clear type attribute area */
-/* printf("data: tot = %d, opcode = %s, binop = %d\n", tot, curops->opcode, curops->binop); */
+/* printf("data: tot = %d, opcode = %s, binop = %d\n", tot, curops->opcode, curops->binop);  */
+/* fflush(stdout); */
 	tdat ();			/* translate rest of data statement */
-/* printf("data: return from tdat, term = %c\n", hbstac[0]); */
+/* printf("data: return from tdat, term = %c\n", hbstac[0]);  */
+/* fflush(stdout); */
 	if (hbstac[0] == ',')		/* is there mode data */
 	  goto again;			/* go do it again */
 	return;				/* no,all done */
@@ -2782,14 +2814,14 @@ void	vfd()
 			break;				/* exit while with count */
 	    }
 	  } else {			/* not form expansion */
-	    unst(0x80010000L);		/* unstring the field length */
+	    unst(0x80010000);		/* unstring the field length */
 	    if (unterm == '/') {	/* / is the field size term */
 	      dv = cnum (10);		/* get the number */
-	      fsize = dv[0] & 0xffffL;	/* get size form l/o part of number */
+	      fsize = dv[0] & 0xffff;	/* get size form l/o part of number */
 	    } else {			/* invalid term, error */
-	      fsize = 5000L;		/* to fail following test */
+	      fsize = 5000;		/* to fail following test */
 	    }
-	    if (fsize > 4096L) {	/* is field size larger than max */
+	    if (fsize > 4096) {	/* is field size larger than max */
 	      if (yeanay())		/* are we assembling */
 	        seterr ('H');		/* set invalid VFD statement error */
 	      fsize = 32;		/* set to default value */
@@ -2841,7 +2873,7 @@ int32	data1;
 int	bcnt;
 {
 	struct	tval	tempc;
-	int32	mask = (1L << bcnt) - 1;	/* mask for incomming data */
+	int32	mask = (1 << bcnt) - 1;	/* mask for incomming data */
 #ifdef MACS
 printf("vfdo: data=%x bcnt=%d\n", data1, bcnt);
 #endif

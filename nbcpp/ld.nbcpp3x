@@ -1,4 +1,5 @@
 DEFM                                                                            
+$PAGE 0
 IFT PATH=OBJ.O SKIP                                                             
 CREA OBJ.O                                                                      
 %SKIP                                                                           
@@ -30,5 +31,6 @@ GOTO END
 NOTE *** ERROR ***  CATALOG FAILED                                              
 %END                                                                            
 PAGE
-EOJ                                                                             
+EOJ
+$PAGE 24
 ENDM                                                                            

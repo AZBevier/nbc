@@ -46,13 +46,13 @@ $IFA %PGMNAME;.O ERROR1
 $PAGE 0                                                                         
 $AS IN TO SYC                                                                   
 $AS OT TO SGO                                                                   
-$@SYSTEM(SYSTEM)COMPRESS                                                        
-@SYSTEM(BIN)C.SRTE.O                                                            
+$COMPRESS                                                        
+^(BIN)C.SRTE.O                                                            
 %PGMNAME;.O                                                                     
 $NOTE  END OF COMPRESS                                                          
 $OPTION 19 25                                                                   
-$AS LIB TO @SYSTEM(BIN)CLB BLOC=N                                               
-$AS DIR TO @SYSTEM(BIN)CDR BLOC=N                                               
+$AS LIB TO ^(BIN)CLB BLOC=N                                               
+$AS DIR TO ^(BIN)CDR BLOC=N                                               
 $IFP %LISTING SOMELIST                                                          
 $AS SLO TO DEV=NU                                                               
 $GOTO CATALOG                                                                   
@@ -77,7 +77,7 @@ $GOTO CATALOG
 $DEFN CATALOG                                                                   
 $ALLOCATE 1B800                                                                 
 $PAGE                                                                           
-$@SYSTEM(SYSTEM)CATALOG                                                         
+$CATALOG                                                         
 OPTION LOWER PROMPT CPUO                                                        
 FILES 8                                                                         
 BUFFERS 8                                                                       

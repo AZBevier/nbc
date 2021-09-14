@@ -89,12 +89,12 @@ register  unsigned char  *s;
 
     union {
 	double d;
-	int i[2];
+	int ii[2];
 	unsigned char c[8];		/* in order to access exponent */
 					/* and last nibble of d */
     } d;
     double	*adjpt, *limp = (double *) limit;
-    int         ch, scale = 0, nzro = 0, exp = 0;
+    int         ch, scale = 0, nzro = 0, expv = 0;
     union	{
 	int all;
 	struct {
@@ -184,8 +184,8 @@ register  unsigned char  *s;
 	}
 
 	for (; isdigit(ch = *s); s++) {
-	    if (exp < DMAXEXP)
-		exp = exp * 10 + (ch - '0');
+	    if (expv < DMAXEXP)
+		expv = expv * 10 + (ch - '0');
 	    else {
 		errno = ERANGE;
 		if (flag.bit.esgn)
@@ -195,37 +195,41 @@ register  unsigned char  *s;
 	}
 	STORE_PTR;
 	if (flag.bit.esgn) {
-	    exp = -exp;
+	    expv = -expv;
 	    flag.bit.esgn = 0;
 	}
     }
 
-    exp += scale + nzro;
-/* limit exp to reasonable values - out-of-range will overflow or underflow */
+    expv += scale + nzro;
+/* limit expv to reasonable values - out-of-range will overflow or underflow */
+#ifdef FIX_COMPILER_ERROR
     scale = (int) ((float) 1.20412 * (float) (d.c[0] - 64));
-    if (exp > 80 - scale)
-	exp = 80 - scale;
-    else if (exp < -80 - scale)
-	exp = -80 - scale;
+#else
+    scale = ((float) 1.20412 * (float) (d.c[0] - 64));
+#endif
+    if (expv > 80 - scale)
+	expv = 80 - scale;
+    else if (expv < -80 - scale)
+	expv = -80 - scale;
 
     adjpt = (double *) powers;
 
-    if (exp < 0) {
-	exp = -exp;
+    if (expv < 0) {
+	expv = -expv;
 	flag.bit.esgn = 1;
     }
-    else if ((exp & 1) == 1 && (d.c[1] & 0xf0) == 0x10
-	&& (d.i[0] & 0x00ffffff) <= 0x00199999
-	&& ((unsigned) d.i[1] >> 1) < 0x4ccccccd) {
+    else if ((expv & 1) == 1 && (d.c[1] & 0xf0) == 0x10
+	&& (d.ii[0] & 0x00ffffff) <= 0x00199999
+	&& ((unsigned) d.ii[1] >> 1) < 0x4ccccccd) {
 	register int n = d.c[7] * 10;
 
 	    d.d *= 10.0;
 	    d.c[7] |= n;	/* fix lost nibble */
-	    exp &= ~1;
+	    expv &= ~1;
     }
 
-    for (; exp; exp >>= 1) {
-	if (exp & 1) {
+    for (; expv; expv >>= 1) {
+	if (expv & 1) {
 	    if (!flag.bit.esgn)
 		d.d *= (*adjpt);
 	    else
@@ -294,7 +298,7 @@ register char *p;
 #endif
 {
 	register int c;
-	int exp = 0, neg_val = 0;
+	int expv = 0, neg_val = 0;
 	double fl_val;
 #if STRTOD
 	int got_digit = 0;
@@ -325,17 +329,17 @@ register char *p;
 					continue;
 				}
 				while (nzeroes > 0) { /* put zeroes back in */
-					exp--;
+					expv--;
 					if (high < MAXLONG/10) {
 						high *= 10;
 					} else if (scale < MAXLONG/10) {
 						scale *= 10;
 						low *= 10;
 					} else
-						exp++;
+						expv++;
 					nzeroes--;
 				}
-				exp--; /* decr exponent if decimal pt. seen */
+				expv--; /* decr exponent if decimal pt. seen */
 			}
 			if (high < MAXLONG/10) {
 				high *= 10;
@@ -345,7 +349,7 @@ register char *p;
 				low *= 10;
 				low += c - '0';
 			} else
-				exp++;
+				expv++;
 		}
 		RET_ZERO(high);
 		fl_val = (double)high;
@@ -371,9 +375,9 @@ register char *p;
 					e_exp = 10 * e_exp + c - '0';
 			} while (isdigit(c = *++p));
 			if (neg_exp)
-				exp -= e_exp;
+				expv -= e_exp;
 			else
-				exp += e_exp;
+				expv += e_exp;
 			STORE_PTR;
 		}
 	}
@@ -386,11 +390,11 @@ register char *p;
 	 * first accumulating powers of (10/8), then jamming powers of 8,
 	 * to avoid underflow in situations like the following (for
 	 * the DEC representation): 1.2345678901234567890e-37,
-	 * where exp would be about (-37 + -18) = -55, and the
+	 * where expv would be about (-37 + -18) = -55, and the
 	 * value 10^(-55) can't be represented, but 1.25^(-55) can
 	 * be represented, and then 8^(-55) jammed via ldexp().
 	 */
-	if (exp != 0) { /* apply exponent */
+	if (expv != 0) { /* apply exponent */
 		register double *powptr = pow1_25, fl_exp = fl_val;
 
 		if (*powptr == 0.0) { /* need to initialize table */
@@ -399,7 +403,7 @@ register char *p;
 				powptr[1] = *powptr * *powptr;
 			powptr = pow1_25;
 		}
-		if ((c = exp) < 0) {
+		if ((c = expv) < 0) {
 			c = -c;
 			fl_exp = 1.0;
 		}
@@ -413,7 +417,7 @@ register char *p;
 			if ((c >>= 1) == 0)
 				break;
 		}
-		fl_val = ldexp(exp < 0 ? fl_val/fl_exp : fl_exp, 3 * exp);
+		fl_val = ldexp(expv < 0 ? fl_val/fl_exp : fl_exp, 3 * expv);
 	}
 	return (neg_val ? -fl_val : fl_val); /* apply sign */
 }

@@ -1,9 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.09.13.20.51.40;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.07.05.20.35.48;	author jbev;	state Exp;
@@ -21,9 +26,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Remove doc file on make clobber.
+@Change mpxmac location.
 @
 text
 @#
@@ -33,7 +38,7 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 SYSBIN = /system/bin
 LBIN = ./mpx3x
 INSTALL = cp
@@ -76,6 +81,17 @@ install: all
 	$(MOVE) basename.o $(LBIN)/BASENAME.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.2
+log
+@Remove doc file on make clobber.
+@
+text
+@d8 1
+a8 1
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 @
 
 

@@ -1,9 +1,14 @@
-head	1.11;
+head	1.12;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.12
+date	2021.09.13.21.43.02;	author jbev;	state Exp;
+branches;
+next	1.11;
 
 1.11
 date	2021.07.09.23.41.36;	author jbev;	state Exp;
@@ -66,9 +71,9 @@ desc
 @
 
 
-1.11
+1.12
 log
-@Use mktemp for tempfile name.
+@Remove size_t definition.
 @
 text
 @/* RCS compile-time configuration */
@@ -78,7 +83,7 @@ text
 #ifndef CONF_H
 #define CONF_H
 
-/* $Id: conf.h,v 1.10 2021/07/09 20:42:57 jbev Exp jbev $ */
+/* $Id: conf.h,v 1.11 2021/07/09 23:41:36 jbev Exp jbev $ */
 
 /*
  * This RCS compile-time configuration describes a host that conforms
@@ -183,7 +188,7 @@ typedef int mode_t;
 typedef int pid_t;
 typedef int sig_atomic_t;
 /*typedef unsigned size_t; */
-typedef int size_t;
+/*typedef int size_t;*/
 typedef int ssize_t;
 typedef long time_t;
 typedef int uid_t;
@@ -670,6 +675,20 @@ size_t strlen P((char const*));
 time_t time P((time_t*));
 
 #endif /* CONF_H */
+@
+
+
+1.11
+log
+@Use mktemp for tempfile name.
+@
+text
+@d8 1
+a8 1
+/* $Id: conf.h,v 1.10 2021/07/09 20:42:57 jbev Exp jbev $ */
+d113 1
+a113 1
+typedef int size_t;
 @
 
 

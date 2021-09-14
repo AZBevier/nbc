@@ -14,17 +14,23 @@ MOVE = mv
 MAKEFILE = make.unix
 
 # define all sources
-SRCS = dcat.c ucat.c fixer.c obd.c caid.c summer.c
+SRCS = cat.c dcat.c ucat.c fixer.c obd.c caid.c summer.c \
+	cp.c ls.c mv.c rm.c
 
 # define all headers
 HDRS = caid.h
 
 # loadmodule names
-MAINS = dcat ucat fixer obd caid summer
+MAINS = cat dcat ucat fixer obd caid summer cp ls mv rm
 
 # build everything
-all:	$(MAINS)
+all:	$(HDRS) $(SRCS) $(MAINS)
 	/bin/echo $(MAINS) are up to date.
+
+#build cat
+cat:	cat.o
+	$(CC) $(CFLAGS) -o cat cat.o
+	/bin/chmod 775 cat
 
 #build dcat
 dcat:	dcat.o
@@ -56,8 +62,28 @@ summer:	summer.o
 	$(CC) $(CFLAGS) -o summer summer.o
 	/bin/chmod 775 summer
 
+#build cp
+cp:	cp.o
+	$(CC) $(CFLAGS) -o cp cp.o
+	/bin/chmod 775 cp
+
+#build ls
+ls:	ls.o
+	$(CC) $(CFLAGS) -o ls ls.o
+	/bin/chmod 775 ls
+
+#build mv
+mv:	mv.o
+	$(CC) $(CFLAGS) -o mv mv.o
+	/bin/chmod 775 mv
+
+#build rm
+rm:	rm.o
+	$(CC) $(CFLAGS) -o rm rm.o
+	/bin/chmod 775 rm
+
 clean:				# delete object files
-	-rm -f $(LBIN)/*.o
+	-rm -f *.o $(LBIN)/*.o
 
 clobber: clean		# delete main from current directory
 	-rm -f $(LBIN)/$(MAINS)

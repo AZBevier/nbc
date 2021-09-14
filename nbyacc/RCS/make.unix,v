@@ -1,9 +1,14 @@
-head	1.6;
+head	1.7;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.7
+date	2021.09.13.19.11.35;	author jbev;	state Exp;
+branches;
+next	1.6;
 
 1.6
 date	2021.06.28.21.09.56;	author jbev;	state Exp;
@@ -41,9 +46,9 @@ desc
 @
 
 
-1.6
+1.7
 log
-@Add -Wall option.
+@Remove /system/bin/nbyacc on make clobber.
 @
 text
 @#
@@ -80,10 +85,11 @@ clean:
 	-rm -f $(OBJS)
 
 clobber:	clean		# delete main from current directory
-	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/y1.c
-	/bin/rm -f $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
+	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	/bin/rm -f $(LBIN)/y1.c $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
 	/bin/rm -f $(LBIN)/y1.o $(LBIN)/y2.o $(LBIN)/y3.o $(LBIN)/y4.o
 	/bin/rm -f $(LBIN)/dextern $(LBIN)/files $(LBIN)/yaccpar
+	/bin/rm -f $(SYSLIB)/$(PAR)
 
 install:	all		# build if necessary, and then copy main to system directory
 	@@if [ -d $(LBIN) ]; then \
@@ -100,6 +106,19 @@ install:	all		# build if necessary, and then copy main to system directory
 	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/dextern $(LBIN)/files $(LBIN)/*.?
 
+@
+
+
+1.6
+log
+@Add -Wall option.
+@
+text
+@d35 2
+a36 2
+	/bin/rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/y1.c
+	/bin/rm -f $(LBIN)/y2.c $(LBIN)/y3.c $(LBIN)/y4.c
+d39 1
 @
 
 

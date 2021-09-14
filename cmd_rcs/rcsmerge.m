@@ -1,0 +1,101 @@
+
+RCSMERGE(1)                                           RCSMERGE(1)
+
+
+NAME
+       rcsmerge - merge RCS revisions
+
+SYNOPSIS
+       rcsmerge [options] file
+
+DESCRIPTION
+       rcsmerge incorporates the changes between two revisions of
+       an RCS file into the corresponding working file.
+
+       Pathnames matching an RCS suffix  denote  RCS  files;  all
+       others   denote   working  files.   Names  are  paired  as
+       explained in ci.m.
+
+       At least one revision must be specified with  one  of  the
+       options  described  below,  usually -r.  At most two revi-
+       sions may be specified.  If only one  revision  is  speci-
+       fied,  the latest revision on the default branch (normally
+       the highest branch on the trunk) is assumed for the second
+       revision.   Revisions may be specified numerically or sym-
+       bolically.
+
+       rcsmerge prints a  warning  if  there  are  overlaps,  and
+       delimits the overlapping regions as explained in  merge.m.
+       The command is useful for  incorporating  changes  into  a
+       checked-out revision.
+
+OPTIONS
+       -ksubst
+              Use  subst  style  keyword substitution.   See co.m
+              for details.  For example, -kk -r1.1 -r1.2  ignores
+              differences  in  keyword  values  when  merging the
+              changes from 1.1 to 1.2.
+
+       -p[rev]
+              Send the result to standard output instead of over-
+              writing the working file.
+
+       -q[rev]
+              Run quietly; do not print diagnostics.
+
+       -r[rev]
+              Merge  with respect to revision rev.  Here an empty
+              rev stands for the latest revision on  the  default
+              branch, normally the head.
+
+       -Vn    Emulate RCS version n.  See co.m for details.
+
+       -xsuffixes
+              Use  suffixes to characterize RCS files.   See ci.m
+              for details.
+
+EXAMPLES
+       Suppose you have released revision  2.8  of  f.c.   Assume
+       furthermore that after you complete an unreleased revision
+       3.4, you receive updates to release 2.8 from someone else.
+       To combine the updates to 2.8 and your changes between 2.8
+       and 3.4, put the updates to 2.8 into file f.c and execute
+
+           rcsmerge  -p  -r2.8  -r3.4  f.c  >f.merged.c
+
+       Then examine f.merged.c.  Alternatively, if  you  want  to
+       save  the updates to 2.8 in the RCS file, check them in as
+       revision 2.8.1.1 and execute co -j:
+
+           ci  -r2.8.1.1  f.c
+           co  -r3.4  -j2.8:2.8.1.1  f.c
+
+       As another  example,  the  following  command  undoes  the
+       changes  between  revision  2.4  and 2.8 in your currently
+       checked out revision in f.c.
+
+           rcsmerge  -r2.8  -r2.4  f.c
+
+       Note the order of the arguments,  and  that  f.c  will  be
+       overwritten.
+
+DIAGNOSTICS
+       Exit status is 0 for no overlaps, 1 for some  overlaps,  2
+       for trouble.
+
+IDENTIFICATION
+       Author: Walter F. Tichy.
+       Revision Number: 5.3; Release Date: 1991/08/19.
+       Copyright (C) 1982, 1988, 1989 by Walter F. Tichy.
+       Copyright (C) 1990, 1991 by Paul Eggert.
+       Ported to MPX-32 05/05/95 by James C. Bevier, J B Systems.
+
+SEE ALSO
+       ci.m,   co.m,   ident.m,   merge.m,   rcs.m,    rcsdiff.m,
+       rcsintro.m,  rlog.m,  rcsfile.m
+       Walter  F.  Tichy,  RCS--A  System  for  Version  Control,
+       Software--Practice   &   Experience  15,  7  (July  1985),
+       637-654.
+
+GNU - RCS - RCSMERGE        J B Systems                  05/05/95
+

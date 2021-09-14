@@ -1,9 +1,14 @@
-head	1.7;
+head	1.8;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.8
+date	2021.09.13.19.19.53;	author jbev;	state Exp;
+branches;
+next	1.7;
 
 1.7
 date	2021.07.02.03.38.45;	author jbev;	state Exp;
@@ -46,9 +51,9 @@ desc
 @
 
 
-1.7
+1.8
 log
-@Correct make.
+@Change mpxmac file location.
 @
 text
 @#
@@ -58,8 +63,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 LBIN = ./mpx1x
 INSTALL = cp
 MOVE = mv
@@ -97,6 +102,17 @@ install: all
 	$(MOVE) nbar.o $(LBIN)/NBAR.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.7
+log
+@Correct make.
+@
+text
+@a7 1
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+d9 1
 @
 
 

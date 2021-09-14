@@ -1,0 +1,37 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.09.13.22.18.27;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# This makefile does nothing.  nbcas is only available on MPX.
+# Linux users must use nbasm to assemble on Linux.
+#
+
+all:
+	@@echo "nothing to do on Linux for nbcas."
+
+clean: all
+
+clobber: clean
+
+install: all
+@

@@ -1,9 +1,14 @@
-head	1.19;
+head	1.20;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.20
+date	2021.09.13.19.22.45;	author jbev;	state Exp;
+branches;
+next	1.19;
 
 1.19
 date	2021.06.28.21.19.29;	author jbev;	state Exp;
@@ -106,9 +111,9 @@ desc
 @
 
 
-1.19
+1.20
 log
-@Correct warning errors.
+@Fix task name to nbcas.
 @
 text
 @/*~!nbcc.c*/
@@ -129,10 +134,13 @@ text
  * (a).
  */
 
-#ident	"$Id: nbcc.c,v 1.18 2019/03/10 19:36:46 jbev Exp jbev $"
+#ident	"$Id: nbcc.c,v 1.19 2021/06/28 21:19:29 jbev Exp jbev $"
 
 /*
  * $Log: nbcc.c,v $
+ * Revision 1.19  2021/06/28 21:19:29  jbev
+ * Correct warning errors.
+ *
  * Revision 1.18  2019/03/10 19:36:46  jbev
  * correct conditional include logic
  *
@@ -1056,7 +1064,8 @@ printf("NBCC: return from NBCCOM\n");
     if (sflag)
       continue;
 assemble:
-    av[0] = "nbcas"; 
+/*  av[0] = "nbcas";  */
+    av[0] = as;         /* use nbasm */ 
     nv = 1;
     if (fflag)
 /*      av[nv++] = "-F"; 08/01/94 fix */
@@ -1909,7 +1918,7 @@ char *f, **v;
     ;
   if ((t=(status&0377)) != 0 && t!=14) {
     if (t!=2) {
-      printf("Fatal error %x in %s\n", t, f);
+      printf("Fatal status %x error %x in %s\n", status, t, f);
       errflag = 8;
     }
     return(1);
@@ -2512,6 +2521,24 @@ blcpy (b1, b2, length)
 
 #endif /* mpx */
 
+@
+
+
+1.19
+log
+@Correct warning errors.
+@
+text
+@d19 1
+a19 1
+#ident	"$Id: nbcc.c,v 1.18 2019/03/10 19:36:46 jbev Exp jbev $"
+d23 3
+d949 2
+a950 1
+    av[0] = "nbcas"; 
+d1803 1
+a1803 1
+      printf("Fatal error %x in %s\n", t, f);
 @
 
 

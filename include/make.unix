@@ -68,7 +68,7 @@ $(Y)	:
 		ln -s $(I) $(Y);  \
 		echo "$(Y) link created"; \
 	fi;
-	@ln -s $(I) $(Y);
+#	@ln -s $(I) $(Y);
 
 install	:	all
 	@if [ -d $(LBIN) ]; then \
@@ -95,4 +95,6 @@ clean	:
 clobber	:	clean
 	@-rm -f $(LBIN)/*.h
 	@-rm -f $(C)/*.h
+	@-rm -fr $(C)
 	@-rm -f $(I)/*.h
+	@-rm -fr $(I)

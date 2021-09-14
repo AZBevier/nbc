@@ -23,6 +23,7 @@
 #include <ctype.h>
 #include "float.h"
 #include <string.h>
+#include <stdio.h>
 
 /*  Note : this atof() generates an internal floating point representation
  *	   of a number.  If we are in IEEE mode, the number is translated
@@ -30,18 +31,15 @@
  */
 
 FPN ifpn;	/* internal floating point number */
-extern void zerof();
-extern void negf();
-extern int dodig();
 
-/* #define FLOATDEB */
+/*#define FLOATDEB*/
 
 #ifdef FLOATDEB
 extern int sdump();
-unsigned char sss[100];
-#else
-unsigned char sss[100];
 #endif
+extern void zerof();
+extern void negf();
+extern int dodig();
 
 FPN * myatof(s)
 register  unsigned char  *s;
@@ -51,25 +49,28 @@ register  unsigned char  *s;
 	int	exp;
 	int	sign;
 	int	esign;
+/*
+    unsigned char ss[200];
+*/
 
 #ifdef FLOATDEB
 	printf("myatof entry: %s\n", s);
-	strcpy(sss,s);
-	s = sss;
-#else
-	*sss='\0';
-	strcpy((char *)sss, (char *)s);
-	s = sss;
+    fflush(stdout);
 #endif
+/*
+	*ss='\0';
+	strcpy((char *)ss, (char *)s);
+	s = ss;
+*/
 	zerof( &ifpn );		/* clear destination number */
 	esign = sign = exp = tz = 0;	/* and local variables */
-
 	i = *s++;		/* get 1st char */
 
 #ifdef FLOATDEB
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof start: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* skip any leading white spaces */
 	while( i == ' ' || i == '\t') i = *s++;
@@ -91,6 +92,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 1: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	}
 	/* now process a fraction, if present */
@@ -107,6 +109,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 2: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* now see if exponent */
 	exp = (tz + exp);
@@ -117,6 +120,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 3: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* now process an exponent, if present */
 	if( i == 'e' || i == 'E' ){
@@ -139,6 +143,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 4: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* we are done with number */
 	if (esign) tz = -tz;
@@ -148,6 +153,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("myatof 5: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	/* if negative, negate the value */
 	if( sign ) negf( &ifpn );
@@ -155,6 +161,7 @@ register  unsigned char  *s;
 	printf("tz = %x, exp = %x, next c = %x\n", tz, exp, i);
 	printf("ret myatof: exp %d man ", ifpn.ne);
 	sdump(&ifpn.nf, NF);
+    fflush(stdout);
 #endif
 	return (&ifpn);
 }

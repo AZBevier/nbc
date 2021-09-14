@@ -1,10 +1,20 @@
-head	1.1;
+head	1.3;
 access;
 symbols;
 locks
-	jbev:1.1; strict;
+	jbev:1.3; strict;
 comment	@# @;
 
+
+1.3
+date	2021.07.13.03.48.03;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.07.12.00.07.05;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.06.30.20.34.26;	author jbev;	state Exp;
@@ -17,9 +27,9 @@ desc
 @
 
 
-1.1
+1.3
 log
-@Initial revision
+@Fix SED files.
 @
 text
 @cd bin/mpx3x
@@ -56,7 +66,7 @@ mkvmtape -ao -dNBAR ../../nbctape3x.tap *.O
 mkvmtape -ap -dNBAR ../../nbctape3x.tap NBAR
 cd ../..
 cd nbyacc/mpx3x
-mkvmtape -at -dNBYACC ../../nbctape3x.tap DEXTERN YACC* M* FILES Y?.C LD.*
+mkvmtape -at -dNBYACC ../../nbctape3x.tap DEXTERN MK* YACC* FILES Y?.C LD.*
 mkvmtape -ao -dNBYACC ../../nbctape3x.tap Y?.O
 mkvmtape -ap -dNBYACC ../../nbctape3x.tap NBYACC 
 mkvmtape -at -dLIB ../../nbctape3x.tap YACCPAR
@@ -98,4 +108,193 @@ mkvmtape -at -dNBLIB ../../nbctape3x.tap [G-R]*.C
 mkvmtape -at -dNBLIB ../../nbctape3x.tap [S-Z]*.C
 mkvmtape -al -dNBLIB ../../nbctape3x.tap CLB CDR
 cd ../..
+cd cmd_ar/mpx3x
+mkvmtape -at -dAR ../../nbctape3x.tap MK.* LD.* *.M *.C ARMAP
+mkvmtape -ao -dAR ../../nbctape3x.tap *.O 
+mkvmtape -ap -dAR ../../nbctape3x.tap AR
+cd ../..
+cd cmd_basename/mpx3x
+mkvmtape -at -dBASENAME ../../nbctape3x.tap MK.* LD.* *.M *.C BNMAP
+mkvmtape -ao -dBASENAME ../../nbctape3x.tap *.O 
+mkvmtape -ap -dBASENAME ../../nbctape3x.tap BASENAME
+cd ../..
+cd cmd_cd/mpx3x
+mkvmtape -at -dCD ../../nbctape3x.tap MK.* LD.* *.M *.C CDMAP
+mkvmtape -ao -dCD ../../nbctape3x.tap *.O 
+mkvmtape -ap -dCD ../../nbctape3x.tap CD
+cd ../..
+cd cmd_chgrp/mpx3x
+mkvmtape -at -dCHGRP ../../nbctape3x.tap MK.* LD.* *.M *.C CHGRPMAP
+mkvmtape -ao -dCHGRP ../../nbctape3x.tap *.O 
+mkvmtape -ap -dCHGRP ../../nbctape3x.tap CHGRP
+cd ../..
+cd cmd_chmod/mpx3x
+mkvmtape -at -dCHMOD ../../nbctape3x.tap MK.* LD.* *.M *.C CHMODMAP
+mkvmtape -ao -dCHMOD ../../nbctape3x.tap *.O 
+mkvmtape -ap -dCHMOD ../../nbctape3x.tap CHMOD
+cd ../..
+cd cmd_chown/mpx3x
+mkvmtape -at -dCHOWN ../../nbctape3x.tap MK.* LD.* *.M *.C CHOWNMAP
+mkvmtape -ao -dCHOWN ../../nbctape3x.tap *.O 
+mkvmtape -ap -dCHOWN ../../nbctape3x.tap CHOWN
+cd ../..
+cd cmd_chtyp/mpx3x
+mkvmtape -at -dCHTYP ../../nbctape3x.tap MK.* LD.* *.M *.C CHTYPMAP
+mkvmtape -ao -dCHTYP ../../nbctape3x.tap *.O 
+mkvmtape -ap -dCHTYP ../../nbctape3x.tap CHTYP
+cd ../..
+cd cmd_cmprs/mpx3x
+mkvmtape -at -dCMPRS ../../nbctape3x.tap MK.* LD.* *.M *.C CMPRSMAP
+mkvmtape -ao -dCMPRS ../../nbctape3x.tap *.O 
+mkvmtape -ap -dCMPRS ../../nbctape3x.tap CMPRS
+cd ../..
+cd cmd_cp/mpx3x
+mkvmtape -at -dCP ../../nbctape3x.tap MK.* LD.* *.M *.C CPMAP
+mkvmtape -ao -dCP ../../nbctape3x.tap *.O 
+mkvmtape -ap -dCP ../../nbctape3x.tap CP
+cd ../..
+cd cmd_date/mpx3x
+mkvmtape -at -dDATE ../../nbctape3x.tap MK.* LD.* *.M *.C DATEMAP
+mkvmtape -ao -dDATE ../../nbctape3x.tap *.O 
+mkvmtape -ap -dDATE ../../nbctape3x.tap DATE
+cd ../..
+cd cmd_dodep/mpx3x
+mkvmtape -at -dDODEP ../../nbctape3x.tap MK.* LD.* *.M *.C DODEPMAP
+mkvmtape -ao -dDODEP ../../nbctape3x.tap *.O 
+mkvmtape -ap -dDODEP ../../nbctape3x.tap DODEP
+cd ../..
+cd cmd_echo/mpx3x
+mkvmtape -at -dECHO ../../nbctape3x.tap MK.* LD.* *.M *.C ECHOMAP
+mkvmtape -ao -dECHO ../../nbctape3x.tap *.O 
+mkvmtape -ap -dECHO ../../nbctape3x.tap ECHO
+cd ../..
+cd cmd_expr/mpx3x
+mkvmtape -at -dEXPR ../../nbctape3x.tap MK.* LD.* *.M *.H *.C EXPRMAP
+mkvmtape -ao -dEXPR ../../nbctape3x.tap *.O 
+mkvmtape -ap -dEXPR ../../nbctape3x.tap EXPR
+cd ../..
+cd cmd_false/mpx3x
+mkvmtape -at -dFALSE ../../nbctape3x.tap MK.* LD.* *.M *.C FALSEMAP
+mkvmtape -ao -dFALSE ../../nbctape3x.tap *.O 
+mkvmtape -ap -dFALSE ../../nbctape3x.tap FALSE
+cd ../..
+cd cmd_grep/mpx3x
+mkvmtape -at -dGREP ../../nbctape3x.tap MK.* LD.* *.M *.H *.C GREPMAP
+mkvmtape -ao -dGREP ../../nbctape3x.tap *.O 
+mkvmtape -ap -dGREP ../../nbctape3x.tap GREP
+cd ../..
+cd cmd_ln/mpx3x
+mkvmtape -at -dLN ../../nbctape3x.tap MK.* LD.* *.M *.C LNMAP
+mkvmtape -ao -dLN ../../nbctape3x.tap *.O 
+mkvmtape -ap -dLN ../../nbctape3x.tap LN
+cd ../..
+cd cmd_ls/mpx3x
+mkvmtape -at -dLS ../../nbctape3x.tap MK.* LD.* *.M *.C *.H LSMAP
+mkvmtape -ao -dLS ../../nbctape3x.tap *.O 
+mkvmtape -ap -dLS ../../nbctape3x.tap LS
+cd ../..
+cd cmd_make/mpx3x
+mkvmtape -at -dMAKE ../../nbctape3x.tap MK.* LD.* *.Y *.M *.C *.H MAKEMAP
+mkvmtape -ao -dMAKE ../../nbctape3x.tap *.O 
+mkvmtape -ap -dMAKE ../../nbctape3x.tap MAKE
+cd ../..
+cd cmd_mkdep/mpx3x
+mkvmtape -at -dMKDEP ../../nbctape3x.tap MK.* LD.* *.M *.C MKDEPMAP
+mkvmtape -ao -dMKDEP ../../nbctape3x.tap *.O 
+mkvmtape -ap -dMKDEP ../../nbctape3x.tap MKDEP
+cd ../..
+cd cmd_mkdir/mpx3x
+mkvmtape -at -dMKDIR ../../nbctape3x.tap MK.* LD.* *.M *.C MKDIRMAP
+mkvmtape -ao -dMKDIR ../../nbctape3x.tap *.O 
+mkvmtape -ap -dMKDIR ../../nbctape3x.tap MKDIR
+cd ../..
+cd cmd_mkfile/mpx3x
+mkvmtape -at -dMKFILE ../../nbctape3x.tap MK.* LD.* *.M *.C MKFILEMAP
+mkvmtape -ao -dMKFILE ../../nbctape3x.tap *.O 
+mkvmtape -ap -dMKFILE ../../nbctape3x.tap MKFILE
+cd ../..
+cd cmd_mv/mpx3x
+mkvmtape -at -dMV ../../nbctape3x.tap MK.* LD.* *.M *.C MVMAP
+mkvmtape -ao -dMV ../../nbctape3x.tap *.O 
+mkvmtape -ap -dMV ../../nbctape3x.tap MV
+cd ../..
+cd cmd_mvdir/mpx3x
+mkvmtape -at -dMVDIR ../../nbctape3x.tap MK.* LD.* *.M *.C MVDIRMAP
+mkvmtape -ao -dMVDIR ../../nbctape3x.tap *.O 
+mkvmtape -ap -dMVDIR ../../nbctape3x.tap MVDIR
+cd ../..
+cd cmd_pwd/mpx3x
+mkvmtape -at -dPWD ../../nbctape3x.tap MK.* LD.* *.M *.C PWDMAP
+mkvmtape -ao -dPWD ../../nbctape3x.tap *.O 
+mkvmtape -ap -dPWD ../../nbctape3x.tap PWD
+cd ../..
+cd cmd_rcs/mpx3x
+mkvmtape -at -dRCS ../../nbctape3x.tap MK.* LD.* *.H *.M *.C
+mkvmtape -ao -dRCS ../../nbctape3x.tap *.O 
+mkvmtape -ap -dRCS ../../nbctape3x.tap CI CO IDENT MERGE RCS RCSDIFF RCSMERGE RLOG
+cd ../..
+cd cmd_rm/mpx3x
+mkvmtape -at -dRM ../../nbctape3x.tap MK.* LD.* *.M *.C RMMAP
+mkvmtape -ao -dRM ../../nbctape3x.tap *.O 
+mkvmtape -ap -dRM ../../nbctape3x.tap RM
+cd ../..
+cd cmd_rmdir/mpx3x
+mkvmtape -at -dRMDIR ../../nbctape3x.tap MK.* LD.* *.M *.C RMDIRMAP
+mkvmtape -ao -dRMDIR ../../nbctape3x.tap *.O 
+mkvmtape -ap -dRMDIR ../../nbctape3x.tap RMDIR
+cd ../..
+cd cmd_sed/mpx3x
+mkvmtape -at -dSED ../../nbctape3x.tap MK.* LD.* *.M *.C *.H SEDMAP
+mkvmtape -ao -dSED ../../nbctape3x.tap *.O 
+mkvmtape -ap -dSED ../../nbctape3x.tap SED
+cd ../..
+cd cmd_sh/mpx3x
+mkvmtape -at -dSH ../../nbctape3x.tap MK.* LD.* *.M *.C *.H SHMAP
+mkvmtape -ao -dSH ../../nbctape3x.tap *.O 
+mkvmtape -ap -dSH ../../nbctape3x.tap SH
+cd ../..
+cd cmd_sum/mpx3x
+mkvmtape -at -dSUM ../../nbctape3x.tap MK.* LD.* *.M *.C SUMMAP
+mkvmtape -ao -dSUM ../../nbctape3x.tap *.O 
+mkvmtape -ap -dSUM ../../nbctape3x.tap SUM
+cd ../..
+cd cmd_touch/mpx3x
+mkvmtape -at -dTOUCH ../../nbctape3x.tap MK.* LD.* *.M *.C TOUCHMAP
+mkvmtape -ao -dTOUCH ../../nbctape3x.tap *.O 
+mkvmtape -ap -dTOUCH ../../nbctape3x.tap TOUCH
+cd ../..
+cd cmd_true/mpx3x
+mkvmtape -at -dTRUE ../../nbctape3x.tap MK.* LD.* *.M *.C TRUEMAP
+mkvmtape -ao -dTRUE ../../nbctape3x.tap *.O 
+mkvmtape -ap -dTRUE ../../nbctape3x.tap TRUE
+cd ../..
+cd cmd_uniq/mpx3x
+mkvmtape -at -dUNIQ ../../nbctape3x.tap MK.* LD.* *.M *.C UNIQMAP
+mkvmtape -ao -dUNIQ ../../nbctape3x.tap *.O 
+mkvmtape -ap -dUNIQ ../../nbctape3x.tap UNIQ
+cd ../..
+@
+
+
+1.2
+log
+@Update for NBC commands.
+@
+text
+@d35 1
+a35 1
+mkvmtape -at -dNBYACC ../../nbctape3x.tap DEXTERN YACC* M* FILES Y?.C LD.*
+d198 1
+a198 1
+mkvmtape -at -dRCS ../../nbctape3x.tap MK.* LD.* *.M *.C
+d221 5
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d77 160
 @

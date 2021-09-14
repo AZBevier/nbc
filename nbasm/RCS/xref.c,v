@@ -1,10 +1,14 @@
-head	1.5;
+head	1.6;
 access;
 symbols;
-locks
-	jbev:1.5; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.6
+date	2021.09.13.20.45.05;	author jbev;	state Exp;
+branches;
+next	1.5;
 
 1.5
 date	2018.10.12.19.57.09;	author jbev;	state Exp;
@@ -37,9 +41,9 @@ desc
 @
 
 
-1.5
+1.6
 log
-@Add string.h and stdlib.h to includes
+@Correct warning errors.
 @
 text
 @/*
@@ -49,13 +53,16 @@ text
 #include "defs.h"
 #include <stdio.h>
 #include <string.h>
+#ifndef mpx
 #include <stdlib.h>
+#endif
+/*#include <stdlib.h>*/
 #ifdef DOS
 #include <io.h>
 #include <malloc.h>
 #endif
 
-/* #define DEBUG */
+/*#define DEBUG*/
 
 #define XRBUFSIZE 300*768
 static int32	xrefmode;	/* xref mode */
@@ -66,18 +73,18 @@ static int32 	segments;	/* number of buffer segments written */
 int mycmp();		/* qsort function */
 
 /*
- * xnegate - routine to negate 8 char name for for macro lookup
+ * xnegate - routine to negate 8 char name for macro lookup
  * input - 8 char name pointer
  * output - point to 8 char negated name
  */
 
-static char negname[8];		/* the negated name returned */
+static uint8 negname[8];		/* the negated name returned */
 
-char * xsnegate (name)
-register char * name;
+uint8 *xsnegate (name)
+register uint8 *name;
 {
-	register int	i;
-	register char * rname = negname;
+	int	    i;
+	uint8   *rname = negname;
 
 	for (i=0; i<8; i++)
 	  rname[i] = (char)(-(int)(name[i]));
@@ -120,10 +127,13 @@ report:
 #ifdef DEBUG
 if(info->type == TYPL)
 printf("REPTR name [%0.2x%0.2x%0.2x%0.2x] flags %x type %x sval %x\n",
+name[4], name[5], name[6], name[7],
+#if 0
 #ifdef mpx
 name[4], name[5], name[6], name[7],
 #else
 name[7], name[6], name[5], name[4],
+#endif
 #endif
 info->flags, info->type, sval);
 else if(info->type == TYMACDEF)
@@ -151,7 +161,7 @@ printf("REPTR name [%0.8s] flags %x type %x value %x sval %x\n",
 	xrbufp += 16;		/* bump pointer */
 	if(xrbufp >= XRBUFSIZE) {
 	    /* sort the buffer before we write it out */
-printf("OVERFLOW xrbuf %x %x\n", xrbuf, xrbufp);
+printf("OVERFLOW xrbuf %s %x\n", xrbuf, xrbufp);
 fflush(stdout);
 	    qsort(xrbuf, XRBUFSIZE/16, 16, mycmp);
 	    segments++;
@@ -278,11 +288,10 @@ int length;
 	int pp;
 	unsigned char oldname[8];
 	char xx[12];
-	char *til = TCWTITL;
 	char *ep;
 	int i;
 	unsigned char name[8];
-	int value, literal;
+	int literal;
 	char flags, type;
 
 /*
@@ -383,7 +392,7 @@ printf("type %d ttype %d\n", type, tt.type);
 	    	    memcpy((char *)&literal, &name[4], 4);
 #endif
 		    /* store 8 hex chars */
-		    sprintf(xx, "%0.8X", literal);
+		    sprintf(xx, "%.8X", literal);
 		    memcpy(&prmt[12], xx, 8);
 		    continue;
 		} else if (type < TYMACDEF) {
@@ -406,7 +415,7 @@ printf("type %d ttype %d\n", type, tt.type);
 		    memcpy(&prmt[12], xsnegate(name), 8);
 		    continue;
 		} else {
-		    sprintf(xx, "%0.8X", literal);
+		    sprintf(xx, "%.8X", literal);
 /*
 printf("fixup type %d name %0.8s\n", type, name);
 */
@@ -432,7 +441,7 @@ printf("fixup type %d name %0.8s\n", type, name);
 	    sval &= 0x7fffff;
 	    /* store 5 dec chars */
 /*	    sprintf(xx, "%0.5d", value); */
-	    sprintf(xx, "%0.5d", sval);
+	    sprintf(xx, "%.5d", sval);
 	    memcpy(&prmt[pp + 23], xx, 5);
 	    pp += 8;			/* next print position */
 	    continue;
@@ -441,6 +450,52 @@ printf("fixup type %d name %0.8s\n", type, name);
 	ppp(length, prmt, 0);	/* print last line */
 	return;
 }
+@
+
+
+1.5
+log
+@Add string.h and stdlib.h to includes
+@
+text
+@d8 1
+d10 2
+d17 1
+a17 1
+/* #define DEBUG */
+d28 1
+a28 1
+ * xnegate - routine to negate 8 char name for for macro lookup
+d33 1
+a33 1
+static char negname[8];		/* the negated name returned */
+d35 2
+a36 2
+char * xsnegate (name)
+register char * name;
+d38 2
+a39 2
+	register int	i;
+	register char * rname = negname;
+d82 2
+d89 1
+d116 1
+a116 1
+printf("OVERFLOW xrbuf %x %x\n", xrbuf, xrbufp);
+a242 1
+	char *til = TCWTITL;
+d246 1
+a246 1
+	int value, literal;
+d347 1
+a347 1
+		    sprintf(xx, "%0.8X", literal);
+d370 1
+a370 1
+		    sprintf(xx, "%0.8X", literal);
+d396 1
+a396 1
+	    sprintf(xx, "%0.5d", sval);
 @
 
 

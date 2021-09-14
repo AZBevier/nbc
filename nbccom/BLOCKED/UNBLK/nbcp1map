@@ -1,0 +1,677 @@
+1 MPX-32 NBC RELEASE 1.1.0  (NBCAT.R3.4.0.05) 
+     DIRECTIVE PROCESSING
+0
+ FILES 8
+ BUFFERS 8
+ OPTION LOWER PROMPT
+ ENVIRONMENT ,,SHARED,MAP2048
+ SPACE 16
+ BUILD NBCP1
+1 MPX-32 NBC RELEASE 1.1.0  (NBCAT.R3.4.0.05) 
+     NBCP1        LOAD MODULE MAP
+0
+         -------------------------------
+         NBCP1                          
+         MAIN    , LEVEL 60             
+         UNPRIVILEGED 
+         TRANSIENT AREA 00000
+         TRANSFER ADDR  7B43C
+         -------------------------------
+0
+ ATOF       00000    PGM 
+ **DSECT*   00000    SEC 
+ **CSECT*   5E000    SEC 
+ _atof      5E004    DEF 
+ 
+ CODE       00058    PGM 
+ **DSECT*   00058    SEC 
+ _extfun    00394    DEF 
+ _extflg    00390    DEF 
+ _begstrn   00460    DEF 
+ _currstn   00464    DEF 
+ _handopt   0005C    DEF 
+ _proflg    00060    DEF 
+ _strftn    00064    DEF 
+ _gdebug    00068    DEF 
+ _fdeffla   0006C    DEF 
+ _SAflag    00070    DEF 
+ _NULLNAM   00074    DEF 
+ _labelno   0007C    DEF 
+ _slineno   00080    DEF 
+ _prognam   00084    DEF 
+ _currpro   00098    DEF 
+ _lastloc   0010C    DEF 
+ _log2tab   00110    DEF 
+ _crslab    001C8    DEF 
+ _crs2lab   001CC    DEF 
+ _reg_use   001D0    DEF 
+ _ftlab1    00288    DEF 
+ _ftlab2    0028C    DEF 
+ **CSECT*   5E3E8    SEC 
+ _bccode    5F0A0    DEF 
+ _ejobcod   5F130    DEF 
+ _aobeg     5F310    DEF 
+ _aocode    5F32C    DEF 
+ _aoend     5F348    DEF 
+ _putstri   5F3E0    DEF 
+ _putabyt   5F4D4    DEF 
+ _fldal     5F874    DEF 
+ _fldty     5F8A4    DEF 
+ _where     5F8C0    DEF 
+ _swepilo   5F904    DEF 
+ _main      5F99C    DEF 
+ _p1init    5F9FC    DEF 
+ _branch    5E3EC    DEF 
+ _defalig   5E48C    DEF 
+ _locctr    5E4DC    DEF 
+ _defloi    5E61C    DEF 
+ _getloi    5E76C    DEF 
+ _deflab    5E878    DEF 
+ _getlab    5E8D0    DEF 
+ _get2lab   5E8F8    DEF 
+ _efcode    5E924    DEF 
+ _zecode    5F820    DEF 
+ _dumpstr   5F6B8    DEF 
+ _bfcode    5ECFC    DEF 
+ _defnam    5F364    DEF 
+ 
+ COMM1      005A0    PGM 
+ **DSECT*   005A0    SEC 
+ _tstruse   019FC    DEF 
+ _tstrbuf   01958    DEF 
+ _curtstr   019F8    DEF 
+ _nerrors   00614    DEF 
+ _dope      0068C    DEF 
+ _opst      008B4    DEF 
+ _offsz     01114    DEF 
+ _lastfre   01118    DEF 
+ _lflag     005A4    DEF 
+ _Wflag     00618    DEF 
+ _indope    00ADC    DEF 
+ _itstrbu   01158    DEF 
+ **CSECT*   5FC10    SEC 
+ _tstr      60588    DEF 
+ _caloff    60328    DEF 
+ _talloc    603E4    DEF 
+ _malloc    5FC7C    DEF 
+ _mymallo   5FCD8    DEF 
+ _ispow2    5FC14    DEF 
+ _free      5FECC    DEF 
+ _putenv    5FF08    DEF 
+ _uerror    5FF24    DEF 
+ _cerror    5FFA0    DEF 
+ _werror    60074    DEF 
+ _fwalk     60100    DEF 
+ _walkf     601C0    DEF 
+ _mkdope    602C0    DEF 
+ _tinit     60390    DEF 
+ _tcheck    60494    DEF 
+ _tfree     60508    DEF 
+ _tfree1    60548    DEF 
+ 
+ CGRAM      01A38    PGM 
+ **DSECT*   01A38    SEC 
+ _yylval    01A3C    DEF 
+ _yychar    045D0    DEF 
+ _yyerrfl   045CC    DEF 
+ _yyval     01A40    DEF 
+ _yyexca    01BB4    DEF 
+ _yyact     01D0C    DEF 
+ _yypact    02C4C    DEF 
+ _yypgo     03100    DEF 
+ _yyr1      031F4    DEF 
+ _yyr2      034C8    DEF 
+ _yychk     0379C    DEF 
+ _yydef     03C50    DEF 
+ _yydebug   04104    DEF 
+ _yyv       04108    DEF 
+ _yys       04360    DEF 
+ _yypv      045B8    DEF 
+ _yyps      045BC    DEF 
+ _yystate   045C0    DEF 
+ _yytmp     045C4    DEF 
+ _yynerrs   045C8    DEF 
+ **CSECT*   60658    SEC 
+ _bdty      606B0    DEF 
+ _mkty      6065C    DEF 
+ _dstash    6076C    DEF 
+ _savebc    607BC    DEF 
+ _resetbc   60838    DEF 
+ _addcase   608B0    DEF 
+ _adddef    60968    DEF 
+ _swstart   609E0    DEF 
+ _swend     60A38    DEF 
+ _yyparse   60B78    DEF 
+ 
+ FIXCALL    04878    PGM 
+ **DSECT*   04878    SEC 
+ **CSECT*   62ED0    SEC 
+ _fixcall   62ED4    DEF 
+ 
+ GETENV     04A10    PGM 
+ **DSECT*   04A10    SEC 
+ **CSECT*   63268    SEC 
+ _getenv    6326C    DEF 
+ 
+ LOCAL      04A20    PGM 
+ **DSECT*   04A20    SEC 
+ **CSECT*   63388    SEC 
+ _offcon    63FE4    DEF 
+ _clocal    63418    DEF 
+ _exname    64290    DEF 
+ _cast      6338C    DEF 
+ _tlen      644CC    DEF 
+ _andable   63E38    DEF 
+ _cendarg   63E74    DEF 
+ _cisreg    63E94    DEF 
+ _CanBeLN   63F3C    DEF 
+ _incode    64020    DEF 
+ _fincode   640D8    DEF 
+ _cinit     64144    DEF 
+ _ecode     64474    DEF 
+ _vfdzero   64228    DEF 
+ _ctype     64330    DEF 
+ _noinit    643BC    DEF 
+ _isitlon   643E0    DEF 
+ _isitflo   64440    DEF 
+ _fltprin   64564    DEF 
+ _addrore   645D4    DEF 
+ 
+ OPTIM      04E40    PGM 
+ **DSECT*   04E40    SEC 
+ _oflag     04E44    DEF 
+ _revrel    04E8C    DEF 
+ **CSECT*   64638    SEC 
+ _optim     646E4    DEF 
+ _fortarg   6463C    DEF 
+ _nncon     65C1C    DEF 
+ 
+ PFTN       04ED0    PGM 
+ **DSECT*   04ED0    SEC 
+ _entered   04ED4    DEF 
+ _instack   04ED8    DEF 
+ _pstk      05040    DEF 
+ _ibseen    052D0    DEF 
+ _iclass    052D4    DEF 
+ _ilocctr   052D8    DEF 
+ **CSECT*   65C88    SEC 
+ _ilbrace   68794    DEF 
+ _irbrace   68834    DEF 
+ _putbyte   67EE8    DEF 
+ _gotscal   68610    DEF 
+ _endinit   67F30    DEF 
+ _doinit    6815C    DEF 
+ _upoff     6889C    DEF 
+ _nidcl     68DE4    DEF 
+ _tyreduc   69200    DEF 
+ _uclass    69518    DEF 
+ _lookup    699A0    DEF 
+ _clearst   69B60    DEF 
+ _unhide    69F40    DEF 
+ _movesta   69DB4    DEF 
+ _rstruct   66DC4    DEF 
+ _dclstru   670E8    DEF 
+ _getstr    67D88    DEF 
+ _tymerge   690D4    DEF 
+ _tsize     67754    DEF 
+ _types     68EE4    DEF 
+ _instk     67B38    DEF 
+ _relook    69AA0    DEF 
+ _mknonun   698C8    DEF 
+ _defid     65C8C    DEF 
+ _fixtype   69320    DEF 
+ _fixclas   69570    DEF 
+ _falloc    68B28    DEF 
+ _psave     66B2C    DEF 
+ _oalloc    68944    DEF 
+ _hide      69E68    DEF 
+ _StabInf   66914    DEF 
+ _ftnend    66B78    DEF 
+ _dclargs   66C60    DEF 
+ _moedef    66F28    DEF 
+ _bstruct   66F8C    DEF 
+ _talign    675D8    DEF 
+ _yyerror   674C4    DEF 
+ _yyaccpt   674EC    DEF 
+ _ftnarg    6750C    DEF 
+ _inforce   67850    DEF 
+ _vfdalig   67938    DEF 
+ _beginit   67994    DEF 
+ 
+ SCAN       05738    PGM 
+ **DSECT*   05738    SEC 
+ _lxrdope   06850    DEF 
+ _savetab   06A6C    DEF 
+ _savelef   06A70    DEF 
+ _htab      06A90    DEF 
+ _onlyuch   05B28    DEF 
+ _dobuilt   05B2C    DEF 
+ _yytext    05794    DEF 
+ _asmbuf    0573C    DEF 
+ _asmp      0578C    DEF 
+ _asm_esc   05790    DEF 
+ _lxgcp     05A94    DEF 
+ _lxmask    05CF0    DEF 
+ _lxdope    05E00    DEF 
+ _lxcp      05F08    DEF 
+ _lxmatch   065D4    DEF 
+ **CSECT*   6A008    SEC 
+ _yylex     6B294    DEF 
+ _lxres     6BFD0    DEF 
+ _asmout    6C6F0    DEF 
+ _hash      6C7BC    DEF 
+ _savestr   6C720    DEF 
+ _readcoi   6A00C    DEF 
+ _mainp1    6A110    DEF 
+ _lxinit    6A898    DEF 
+ _lxenter   6A794    DEF 
+ _lxmore    6A7E0    DEF 
+ _lxtitle   6C434    DEF 
+ _gettmps   6AA08    DEF 
+ _lxstr     6AC2C    DEF 
+ _settmps   6AAE0    DEF 
+ _lxcom     6B060    DEF 
+ 
+ STAB       06BB0    PGM 
+ **DSECT*   06BB0    SEC 
+ _stabLCS   06BB4    DEF 
+ **CSECT*   6C978    SEC 
+ _outstru   6E588    DEF 
+ _pstab     6E6D0    DEF 
+ _pstabdo   6E73C    DEF 
+ _psline    6E764    DEF 
+ _plcstab   6E86C    DEF 
+ _prcstab   6E8B0    DEF 
+ _pfstab    6E8EC    DEF 
+ _fixarg    6C97C    DEF 
+ _outstab   6CA04    DEF 
+ 
+ TREES      08F50    PGM 
+ **DSECT*   08F50    SEC 
+ **CSECT*   6E968    SEC 
+ _buildtr   6E96C    DEF 
+ _stref     70824    DEF 
+ _bcon      70B30    DEF 
+ _bpsize    70B9C    DEF 
+ _convert   70C7C    DEF 
+ _pconver   70E4C    DEF 
+ _oconver   70EF8    DEF 
+ _ptmatch   711A0    DEF 
+ _tymatch   71400    DEF 
+ _makety    7176C    DEF 
+ _block     71904    DEF 
+ _doszof    720AC    DEF 
+ _strargs   6FBF4    DEF 
+ _psize     70BF4    DEF 
+ _conval    6FE68    DEF 
+ _opact     719F4    DEF 
+ _notlval   70A30    DEF 
+ _chkpun    70484    DEF 
+ _chkstr    6FCEC    DEF 
+ _isstrco   70780    DEF 
+ _econver   70D50    DEF 
+ _icons     71974    DEF 
+ _modityp   71FB0    DEF 
+ _ecomp     7212C    DEF 
+ _prtree    7218C    DEF 
+ 
+ VERSION    094B0    PGM 
+ **DSECT*   094B0    SEC 
+ _version   094B0    DEF 
+ **CSECT*   725A8    SEC 
+ 
+ XDEFS      094F8    PGM 
+ **DSECT*   094F8    SEC 
+ _Needb3    1249C    DEF 
+ _Needb4    124A0    DEF 
+ _swtab     09E00    DEF 
+ _swp       0A5D0    DEF 
+ _swx       0A5D4    DEF 
+ _ftnno     095E0    DEF 
+ _blevel    095FC    DEF 
+ _instruc   095F4    DEF 
+ _stwart    095F8    DEF 
+ _forceal   09604    DEF 
+ _ininit    09608    DEF 
+ _lineno    095C4    DEF 
+ _lastcon   095C8    DEF 
+ _dcon      095D0    DEF 
+ _ftitle    094FC    DEF 
+ _ititle    09560    DEF 
+ _stab      095D8    DEF 
+ _curftn    095DC    DEF 
+ _curclas   095F0    DEF 
+ _curdim    09600    DEF 
+ _dimtab    0960C    DEF 
+ _paramst   09610    DEF 
+ _paramno   09DE0    DEF 
+ _autooff   09DE4    DEF 
+ _argoff    09DE8    DEF 
+ _strucof   09DEC    DEF 
+ _regvar    09DF0    DEF 
+ _minrvar   09DF4    DEF 
+ _brkflag   09DFC    DEF 
+ _strflg    0A5D8    DEF 
+ _inoff     09DF8    DEF 
+ _reached   0A5DC    DEF 
+ _idname    0A5E0    DEF 
+ _node      0A5E8    DEF 
+ _cflag     122E8    DEF 
+ _hflag     122EC    DEF 
+ _pflag     122F0    DEF 
+ _brklab    122F4    DEF 
+ _contlab   122F8    DEF 
+ _flostat   122FC    DEF 
+ _retlab    12300    DEF 
+ _retstat   12304    DEF 
+ _asavbc    12308    DEF 
+ _psavbc    12498    DEF 
+ _SYMTSZ    095E8    DEF 
+ _DIMTABS   095E4    DEF 
+ _sizeoff   095EC    DEF 
+ **CSECT*   725B0    SEC 
+ 
+ CTYPE      124E8    PGM  LIB
+ **DSECT*   124E8    SEC 
+ __ctype    124E8    DEF 
+ **CSECT*   725B8    SEC 
+ 
+ FPS        126F0    PGM  LIB
+ **DSECT*   126F0    SEC 
+ _dnum      126F8    DEF 
+ **CSECT*   725C0    SEC 
+ _cvtfi     725C4    DEF 
+ _cvtfui    72670    DEF 
+ _cvtdl     726A0    DEF 
+ _cvtdul    72758    DEF 
+ _cvtif     72784    DEF 
+ _cvtuif    72808    DEF 
+ _cvtld     72834    DEF 
+ _cvtuld    728D0    DEF 
+ 
+ FOPEN      12700    PGM  LIB
+ **DSECT*   12700    SEC 
+ **CSECT*   72950    SEC 
+ _fopen     72954    DEF 
+ _freopen   72998    DEF 
+ 
+ MPXINI     12708    PGM  LIB
+ **DSECT*   12708    SEC 
+ __myid     12708    DEF 
+ _prb       12828    DEF 
+ _envdata   12734    DEF 
+ _environ   12824    DEF 
+ _curvol    1283C    DEF 
+ _curdir    12850    DEF 
+ **CSECT*   72C10    SEC 
+ __mpxini   72C14    DEF 
+ 
+ FLSBUF     12A38    PGM  LIB
+ **DSECT*   12A38    SEC 
+ **CSECT*   738E8    SEC 
+ _fclose    73924    DEF 
+ _fflush    739FC    DEF 
+ __cleanu   738EC    DEF 
+ __xflsbu   73C94    DEF 
+ __flsbuf   73AA8    DEF 
+ __wrtchk   73D94    DEF 
+ __bufsyn   73FE0    DEF 
+ __findbu   73EA0    DEF 
+ 
+ SPRINTF    12A50    PGM  LIB
+ **DSECT*   12A50    SEC 
+ **CSECT*   74070    SEC 
+ _sprintf   74074    DEF 
+ 
+ PRINTF     12A50    PGM  LIB
+ **DSECT*   12A50    SEC 
+ **CSECT*   740F8    SEC 
+ _printf    740FC    DEF 
+ 
+ STRNCPY    12A50    PGM  LIB
+ **DSECT*   12A50    SEC 
+ **CSECT*   74198    SEC 
+ _strncpy   7419C    DEF 
+ 
+ FPRINTF    12A50    PGM  LIB
+ **DSECT*   12A50    SEC 
+ **CSECT*   74210    SEC 
+ _fprintf   74214    DEF 
+ 
+ EEXIT      12A50    PGM  LIB
+ **DSECT*   12A50    SEC 
+ **CSECT*   742B0    SEC 
+ _exit      742B4    DEF 
+ __exitmp   743D8    DEF 
+ __exit     74348    DEF 
+ 
+ STRICMP    12A60    PGM  LIB
+ **DSECT*   12A60    SEC 
+ **CSECT*   74498    SEC 
+ _stricmp   7449C    DEF 
+ 
+ STRCAT     12A60    PGM  LIB
+ **DSECT*   12A60    SEC 
+ **CSECT*   74520    SEC 
+ _strcat    74524    DEF 
+ 
+ STRCPY     12A60    PGM  LIB
+ **DSECT*   12A60    SEC 
+ **CSECT*   74588    SEC 
+ _strcpy    7458C    DEF 
+ 
+ DATA       12A60    PGM  LIB
+ **DSECT*   12A60    SEC 
+ __iob      13118    DEF 
+ __bufend   1325C    DEF 
+ __sibuf    12A60    DEF 
+ __sobuf    12D68    DEF 
+ __smbuf    13070    DEF 
+ __lastbu   13258    DEF 
+ **CSECT*   745D8    SEC 
+ 
+ FILBUF     132B0    PGM  LIB
+ **DSECT*   132B0    SEC 
+ **CSECT*   745E0    SEC 
+ __filbuf   745E4    DEF 
+ 
+ SBRK       132B8    PGM  LIB
+ **DSECT*   132B8    SEC 
+ **CSECT*   74770    SEC 
+ _sbrk      74774    DEF 
+ 
+ CALLOC     132B8    PGM  LIB
+ **DSECT*   132B8    SEC 
+ **CSECT*   747D0    SEC 
+ _calloc    747D4    DEF 
+ _cfree     74844    DEF 
+ 
+ STRLEN     132B8    PGM  LIB
+ **DSECT*   132B8    SEC 
+ **CSECT*   74870    SEC 
+ _strlen    74874    DEF 
+ 
+ SETBUF     132B8    PGM  LIB
+ **DSECT*   132B8    SEC 
+ **CSECT*   748B8    SEC 
+ _setbuf    748BC    DEF 
+ 
+ UNIXIO     132C0    PGM  LIB
+ **DSECT*   132C0    SEC 
+ _errno     132C0    DEF 
+ _mpxerr    132C4    DEF 
+ _ioc       141A4    DEF 
+ _defft     14168    DEF 
+ _rmerror   141A0    DEF 
+ _bound1d   132E8    DEF 
+ _filtabl   132F0    DEF 
+ **CSECT*   749F0    SEC 
+ _read1ln   75054    DEF 
+ _readcom   750D8    DEF 
+ _open      76C88    DEF 
+ _close     774DC    DEF 
+ _creat     7727C    DEF 
+ _read      75098    DEF 
+ _write     749F4    DEF 
+ _seek      75220    DEF 
+ _isatty    781F8    DEF 
+ _setdft    76AE0    DEF 
+ ___isblk   78170    DEF 
+ _setsiz    76B30    DEF 
+ _setacc    76B6C    DEF 
+ _getacc    76BB0    DEF 
+ _fcbadr    7828C    DEF 
+ _readraw   76708    DEF 
+ _writraw   768FC    DEF 
+ _delete    78308    DEF 
+ _creatd    772C0    DEF 
+ _mpxccse   78334    DEF 
+ 
+ UNLINK     14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   797A0    SEC 
+ _unlink    797A4    DEF 
+ 
+ STRNCMP    14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   79868    SEC 
+ _strncmp   7986C    DEF 
+ 
+ STRCMP     14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   79908    SEC 
+ _strcmp    7990C    DEF 
+ 
+ ATOI       14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   79990    SEC 
+ _atoi      79994    DEF 
+ 
+ BRK        14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   79A98    SEC 
+ _brk       79A9C    DEF 
+ 
+ STRCHR     14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   79BB0    SEC 
+ _strchr    79BB4    DEF 
+ 
+ GETCWVD    14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   79C08    SEC 
+ _getcwvd   79C0C    DEF 
+ 
+ DOPRNT     14338    PGM  LIB
+ **DSECT*   14338    SEC 
+ **CSECT*   79D08    SEC 
+ __doprnt   79E28    DEF 
+ 
+ FINDIOP    143D0    PGM  LIB
+ **DSECT*   143D0    SEC 
+ **CSECT*   7B3E0    SEC 
+ __findio   7B3E4    DEF 
+ 
+ C.SRT      143D0    PGM  LIB
+ **DSECT*   143D0    SEC 
+ _eas       143D0    DEF 
+ _csect     143D4    DEF 
+ _blksize   143D8    DEF 
+ _bufrsio   143DC    DEF 
+ _runrflg   143E0    DEF 
+ u.mbrk     143E8    DEF 
+ u.endstk   143EC    DEF 
+ c.flgs     143E4    DEF 
+ **CSECT*   7B438    SEC 
+ _c.srt     7B43C    DEF 
+ 
+ MPXSVC     14400    PGM  LIB
+ **DSECT*   14400    SEC 
+ **CSECT*   7B4B0    SEC 
+ _mpxsvc    7B4B4    DEF 
+ 
+ MEMCHR     14918    PGM  LIB
+ **DSECT*   14918    SEC 
+ **CSECT*   7B620    SEC 
+ _memchr    7B624    DEF 
+ 
+ LSEEK      14918    PGM  LIB
+ **DSECT*   14918    SEC 
+ **CSECT*   7B680    SEC 
+ _lseek     7B684    DEF 
+ 
+ MEMCPY     14918    PGM  LIB
+ **DSECT*   14918    SEC 
+ **CSECT*   7B6C0    SEC 
+ _memcpy    7B6C4    DEF 
+ 
+ PNPARS     14920    PGM  LIB
+ **DSECT*   14920    SEC 
+ __rrs      14920    DEF 
+ **CSECT*   7B7A0    SEC 
+ __cassg    7B7B8    DEF 
+ 
+ ECVT       14BA0    PGM  LIB
+ **DSECT*   14BA0    SEC 
+ **CSECT*   7C0E0    SEC 
+ _ecvt      7C0E4    DEF 
+ _fcvt      7C130    DEF 
+ 
+ UNIX2MPX   14BF8    PGM  LIB
+ **DSECT*   14BF8    SEC 
+ **CSECT*   7C858    SEC 
+ _unix2mp   7C85C    DEF 
+ 
+ ABS        14C10    PGM  LIB
+ **DSECT*   14C10    SEC 
+ **CSECT*   7CB98    SEC 
+ _abs       7CB9C    DEF 
+ 
+ STR2UP     14C10    PGM  LIB
+ **DSECT*   14C10    SEC 
+ **CSECT*   7CBD8    SEC 
+ _str2up    7CBDC    DEF 
+ _str2lc    7CC54    DEF 
+ 
+ SCANF      14C10    PGM  LIB
+ **DSECT*   14C10    SEC 
+ **CSECT*   7CCD0    SEC 
+ _scanf     7CCD4    DEF 
+ _fscanf    7CD18    DEF 
+ _sscanf    7CD5C    DEF 
+ 
+ CTSCAN     14C10    PGM  LIB
+ **DSECT*   14C10    SEC 
+ **CSECT*   7CDD0    SEC 
+ _ctscan    7CDD4    DEF 
+ _get_lbu   7CFB4    DEF 
+ 
+ MEMSET     14D18    PGM  LIB
+ **DSECT*   14D18    SEC 
+ **CSECT*   7D090    SEC 
+ _memset    7D094    DEF 
+ 
+ BCOPY      14D18    PGM  LIB
+ **DSECT*   14D18    SEC 
+ **CSECT*   7D138    SEC 
+ _bcopy     7D13C    DEF 
+ 
+ DOSCAN     14D18    PGM  LIB
+ **DSECT*   14D18    SEC 
+ **CSECT*   7D1C8    SEC 
+ __doscan   7D1CC    DEF 
+ 
+ FWRITE     14D20    PGM  LIB
+ **DSECT*   14D20    SEC 
+ **CSECT*   7DFB0    SEC 
+ _fwrite    7DFB4    DEF 
+ 
+ UNGETC     14D28    PGM  LIB
+ **DSECT*   14D28    SEC 
+ **CSECT*   7E250    SEC 
+ _ungetc    7E254    DEF 
+ 
+ **END**    14D28
+ 
+  LOAD MODULE SIZE =      316   SECTORS.
+ 

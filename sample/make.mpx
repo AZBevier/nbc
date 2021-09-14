@@ -116,9 +116,7 @@ CLEAN:  clean
 
 clean:				# delete object files
 #	following line(s) must start with a TAB character
-	$(BIN)/rm -f \
-	dcat.o ucat.o fixer.o obd.o caid.o summer.o \
-	dcat.l ucat.l fixer.l obd.l caid.l summer.l
+	$(BIN)/rm -f *.o *.l
 
 CLOBBER: clobber
 

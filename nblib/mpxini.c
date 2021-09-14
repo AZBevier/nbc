@@ -26,7 +26,7 @@
  * an argument list for a C program.  In the process, input and output
  * redirection is performed if indicated.  */
 
-/*#define RRDEBUG*/
+#define RRDEBUG
 
 #include <mosde.h>	/* Machine dependent equates !MOD */
 #include <stdio.h>
@@ -106,7 +106,7 @@ _mpxini()
     char   **ep;                    /* curr env pointer */
     int    reg[8];                  /* mpx regs */
 #ifdef RRDEBUG
-   	char msg1[80];
+   	char msg1[160];
 #endif
 
     /* set default activation stdin, stdout, stderr */
@@ -120,7 +120,12 @@ _mpxini()
     argbuf[0] = 0;		/* insure null args */
 
 #ifdef RRDEBUG
-    sprintf(msg1, "\r\nRUN BUG: exmode = %x runrflg = %x\n", exmode, runrflg);
+    sprintf(msg1,
+        "\r\nRUN BUG: exmode %x runrflg %x tn %x lm %8s ps %8s\n",
+        exmode, runrflg, _myid._taskno, _myid._lm, _myid._pn);
+    contyp(msg1);
+    sprintf(msg1, "\r\nRUN BUG: curvol %s curdir %s\n",
+        curvol, curdir);
     contyp(msg1);
 #endif
 

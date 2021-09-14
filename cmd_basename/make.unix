@@ -26,6 +26,7 @@ clean:
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS) $(LBIN)/$(DOC)
+#	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@if [ -d $(LBIN) ]; then \
@@ -34,8 +35,8 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/basename $(SYSBIN)
-	$(INSTALL) $(SRCS) $(LBIN)
-	$(INSTALL) $(DOC) $(SRCS) $(LBIN)
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
+	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
+	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
 	/bin/chmod 664 $(LBIN)/*.?
 

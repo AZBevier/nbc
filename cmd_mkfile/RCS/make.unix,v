@@ -1,9 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.09.13.21.39.32;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.07.08.20.21.13;	author jbev;	state Exp;
@@ -21,9 +26,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Correct spelling error.
+@Change mpxmac location.
 @
 text
 @#
@@ -55,6 +60,7 @@ clean:
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
 	-rm -f $(LBIN)/$(DOC) # $(LBIN)/$(HDRS)
+	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@@if [ -d $(LBIN) ]; then \
@@ -63,12 +69,24 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/mkfile $(SYSBIN)
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
 #	$(INSTALL) $(HDRS) $(LBIN)/$(HDRS)
 	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.2
+log
+@Correct spelling error.
+@
+text
+@d30 1
+d39 1
+a39 1
+#	$(INSTALL) $(LBIN)/mkfile $(SYSBIN)
 @
 
 

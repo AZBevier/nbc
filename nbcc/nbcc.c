@@ -16,10 +16,13 @@
  * (a).
  */
 
-#ident	"$Id: nbcc.c,v 1.19 2021/06/28 21:19:29 jbev Exp $"
+#ident	"$Id: nbcc.c,v 1.20 2021/09/13 19:22:45 jbev Exp $"
 
 /*
  * $Log: nbcc.c,v $
+ * Revision 1.20  2021/09/13 19:22:45  jbev
+ * Fix task name to nbcas.
+ *
  * Revision 1.19  2021/06/28 21:19:29  jbev
  * Correct warning errors.
  *
@@ -946,7 +949,8 @@ printf("NBCC: return from NBCCOM\n");
     if (sflag)
       continue;
 assemble:
-    av[0] = "nbcas"; 
+/*  av[0] = "nbcas";  */
+    av[0] = as;         /* use nbasm */ 
     nv = 1;
     if (fflag)
 /*      av[nv++] = "-F"; 08/01/94 fix */
@@ -1799,7 +1803,7 @@ char *f, **v;
     ;
   if ((t=(status&0377)) != 0 && t!=14) {
     if (t!=2) {
-      printf("Fatal error %x in %s\n", t, f);
+      printf("Fatal status %x error %x in %s\n", status, t, f);
       errflag = 8;
     }
     return(1);

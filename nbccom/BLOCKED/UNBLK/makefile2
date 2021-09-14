@@ -1,0 +1,126 @@
+#~!Makefile for nbccom
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1995 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+ 
+#ident	"$Id: make2.mpx,v 1.7 1995/03/03 16:25:00 jbev Exp jbev $"
+ 
+# Make parameters when running on MPX
+ 
+ROOT = /system/system
+TARGET = /system/bin
+SOURCE = .
+PREFIX = nb
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/system
+BIN = /system/bin
+UBIN = /system/bin
+LIB = /system/bin
+YBIN = /system/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+#CFLAGS = -DMPX -DNOBUG -DMYATOF
+#CFLAGS = -DMPX -DNOBUG -DTWOPASS -DMYATOF
+#CFLAGS = -DMPX -DNOBUG -DTWOPASS
+CFLAGS = -DMPX -DNOBUG -DTWOPASS -DNEWATOF
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS = -Ynbcommap
+LD1FLAGS = -Ynbcp1map
+LD2FLAGS = -Ynbcp2map
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+#MAKEFILE = makefile
+MAKEFILE = makefile2
+ 
+# Fill in with correct information
+ 
+P1OBJS = getenv.o version.o fixcall.o stab.o code.o atofn.o float.o \
+	comm1.o cgram.o local.o optim.o pftn.o scan.o trees.o xdefs.o
+ 
+P2OBJS = allo.o comm2.o local2.o match.o order.o reader.o switch.o \
+	table.o
+ 
+HDRS = caloff.h common.h mac2defs.h macdefs.h manifest.h mfile1.h \
+	mfile2.h opdesc.h print.h stab.h treemgr.h treewalk.h float.h
+ 
+P1SRCS = getenv.c version.c fixcall.c stab.c code.c atofn.c float.c \
+	comm1.c cgram.c local.c optim.c pftn.c scan.c trees.c xdefs.c
+ 
+P2SRCS = allo.c comm2.c local2.c match.c order.c reader.c switch.c \
+	table.c
+ 
+ALLSRC = $(P1SRCS) $(P2SRCS)
+ 
+#MAIN = nbccom
+MAIN = nbcp1 nbcp2
+ 
+ALL:	all
+ 
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+ 
+nbccom:	$(MAKEFILE) $(P1OBJS) $(P2OBJS)
+	$(CC) $(LDFLAGS) $(P1OBJS) $(P2OBJS) -o nbccom
+	$(BIN)/chmod 755 nbccom
+	$(BIN)/chgrp system nbccom
+	$(BIN)/chown system nbccom
+ 
+nbcp1:	$(MAKEFILE) $(P1OBJS)
+	$(CC) $(LD1FLAGS) $(P1OBJS) -o nbcp1
+	$(BIN)/chmod 755 nbcp1
+	$(BIN)/chgrp system nbcp1
+	$(BIN)/chown system nbcp1
+ 
+nbcp2:	$(MAKEFILE) $(P2OBJS)
+	$(CC) $(LD2FLAGS) $(P2OBJS) -o nbcp2
+	$(BIN)/chmod 755 nbcp2
+	$(BIN)/chgrp system nbcp2
+	$(BIN)/chown system nbcp2
+ 
+CLEAN:  clean
+ 
+clean:
+	$(BIN)/rm -f $(P1OBJS) $(P2OBJS)
+ 
+CLOBBER: clobber
+ 
+clobber: clean
+	$(BIN)/rm -f $(MAIN) cgram.c
+	$(BIN)/rm -f nbcp1map nbcp2map nbcommap
+ 
+DEPEND: depend
+ 
+#depend: $(P1SRCS) $(P2SRCS) $(HDRS) $(MAKEFILE)
+#	$(BIN)/dodep $(CFLAGS) $(MAKEFILE) $(P1SRCS) $(P2SRCS) >dep.out
+#	$(BIN)/mv dep.out $(MAKEFILE)
+ 
+depend: $(P1SRCS) $(P2SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	@for i in $(ALLSRC); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $(CFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+ 
+INSTALL: install
+ 
+install: all
+	$(BIN)/cp $(MAIN) $(BIN)
+ 
+# DO NOT DELETE THIS LINE -- the dependencies begin here

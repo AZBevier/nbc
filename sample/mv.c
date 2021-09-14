@@ -16,10 +16,14 @@
  * (a).
  */
 
-#ident	"Make4MPX $Id: mv.c,v 1.4 1995/10/17 23:23:24 jbev Exp $"
+#ident	"Make4MPX $Id: mv.c,v 1.5 2021/07/05 18:26:50 jbev Exp $"
 
-/* $Log: mv.c,v $
- * Revision 1.4  1995/10/17  23:23:24  jbev
+/*
+ * $Log: mv.c,v $
+ * Revision 1.5  2021/07/05 18:26:50  jbev
+ * Correct warnings.
+ *
+ * Revision 1.4  1995/10/17 23:23:24  jbev
  * Bad test in determining file type.  Should be 768 instead of 255.
  * Caused files to be created as unblocked file when really blocked.
  *
@@ -48,11 +52,17 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <ctype.h>
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#endif
 
+void usage();
 char *pname();
 char *dname();
 char *strrchr();
 int utime();
+int move();
 
 extern char *getcwd();
 static char *cvtdname();
@@ -87,7 +97,8 @@ struct stat s1, s2;
 
 int f_flag = 0;
 
-main(argc, argv)
+int main(argc, argv)
+int argc;
 char *argv[];
 {
     int i, rc;
@@ -142,8 +153,10 @@ char *argv[];
     	}
     	exit(0);		/* move was O.K. */
 #else
-    	execl("/usr/lib/mv_dir", "mv", argv[1], argv[2], 0);
-    	fprintf(stderr, "mv:  cannot exec() /usr/lib/mv_dir\n");
+/*    	execl("/usr/lib/mv_dir", "mv", argv[1], argv[2], (char *)0); */
+/*    	fprintf(stderr, "mv:  cannot exec() /usr/lib/mv_dir\n"); */
+    	execl("/usr/bin/mv", "mv", argv[1], argv[2], (char *)0);
+    	fprintf(stderr, "mv:  cannot exec() /usr/bin/mv\n");
     	exit(2);
 #endif
     }
@@ -204,13 +217,15 @@ char *argv[];
 }
 
 
-move(source, target)
+int move(source, target)
 char *source, *target;
 {
     char buf[MAXN];
     int c, i;
     int from, to, cnt, mflg;
+#ifdef mpx
     int size, type;
+#endif
     int iflag = O_RDONLY;
     int oflag = O_WRONLY | O_TRUNC | O_CREAT;
     int udflag = 0;
@@ -228,10 +243,10 @@ char *source, *target;
     if (access(pname(source), 2) == -1)
     	goto s_unlink;
 
+#ifdef mpx
     /* from is a file, so get its type/size for to file creation */
     type = s1.st_nlink;
     size = s1.st_size;
-#ifdef mpx
     size = size/768;
     setdft(type);		/* set new creat type */
     setsiz(size, size / 16, size / 16);	/* set default size */
@@ -368,12 +383,12 @@ char *
 pname(name)
 register char *name;
 {
-    register c;
+    register int c;
     register char *p, *q;
     static char buf[MAXN];
 
     p = q = buf;
-    while (c = *p++ = *name++)
+    while ((c = *p++ = *name++))
     	if (c == DELIM)
     	    q = p - 1;
     if (q == buf && *q == DELIM)
@@ -397,9 +412,8 @@ register char *name;
 }
 
 
-usage()
+void usage()
 {
-    register char *opt;
     fprintf(stderr, "Usage: mv [-f] f1 f2\n       mv [-f] f1 ... fn d1\n");
     fprintf(stderr, "       mv [-f] d1 d2\n");
     exit(2);
@@ -549,7 +563,7 @@ register char *path;
     	if(strcmp(path,"..") == 0 || strncmp(path,"../",3) == 0) {
     	    /* Hop up a level */
     	    if((cp = strrchr(buf,'/')) == (char *)0)
-    		cp = buf;		/* Don't back up beyond root */
+    		    cp = buf;	/* Don't back up beyond root */
     		*cp = '\0';		/* In case there's another .. */
     		path += 2;		/* Skip ".." */
     		while(*path == '/')	/* Skip one or more slashes */

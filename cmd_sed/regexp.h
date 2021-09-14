@@ -16,10 +16,13 @@
  * (a).
  */
 
-#ident	"Makef4MPX $Id: regexp.h,v 1.3 2021/07/05 23:30:42 jbev Exp jbev $"
+#ident	"Makef4MPX $Id: regexp.h,v 1.4 2021/09/13 21:48:53 jbev Exp $"
 
 /*
  * $Log: regexp.h,v $
+ * Revision 1.4  2021/09/13 21:48:53  jbev
+ * Correct warning errors.
+ *
  * Revision 1.3  2021/07/05 23:30:42  jbev
  * Correct warnings.
  *

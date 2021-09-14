@@ -1,9 +1,14 @@
-head	1.9;
+head	1.10;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.10
+date	2021.09.13.22.09.02;	author jbev;	state Exp;
+branches;
+next	1.9;
 
 1.9
 date	2021.07.01.02.40.38;	author jbev;	state Exp;
@@ -56,9 +61,9 @@ desc
 @
 
 
-1.9
+1.10
 log
-@Fix lookaround call parameter.
+@Change lookaround calls.
 @
 text
 @%{
@@ -73,12 +78,15 @@ text
 
 #ifndef lint
 static char *rcsid =
-"$Header: /bulk2/simhv/nbc-master/nbccom/RCS/cgram.y,v 1.8 2019/01/31 21:43:05 jbev Exp jbev $";
+"$Header: /bulk2/simhv/nbc-master/nbccom/RCS/cgram.y,v 1.9 2021/07/01 02:40:38 jbev Exp jbev $";
 #endif
 %}
 
 /*
  * $Log: cgram.y,v $
+ * Revision 1.9  2021/07/01 02:40:38  jbev
+ * Fix lookaround call parameter.
+ *
  * Revision 1.8  2019/01/31 21:43:05  jbev
  * Update for Linux
  *
@@ -511,14 +519,14 @@ init_declarator:   nfdeclarator
 #ifndef mpx
 #ifndef BUG1
 			    if(idebug)
-/*		    lookaround(yystack); */
-				    lookaround(yypvt);
+  		    lookaround(yystack);
+/*    lookaround(yypvt); */
 #endif
 #endif
 			    if( ISARY(p->in.type) )
 				    outstab(&stab[p->tn.rval]);
 			}
-		|  fdeclarator
+		  | fdeclarator
 			={  defid( tymerge($<nodep>0,$1), uclass(curclass) );
 			    if(paramno) {
 				uerror("can't declare parameters here");
@@ -534,8 +542,8 @@ init_declarator:   nfdeclarator
 #ifndef mpx
 #ifndef BUG1
 			    if(idebug)
-/*		    lookaround(yystack); */
-				    lookaround(yypvt);
+  		    lookaround(yystack);
+/*    lookaround(yypvt); */
 #endif
 #endif
 			    if( ISARY(p->in.type) )
@@ -548,8 +556,8 @@ init_declarator:   nfdeclarator
 #ifndef mpx
 #ifndef BUG1
 			    if(idebug)
-/*		    lookaround(yystack); */
-				    lookaround(yypvt);
+  		    lookaround(yystack);
+/*    lookaround(yypvt); */
 #endif
 #endif
 			    if( ISARY(p->in.type) )
@@ -1171,6 +1179,33 @@ register YYSTYPE *yypvt;
 #endif
 #endif
 
+@
+
+
+1.9
+log
+@Fix lookaround call parameter.
+@
+text
+@d13 1
+a13 1
+"$Header: /bulk2/simhv/nbc-master/nbccom/RCS/cgram.y,v 1.8 2019/01/31 21:43:05 jbev Exp jbev $";
+d19 3
+d454 2
+a455 2
+/*		    lookaround(yystack); */
+				    lookaround(yypvt);
+d461 1
+a461 1
+		|  fdeclarator
+d477 2
+a478 2
+/*		    lookaround(yystack); */
+				    lookaround(yypvt);
+d491 2
+a492 2
+/*		    lookaround(yystack); */
+				    lookaround(yypvt);
 @
 
 

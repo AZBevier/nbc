@@ -36,6 +36,7 @@ clobber: clean
 	-rm -f $(LBIN)/rules.c $(LBIN)/dosys.c $(LBIN)/gram.c $(LBIN)/gram.y
 	-rm -f $(LBIN)/dyndep.c $(LBIN)/docd.c $(LBIN)/files.c $(LBIN)/rules.c
 	-rm -f $(LBIN)/ar.h $(LBIN)/defs.h
+#	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@if [ -d $(LBIN) ]; then \
@@ -44,7 +45,7 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/make $(SYSBIN)
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) main.c $(LBIN)/main.c
 	$(INSTALL) doname.c $(LBIN)/doname.c
 	$(INSTALL) files.c $(LBIN)/files.c

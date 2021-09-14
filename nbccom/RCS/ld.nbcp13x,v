@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.09.13.22.07.43;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.04.26.22.44.48;	author jbev;	state Exp;
@@ -16,25 +21,27 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Add page commands.]
 @
 text
 @$DEFM
+$PAGE 0
 $JOB NBCP1
 $PAGE 0
 $AS IN TO SYC
 $AS OT TO SGO
 $@@SYSTEM(SYSTEM)COMPRESS
 ^(BIN)C.SRTE.O
-FLOAT.O
-MYATOF.O
 CGRAM.O
 CODE.O
 COMM1.O
 FIXCALL.O
+FLOAT.O
+GETENV.O
 LOCAL.O
+MYATOF.O
 OPTIM.O
 PFTN.O
 SCAN.O
@@ -65,5 +72,21 @@ $NOTE *** ERROR *** CATALOG OF NBCP1 FAILED
 $DEFN ENDJOB
 $PAGE
 $EOJ
+$PAGE 24
 $ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+a8 2
+FLOAT.O
+MYATOF.O
+d13 2
+d16 1
+d47 1
 @

@@ -1,9 +1,14 @@
-head	1.6;
+head	1.7;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.7
+date	2021.09.13.22.34.46;	author jbev;	state Exp;
+branches;
+next	1.6;
 
 1.6
 date	2021.06.27.14.43.24;	author jbev;	state Exp;
@@ -41,9 +46,9 @@ desc
 @
 
 
-1.6
+1.7
 log
-@Update for nbc-master build.
+@Revise for building on Linux.
 @
 text
 @#~!Makefile for nblib1x when building for MPX on Linux
@@ -75,19 +80,18 @@ PREFIX = nb
 INCLUDE = /system/$(PREFIX)include
 SINCLUDE = $(INCLUDE)
 SBIN = /system/bin
-BIN = /system/bin
 UBIN = /system/bin
-SLIB = /system/lib
 YBIN = /system/bin
 CPP = $(SLIB)/$(PREFIX)cpp
 CPFLAGS = -C -UMPX
 CC = $(SBIN)/$(PREFIX)cc
-CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+#CFLAGS = -C -N -DMPX -Ui386 -1 -DMPX1X -M$(SBIN)/m.mpxmac1x -P$(SBIN)/mpxpre1x
+CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SBIN)/m.mpxmac1x -P$(SBIN)/mpxpre1x
 LD = $(UBIN)/$(PREFIX)nbcat
 LDFLAGS = 
 YACC = $(YBIN)/$(PREFIX)yacc
 YFLAGS =
-PRE = $(SLIB)/mpxpre1x
+PRE = $(SBIN)/mpxpre1x
 CLIBPREFIX = c
 MAKEFILE = make.mpx1x
 
@@ -176,14 +180,15 @@ ALLSRC = $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC_1X)
 ALL:	all
 
 #all:	files $(MAIN) $(SRC1) $(SRC2) $(SRC3) $(SRC4) $(SRC_1X)
-all:	files $(MAIN) $(ALLSRC)
-	$(BIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
-	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ_1X)
-	$(BIN)/echo clib/cdir are up to date.
+#all:	clean files $(MAIN) $(ALLSRC)
+all:	clean files $(MAIN)
+	$(SBIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
+	$(SBIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ_1X)
+	$(SBIN)/echo clib/cdir are up to date.
 
 files:
 	-touch clib
@@ -208,42 +213,42 @@ clobber: clean
 DEPEND: depend
 
 depend: $(SRCS) $(HDRS) $(MAKEFILE)
-#	$(BIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
-#	$(BIN)/mv dep.out $(MAKEFILE)
+#	$(SBIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+#	$(SBIN)/mv dep.out $(MAKEFILE)
 
-	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	$(SBIN)/mkdep $(MAKEFILE) >dep.out
 	@@for i in $(SRCS_A); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC1); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC2); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC3); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
 	@@for i in $(SRC4); do \
-	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(SBIN)/echo "# Source file '$$i'" >> dep.out; \
 	$(CPP) $(CPFLAGS) $$i >> dep.out; \
 	done;
-	$(BIN)/echo "# End of dependencies" >> dep.out;
-	$(BIN)/mv dep.out $(MAKEFILE)
+	$(SBIN)/echo "# End of dependencies" >> dep.out;
+	$(SBIN)/mv dep.out $(MAKEFILE)
 
 INSTALL: install
 
 install: all
-	$(BIN)/cp clib clb
-	$(BIN)/cp clib CLB
-	$(BIN)/cp cdir cdr
-	$(BIN)/cp cdir CDR
-#	$(BIN)/cp clib $(BIN)/clb
-#	$(BIN)/cp cdir $(BIN)/cdr
+	$(SBIN)/cp clib clb
+	$(SBIN)/cp clib CLB
+	$(SBIN)/cp cdir cdr
+	$(SBIN)/cp cdir CDR
+#	$(SBIN)/cp clib $(BIN)/clb
+#	$(SBIN)/cp cdir $(BIN)/cdr
 
 prefile:
 
@@ -268,6 +273,68 @@ pnpars.o: $(PRE) pnpars.s
 	$(CC) -P$(PRE) -C pnpars.s -o pnpars.o
 
 # DO NOT DELETE THIS LINE -- the dependencies begin here
+@
+
+
+1.6
+log
+@Update for nbc-master build.
+@
+text
+@a29 1
+BIN = /system/bin
+a30 1
+SLIB = /system/lib
+d35 2
+a36 1
+CFLAGS = -C -DMPX -Ui386 -1 -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+d41 1
+a41 1
+PRE = $(SLIB)/mpxpre1x
+d130 9
+a138 8
+all:	files $(MAIN) $(ALLSRC)
+	$(BIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
+	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
+	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
+	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ3)
+	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ4)
+	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ_1X)
+	$(BIN)/echo clib/cdir are up to date.
+d163 2
+a164 2
+#	$(BIN)/dodep $(CPFLAGS) $(MAKEFILE) $(SRCS) >dep.out
+#	$(BIN)/mv dep.out $(MAKEFILE)
+d166 1
+a166 1
+	$(BIN)/mkdep $(MAKEFILE) >dep.out
+d168 1
+a168 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d172 1
+a172 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d176 1
+a176 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d180 1
+a180 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d184 1
+a184 1
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+d187 2
+a188 2
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+d193 6
+a198 6
+	$(BIN)/cp clib clb
+	$(BIN)/cp clib CLB
+	$(BIN)/cp cdir cdr
+	$(BIN)/cp cdir CDR
+#	$(BIN)/cp clib $(BIN)/clb
+#	$(BIN)/cp cdir $(BIN)/cdr
 @
 
 

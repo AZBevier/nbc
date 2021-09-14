@@ -1,0 +1,1007 @@
+
+                                           MPX-32 DoD Protocols
+
+                                                   Revision 3.1
+
+                                         Software Release Notes
+
+                                                  February 1991 
+
+
+
+
+
+
+
+
+324-005720-000
+
+
+
+
+LIMITED RIGHTS
+_________________________________________________________
+
+This manual is supplied without representation or
+warranty of any kind.  Encore Computer Corporation
+therefore assumes no responsibility and shall have no
+liability of any kind arising from supply or use of this
+publication or any material contained herein.
+
+
+PROPRIETARY INFORMATION
+
+The information contained herein is proprietary to Encore
+Computer Corporation and/or its vendors, and its use,
+disclosure or duplication is subject to the restrictions
+stated in the standard Encore Computer Corporation
+License terms and conditions or the appropriate third-
+party sublicense agreement.
+
+
+RESTRICTED RIGHTS
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subdivision (c)
+(1) (ii) of the Rights in Technical Data and Computer
+Software clause at 252.227.7013.
+
+Encore Computer Corporation
+6901 West Sunrise Boulevard
+Fort Lauderdale, Florida  33313
+
+
+
+UTX/32, MPX-32, ACX-32, and Comm-32 are trademarks of
+Encore Computer Corporation.
+
+Concept/32 is a registered trademark of Encore Computer
+Corporation.
+
+Pronet-80 is a registered trademark of Proteon, Inc.
+
+HYPERchannel is a registered trademark of Network Systems
+Corporation.
+
+DECnet is a trademark of Digital Equipment Corporation.
+
+IBM is a registered trademark of International Business
+Machines.
+
+UNIX is a registered trademark of AT&T Bell Laboratories.
+
+Ethernet is a trademark of Xerox Corporation.
+
+
+
+Copyright 1991 by Encore Computer Corporation
+All Rights Reserved
+Printed in the U.S.A.
+
+
+
+Contents
+____________________________________________________________
+
+
+1 OVERVIEW
+
+  Summary of Contents
+  Documentation
+    MPX-32 DoD Protocols Documentation
+    Documentation Conventions
+      Bold Type
+      Non-Proportional Type
+      Italic Type
+      Braces
+      Brackets
+      Horizontal Ellipses
+      Vertical Ellipses
+      Control Characters
+
+2 CONTENTS OF THIS RELEASE
+
+  Product Name
+  Model Number
+  Software Revision Number
+  Revision Date
+  Model Number(s) to Purchase Subscription Service Programs
+  Revision History
+  Prerequisites
+  Package Contents
+  Package Formats
+  Documentation Delivered With This Product
+  Related Documentation
+
+3 PRODUCT INFORMATION
+
+  About MPX-32 DoD Protocols
+
+4 REQUIREMENTS
+
+  Introduction
+  Disk Space Requirements
+  Memory Requirements
+  Physical Requirements
+  Software Requirements
+
+5 INSTALLATION INSTRUCTIONS
+
+  Binary Installation
+  Software Configuration
+
+6 PRODUCT HINTS
+
+  General Hints
+
+7 KNOWN PROBLEMS
+
+  Introduction
+
+8 PROBLEM REPORT SUMMARY
+
+  Introduction
+  Online Viewing of Problem Reports
+  Problem Reporting
+    By Telephone
+    With PR Forms
+
+
+
+1 OVERVIEW
+____________________________________________________________
+
+
+Summary of Contents
+
+    These Software Release Notes (SRN) provide information
+    on using Revision 3.1 of MPX-32 DoD Protocols with the
+    MPX-32 operating system, version 3.4U02 or later.
+
+    The file on the installation tape containing the SRN
+    (SRN_DOD_3.1) may be printed from the TSM> prompt. The
+    file may also be examined online. It was included to
+    provide users with the latest information about Revision
+    3.1.  Note that the hardcopy and installation-tape versions
+    may differ because of last-minute changes.
+
+    The topics contained in this SRN are in the following order:
+
+
+    + Overview
+
+    + Contents of this Revision
+
+    + Product Information
+
+    + Requirements
+
+    + Installation Instructions
+
+    + Product Hints
+
+    + Known Problems
+
+    + Problem Report Summary
+
+
+
+Documentation
+
+
+MPX-32 DoD Protocols Documentation
+
+    The documentation for Revision 3.1 of MPX-32 DoD Protocols
+    consists of the following manuals:
+
+
+    Comm-32 DoD Protocols Network Administrator's Guide 3.0 (323-005720-000)
+    Comm-32 DoD Protocols Programmer's Guide 3.0 (323-005730-000)
+    Comm-32 DoD Protocols Applications Guide 3.0 (323-005740-000)
+
+    MPX-32 DoD Protocols Software Release Notes (324-005720-000)
+
+
+    Note:  The original Comm-32 DoD Protocols software has
+           been renamed MPX-32 DoD Protocols, to distinguish
+           it from the new Comm-32 DoD Architecture products;
+	   however, the technical manuals retain the older name.
+
+Documentation Conventions
+
+
+    The following typographic conventions used throughout
+    this document are intended to increase the document's
+    readability and enhance your understanding of its contents.
+
+Bold Type
+
+    In command lines, boldfaced information must be entered
+    exactly as shown.
+
+    Example
+
+      TSM> OPCOM SEND T X25
+
+
+Non-Proportional Type
+
+    In file entries, information in non-proportional type
+    must be entered exactly as shown.
+
+    Example
+
+      struct x25_cug [
+
+    In messages, information in non-proportional type is
+    text written by the system.
+
+    Example
+
+      PAD: RESET confirmed
+
+
+Italic Type
+
+    In file entries and command syntax, information you provide
+    is printed in italics.
+
+    Example File entry.
+
+      TSM> $USERNAME name
+
+    Example Command syntax.
+
+      from file
+
+    In system messages, variable information is printed in italics.
+
+    Example
+
+      UNABLE TO DELETE FILE - VMxx
+
+    Note:  In text, italics are used for emphasis.
+
+
+Braces
+
+    When braces surround parameters that are separated by a
+    vertical bar(s), only one parameter is required.
+    Example
+
+      $ASSIGN {LO | ER} TO {pathname}
+
+
+Brackets
+
+    In command syntax, parameters inside brackets are optional.
+
+    Example
+
+      from [file]
+
+
+Horizontal Ellipses
+
+    In text and messages, horizontal ellipses indicate that
+    similar information has been omitted.
+
+    Example
+
+      RPAR? [1,2,...,22]
+
+
+Vertical Ellipses
+
+    Vertical ellipses in command syntax, file entries, and
+    messages indicate that similar lines have been omitted.
+
+    Example
+
+      PAD: RPAR 2:v
+            .
+            .
+            .
+      PAD: RPAR 22:v
+
+
+Control Characters
+
+    A circumflex (^) followed immediately by a capital
+    letter indicates a control-character sequence. To enter
+    a control character, press and hold the control key
+    (Ctrl or CTRL) while typing the specified control character.
+
+    Example
+
+      ^X
+
+
+2 CONTENTS OF THIS RELEASE
+____________________________________________________________
+
+
+Product Name
+
+    MPX-32 DoD Protocols
+
+
+Model Number
+
+    1119-0303 (Binary Single System/Node)
+
+
+Software Revision Number
+
+    3.1
+
+
+Revision Date
+
+    January 1991
+
+
+Model Number(s) to Purchase Subscription Service Programs
+
+
+    FP-1119-0303   Premier Support Service
+
+    FS-1119-0303   Standard Support Service
+
+    FU-1119-0303   Software Update Service
+
+
+    Please contact your local Encore sales service representative
+    for complete information about the Service Programs.
+
+
+
+Revision History
+
+    Description                 Level             Date
+    ------------                -----             ----
+    Original Release            Revision 1.0      September 1985*
+    Maintenance Release         Revision 1.0A     January 1986*
+    Enhancement Release         Revision 2.0      June 1986
+    Enhancement Release         Revision 3.0      July 1987
+    Maintenance Release         Revision 3.0A     March 1988
+    Maintenance Release         Revision 3.1      January 1991
+
+     * Formerly known as TCP/IP
+
+
+
+Prerequisites
+
+    Encore Proprietary Software License Form 620-28
+
+    Also see the minimum requirements in chapter 4.
+
+
+Package Contents
+
+    Twenty four files in the following four Volume Manager
+    save images:
+
+    Image1  contains this Software Release Notes file.
+
+    Image2  contains the product files.
+
+    Image3  contains the resident object files.
+
+    Image4  contains the demonstration programs.
+
+
+Package Formats
+
+    Four Volume Manager (VOLMGR) save images as follows:
+
+
+   Save Image 1
+
+   File(s)       Contents           Description
+   -------       --------           -----------
+     1      (SYSTEM)SRN_DOD_3.1 This SRN file
+
+   Save Image 2
+
+   File(s)       Contents           Description
+   -------       --------           -----------
+     1      (SYSTEM)D.DODIT     DoD Protocols initialization file
+     2      (SYSTEM)DNETOP      Network configurator
+     3      (SYSTEM)DOD.ERR     Online help file
+     4      (SYSTEM)DOD.INC     DoD Protocol parameters file
+     5      (SYSTEM)DODDIR      Directory for user interface routines
+     6      (SYSTEM)DODLIB      Library for user interface routines
+     7      (SYSTEM)FTP         Interactive file transfer protocol
+     8      (SYSTEM)FTPS        File transfer protocol server
+     9      (SYSTEM)IP          Internet protocol
+    10      (SYSTEM)TCP         Transport protocol
+    11      (SYSTEM)TELNET      Virtual terminal protocol
+    12      (SYSTEM)TELS        Virtual terminal protocol server
+    13      (SYSTEM)TFTP        Trivial file transfer protocol
+    14      (SYSTEM)TFTPDOC     TFTP online help file
+    15      (SYSTEM)TFTPM       Trivial File Transfer Protocol master
+    16      (SYSTEM)TFTPS       Trivial File Transfer Protocol server
+    17      (SYSTEM)X.DODIT     DoD Protocols activator
+
+   Save Image 3
+
+   File(s)       Contents           Description
+   -------       --------           -----------
+     1      (OBJECT)ON.IPXIO    Virtual terminal pseudo handler
+     2      (OBJECT)ON.SVC7     Interprocess notification service-1
+     3      (OBJECT)ON.NOT      Interprocess notification service-2
+
+   Save Image 4
+
+   File(s)       Contents           Description
+   -------       --------           -----------
+     1      (SYSTEM)ACTIVE       Demo program for transmission
+     2      (SYSTEM)DEMODOC      Demo annotation file
+     3      (SYSTEM)PASSIVE      Demo program for reception
+
+    Total disk space required for installation with last image: 3,944
+
+
+
+Documentation Delivered With This Product
+
+
+    + Comm-32 DoD Protocols Network Administrator's Guide
+      3.0 (323-005720-000)
+
+    + Comm-32 DoD Protocols Programmer's Guide 3.0 (323-
+      005730-000)
+
+    + Comm-32 DoD Protocols Applications Guide 3.0 (323-
+      005740-000)
+
+    + MPX-32 DoD Protocols Software Release Notes (324-
+      005720-000)
+
+
+Related Documentation
+
+    + MPX-32 Reference Manual*
+
+     * For current publication numbers, contact your Encore
+     representative.
+
+
+3 PRODUCT INFORMATION
+____________________________________________________________
+
+
+About MPX-32 DoD Protocols
+
+    MPX-32 DoD Protocols provides file-transfer and
+    virtual-terminal capabilities. Specifically, TFTP and
+    FTP provide the capability to transfer files to or from
+    remote hosts on up to four networks.  TELNET provides
+    virtual-terminal capability.
+
+
+4 REQUIREMENTS
+____________________________________________________________
+
+
+Introduction
+
+    This chapter contains the system requirements for MPX-32
+    DoD Protocols, Revision 3.1.
+
+
+Disk Space Requirements
+
+    To use this binary installation package, adequate disk
+    space must be available on the system. 3,944 blocks of
+    available space are needed for this installation. (Space
+    for temporary and SLO files is not included.)
+
+
+Memory Requirements
+
+
+    TCP         requires 18 map blocks of memory for execution,
+		none of which are shared.
+
+    IP          requires 23 map blocks of memory for execution,
+		none of which are shared.
+
+    TELNET      requires 26 map blocks of memory for execution,
+		8 of which are shared among all active copies
+		of TELNET.
+
+    TELS        requires 22 map blocks of memory for execution,
+		7 of which are shared.
+
+    FTP         requires 29 map blocks of memory for execution,
+		6 of which are shared.
+
+    FTPS        requires 18 map blocks of memory for execution,
+		none of which are shared.
+
+    TFTP        requires 15 map blocks of memory for execution,
+		none of which are shared.
+
+    TFTPS       requires 10 map blocks of memory for execution,
+		none of which are shared.
+
+    TFTPM       requires 9 map blocks of memory for execution,
+		none of which are shared.
+
+    X.DODIT     requires 17 map blocks of memory for execution,
+		none of which are shared.
+
+    ON.SVC7     has a size of 720 bytes.
+
+    ON.IPXIO    has a size of 2176 bytes, plus 5376 bytes
+                for each set of eight pseudo-terminals.
+
+    ON.NOT      has a size of 656 bytes.
+
+
+    Note:  The numbers in this section include the swappable
+           and shared portions of the tasks. Operating system
+	   and DODSPACE (buffer pool) sizes are not included.
+
+
+Physical Requirements
+
+    1. One compatible input device for the distribution medium:
+
+              9-Track tape drive
+
+    2. One compatible auxiliary input device for batch processing:
+
+              One TSM terminal (with lower-case capability).
+
+    3.  Model 8516     Ethernet Controller
+                       P/N 160-103675-001AA         *
+                       Firmware Rev. 531-322947-004 *
+              OR
+        Model 73-8516  Ethernet Plus Controller
+                       P/N 160-113145-001D          *
+                       Firmware Rev. 531-103284-002 *
+
+      * Development and testing of this product were performed on
+        the recommended revisions stated above. This does not mean
+        that earlier or later revisions of the hardware will not work.
+
+    4.  Two megabytes of memory (see Memory Requirements section)
+
+
+Software Requirements
+
+    1. A copy of MPX-32 DoD Protocols must be installed on each
+       node (system).
+
+    2. Recommended revision-specific environments:
+
+       A.  1401-33 MPX-32 Operating System Revision 3.4U02
+           1407-03 MPX-32 Utilities Revision 3.1
+           1411-33 Scientific Run-Time Library Rev. 4.5 native mode (demos)
+           1413-33 FORTRAN 77+ Compiler Rev. 4.5 native mode (demos)
+           1113-03 Comm-32 Ethernet Handler Rev. 2.0
+
+       B.  1401-X3 MPX-32 Operating System Revision 3.4U03(A)
+           1407-X3 MPX-32 Uilities Revison 3.2 or later
+           1411-33 Scientific Run-Time Library Rev. 5.0 or later (demos)
+           1413-X3 FORTRAN 77+ Compiler        Rev. 5.0 or later (demos)
+           1113-03 Comm-32 Ethernet Handler    Rev. 2.0
+
+       C.  1401-X3 MPX-32 Operating System Revision 3.5/3.5U00A*
+           1407-X3 MPX-32 Uilities Revison 3.2 with 3.2U03 or later
+           1411-33 Scientific Run-Time Library Rev. 5.0 or later (demos)
+           1413-X3 FORTRAN 77+ Compiler        Rev. 5.0 or later (demos)
+           1113-03 Comm-32 Ethernet Handler    Rev. 2.0 or later
+
+       D.  1401-X3 MPX-32 Operating System Revision 3.5U01* or later
+           1407-X3 MPX-32 Uilities Revison 3.2 with 3.2U04 or later
+           1411-33 Scientific Run-Time Library Rev. 5.0C or later (demos)
+           1413-X3 FORTRAN 77+ Compiler        Rev. 5.0C or later (demos)
+           1113-03 Comm-32 Ethernet Handler    Rev. 2.1 (MANDATORY) or later
+
+    3. The following are used to install MPX-32 DoD Protocols:
+
+           VOLMGR, an editor, SYSGEN, and COMPRESS
+
+
+
+    * NOTE: MPX-32 DoD Protocols, Revision 3.1, does NOT support
+            32/20xx-related Demand-Paged or Mapped-Out modes.
+
+
+5 INSTALLATION INSTRUCTIONS
+____________________________________________________________
+
+
+Binary Installation
+
+    If the DoD Protocols have already been installed on the
+    system, the file D.DODIT should be saved to protect it
+    from being overwritten by the file on this tape.
+
+    If ACX-32 is currently installed on the system, the
+    object module ON.NOT should be saved before restoring
+    the installation tape. The ACX-32 version of ON.NOT must
+    be used for both protocols.  To add MPX-32 DoD Protocols
+    to the system, first install it by restoring the
+    appropriate files from the installation tape.
+
+    To install the MPX-32 DoD Protocols, Revision 3.1,
+    binary installation media on your system, perform the
+    following procedures:
+
+
+    1. Restore the files to disk:
+
+       A. Mount the installation medium on the appropriate unit.
+
+              TSM>AS TAP TO DEV=DEVMNC BLOC=N
+
+       B. Invoke the Volume Manager and ensure tape positioning
+          by rewinding the tape.
+
+              TSM>VOLMGR
+              VOL>REWIND
+
+       C. Skip the first image which contains this SRN file.
+
+              VOL>SKIP I
+
+       D. Restore the DoD Protocols files.
+
+              VOL>RESTORE VOLUME=SYSTEM
+
+       E. Restore DoD system object modules.
+
+              VOL>RESTORE VOLUME=SYSTEM
+
+       F. If desired, restore the demonstration files.
+
+              VOL>RESTORE VOLUME=SYSTEM
+
+       G. Rewind the tape and exit the Volume Manager.
+
+              VOL>REWIND
+              VOL>EXIT
+
+
+Software Configuration
+
+    Perform the installation of the necessary system
+    modules.  Read the Network Administrator's guide for
+    details of the installation procedure before attempting
+    the installation of MPX-32 DoD Protocols.
+
+
+    + Modify the MPX-32 COMPRESS input file.
+
+    + Perform a COMPRESS.
+
+    + Modify the MPX-32 SYSGEN directives.
+
+    + Perform a SYSGEN.
+
+    + Restart the system.
+
+    + Modify the DoD Protocols control file 'D.DODIT'
+
+    + Create the network tables file 'D.NETAB' (via DNETOP).
+
+    + Run the DoD Protocol activator task 'X.DODIT'. This
+      activates the required DoD Protocols tasks. The task
+      'X.DODIT' correctly activates the DoD Protocol tasks
+      only when it is run by ownername 'SYSTEM'.
+
+6 PRODUCT HINTS
+____________________________________________________________
+
+
+General Hints
+
+
+    + The TELNET escape character declared in the file
+      D.DODIT must be alphabetic. Non-alphabetic characters
+      may be used by entering their ASCII values.
+
+      EXAMPLE:  TESC  5D    # ASCII VALUE FOR "]"
+
+    + FTP now checks for project as well as owner rights
+      when transferring a file. Files previously transferred
+      may now be denied. Non-shared files are denied.
+
+    + During DOD 3.1 initialize, an error code can occur in
+      the form of DMXX (where XX is a number). The error
+      indicates a partition INCLUDE error. The number can be
+      interpreted by referring to the M.INCLUDE service in
+      the MPX-32 Reference Manual, Volume I.
+
+    + A restart failure can occur if the DoD Protocols are
+      active.  If this problem occurs, it is recommended
+      that IP be placed on hold (!HOLD T,IP) or killed
+      (!KILL T,IP) before performing the restart.
+
+    + If the TELNET task must be deleted for any reason, use
+      the OPCOM "ABORT" command and not the "KILL", or the
+      terminal echo and page feature may be lost. This can
+      be corrected by logging off and initializing (INIT)
+      the terminal.
+
+    + In this release of the product, the interactive task
+      DNETOP and its generated output file D.NETAB replaces
+      the file D.DHOST for defining the network configuration.
+
+    + The Ethernet handler that was previously bundled into
+      Rev. 2.0 of this product is now not included in
+      Revision 3.1 of the DoD Protocols. You must ensure
+      that you have the latest revision of the handler
+      already installed on your system before attempting to
+      use these protocols.
+
+    + The Ethernet handler and controller together provide
+      the lower two layers (physical and data-link) of
+      protocol required by this product. The physical layer
+      can be configured either to meet IEEE 802.3 OR
+      XEROX/Ethernet specifications. The choice of
+      configurations are determined by:
+
+      A) The jumpering on the controller backplane card (DI)
+      B) The transceiver cable
+      C) The transceiver
+
+    + The network you intend to connect to dictates the
+      choice of physical specifications.
+
+      The data-link layer specifications are determined by
+      the mode you select for the Ethernet controller. The
+      modes supported are 1, 2, and 3. The modes are
+      selected by a set of jumpers on the controller board.
+      Modes 1 and 2 support XEROX Ethernet specifications
+      1.0 AND 2.0. Mode 3 provides for IEEE 802.3 support.
+      The following modes define the data encapsulation method:
+
+
+              MODE 1 AND 2
+                 DEST. ADDR | SRCE. ADDR | TYPE CODE | DATA
+
+              MODE 3
+                 DEST. ADDR | SRCE. ADDR | LENGTH CNT | DATA
+
+
+    + X.DODIT performs the same Ethernet controller
+      initialization as ENETOP in the product Comm-32
+      Ethernet 2.1. Any Ethernet controller used by MPX-32
+      DoD Protocols 3.1 does not need to be initialized by
+      ENETOP and its data file D.INIT.
+
+    + The data-link and physical layers are independent in
+      that the choice of physical layer configuration does
+      not require a matching data-link mode selection. You
+      only need ascertain that the peer-to-peer protocol
+      layers of your system are compatible with those of
+      others on the network.
+
+    + Each TPHL entry in the D.DODIT file supports up to
+      eight TELNET servers for remote logins to your host.
+      Additional servers may be added by introducing extra
+      TPHL entries (with unique subchannel addresses).
+
+    + When using FTP, please note that the command line
+      feature system only if your user name is in upper
+      case. This is a problem with TSM converting lower to
+      upper case before passing the command-line arguments
+      to the task being activated.
+
+    + To identify the user in FTP, the 'LOGIN' directive on
+      MPX is the same as 'USER' on UNIX.
+
+    + To transfer a work file using FTP, the file name must
+      be preceded by two single quotes and terminated with a
+      single quote. MPX syntax requires the single quote,
+      and the single quote also is significant to FTP
+      interactive.
+
+      EXAMPLE:  GET ''JS*WRKFL'
+
+    + FTP cannot transfer static memory partitions. If this
+      is attempted, FTP or FTPS aborts with error IO17.
+
+    + FTP cannot append to a file that has already reached
+      its maximum size. FTP or FTPS will abort with error
+      IO17. There is an outstanding PR on MPX for this
+      problem.
+
+    + TFTP is not aware of the user's login and, therefore,
+      its access rights. To PUT a file using TFTP, "OTHER"
+      must have complete privileges or the file is not
+      written.
+
+    + UDP can broadcast frames. This is accomplished by
+      entering (via DNETOP) 'FFFFFFFFFFFF' as the local
+      network address for a host in the D.NETAB file.
+
+    + There was a PR that noted that some UNIX-to-MPX FTP
+      ASCII file transfers sometimes truncated the file.
+      This has been closed in MPX-32 DoD Protocols 3.0. You
+      must have UTX/32 2.0U06 or later installed.
+
+    + When using TELNET and you are intending to use a
+      UTX/32 machine as an intermediate node(s), you must
+      have UTX/32 2.0U03 or later installed. Perform the
+      following modifications to the TELNETD server daemon
+      on the UTX/32 machine for your TELNET session to
+      function correctly.
+
+      When there is no active telnetd, do the following as
+      superuser:
+
+
+      cd /the_directory_that_telnetd_is_in
+      abd -w telnetd
+      telnet_with_bridge_box?w 1
+
+
+    + When you SYSGEN in the pseudo handler on a system with
+      multiple IOPs, you can use any IOP channel address,
+      but the subchannel address must be unique.
+
+    + Terminals that use TELNET must not have write flow
+      control, "WXON". The entry must be deleted from the
+      LOGONFLE and the system must be rebooted to remove the
+      control.
+
+    + IF ACX-32 is to be installed on the same system as the
+      DoD protocols, the ACX-32 module name ON.NOT must be
+      used rather than the DoD Protocol version of ON.NOT.
+
+
+7 KNOWN PROBLEMS
+____________________________________________________________
+
+
+List of Current Problems
+
+
+    + Comm-32 DoD Protocols Programmer's Guide, pg. 5-26.
+
+      Add the following under the status code "0" explanation:
+
+      A return status of 0 (zero) means only that the
+      request has passed through the protocol layers to the
+      network; it does not imply that the request was
+      successfully received by the remote host.
+
+    + When a TCPSEND is issued, a Urgent flag byte is set at
+      the beginning of the packet whenever the Urgent flag
+      is true; the additional Urgent-flag byte may be seen
+      as one more byte of data than was expected. The remote
+      application should check for this flag; if it exists,
+      the application should perform an additional Read or
+      adjust the packet size.
+
+    + Comm-32 Network Administrator's Guide, pg. 5-3.
+
+      Under "TELNET Pseudo-handler", references to "y0"
+      should be changed to "x0" (e.g., change U8ccy0 to
+      U8ccx0, and change "y0" to "x0" in the text. Also
+      change the word "second" in line 7 of the second
+      paragraph to read "first".
+
+
+8 PROBLEM REPORT SUMMARY
+____________________________________________________________
+
+
+Introduction
+
+    You can check on the status of any MPX-32 software Problem
+    Report (PR) by logging on to a system at Encore Computer
+    Corporation in Fort Lauderdale. This procedure is discussed
+    in the section, ONLINE VIEWING OF PROBLEM REPORTS.
+
+    To learn how to report new problems with MPX-32 DoD Protocols,
+    Revision 3.1, software and documents, refer to the section,
+    PROBLEM REPORTING.
+
+    This is Revision 3.1 of MPX-32 DoD Protocols.  The following
+    PRs have been addressed in this revision:
+
+
+              87001474 88001563 89000227 89000913
+              87001629 88001564 89000251 89001045
+              87001980 88001565 89000269 89001071
+              87002039 88001740 89000416 89001168
+              87002092 88002181 89000463 89001189
+              88000305 88002326 89000512 90000089
+              88000656 89000021 89000580 90000097
+              88000817 89000085 89000688 90000099
+              88000884 89000092 89000755 90000118
+              88001149 89000110 89000756 90000169
+              88001332 89000188 89000774 90000273
+              88001534 89000190 89000858 90000276
+
+
+Online Viewing of Problem Reports
+
+    Encore Computer Corporation Customer Services maintains
+    a problem-report database for Service Program customers.
+    If you are a Service Program customer, use a modem to
+    log on to a UTX/32 system at Encore Computer Corporation
+    in Fort Lauderdale. Dial (305) 797-5837 and log in as
+    cstspr.  Be sure the modem is set to:
+
+    + 1200 baud
+
+    + Full duplex
+
+    + 8-bit characters
+
+    + One stop bit
+
+    + No parity
+
+
+    Call 1-800-TECHAID to report any difficulties with the
+    online database.
+
+
+Problem Reporting
+
+    There are two ways to report problems with MPX-32 DoD
+    Protocols, Revision 3.1, software and documentation.
+
+
+    + call the toll-free telephone number
+
+    + fill out a PR form.
+
+    The following sections give more information on the use
+    of these methods.
+
+
+By Telephone
+
+    To report a software or documentation problem by telephone,
+    within the U. S. A., call a customer service representative
+    at 1-800-TECHAID. You will be asked to provide the following
+    information:
+
+
+    + The call number (if this is a follow-up call)
+
+    + Your name
+
+    + Company name
+
+    + Contract number
+
+    + System number
+
+    + Telephone number
+
+    + Machine type
+
+    + Operating system and revision number
+
+    + Product and revision number
+
+    + Problem description
+
+    If possible, have an auto-answer modem connected to the
+    appropriate MPX/32 system. Customer Services personnel
+    should then be able to provide remote hardware or
+    software support.
+
+
+With PR Forms
+
+    A software or documentation problem can be reported by
+    filling out a PR form and sending the form with the
+    appropriate supplemental information to the address
+    indicated on the form.  Forms may be obtained from your
+    local Encore Computer Corporation office.
+
+

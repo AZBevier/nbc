@@ -6,14 +6,15 @@
 #
 CC = cc
 #CFLAGS = -O -DMPX -m32
-CFLAGS = -L -O -m32 -Wall -DMYATOF
+CFLAGS = -O -m32 -Wall -DMYATOF
+#CFLAGS = -O -m32 -DMYATOF
 SYSBIN = /system/bin
 SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-#YACC = yacc
-YACC = $(SYSBIN)/nbyacc
+YACC = /usr/bin/yacc
+#YACC = $(SYSBIN)/nbyacc
 MAKEFILE = make.unix
 
 HDRS	= defs.h
@@ -21,6 +22,8 @@ SRCS 	= main.c macro.c goasm.c parse.c io.c opcode.c pseudo.c symbol.c \
 	xref.c float.c myatof.c
 OBJS 	= main.o macro.o goasm.o parse.o io.o opcode.o pseudo.o symbol.o \
 	xref.o float.o myatof.o
+MACS	= m.mpxmac m.mpxmac24 m.mpxmac1x m.mpxmac35 m.mpxmac36 m.mpxmac3x
+PRES	= mpxpre mpxpre1x mpxpre3x mpxpre7x
 
 MAIN = nbasm
 
@@ -57,10 +60,16 @@ clean:
 	-rm -f $(OBJS) $(LBIN)/*.o
 
 clobber:	clean
-	-rm -f $(MAIN) $(LBIN)/$(MAIN)
+	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	-rm -f $(LBIN)/io.c $(LBIN)/main.c $(LBIN)/macro.c $(LBIN)/opcode.c
 	-rm -f $(LBIN)/xref.c $(LBIN)/float.c $(LBIN)/myatof.c $(LBIN)/goasm.c
 	-rm -f $(LBIN)/parse.c $(LBIN)/pseudo.c $(LBIN)/symbol.c $(LBIN)/defs.h
+	@for i in $(MACS); do \
+		/bin/rm -f $(SYSBIN)/$$i ; \
+	done;
+	@for i in $(PRES); do \
+		/bin/rm -f $(SYSBIN)/$$i ; \
+	done;
 
 install:	all
 	@if [ -d $(LBIN) ]; then \
@@ -71,6 +80,12 @@ install:	all
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	$(INSTALL) $(HDRS) $(SRCS) $(LBIN)
+	@for i in $(MACS); do \
+		$(INSTALL) $$i $(SYSBIN)/; \
+	done;
+	@for i in $(PRES); do \
+		$(INSTALL) $$i $(SYSBIN)/; \
+	done;
 	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?
 

@@ -1,0 +1,146 @@
+
+RLOG(1)                                                   RLOG(1)
+
+
+NAME
+       rlog  - print log messages and other information about RCS
+       files
+
+SYNOPSIS
+       rlog [ options ] file ...
+
+DESCRIPTION
+       rlog prints information about RCS files.
+
+       Pathnames matching an RCS suffix  denote  RCS  files;  all
+       others   denote   working  files.   Names  are  paired  as
+       explained in ci.m.
+
+       rlog prints the following information for each  RCS  file:
+       RCS  pathname, working pathname, head (i.e., the number of
+       the latest revision on the trunk), default branch,  access
+       list, locks, symbolic names, suffix, total number of revi-
+       sions, number of  revisions  selected  for  printing,  and
+       descriptive  text.   This  is  followed by entries for the
+       selected revisions in reverse chronological order for each
+       branch.   For  each revision, rlog prints revision number,
+       author, date/time, state, number  of  lines  added/deleted
+       (with  respect  to  the  previous revision), locker of the
+       revision (if any), and log message.  All  times  are  dis-
+       played  in  Coordinated  Universal  Time  (UTC).   Without
+       options, rlog prints complete  information.   The  options
+       below restrict this output.
+
+       -L  Ignore RCS files that have no locks set.  This is con-
+           venient in combination with -h, -p, and -O.
+
+       -O  Print only the name of the RCS file.  This  is  conve-
+           nient  for  translating a working pathname into an RCS
+           pathname.
+
+       -h  Print only the RCS pathname, working  pathname,  head,
+           default  branch,  access  list, locks, symbolic names,
+           and suffix.
+
+       -t  Print the same as -h, plus the descriptive text.
+
+       -b  Print information about the revisions on  the  default
+           branch, normally the highest branch on the trunk.
+
+       -ddates
+           Print  information  about  revisions  with  a  checkin
+           date/time  in  the  ranges  given  by  the  semicolon-
+           separated list of dates.  A range of the form d1<d2 or
+           d2>d1  selects  the  revisions  that  were   deposited
+           between  d1  and d2 inclusive.  A range of the form <d
+           or d> selects all revisions dated  d  or  earlier.   A
+           range of the form d< or >d selects all revisions dated
+           d or later.  A range of the form d selects the single,
+           latest  revision  dated  d  or earlier.  The date/time
+           strings d, d1, and d2 are in the free format explained
+           in  co(1).   Quoting is normally necessary, especially
+           for < and >.  Note that the separator is a  semicolon.
+
+       -p[lockers]
+           Print  information  about  locked  revisions only.  In
+           addition, if the comma-separated list lockers of login
+           names is given, ignore all locks other than those held
+           by the lockers.  For  example,  rlog -L -O -pjohn  *_v
+           prints the name of RCS files locked by the user john.
+
+       -r[revisions]
+           prints information about revisions given in the comma-
+           separated list revisions of revisions and  ranges.   A
+           range  rev1:rev2  means  revisions rev1 to rev2 on the
+           same branch, :rev means revisions from  the  beginning
+           of  the branch up to and including rev, and rev: means
+           revisions starting with rev to the end of  the  branch
+           containing  rev.   An  argument that is a branch means
+           all revisions on that branch.   A  range  of  branches
+           means  all revisions on the branches in that range.  A
+           branch followed by a . means the  latest  revision  in
+           that  branch.   A  bare -r with no revisions means the
+           latest revision on the default  branch,  normally  the
+           trunk.
+
+       -sstates
+           prints   information   about   revisions  whose  state
+           attributes match one of the states given in the comma-
+           separated list states.
+
+       -w[logins]
+           prints information about revisions checked in by users
+           with login names appearing in the comma-separated list
+           logins.   If  logins  is  omitted, the user's login is
+           assumed.
+
+       -Vn Emulate RCS version n when generating logs.   See co.m
+           for more.
+
+       -xsuffixes
+           Use suffixes to characterize RCS files.  See ci.m  for
+           details.
+
+       rlog prints the intersection  of  the  revisions  selected
+       with  the options -d, -p, -s, and -w, intersected with the
+       union of the revisions selected by -b and -r.
+
+EXAMPLES
+           rlog  -L  -R  *_v
+           rlog  -L  -h  *_v
+           rlog  -L  -l  *_v
+           rlog  *_v
+
+       The first command prints the names of all RCS files in the
+       subdirectory  RCS  that  have  locks.   The second command
+       prints the headers of those files, and  the  third  prints
+       the headers plus the log messages of the locked revisions.
+       The last command prints complete information.
+
+DIAGNOSTICS
+       The exit status is zero if and only if all operations were
+       successful.
+
+IDENTIFICATION
+       Author: Walter F. Tichy.
+       Revision Number: 5.3; Release Date: 1991/08/22.
+       Copyright (C) 1982, 1988, 1989 by Walter F. Tichy.
+       Copyright (C) 1990, 1991 by Paul Eggert.
+       Ported to MPX-32 05/05/95 by James C. Bevier, J B Systems.
+
+SEE ALSO
+       ci.m,  co.m,  ident.m,   rcs.m,   rcsdiff.m,   rcsintro.m,
+       rcsmerge.m, rcsfile.m
+       Walter  F.  Tichy,  RCS--A  System  for  Version  Control,
+       Software--Practice  &  Experience  15,  7   (July   1985),
+       637-654.
+
+BUGS
+       The separator for revision ranges in the -r option used to
+       be - instead of :, but this leads to confusion  when  sym-
+       bolic  names  contain -.  For backwards compatibility rlog
+       -r still supports the old - separator, but it warns  about
+       this obsolete use.
+
+GNU - RCS - RLOG            J B Systems                  05/05/95
+

@@ -36,13 +36,11 @@ FPN ifpn;	/* internal floating point number */
 #ifdef FLOATDEB
 extern int sdump();
 #endif
-unsigned char ss[100];
 extern void zerof();
 extern void negf();
 extern int dodig();
 
-FPN *
-myatof(s)
+FPN * myatof(s)
 register  unsigned char  *s;
 {
 	register int i;
@@ -50,16 +48,14 @@ register  unsigned char  *s;
 	int	exp;
 	int	sign;
 	int	esign;
+    unsigned char ss[200];
 
 #ifdef FLOATDEB
 	printf("myatof entry: %s\n", s);
-	strcpy(ss,s);
-	s = ss;
-#else
-	*ss='\0';
-	strcpy(ss,s);
-	s = ss;
 #endif
+	*ss='\0';
+	strcpy((char *)ss, (char *)s);
+	s = ss;
 	zerof( &ifpn );		/* clear destination number */
 	esign = sign = exp = tz = 0;	/* and local variables */
 

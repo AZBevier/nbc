@@ -7,7 +7,7 @@ CC = nbcc
 SLIB = /system/lib
 SYSBIN = /system/bin
 LBIN = ./mpx1x2p
-CFLAGS = -C -1 -DMPX -DMPX1X -DMYATOF -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
+CFLAGS = -C -1 -DMPX -DMPX1X -DMYATOF -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 INSTALL = cp
 MOVE = mv
 YACC = nbyacc
@@ -44,7 +44,7 @@ SMK = mk.nbcom1x2p
 MK = MK.NBC2P
 
 #Two pass compiler
-all:	$(ALLOBJ)
+all:	$(ALLOBJ) $(SLD1) $(SLD2) $(SMK)
 	-echo $(MAIN) objects created
 
 $(P1OBJ):	$(MAKEFILE) $(ALLHDR) $(P1SRC)

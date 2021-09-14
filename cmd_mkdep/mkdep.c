@@ -16,10 +16,13 @@
  * (a).
  */
 
-#ident	"Makef4MPX $Id: mkdep.c,v 1.3 2021/07/05 02:46:18 jbev Exp $"
+#ident	"Makef4MPX $Id: mkdep.c,v 1.4 2021/09/13 21:37:20 jbev Exp $"
 
 /*
  * $Log: mkdep.c,v $
+ * Revision 1.4  2021/09/13 21:37:20  jbev
+ * Minor format change.
+ *
  * Revision 1.3  2021/07/05 02:46:18  jbev
  * MPX build.
  *
@@ -37,7 +40,8 @@
 
 void filecopy();
 
-char ll[] = "# DO NOT DELETE THIS LINE -- the dependencies begin here\n";
+char ll[] =
+"# DO NOT DELETE THIS LINE -- the dependencies begin here\n";
 
 int main (argc, argv)
 int	argc;

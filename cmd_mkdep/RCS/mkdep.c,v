@@ -1,9 +1,14 @@
-head	1.3;
+head	1.4;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.4
+date	2021.09.13.21.37.20;	author jbev;	state Exp;
+branches;
+next	1.3;
 
 1.3
 date	2021.07.05.02.46.18;	author jbev;	state Exp;
@@ -26,9 +31,9 @@ desc
 @
 
 
-1.3
+1.4
 log
-@MPX build.
+@Minor format change.
 @
 text
 @/*~!mkdep.c*/
@@ -49,10 +54,13 @@ text
  * (a).
  */
 
-#ident	"Makef4MPX $Id: mkdep.c,v 1.2 1996/03/25 18:14:29 jbev Exp jbev $"
+#ident	"Makef4MPX $Id: mkdep.c,v 1.3 2021/07/05 02:46:18 jbev Exp jbev $"
 
 /*
  * $Log: mkdep.c,v $
+ * Revision 1.3  2021/07/05 02:46:18  jbev
+ * MPX build.
+ *
  * Revision 1.2  1996/03/25 18:14:29  jbev
  * Mods for alpha port.
  *
@@ -67,7 +75,8 @@ text
 
 void filecopy();
 
-char ll[] = "# DO NOT DELETE THIS LINE -- the dependencies begin here\n";
+char ll[] =
+"# DO NOT DELETE THIS LINE -- the dependencies begin here\n";
 
 int main (argc, argv)
 int	argc;
@@ -109,6 +118,21 @@ FILE	*fp;
     /* dependency line not found, put one in */
     printf("%s", ll);
 }
+@
+
+
+1.3
+log
+@MPX build.
+@
+text
+@d19 1
+a19 1
+#ident	"Makef4MPX $Id: mkdep.c,v 1.2 1996/03/25 18:14:29 jbev Exp jbev $"
+d23 3
+d40 2
+a41 1
+char ll[] = "# DO NOT DELETE THIS LINE -- the dependencies begin here\n";
 @
 
 

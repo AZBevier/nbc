@@ -8,7 +8,7 @@ SYSLIB = /system/lib
 LBIN = ./linux2p
 INSTALL = cp
 MOVE = mv
-YACC = yacc
+YACC = /usr/bin/yacc
 MAKEFILE = make.unix2p
 
 P1SRC = cgram.c code.c comm1.c fixcall.c local.c optim.c pftn.c \
@@ -58,10 +58,11 @@ clean:
 	-rm -f $(P1OBJ) $(P2OBJ) $(FPOBJ)
 
 clobber: clean
-	-rm -f $(P1OBJ) nbcp1 $(LBIN)/nbcp1
-	-rm -f $(P2OBJ) nbcp2 $(LBIN)/nbcp2
+	-rm -f $(P1OBJ) nbcp1 $(LBIN)/nbcp1 $(SYSBIN)/nbcp1
+	-rm -f $(P2OBJ) nbcp2 $(LBIN)/nbcp2 $(SYSBIN)/nbcp2
 	-rm -f $(LBIN)/*.?
 	-rm -f cgram.c y.tab.c #version.c
+	-rm -f $(SYSBIN)nbcp?
 
 # Copy the files into linuxp2 directory
 install: all

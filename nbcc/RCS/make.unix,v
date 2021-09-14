@@ -1,9 +1,19 @@
-head	1.6;
+head	1.8;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.8
+date	2021.09.13.19.21.56;	author jbev;	state Exp;
+branches;
+next	1.7;
+
+1.7
+date	2021.07.13.02.53.23;	author jbev;	state Exp;
+branches;
+next	1.6;
 
 1.6
 date	2021.06.28.21.19.49;	author jbev;	state Exp;
@@ -41,9 +51,9 @@ desc
 @
 
 
-1.6
+1.8
 log
-@Do clean befor install.
+@Update mpxmac location.
 @
 text
 @#
@@ -73,6 +83,7 @@ clean:
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS)
+	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@@if [ -d $(LBIN) ]; then \
@@ -85,6 +96,29 @@ install: all
 	$(INSTALL) $(SRCS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.7
+log
+@Add missing mk file.
+@
+text
+@d28 1
+d37 1
+a37 1
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
+@
+
+
+1.6
+log
+@Do clean befor install.
+@
+text
+@d36 1
+a36 1
+	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 @
 
 

@@ -1,9 +1,19 @@
-head	1.1;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.09.13.19.21.56;	author jbev;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2021.07.13.02.53.23;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.02.05.23.50.57;	author jbev;	state Exp;
@@ -16,9 +26,9 @@ desc
 @
 
 
-1.1
+1.3
 log
-@Initial revision
+@Update mpxmac location.
 @
 text
 @#
@@ -28,8 +38,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -44,7 +54,7 @@ LD = LD.NBCC
 SMK = mk.nbcc3x
 MK = MK.NBCC
 
-all:	$(SLD) $(MAIN)
+all:	$(SLD) $(SMK) $(MAIN)
 
 $(MAIN):	$(MAKEFILE) $(SRCS)
 	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
@@ -68,4 +78,26 @@ install: all
 	$(MOVE) nbcc.o $(LBIN)/NBCC.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.2
+log
+@Add missing mk file.
+@
+text
+@a7 1
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d9 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d24 1
+a24 1
+all:	$(SLD) $(MAIN)
 @

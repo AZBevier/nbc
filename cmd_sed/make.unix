@@ -28,6 +28,7 @@ clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(DOC)
 	-rm -f $(LBIN)/sed0.c $(LBIN)/sed1.c
 	-rm -f $(LBIN)/sed.h $(LBIN)/regexp.h
+#	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@if [ -d $(LBIN) ]; then \
@@ -36,7 +37,7 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/sed $(SYSBIN)
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) sed0.c $(LBIN)/sed0.c
 	$(INSTALL) sed1.c $(LBIN)/sed1.c
 #	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)

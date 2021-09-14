@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.09.13.21.18.59;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.02.23.57.32;	author jbev;	state Exp;
@@ -16,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@CHange mpxmac location.
 @
 text
 @#
@@ -49,6 +54,7 @@ clean:
 
 clobber: clean
 	-rm -f $(MAIN) $(LBIN)/$(MAIN) $(LBIN)/$(SRCS) $(LBIN)/$(DOC)
+#	-rm -f $(SYSBIN)/$(MAIN)
 
 install: all
 	@@if [ -d $(LBIN) ]; then \
@@ -57,9 +63,21 @@ install: all
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
-#	$(INSTALL) $(LBIN)/cp $(SYSBIN)
+#	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)
 	$(INSTALL) $(SRCS) $(LBIN)/$(SRCS)
 	$(INSTALL) $(DOC) $(LBIN)/$(DOC)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d29 1
+d38 1
+a38 1
+#	$(INSTALL) $(LBIN)/cp $(SYSBIN)
 @

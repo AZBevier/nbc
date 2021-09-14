@@ -16,11 +16,18 @@
  * (a).
  */
 
-#ident	"Make4MPX $Id: date.c,v 1.2 1995/03/14 04:03:41 jbev Exp jbev $"
+#ident	"Make4MPX $Id: date.c,v 1.4 2021/07/11 00:12:23 jbev Exp $"
 
-/* $Log: date.c,v $
+/*
+ * $Log: date.c,v $
+ * Revision 1.4  2021/07/11 00:12:23  jbev
+ * fix warning error.
+ *
+ * Revision 1.3  2021/07/11 00:10:57  jbev
+ * Update linux build to be error free.
+ *
  * Revision 1.2  1995/03/14 04:03:41  jbev
- * Correct external errorrs.
+ * Correct external errors.
  *
  * Revision 1.1  1995/03/14  01:29:22  jbev
  * Initial revision
@@ -189,12 +196,12 @@ char *date;
     	if (localtime(&clock_val)->tm_isdst)
     	    clock_val = clock_val - (time_t)(timezone - altzone);
     }
-#endif
 
     if (stime(&clock_val) < 0) {
     	(void) fprintf(stderr, "date: no permission\n");
     	return(1);
     }
+#endif
     return(0);
 }
 

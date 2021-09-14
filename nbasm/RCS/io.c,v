@@ -1,10 +1,14 @@
-head	1.4;
+head	1.5;
 access;
 symbols;
-locks
-	jbev:1.4; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.5
+date	2021.09.13.20.41.57;	author jbev;	state Exp;
+branches;
+next	1.4;
 
 1.4
 date	2016.01.28.04.15.47;	author jbev;	state Exp;
@@ -32,9 +36,9 @@ desc
 @
 
 
-1.4
+1.5
 log
-@fix up warning errors
+@Correct warning errors.
 @
 text
 @/* io.c */
@@ -65,13 +69,13 @@ void	pbyt(char);
 #ifndef CAID
 extern	int	sudo;	/* processing pseudo-op */
 #endif
-char	inscnt;		/* input scanner count */
-char	ppt;		/* binary record length (120) */
+uint8	inscnt;		/* input scanner count */
+uint8	ppt;		/* binary record length (120) */
 
 short	pbsq;		/* current sequence number */
-/* short	xdummy;		/* bound buffer in 16 bit boundry */
+/* short	xdummy; */		/* bound buffer in 16 bit boundry */
 unsigned char	PBL[BRL];	/* binary buffer */
-/* unsigned char	*PBBA;		/* saved pointer address to buffer */
+/* unsigned char	*PBBA; */		/* saved pointer address to buffer */
 short	*pblc = (short *)&PBL[2];  /* 16 bit checksum */
 short	*pbls = (short *)&PBL[4];  /* 16 bit sequence */
 unsigned char	*pblp = (&PBL[6]);  /* start of data in binary buffer */
@@ -79,7 +83,7 @@ unsigned char	*pblp = (&PBL[6]);  /* start of data in binary buffer */
 extern	FILE	*outfd;	/* output file descriptor */
 int32	lice;		/* line count */
 struct	tval	max;	/* maximum program size */
-/* char	imip;		/* image in progress flag */
+/* char	imip; */		/* image in progress flag */
 
 char	*ahdr;		/* header address for tof printing */
 char	nlpr = 0;	/* number of lines printed on page */
@@ -244,7 +248,7 @@ int	fc;
 }
 
 static	unsigned  char	bb[768];	/* blocking buffer */
-/* static	char	*bhc = 0;		/* buffer head cell */
+/* static	char	*bhc = 0; */		/* buffer head cell */
 static	char	first = 0;		/* 1st time thru flag */
 
 /*
@@ -264,7 +268,7 @@ int	cnt;
 	  memset (bb, '\0', 768);	/* zero the buffer */
 	  bb[3] = 4;			/* next write byte offset */
 	  bb[4] = 0x60;			/* set beg/end of block */
-/*	  bb[5] = 8;			/* 1st block count is 8 bytes */
+/*	  bb[5] = 8; */			/* 1st block count is 8 bytes */
 	  bb[5] = 0;			/* 1st block count is 0 bytes */
 	}
 	boff = (bb[2] << 8) | (bb[3]);	/* get next write address offset */
@@ -282,7 +286,7 @@ int	cnt;
 	  boff = 4;			/* init count at 4 bytes */
 	}
 	/* we have enough room, move in the record */
-	/* clear last record end of block flag, set up this record *
+	/* clear last record end of block flag, set up this record */
 	/* info and last rec info at end of data, and update cnt */
 	bb[boff] &= ~0x20;		/* clear end of block flag */
 	bb[boff+2] = 0x00;		/* clear this blocks flags */
@@ -331,7 +335,7 @@ int	cnt;
 int	inpt()
 {
 	uchrfp	tcp;			/* where input is from */
-	uchrfpp	place;			/* which pointer to use */
+	uchrfpp	place=NULL;		/* which pointer to use */
 	int	cnt;			/* number of chars processed */
 
     	if (macstate & BLANKLN) {	/* do we have a blank line */
@@ -391,6 +395,7 @@ getin:
 	}  
 #ifdef MACD
 {
+#ifdef OLDWAY_022521
 	int	i;
 printf("getin: count = %d\n", cnt);
 	for (i=0; i<80; i++) {
@@ -399,11 +404,15 @@ printf("getin: count = %d\n", cnt);
 	if (isprint(in[i]))
 	  printf("%c", in[i]);
 	else
-	  printf("%0.2x",in[i]);
+	  printf("%.2x",in[i]);
 	if (in[i] == 0xff) break;
 	}
 	printf("\n");
-/* printf("getin: %0.72s\n", in); */
+#else
+printf("getin: count = %d\n", cnt);
+    printf("getin: %.72s\n", in);
+#endif
+/* printf("getin: %.72s\n", in); */
 /* printf("",in); */
 }
 #endif
@@ -488,7 +497,7 @@ printf("releas: hwbyte = %x %x %x %x\n", hwbyte[0], hwbyte[1], hwbyte[2], hwbyte
 neworg:
 	if (currpc.type == TYPC) {	/* pc in common */
 	  /* a common origin is needed */
-	  bfa((int32)currpc.value);	/* output block # and offset */
+	  bfa(currpc.value);		/* output block # and offset */
 	  pb (hbbs, PTCO, 0);		/* publish common origin */
 	  goto bb2;			/* go output other bytes */
 	}
@@ -497,14 +506,14 @@ prtval("neworg", &currpc);
 #endif
 	if (!(bits3 & EXPLFC)) {	/* using expanded lfc's */
 	  /* no, use std lfc's */
-	  bfa((int32)(currpc.value | ((currpc.flags & ABSREL) ? 0x800000 : 0)));
+	  bfa(currpc.value | (currpc.flags & ABSREL ? 0x800000L : 0L));
 	  pb (hbbs, PTO, 0);		/* publish the stack */
 	} else {			/* using exp loader funct codes */
 	  bfb(LFSORIG);			/* set loader subcode */
 	  bfb(0);			/* dummy byte */
 	  bfb(0);			/* zero unused byte */
 	  bfb(currpc.flags & CSDS ? 1 : 0);	/* section number */
-	  bfa0((int32)currpc.value);		/* output address */
+	  bfa0(currpc.value);		/* output address */
 	  pb (hbbs, EXPFUNC, 0);	/* publish the stack */
 	}
 bb2:
@@ -576,8 +585,7 @@ bbxit:
     		    bfb(0);		/* unused byte */
     		    bfb(extwrd.flags & CSDS ? 1 : 0);	/* section number */
     		    /* output address */
-    		    bfa((int32)(currpc.value |
-			((extwrd.flags & ABSREL) ? 0x800000 : 0)));
+    		    bfa(currpc.value|(extwrd.flags & ABSREL?0x800000L:0L));
     		    memcpy (usname, extnam, 8);	/* move 8 bytes of ext name */
     		    bfn0 ();		/* output 8 bytes from usname */
     		    pb(hbbs, EXPFUNC, 0); /* publish the stack */
@@ -738,19 +746,19 @@ pouy:
 	  }
 	  /* format those flagged bytes of generated code for printout */
 	  if (hwbytf[0]) {		/* this byte to be printed */
-	    sprintf(xx, "%0.2X", hwbyte[0]);
+	    sprintf(xx, "%02X", hwbyte[0]);
 	    memcpy(&prnt[19], xx, 2);	/* copy in 2 chars */
 	  }
 	  if (hwbytf[1]) {		/* this byte to be printed */
-	    sprintf(xx, "%0.2X", hwbyte[1]);
+	    sprintf(xx, "%02X", hwbyte[1]);
 	    memcpy(&prnt[21], xx, 2);	/* copy in 2 chars */
 	  }
 	  if (hwbytf[2]) {		/* this byte to be printed */
-	    sprintf(xx, "%0.2X", hwbyte[2]);
+	    sprintf(xx, "%02X", hwbyte[2]);
 	    memcpy(&prnt[23], xx, 2);	/* copy in 2 chars */
 	  }
 	  if (hwbytf[3]) {		/* this byte to be printed */
-	    sprintf(xx, "%0.2X", hwbyte[3]);
+	    sprintf(xx, "%02X", hwbyte[3]);
 	    memcpy(&prnt[25], xx, 2);	/* copy in 2 chars */
 	  }
 	}				/* don't print pc */
@@ -781,7 +789,7 @@ pouu:
 	hwmspbuf = 0;			/* clear store pointer for macro prnt */
 	/* if expanding a macro or in rept gen, don't print line number */
 	if (!(inptstat & (EXPAND | RPTGEN))) {
-	  sprintf(xx, "%0.5d", lict);	/* print line number */
+	  sprintf(xx, "%05d", lict);	/* print line number */
 	  memcpy(&prnt[3], xx, 5);	/* copy in 5 chars */
 	}
 	line = 4;			/* indicate a full line to print */
@@ -792,13 +800,13 @@ pouv:
 	 * number of errors that can be printed on the line
 	 */
 	if (hwerrf != 0) {		/* all possible error flags */
-	  char	pos = 1;		/* starting print position */
+	  unsigned char	pos = 1;		/* starting print position */
 	  int	i;
 
 	  for (i = 0; i < 32; i++) {	/* check all 32 bits */
 	    if (hwerrf & (1L << i)) {	/* see if flag on */
 	      prnt[pos] = 0x40 + i;	/* output the code */
-	      hwerrf &= ~(1L << i);	/* turn off the flag */
+	      hwerrf &= ~(1 << i);	/* turn off the flag */
 	      if (maxerr <= pos++)	/* max errors processed */
 		break;			/* yes, quit */
 	    }
@@ -823,9 +831,10 @@ pouw:
 	  goto pouj;			/* yes don't touch mpbuf */
 	if (spmac & MBUFSW) {		/* were print buffs switched */
 	  int 	i;
-	  for (i=0; i<80; i++)		/* yes, switch back */
+	  for (i=0; i<80; i++) {		/* yes, switch back */
 	    in[i] = mpbuf[i];		/* restore input buffer */
 	    mpbuf[i] = ' ';		/* blank buffer */
+      }
 	} else {			/* no, just blank buffer */
 	  int 	i;
 	  for (i=0; i<80; i++)		/* yes, switch back */
@@ -889,15 +898,15 @@ prtval("loch", lcd);
 	tmp = ((lcd->type << 1) | ((lcd->flags & ABSREL) ? 1 : 0));
 	buff[2] = sstb[tmp];			/* get the type char */
 	if (buff[2] == 'C') {			/* is type common */
-	  tmp = ((int32)(lcd->value & 0xff0000L) >> 16);  /* get common blk # */
-	  if (hwcmsize[tmp] & 0x80000000L)	/* is it ssect */
+	  tmp = ((int32)(lcd->value & 0xff0000) >> 16);  /* get common blk # */
+	  if (hwcmsize[tmp] & 0x80000000)	/* is it ssect */
 	    buff[2] = 'S';			/* show as ssect */
 	}
 	if (exts)			/* are we processing oprnd data */
 	  if (eisflg & EISOPC)		/* is this a context instr */
 	    buff[2] = '#';		/* store # in output line */
 	eisflg &= ~EISOPC;		/* clear context flag */
-	sprintf(xx, "%0.5X", (int)lcd->value & 0xfffffL);	/* store 5 hex chars */
+	sprintf(xx, "%05X", lcd->value & 0xfffff);	/* store 5 hex chars */
 	memcpy(&buff[3], xx, 5);	/* copy in 5 hex chars */
 	return;				/* return */
 }
@@ -1036,14 +1045,14 @@ fflush(tempfd);
 	/* we have an EOF on the input, get next file */
 
 	/* assemble all the files given */
-	if (infile = inputf[numfproc++]) {	/* get file to process */
+	if ((infile = inputf[numfproc++])) {	/* get file to process */
 
 	  if (freopen(infile,"r",stdin)==(FILE *)NULL) {
 	    perror(infile);
 	    error ("Fatal assembler error (input file %s)", infile);
 	    abortm(0);			/* abort the assembler */
 	    /* no return */
-    	  }
+      }
 	  curfile = infile;		/* set current file */
 	} else return(0);		/* return EOF */
 	goto again;			/* read next file */
@@ -1064,6 +1073,97 @@ char	chr;
 	return;
 }
 
+@
+
+
+1.4
+log
+@fix up warning errors
+@
+text
+@d29 2
+a30 2
+char	inscnt;		/* input scanner count */
+char	ppt;		/* binary record length (120) */
+d33 1
+a33 1
+/* short	xdummy;		/* bound buffer in 16 bit boundry */
+d35 1
+a35 1
+/* unsigned char	*PBBA;		/* saved pointer address to buffer */
+d43 1
+a43 1
+/* char	imip;		/* image in progress flag */
+d208 1
+a208 1
+/* static	char	*bhc = 0;		/* buffer head cell */
+d228 1
+a228 1
+/*	  bb[5] = 8;			/* 1st block count is 8 bytes */
+d246 1
+a246 1
+	/* clear last record end of block flag, set up this record *
+d295 1
+a295 1
+	uchrfpp	place;			/* which pointer to use */
+d355 1
+d364 1
+a364 1
+	  printf("%0.2x",in[i]);
+d368 5
+a372 1
+/* printf("getin: %0.72s\n", in); */
+d457 1
+a457 1
+	  bfa((int32)currpc.value);	/* output block # and offset */
+d466 1
+a466 1
+	  bfa((int32)(currpc.value | ((currpc.flags & ABSREL) ? 0x800000 : 0)));
+d473 1
+a473 1
+	  bfa0((int32)currpc.value);		/* output address */
+d545 1
+a545 2
+    		    bfa((int32)(currpc.value |
+			((extwrd.flags & ABSREL) ? 0x800000 : 0)));
+d706 1
+a706 1
+	    sprintf(xx, "%0.2X", hwbyte[0]);
+d710 1
+a710 1
+	    sprintf(xx, "%0.2X", hwbyte[1]);
+d714 1
+a714 1
+	    sprintf(xx, "%0.2X", hwbyte[2]);
+d718 1
+a718 1
+	    sprintf(xx, "%0.2X", hwbyte[3]);
+d749 1
+a749 1
+	  sprintf(xx, "%0.5d", lict);	/* print line number */
+d760 1
+a760 1
+	  char	pos = 1;		/* starting print position */
+d766 1
+a766 1
+	      hwerrf &= ~(1L << i);	/* turn off the flag */
+d791 1
+a791 1
+	  for (i=0; i<80; i++)		/* yes, switch back */
+d794 1
+d858 2
+a859 2
+	  tmp = ((int32)(lcd->value & 0xff0000L) >> 16);  /* get common blk # */
+	  if (hwcmsize[tmp] & 0x80000000L)	/* is it ssect */
+d866 1
+a866 1
+	sprintf(xx, "%0.5X", (int)lcd->value & 0xfffffL);	/* store 5 hex chars */
+d1005 1
+a1005 1
+	if (infile = inputf[numfproc++]) {	/* get file to process */
+d1012 1
+a1012 1
+    	  }
 @
 
 

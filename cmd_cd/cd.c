@@ -16,10 +16,13 @@
  * (a).
  */
  
-#ident  "Make4MPX $Id: cd.c,v 1.2 2021/07/05 22:11:18 jbev Exp $"
+#ident  "Make4MPX $Id: cd.c,v 1.3 2021/09/13 21:06:52 jbev Exp $"
  
 /*
  * $Log: cd.c,v $
+ * Revision 1.3  2021/09/13 21:06:52  jbev
+ * Correct warning errors.
+ *
  * Revision 1.2  2021/07/05 22:11:18  jbev
  * Correct warnings.
  *
@@ -52,6 +55,8 @@ to build:
 void usage();
 extern char *getcwd();
 static char *cvtdname();
+extern char curvol[];
+extern char curdir[];
 #ifdef NOT_USED
 static char *cvtfname();
 #endif
@@ -60,7 +65,7 @@ static void crunch();
 #ifdef mpx
 extern char curvol[];
 extern char curdir[];
-extern char *getcwvd();
+extern void getcwvd();
 extern char *str2lc();
 static void conv2unix();
 static void blcpy();
@@ -78,7 +83,10 @@ char *argv[];
 {
     char *p;
  
+    fprintf(stderr, "enter argc %d argv[0] {%s}\n", argc, argv[0]);
+    fprintf(stderr, "enter argc %d argv[1] {%s}\n", argc, argv[1]);
 #ifdef mpx
+    fprintf(stderr, "curvol %s curdir %s\n", curvol, curdir);
     if (argc > 2)
     	usage();
     /* If no args, default to system */
@@ -90,28 +98,47 @@ char *argv[];
     	usage();
 #endif
  
+    fprintf(stderr, "argc %d argv[1] {%s}\n", argc, argv[1]);
     /* resolve directory name */
     if ((p = cvtdname(argv[1])) == (char *)0) {
-    	fprintf(stderr, "cd: can't resolve directory %s\n", argv[1]);
+    	fprintf(stderr,
+            "cd: can't resolve directory %s\n", argv[1]);
     	exit(2);
     }
+    fprintf(stderr, "after cvt argv[1] {%s} new {%s}\n",
+        argv[1], p);
     strcpy(source, p);
     free(p);
+    fprintf(stderr, "after cpy argv[1] {%s} src {%s}\n",
+        argv[1], source);
 #ifdef mpx
     if (source[strlen(source)-1] != '/')
     	strcat(source, "/");
 #endif
     stat(source, &s1);
     if ((s1.st_mode & S_IFMT) != S_IFDIR) {
-    	fprintf(stderr, "cd: directory %s: does not exist\n", argv[1]);
+    	fprintf(stderr,
+            "cd: directory %s: does not exist\n", argv[1]);
     	usage();
     }
  
+    fprintf(stderr, "after stat argv[1] {%s} src {%s}\n",
+        argv[1], source);
     /* change current directory */
     if (chdir(source) != 0) {
-    	fprintf(stderr, "cd: can't change to directory %s\n", argv[1]);
+    	fprintf(stderr,
+            "cd: can't change to directory %s\n", argv[1]);
     	exit(2);
     }
+    fprintf(stderr, "after chdir argv[1] {%s} src {%s}\n",
+        argv[1], source);
+#ifdef mpx
+    fprintf(stderr, "new1 curvol %s curdir %s\n", curvol, curdir);
+    getcwvd();
+    fprintf(stderr, "new2 curvol %s curdir %s\n", curvol, curdir);
+    unix2mpx(source);
+    fprintf(stderr, "PN vector %s\n", source);
+#endif
     exit(0);
 }
  
@@ -123,8 +150,8 @@ void usage()
 }
  
 /* cvtdname
- * convert an arbitrary directory name to a qualified unix pathname.
- * return pointer to malloc'd name or null if error.
+ * convert an arbitrary directory name to a qualified unix
+ * pathname.  Return pointer to malloc'd name or null if error.
  */
 static char *
 cvtdname(path)
@@ -141,7 +168,8 @@ char *path;
     dirp = getcwd(0, MAXN);
     /* see if just a name, if so add () around name */
 #ifdef mpx
-    if (*path != '/' && *path != '@' && *path != '^' && *path != '(') {
+    if ((*path != '/') && (*path != '@') &&
+        (*path != '^') && (*path != '(')) {
     	/* put () around dir name to see if o.k. */
     	dbuf[0] = '(';		/* start with ( */
     	strcpy(&dbuf[1], path);	/* copy name */
@@ -186,9 +214,9 @@ char *path;
  
 /* Convert relative to absolute pathnames */
  
-/* Given a working directory and an arbitrary pathname, resolve them into
- * an absolute pathname. Memory is allocated for the result, which
- * the caller must free
+/* Given a working directory and an arbitrary pathname, resolve
+ * them into an absolute pathname. Memory is allocated for the
+ * result, which the caller must free
  */
 static char *
 pathname(cd,path)
@@ -213,8 +241,8 @@ char *path;	/* Pathname argument */
     buf = (char *)malloc((unsigned)strlen(cd) + strlen(path) + 16);
     buf[0] = '\0';
  
-    /* Interpret path relative to cd only if it doesn't begin with "/" */
-    /* for MPX also see if @, ^, or ( */
+    /* Interpret path relative to cd only if it doesn't */
+    /* begin with "/", for MPX also see if @, ^, or ( */
     if(*path == '/'
 #ifdef mpx
       || *path == '@' || *path == '^' || *path == '('
@@ -251,7 +279,7 @@ register char *path;
 {
     register char *cp;
 	
-    cp = buf + strlen(buf);	/* Start write at end of current buffer */
+    cp = buf + strlen(buf);	/* Start write at end of current buf */
 	
     /* Now start crunching the pathname argument */
     for(;;){
@@ -271,10 +299,11 @@ register char *path;
     		path += 2;		/* Skip ".." */
     		while(*path == '/')	/* Skip one or more slashes */
     		    path++;
-    		/* Look for current directory references, either at the end
-    		 * of the path or imbedded in it
+    		/* Look for current directory references, either at the
+             * end  of the path or imbedded in it
     		 */
-    	} else if(strcmp(path,".") == 0 || strncmp(path,"./",2) == 0) {
+    	} else
+        if(strcmp(path,".") == 0 || strncmp(path,"./",2) == 0) {
     	    /* "no op" */
     	    path++;			/* Skip "." */
     	    while(*path == '/')		/* Skip one or more slashes */

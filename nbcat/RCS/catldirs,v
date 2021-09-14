@@ -1,0 +1,38 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.10.13.22.57.15;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Initial file check in.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@SPACE 8
+ALLOCATE 8000
+AS LIS TO @@SYSTEM(SYSTEM)MPXLIB BLOC=N
+AS LID TO @@SYSTEM(SYSTEM)MPXDIR BLOC=N
+AS SYC TO SYC
+AS SLO TO SLO
+AS SGO TO SGO
+AS AID TO TEMP SIZE=2000 BLOC=N
+ENVIRONMENT MULTICOPY,NOMAPOUT
+EXTDMPX MAXADDR,NOTSA
+OPTION PROMPT
+FILES 220
+BUFFERS 3
+BUILD NBCAT
+@

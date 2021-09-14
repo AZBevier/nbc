@@ -1,0 +1,29 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	95.10.13.22.57.15;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@initial file check in.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@* PRE FILE FOR NON-EXTENDED MODE OF MPX-32 REV 3                MPX_NON         
+C.3227   SETT                                                                   
+C.TRACF  SETF                                                                   
+C.MEMO   SETF                                                                   
+BOPT_MPX SETF                                                                   
+@

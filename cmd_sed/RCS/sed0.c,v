@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.13.21.48.53;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.03.14.03.11.11;	author jbev;	state Exp;
@@ -17,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Correct warning errors.
 @
 text
 @/*~!sed0.c*/
@@ -40,13 +44,28 @@ text
  * (a).
  */
 
-#ident	"Make4MPX $Id$"
+#ident	"Make4MPX $Id: sed0.c,v 1.1 1995/03/14 03:11:11 jbev Exp jbev $"
 
-/* $Log: $
+/*
+ * $Log: sed0.c,v $
+ * Revision 1.1  1995/03/14 03:11:11  jbev
+ * Initial revision
+ *
  */
 
 #include <stdio.h>
 #include "sed.h"
+#ifndef mpx
+#include <stdlib.h>
+#include <unistd.h>
+#endif
+
+void fcomp();
+int cmp();
+void dechain();
+int rline();
+
+extern void execute();
 
 FILE	*fin;
 FILE    *fcode[12];
@@ -56,7 +75,7 @@ char *reend;
 char *hend;
 union reptr *ptrend;
 int eflag;
-extern nbra;
+extern int nbra;
 char linebuf[LBSIZE+1];
 int gflag;
 int nlno;
@@ -87,10 +106,11 @@ char AD0MES[]	 = "No addresses allowed: %s\n";
 char AD1MES[]	 = "Only one address allowed: %s\n";
 char TOOBIG[]	 = "Suffix too large - 512 max: %s\n";
 
-extern sed;	  /* IMPORTANT flag !!! */
+extern int  sed;	  /* IMPORTANT flag !!! */
 extern char *comple();
 
-main(argc, argv)
+int main(argc, argv)
+int argc;
 char *argv[];
 {
 
@@ -191,7 +211,7 @@ char *argv[];
 }
 
 
-fcomp()
+void fcomp()
 {
 
     register char *p, *op, *tp;
@@ -219,7 +239,7 @@ fcomp()
     	cp = linebuf;
 
 comploop:
-    	/*      fprintf(stdout, "cp: %s\n", cp);	/*DEBUG*/
+    	/*      fprintf(stdout, "cp: %s\n", cp);*/	/*DEBUG*/
     	while (*cp == ' ' || *cp == '\t')	
     	    cp++;
     	if (*cp == '\0')	 
@@ -349,7 +369,7 @@ swit:
     	    	}
     	    *--tp = '\0';
 
-    	    if (lpt = search(lab)) {
+    	    if ((lpt = search(lab))) {
     	    	if (lpt->address) {
     	    	    fprintf(stderr, "Duplicate labels: %s\n", linebuf);
     	    	    exit(2);
@@ -437,8 +457,8 @@ jtcommon:
     	    cp--;
 
     	    if (*cp == '\0') {
-    	    	if (pt = labtab->chain) {
-    	    	    while (pt1 = pt->r2.lb1)
+    	    	if ((pt = labtab->chain)) {
+    	    	    while ((pt1 = pt->r2.lb1))
     	    	    	pt = pt1;
     	    	    pt->r2.lb1 = rep;
     	    	} else
@@ -454,12 +474,12 @@ jtcommon:
     	    cp--;
     	    *--tp = '\0';
 
-    	    if (lpt = search(lab)) {
+    	    if ((lpt = search(lab))) {
     	    	if (lpt->address) {
     	    	    rep->r2.lb1 = lpt->address;
     	    	} else {
     	    	    pt = lpt->chain;
-    	    	    while (pt1 = pt->r2.lb1)
+    	    	    while ((pt1 = pt->r2.lb1))
     	    	    	pt = pt1;
     	    	    pt->r2.lb1 = rep;
     	    	}
@@ -701,11 +721,11 @@ char *rhsbuf;
 }
 
 
-rline(lbuf)
+int rline(lbuf)
 char *lbuf;
 {
     register char *p, *q;
-    register t;
+    register int t;
     static char *saveq;
 
     p = lbuf - 1;
@@ -716,7 +736,7 @@ char *lbuf;
     	    if (eargc-- <= 0)
     	    	exit(2);
     	    q = *++eargv;
-    	    while (*++p = *q++) {
+    	    while ((*++p = *q++)) {
     	    	if (*p == '\\') {
     	    	    if ((*++p = *q++) == '\0') {
     	    	    	saveq = 0;
@@ -736,7 +756,7 @@ char *lbuf;
     	if ((q = saveq) == 0)    
     	    return(-1);
 
-    	while (*++p = *q++) {
+    	while ((*++p = *q++)) {
     	    if (*p == '\\') {
     	    	if ((*++p = *q++) == '0') {
     	    	    saveq = 0;
@@ -809,7 +829,7 @@ char *expbuf;
 }
 
 
-cmp(a, b)
+int cmp(a, b)
 char *a, *b;
 {
     register char *ra, *rb;
@@ -860,7 +880,7 @@ struct label *ptr;
 }
 
 
-dechain()
+void dechain()
 {
     struct label *lptr;
     union reptr *rptr, *trptr;
@@ -874,7 +894,7 @@ dechain()
 
     	if (lptr->chain) {
     	    rptr = lptr->chain;
-    	    while (trptr = rptr->r2.lb1) {
+    	    while ((trptr = rptr->r2.lb1)) {
     	    	rptr->r2.lb1 = lptr->address;
     	    	rptr = trptr;
     	    }
@@ -887,7 +907,9 @@ dechain()
 char *ycomp(expbuf)
 char *expbuf;
 {
-    register char c, *ep, *tsp;
+/*  register char c, *ep, *tsp;a */
+    int c;
+    char *ep, *tsp;
     char *sp;
 
     ep = expbuf;
@@ -895,17 +917,17 @@ char *expbuf;
     for (tsp = cp; *tsp != sseof; tsp++) {
     	if (*tsp == '\\')
     	    tsp++;
-    	if (*tsp == '\n' || *tsp == NULL)
+    	if ((*tsp == '\n') || (*tsp == (char)0))
     	    return(badp);
     }
     tsp++;
 
     while ((c = *sp++ & 0177) != sseof) {
-    	if (c == '\\' && *sp == 'n') {
+    	if ((c == '\\') && (*sp == 'n')) {
     	    sp++;
     	    c = '\n';
     	}
-    	if ((ep[c] = *tsp++) == '\\' && *tsp == 'n') {
+    	if ((ep[c] = *tsp++) == '\\' && (*tsp == 'n')) {
     	    ep[c] = '\n';
     	    tsp++;
     	}
@@ -924,4 +946,80 @@ char *expbuf;
 }
 
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d19 1
+a19 1
+#ident	"Make4MPX $Id$"
+d21 5
+a25 1
+/* $Log: $
+d30 11
+d50 1
+a50 1
+extern nbra;
+d81 1
+a81 1
+extern sed;	  /* IMPORTANT flag !!! */
+d84 2
+a85 1
+main(argc, argv)
+d186 1
+a186 1
+fcomp()
+d214 1
+a214 1
+    	/*      fprintf(stdout, "cp: %s\n", cp);	/*DEBUG*/
+d344 1
+a344 1
+    	    if (lpt = search(lab)) {
+d432 2
+a433 2
+    	    	if (pt = labtab->chain) {
+    	    	    while (pt1 = pt->r2.lb1)
+d449 1
+a449 1
+    	    if (lpt = search(lab)) {
+d454 1
+a454 1
+    	    	    while (pt1 = pt->r2.lb1)
+d696 1
+a696 1
+rline(lbuf)
+d700 1
+a700 1
+    register t;
+d711 1
+a711 1
+    	    while (*++p = *q++) {
+d731 1
+a731 1
+    	while (*++p = *q++) {
+d804 1
+a804 1
+cmp(a, b)
+d855 1
+a855 1
+dechain()
+d869 1
+a869 1
+    	    while (trptr = rptr->r2.lb1) {
+d882 3
+a884 1
+    register char c, *ep, *tsp;
+d892 1
+a892 1
+    	if (*tsp == '\n' || *tsp == NULL)
+d898 1
+a898 1
+    	if (c == '\\' && *sp == 'n') {
+d902 1
+a902 1
+    	if ((ep[c] = *tsp++) == '\\' && *tsp == 'n') {
 @

@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.09.13.21.15.03;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.02.19.48.54;	author jbev;	state Exp;
@@ -16,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Change mpxmac location.
 @
 text
 @#
@@ -28,8 +33,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -71,4 +76,15 @@ install: all
 	$(MOVE) chmod.o $(LBIN)/CHMOD.O
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@a7 1
+CFLAGS = -C -1 -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d9 1
 @

@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.09.13.22.06.17;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.01.03.21.09;	author jbev;	state Exp;
@@ -16,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Change mpxmac location.
 @
 text
 @#
@@ -30,7 +35,7 @@ CC = nbcc
 SLIB = /system/lib
 SYSBIN = /system/bin
 LBIN = ./mpx3x2p
-CFLAGS = -C -DMPX -DMYATOF -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+CFLAGS = -C -DMPX -DMYATOF -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 INSTALL = cp
 MOVE = mv
 YACC = nbyacc
@@ -124,4 +129,15 @@ install: all		# build and then copy main to install directory
 	-rm -f cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.? $(LBIN)/$(LD1) $(LBIN)/$(LD2) $(LBIN)/$(MK)
 
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d10 1
+a10 1
+CFLAGS = -C -DMPX -DMYATOF -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 @

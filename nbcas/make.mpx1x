@@ -5,8 +5,8 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 BIN = /bin
 LBIN = ./mpx1x
 INSTALL = cp

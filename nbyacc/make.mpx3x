@@ -5,8 +5,8 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -25,7 +25,7 @@ LD = LD.NBYACC
 SMK = mk.nbyac3x
 MK = MK.NBYACC
 
-all:	clean $(MAIN)
+all:	clean $(SLD) $(SMK) $(MAIN)
 	-/bin/echo $(MAIN) objects created
 
 $(MAIN):	$(MAKEFILE) $(PAR) $(DEPS) $(SRCS)

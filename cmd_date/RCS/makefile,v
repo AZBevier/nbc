@@ -1,0 +1,126 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.07.14.19.56.04;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Saving version.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#~!Makefile for date
+# Name:  Makefile Part No.: _______-____r
+#
+# Copyright 1994 - J B Systems, Morrison, CO
+#
+# The recipient of this product specifically agrees not to distribute,
+# disclose, or disseminate in any way, to any one, nor use for its own
+# benefit, or the benefit of others, any information contained  herein
+# without the expressed written consent of J B Systems.
+#
+#                     RESTRICTED RIGHTS LEGEND
+#
+# Use, duplication, or disclosure by the Government is  subject  to
+# restriction  as  set forth in paragraph (b) (3) (B) of the Rights
+# in Technical Data and Computer Software  Clause  in  DAR  7-104.9
+# (a).
+#
+ 
+#ident	"@@(#)Make:date/Makefile	1.0"
+ 
+# Make parameters when running on MPX
+ 
+ROOT = /system/system
+TARGET = /system/system
+SOURCE = .
+PREFIX = nb
+INCLUDE = /system/$(PREFIX)include
+SINCLUDE = $(INCLUDE)
+SBIN = /system/system
+BIN = /system/bin
+UBIN = /system/bin
+LIB = /system/bin
+YBIN = /system/bin
+CPP = $(LIB)/$(PREFIX)cpp
+CPFLAGS = -M
+CC = $(UBIN)/$(PREFIX)cc
+CFLAGS = -DMPX #-N 
+LD = $(UBIN)/$(PREFIX)nbcat
+LDFLAGS = -Ydatemap
+YACC = $(YBIN)/$(PREFIX)yacc
+YFLAGS =
+MAKEFILE = makefile
+ 
+# Fill in with correct information
+ 
+OBJECTS = date.o
+ 
+HDRS =
+ 
+SRCS = date.c
+ 
+MAIN = date
+ 
+ALL:	all
+ 
+all:	$(MAIN)
+	$(BIN)/echo $(MAIN) is up to date.
+ 
+#
+# this is the main cataloging point
+#
+ 
+$(MAIN):	$(MAKEFILE) $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(MAIN)
+	$(BIN)/chmod 755 $(MAIN)
+	$(BIN)/chgrp system $(MAIN)
+	$(BIN)/chown system $(MAIN)
+ 
+CLEAN:  clean
+ 
+clean:
+	$(BIN)/rm -f $(OBJECTS)
+ 
+CLOBBER: clobber
+ 
+clobber: clean
+	$(BIN)/rm -f $(MAIN)
+ 
+DEPEND: depend
+ 
+depend: $(SRCS) $(HDRS) $(MAKEFILE)
+	$(BIN)/mkdep $(MAKEFILE) >dep.out
+	@@for i in $(SRCS); do \
+	$(BIN)/echo "# Source file '$$i'" >> dep.out; \
+	$(CPP) $(CPFLAGS) $$i >> dep.out; \
+	done;
+	$(BIN)/echo "# End of dependencies" >> dep.out;
+	$(BIN)/mv dep.out $(MAKEFILE)
+ 
+INSTALL: install
+ 
+install: all
+	$(BIN)/cp $(MAIN) $(BIN)/$(MAIN)
+ 
+# DO NOT DELETE THIS LINE -- the dependencies begin here
+# Source file 'date.c'
+date.o: date.c
+date.o: /system/nbinclude/stdio.h
+date.o: /system/nbinclude/time.h
+date.o: /system/nbinclude/types.h
+date.o: /system/nbinclude/fcntl.h
+# End of dependencies
+@

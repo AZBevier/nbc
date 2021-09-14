@@ -1,0 +1,83 @@
+head	1.1;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.1
+date	2021.09.13.21.45.57;	author jbev;	state Exp;
+branches;
+next	;
+
+
+desc
+@Change mpxmac location.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@#
+# Makefile for sed for running sed on mpx1x
+# Object files must be produced and then cataloged
+# on MPX1.X using the LD.SED command file.
+#
+CC = nbcc
+SLIB = /system/lib
+SYSBIN = /system/bin
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
+LBIN = ./mpx1x
+INSTALL = cp
+MOVE = mv
+MAKEFILE = make.mpx1x
+
+OBJS = sed0.o sed1.o
+HDRS = sed.h regexp.h
+HD = SED.H REGEXP.H
+SRCS= sed0.c sed1.c
+SRC= SED.C SEL1.C
+MAIN = $(OBJS)
+SLD = ld.sed1x
+LD = LD.SED
+SMK = mk.sed1x
+MK = MK.SED
+SDOC = sed.m
+DOC = SED.M
+
+all:	$(SLD) $(SMK) $(SDOC) $(MAIN)
+
+$(MAIN):	$(MAKEFILE) $(HDRS) $(SRCS)
+	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
+
+clean:
+	-rm -f *.o $(LBIN)/*.O
+
+clobber: clean
+	-rm -f $(LBIN)/SED0.O $(LBIN)/SED0.C $(LBIN)/$(LD)
+	-rm -f $(LBIN)/SED1.O $(LBIN)/SED1.C $(LBIN)/$(MK)
+	-rm -f $(LBIN)/SED.H $(LBIN)/REGEXP.H $(LBIN)/$(DOC)
+
+install: all
+	@@if [ -d $(LBIN) ]; then \
+			echo "$(LBIN) already exits"; \
+	else \
+			mkdir $(LBIN); \
+	fi;
+	mpxblk <sed0.c >$(LBIN)/SED0.C
+	mpxblk <sed1.c >$(LBIN)/SED1.C
+#	mpxblk <$(SRCS) >$(LBIN)/$(SRC)
+	mpxblk <sed.h >$(LBIN)/SED.H
+	mpxblk <regexp.h >$(LBIN)/REGEXP.H
+#	mpxblk <$(HDRS) >$(LBIN)/$(HD)
+	mpxblk <$(SLD) >$(LBIN)/$(LD)
+	mpxblk <$(SMK) >$(LBIN)/$(MK)
+	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
+	$(MOVE) sed0.o $(LBIN)/SED0.O
+	$(MOVE) sed1.o $(LBIN)/SED1.O
+	/bin/chmod 664 $(LBIN)/*.?
+
+@

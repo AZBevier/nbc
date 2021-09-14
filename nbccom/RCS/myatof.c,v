@@ -1,9 +1,19 @@
-head	1.5;
+head	1.7;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.7
+date	2021.09.13.22.02.09;	author jbev;	state Exp;
+branches;
+next	1.6;
+
+1.6
+date	2021.07.15.15.55.35;	author jbev;	state Exp;
+branches;
+next	1.5;
 
 1.5
 date	2019.01.31.21.58.56;	author jbev;	state Exp;
@@ -36,9 +46,9 @@ desc
 @
 
 
-1.5
+1.7
 log
-@Update for Linux
+@Code cleanup.
 @
 text
 @/*~!myatof.c*/
@@ -79,13 +89,11 @@ FPN ifpn;	/* internal floating point number */
 #ifdef FLOATDEB
 extern int sdump();
 #endif
-unsigned char ss[100];
 extern void zerof();
 extern void negf();
 extern int dodig();
 
-FPN *
-myatof(s)
+FPN * myatof(s)
 register  unsigned char  *s;
 {
 	register int i;
@@ -93,16 +101,14 @@ register  unsigned char  *s;
 	int	exp;
 	int	sign;
 	int	esign;
+    unsigned char ss[200];
 
 #ifdef FLOATDEB
 	printf("myatof entry: %s\n", s);
-	strcpy(ss,s);
-	s = ss;
-#else
-	*ss='\0';
-	strcpy(ss,s);
-	s = ss;
 #endif
+	*ss='\0';
+	strcpy((char *)ss, (char *)s);
+	s = ss;
 	zerof( &ifpn );		/* clear destination number */
 	esign = sign = exp = tz = 0;	/* and local variables */
 
@@ -202,6 +208,42 @@ register  unsigned char  *s;
 }
 
 #endif /* MYATOF */
+@
+
+
+1.6
+log
+@Increase string storage for number.
+@
+text
+@a38 1
+unsigned char ss[200];
+d43 1
+a43 2
+FPN *
+myatof(s)
+d51 1
+d55 1
+a55 3
+	strcpy(ss,s);
+	s = ss;
+#else
+d57 1
+a57 1
+	strcpy(ss,s);
+a58 1
+#endif
+@
+
+
+1.5
+log
+@Update for Linux
+@
+text
+@d39 1
+a39 1
+unsigned char ss[100];
 @
 
 

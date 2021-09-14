@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.12.21.07.33;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.07.05.02.44.59;	author jbev;	state Exp;
@@ -16,12 +21,13 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Add page command.
 @
 text
 @DEFM
+$PAGE 0
 IFT PATH=OBJ.O SKIP
 CREA OBJ.O
 %SKIP
@@ -56,5 +62,16 @@ $NOTE *** ERROR *** CATALOG OF MKDEP FAILED
 %ENDJOB
 PAGE
 EOJ
+$PAGE 24
 ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d2 1
+d37 1
 @

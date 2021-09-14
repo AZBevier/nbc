@@ -90,7 +90,8 @@
 #define _LENBASE	1
 #endif /* ieee or i386 */
 
-#if defined(gould) && !defined(i386) && !defined(ieee)
+/*#if defined(gould) && !defined(i386) && !defined(ieee) */
+#if defined(mpx) && !defined(i386) && !defined(ieee)
 #define MAXDOUBLE	0.7237005577332262e76
 #ifndef MAXFLOAT
 #define MAXFLOAT	((float)MAXDOUBLE)

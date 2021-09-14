@@ -1,10 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
-locks
-	jbev:1.1; strict;
+locks; strict;
 comment	@ * @;
 
+
+1.2
+date	2021.09.13.22.28.57;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.10.30.21.24.48;	author jbev;	state Exp;
@@ -18,9 +22,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Correct define.
 @
 text
 @/*~!unixio.h*/
@@ -87,7 +91,9 @@ static struct fcbtag *curfcb;
 static struct flprmtag *curfprm;
 static int carcont = 1;
 static int ieofbl;      /* initial eof block(from rd) */
+#ifndef NOBBS
 static int iofd;	/* current fd */
+#endif
 
 /* macros */
 
@@ -98,7 +104,11 @@ static int iofd;	/* current fd */
 #define CURFIL curfil=filtabl+fd
 #define CURFCB curfcb= &(curfil->fcb)
 #define CURFPRM curfprm= &(curfil->filparm)
+#ifndef NOBBS
 #define INIT CURFIL;CURFCB;CURFPRM; iofd = fd;
+#else
+#define INIT CURFIL;CURFCB;CURFPRM;
+#endif
 
 #ifdef MPX1X
 /* added for MPX1X */
@@ -513,4 +523,16 @@ extern struct filtag filtabl[];
 #define CUBFUS 160
 #define REOFBL 68
 #endif /* UNIXIO_H */
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d65 1
+d67 1
+d78 1
+d80 3
 @

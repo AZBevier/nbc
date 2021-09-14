@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.14.17.25.51;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.02.11.02.44.01;	author jbev;	state Exp;
@@ -16,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Add page cmd.
 @
 text
 @$DEFM
@@ -51,8 +56,8 @@ $A1 SGO=CCOBJ.O
 $A1 LIB=CLB,,U
 $A1 DIR=CDR,,U
 $CATALOG
-FILES 16
-BUFFERS 16
+FILES 8
+BUFFERS 8
 OPTION LOWER PROMPT
 ENVIRONMENT ,,SHARED,MAP2048
 CATALOG NBLEX
@@ -62,4 +67,16 @@ $DEFN ENDJOB
 $EOJ
 $PAGE 24
 $ENDM
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d31 2
+a32 2
+FILES 16
+BUFFERS 16
 @

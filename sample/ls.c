@@ -16,10 +16,11 @@
  * (a).
  */
 
-#ident	"Makef4MPX $Id: ls.c,v 1.2 1995/04/03 23:10:40 jbev Exp $"
+#ident	"Makef4MPX $Id: ls.c,v 1.2 1995/04/03 23:10:40 jbev Exp jbev $"
 
-/* $Log: ls.c,v $
- * Revision 1.2  1995/04/03  23:10:40  jbev
+/*
+ * $Log: ls.c,v $
+ * Revision 1.2  1995/04/03 23:10:40  jbev
  * Fix warning errors.
  *
  * Revision 1.1  1995/03/14  02:43:39  jbev
@@ -43,20 +44,18 @@
 #include	<sys/types.h>
 #ifndef mpx
 #include	<sys/sysmacros.h>
+#include	<stdlib.h>
+#include	<stdarg.h>
+#include	<unistd.h>
 #endif
-#include	<sys/stat.h>
 
-#ifndef MPX
 #include	"dirent.h"
-#else
-#include	<dirent.h>
-#endif
-
+#include	<sys/stat.h>
 #include	<string.h>
 
 /* #define DBUG */
 
-#ifdef MPX
+#ifndef mpx
 #include <limits.h>
 #include <ctype.h>
 #endif
@@ -74,6 +73,19 @@ static void conv2unix();
 static void blcpy();
 static void strlcpy();
 #endif
+void mstat();
+void pprintf();
+void new_line();
+void rddir();
+void pem();
+void pentry();
+void column();
+int getname();
+void pmode();
+void selectx();
+void pdirectory();
+int compar();
+struct lbuf *gstat();
 
 #define MAXN 256
 
@@ -86,7 +98,8 @@ static void strlcpy();
 #endif
 
 #ifdef MPX
-int wildmat __ARGS((char *s,char *p,char **argv));
+/*int wildmat __ARGS((char *s,char *p,char **argv));*/
+extern int wildmat();
 #endif
 
 #ifndef NULL
@@ -180,7 +193,7 @@ int	fixedwidth;
 int	curcol;
 int	compar();
 
-main(argc, argv)
+int main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -192,7 +205,7 @@ char *argv[];
 	struct	lbuf	lb;
 	int	i, width;
 	long	time();
-	char *malloc();
+/*	char *malloc(); */
 	void qsort(), exit();
 #ifdef MPX
 #ifndef mpx
@@ -201,7 +214,10 @@ char *argv[];
 #endif
 #ifdef MPX
     char dname[MAXN], fname[MAXN];
-    char *file, *cp, *sp;
+    char *file, *cp;
+#ifdef mpx
+    char *sp;
+#endif
     int j;
 #endif
 
@@ -492,7 +508,7 @@ char *argv[];
 	colwidth = fixedwidth + filewidth;
 	qsort(flist, (unsigned)nargs, sizeof(struct lbuf *), compar);
 	for (i=0; i<nargs; i++)
-		if (flist[i]->ltype=='d' && dflg==0 || fflg)
+		if (((flist[i]->ltype=='d') && (dflg==0)) || fflg)
 			break;
 	pem(&flist[0],&flist[i], 0);
 	for (; i<nargs; i++) {
@@ -532,9 +548,9 @@ char *argv[];
  * nonzero, using lp as the place to start reading in the dir.
  */
 #ifdef MPX
-pdirectory (name, title, lp, fname)
+void pdirectory (name, title, lp, fname)
 #else
-pdirectory (name, title, lp)
+void pdirectory (name, title, lp)
 #endif
 char *name;
 int title;
@@ -597,7 +613,7 @@ char *fname;
  * pem: print 'em.  Print a list of files (e.g. a directory) bounded
  * by slp and lp.
  */
-pem(slp, lp, tot_flag)
+void pem(slp, lp, tot_flag)
 	register struct lbuf **slp, **lp;
 	int tot_flag;
 {
@@ -628,27 +644,30 @@ pem(slp, lp, tot_flag)
 	}
 }
 
-pentry(ap)  /* print one output entry;
+void pentry(ap)  /* print one output entry;
             *  if uid/gid is not found in the appropriate
             *  file (passwd/group), then print uid/gid instead of 
             *  user/group name;
             */
 struct lbuf *ap;
 {
+#ifdef HUH
 	struct	{
 		char	dminor,
 			dmajor;
 	};
+#endif
 	register struct lbuf *p;
 	register char *cp;
 
 	p = ap;
 	column();
-	if (iflg)
+	if (iflg) {
 		if (mflg && !lflg)
 			curcol += printf("%u ", p->lnum);
 		else
 			curcol += printf("%5u ", p->lnum);
+    }
 	if (sflg)
 		curcol += printf( (mflg && !lflg) ? "%ld " : "%4ld " ,
 			(p->ltype != 'b' && p->ltype != 'c') ?
@@ -664,16 +683,18 @@ struct lbuf *ap;
 		curcol += printf("%4d ", p->lnl);
 #endif
 #ifndef mpx
-		if (oflg)
+		if (oflg) {
 			if(!nflg && getname(p->luid, tbufu, 0)==0)
 				curcol += printf("%-9.9s", tbufu);
 			else
 				curcol += printf("%-9u", p->luid);
-		if (gflg)
+        }
+		if (gflg) {
 			if(!nflg && getname(p->lgid, tbufg, 1)==0)
 				curcol += printf("%-9.9s", tbufg);
 			else
 				curcol += printf("%-9u", p->lgid);
+        }
 #endif
 		if (p->ltype=='b' || p->ltype=='c')
 #ifdef mpx
@@ -718,9 +739,9 @@ struct lbuf *ap;
 	}
 }
 
-/* print various r,w,x permissions 
- */
-pmode(aflag)
+/* print various r,w,x permissions */
+void pmode(aflag)
+int aflag;
 {
         /* these arrays are declared static to allow initializations */
 	static int	m0[] = { 1, S_IREAD>>0, 'r', '-' };
@@ -739,10 +760,10 @@ pmode(aflag)
 
 	flags = aflag;
 	for (mp = &m[0]; mp < &m[sizeof(m)/sizeof(m[0])];)
-		select(*mp++);
+		selectx(*mp++);
 }
 
-select(pairp)
+void selectx(pairp)
 register int *pairp;
 {
 	register int n;
@@ -763,7 +784,7 @@ register int *pairp;
 /*
  * column: get to the beginning of the next column.
  */
-column()
+void column()
 {
 
 	if (curcol == 0)
@@ -796,7 +817,7 @@ column()
 	} while (curcol % colwidth);
 }
 
-new_line()
+void new_line()
 {
 	if (curcol) {
 		putc('\n',stdout);
@@ -808,7 +829,7 @@ new_line()
  *  status in flist[nfiles] 
  *  use makename() to form pathname dir/filename;
  */
-rddir(dir, fname)
+void rddir(dir, fname)
 char *dir;
 char *fname;
 {
@@ -826,7 +847,7 @@ char *fname;
 	}
         else {
           	tblocks = 0;
-		while (dentry = readdir(dirf)) {
+		while ((dentry = readdir(dirf))) {
           		if (aflg==0 && dentry->d_name[0]=='.' 
 #ifdef NODOTDOT
 			&& (dentry->d_name[1]=='\0' || dentry->d_name[1]=='.'
@@ -868,14 +889,16 @@ char *fname;
  * returns that pointer;
  * returns NULL if failed;
  */
-struct lbuf *
-gstat(file, argfl)
+struct lbuf *gstat(file, argfl)
 char *file;
+int argfl;
 {
+#ifndef MPX
 	struct stat statb;
+#endif
 	register struct lbuf *rep;
 	static int nomocore;
-	char *malloc(), *realloc();
+/*	char *malloc(), *realloc(); */
 
 	if (nomocore)
 		return(NULL);
@@ -967,9 +990,10 @@ char *file;
 }
 
 #ifdef MPX
-mstat(rep, file, argfl)
+void mstat(rep, file, argfl)
 register struct lbuf *rep;
 char *file;
+int argfl;
 {
     struct stat statb;
 
@@ -1033,8 +1057,14 @@ long size;
 	long blocks, tot;
 
 #ifdef mpx
-    	tot = size/768;
+    tot = size/768;
 #else
+#ifndef BSHIFT
+#define BSHIFT 10
+#endif
+#ifndef BSIZE
+#define BSIZE 512
+#endif
 	blocks = tot = (size + BSIZE - 1) >> BSHIFT;
 	if(blocks > DIRECT)
 		tot += ((blocks - DIRECT - 1) >> INSHFT) + 1;
@@ -1049,8 +1079,7 @@ long size;
 /* returns pathname of the form dir/file;
  *  dir is a null-terminated string;
  */
-char *
-makename(dir, file) 
+char *makename(dir, file) 
 char *dir, *file;
 {
 	static char dfile[MAXN];  /*  Maximum length of a
@@ -1079,13 +1108,13 @@ char *dir, *file;
  *  and store it in buf; lastuid is set to uid;
  *  returns -1 if uid is not in file
  */
-getname(uid, buf, type)
-unsigned uid;
+int getname(uid, buf, type)
+unsigned int uid;
 int type;
 char buf[];
 {
         int c;
-        register i, j, n;
+        register int i, j, n;
 
 	if (uid==(type ? lastgid : lastuid))
 		return(0);
@@ -1117,7 +1146,7 @@ char buf[];
 }
 #endif
 
-compar(pp1, pp2)  /* return >0 if item pointed by pp2 should appear first */
+int compar(pp1, pp2)  /* return >0 if item pointed by pp2 should appear first */
 struct lbuf **pp1, **pp2;
 {
 	register struct lbuf *p1, *p2;
@@ -1151,8 +1180,8 @@ struct lbuf **pp1, **pp2;
 				p2->lflags&ISARG? p2->ln.namep: p2->ln.lname));
 }
 
-pprintf(s1,s2)
-	char *s1, *s2;
+void pprintf(s1,s2)
+char *s1, *s2;
 {
 	register char *s;
 	register int   c;
@@ -1160,7 +1189,7 @@ pprintf(s1,s2)
 	int i;
 
 	for (s = s1, i = 0; i < 2; i++, s = s2)
-		while(c = *s++) {
+		while((c = *s++)) {
 			if (c < ' ' || c >= 0177) {
 				if (qflg)
 					c = '?';
@@ -1179,6 +1208,7 @@ pprintf(s1,s2)
 		}
 }
 
+#ifndef DEFFED_IN_WILDMAT_C
 #ifdef MPX
 /*
  * @(#)wildmat.c 1.3 87/11/06	Public Domain.
@@ -1233,8 +1263,7 @@ were, I'd use the code I mentioned above.
 
 static int Star __ARGS((char *s,char *p,char **argv));
 
-static int
-Star(s,p,argv)
+static int Star(s,p,argv)
 register char *s;
 register char *p;
 register char **argv;
@@ -1246,8 +1275,7 @@ register char **argv;
 	return cp - s;
 }
 
-int
-wildmat(s,p,argv)
+int wildmat(s,p,argv)
 register char *s;
 register char *p;
 register char **argv;
@@ -1310,7 +1338,7 @@ register char **argv;
 
 extern char *gets();
 
-main()
+int main()
 {
 	char pattern[80];
 	char text[80];
@@ -1340,14 +1368,14 @@ main()
 }
 #endif	/* TEST */
 #endif /* MPX */
+#endif /* DEFED in WILDMAT */
 
 #ifdef MPX
 /* cvtfname
  * convert an arbitrary filename to a qualified unix pathname.
  * return pointer to malloc'd name or null if error.
  */
-static char *
-cvtfname(path)
+static char *cvtfname(path)
 char *path;
 {
     char *dirp, *retp;
@@ -1370,8 +1398,7 @@ char *path;
  * an absolute pathname. Memory is allocated for the result, which
  * the caller must free
  */
-static char *
-pathname(cd,path)
+static char *pathname(cd,path)
 char *cd;	/* Current working directory */
 char *path;	/* Pathname argument */
 {
@@ -1424,8 +1451,7 @@ char *path;	/* Pathname argument */
 /* Process a path name string, starting with and adding to
  * the existing buffer
  */
-static void
-crunch(buf,path)
+static void crunch(buf,path)
 char *buf;
 register char *path;
 {
@@ -1446,7 +1472,7 @@ register char *path;
     	if(strcmp(path,"..") == 0 || strncmp(path,"../",3) == 0) {
     	    /* Hop up a level */
     	    if((cp = strrchr(buf,'/')) == (char *)0)
-    		cp = buf;		/* Don't back up beyond root */
+    		    cp = buf;		/* Don't back up beyond root */
     		*cp = '\0';		/* In case there's another .. */
     		path += 2;		/* Skip ".." */
     		while(*path == '/')	/* Skip one or more slashes */
@@ -1479,8 +1505,7 @@ register char *path;
 /* first char must be /, ., @, ^, or ( to be converted */
 /* NOTE: string supplied must be big enough for conversion */
 
-static void
-conv2unix(s)
+static void conv2unix(s)
 register char *s;
 {
     register char *os = s;
@@ -1594,10 +1619,9 @@ dodir:
 /*
  * copy string p2 to string p1, converting to l/c as we go.
  */
-static void
-strlcpy(p1, p2)
-char * p1;
-char * p2;
+static void strlcpy(p1, p2)
+char *p1;
+char *p2;
 {
     int c;
     /* copy p2 to p1 */
@@ -1612,11 +1636,10 @@ char * p2;
 /*
  * copy string b1 to l/c string b2, with overlap testing
  */
-static void
-blcpy (b1, b2, length)
-     register char *b1;
-     register char *b2;
-     register int length;
+static void blcpy (b1, b2, length)
+register char *b1;
+register char *b2;
+register int length;
 {
     register int c;
     /* handle buffer overlap case */

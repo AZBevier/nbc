@@ -7,7 +7,7 @@
  *	mode C compiler.
  */
 
-/* $Id: mfile2.h,v 1.13 2019/01/31 21:57:26 jbev Exp jbev $ */
+/* $Id: mfile2.h,v 1.13 2019/01/31 21:57:26 jbev Exp $ */
 /*
     Ported from the 4.1c Berkeley Standard
 	Distribution source for a VAX portable C compiler.

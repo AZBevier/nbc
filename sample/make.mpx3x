@@ -8,7 +8,7 @@ BIN = /bin
 SLIB = /system/lib
 SYSBIN = /system/bin
 LBIN = ./mpx3x
-CFLAGS = -C -DMPX -DMYATOF -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+CFLAGS = -C -DMPX -DMYATOF -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 INSTALL = cp
 MOVE = mv
 YACC = nbyacc
@@ -16,13 +16,15 @@ MAKEFILE = make.mpx3x
 MPXMAKE = makefile
 
 # define all source
-SRCS = dcat.c ucat.c fixer.c fort.c prtinc.c obd.c caid.c summer.c cp.c ls.c mv.c rm.c kill.c oscode.c
+SRCS = cat.c dcat.c ucat.c fixer.c fort.c prtinc.c obd.c caid.c \
+	summer.c cp.c ls.c mv.c rm.c kill.c oscode.c recmsg.c sndmsg.c
 # define all objects
-OBJS = dcat.o ucat.o fixer.o fort.o prtinc.o obd.o caid.o summer.o cp.o ls.o mv.o rm.o kill.o oscode.o
+OBJS = cat.o dcat.o ucat.o fixer.o fort.o prtinc.o obd.o caid.o \
+	summer.o cp.o ls.o mv.o rm.o kill.o oscode.o recmsg.o sndmsg.o
 # define all headers
 HDRS = caid.h
 # define all load module names
-MAINS = dcat ucat fixer obd caid summer cp ls mv rm
+MAINS = cat dcat ucat fixer obd caid summer cp ls mv rm
 
 ALLS = $(SRCS) $(HDRS)
 
@@ -38,8 +40,8 @@ MAIN = $(OBJS)
 
 ALL:	all
 
-#all:	$(SLD) $(SMK) $(SMPXMK) $(MAIN)
-all:	$(MAIN)
+all:	$(SLD) $(SMK) $(HDRS) $(SMPXMK) $(MAIN)
+#all:	$(MAIN)
 	$(BIN)/echo $(MAINS) are up to date
 	$(BIN)/echo $(OBJS) objects created
 
@@ -47,6 +49,22 @@ all:	$(MAIN)
 #	$(SYSBIN)/$(CC) $(CFLAGS) $(SRCS)
 
 prefile:
+
+# Source file 'cat.c'
+cat.o: prefile cat.c
+	$(CC) -L $(CFLAGS) -c cat.c -o cat.o
+
+# Source file 'dcat.c'
+dcat.o: prefile dcat.c
+	$(CC) -L $(CFLAGS) -c dcat.c -o dcat.o
+
+# Source file 'ucat.c'
+ucat.o: prefile ucat.c
+	$(CC) -L $(CFLAGS) -c ucat.c -o ucat.o
+
+# Source file 'fixer.c'
+fixer.o: prefile fixer.c
+	$(CC) -L $(CFLAGS) -c fixer.c -o fixer.o
 
 # Source file 'fort.c'
 fort.o: prefile fort.c
@@ -76,6 +94,7 @@ CLEAN:  clean
 
 clean:
 	# remove obj files
+	rm -f *.o *.l
 	@for n in $(OBJS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
 		/bin/rm -f $(LBIN)/$$nn ; \

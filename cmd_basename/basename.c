@@ -16,10 +16,13 @@
  * (a).
  */
 
-#ident	"Make4MPX $Id: basename.c,v 1.2 2021/07/02 03:10:12 jbev Exp jbev $"
+#ident	"Make4MPX $Id: basename.c,v 1.3 2021/09/13 20:52:45 jbev Exp $"
 
 /*
  * $Log: basename.c,v $
+ * Revision 1.3  2021/09/13 20:52:45  jbev
+ * Fix #ident.
+ *
  * Revision 1.2  2021/07/02 03:10:12  jbev
  * Correct warnings.
  *

@@ -70,8 +70,8 @@ static int iofd;	/* current fd */
 
 #define BUFVALID curfprm->bufvalid
 #define BUFALTER curfprm->bufalter
-#define PUTR {int i;if(i=_putrec(BUFSIZ,curfil->line))return(i);}
-#define GETR {int i;if(i=_getrec(BUFSIZ,curfil->line))return(i);BUFALTER = 0;}
+#define PUTR {int zi;if(zi=_putrec(BUFSIZ,curfil->line))return(zi);}
+#define GETR {int yi;if(yi=_getrec(BUFSIZ,curfil->line))return(yi);BUFALTER = 0;}
 #define CURFIL curfil=filtabl+fd
 #define CURFCB curfcb= &(curfil->fcb)
 #define CURFPRM curfprm= &(curfil->filparm)
@@ -84,7 +84,7 @@ static int iofd;	/* current fd */
 #ifdef MPX1X
 /* added for MPX1X */
 #define CPYNAME(SRC,DST) {char *s=(char *)(SRC);char *d=(char *)(DST);\
-int i;for(i=0;i<8;i++,s++)*d++=((*s)!=' ')?*s:'\0';}
+int wi;for(wi=0;wi<8;wi++,s++)*d++=((*s)!=' ')?*s:'\0';}
 #endif
 
 #ifndef MPX1X
@@ -133,7 +133,7 @@ struct rrstag {    /* RRS structure */
 */
     char	lfc[3];
     int		wd2;
-/* wd2 can of the form /*
+/* wd2 can of the form */
 /* type 1	short password
 		short filename[3] - 6bit compressed code 0-3f = 20-5f
    type 2	char  unused
@@ -481,8 +481,8 @@ extern struct filtag filtabl[];
 /*    macros      */
 
 #define BADFD(d,r)  if(d<0||d>=_NFILE){errno=EBADF;mpxerr=E027;return(r);}
-#define ZREG(ari,sz)  {int i;for(i=0;i<sz;i++)ari[i]=0;}
-#define ZINT(ptr,sz)  {int i,*p=(int*)(ptr);for(i=0;i<sz;i++)*p++ =0;}
+#define ZREG(ari,sz)  {int qi;for(qi=0;qi<sz;qi++)ari[qi]=0;}
+#define ZINT(ptr,sz)  {int ui,*p=(int*)(ptr);for(ui=0;ui<sz;ui++)*p++ =0;}
 
 /*    other defines    */
 

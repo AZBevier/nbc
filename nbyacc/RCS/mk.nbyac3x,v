@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.07.12.23.43.47;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	2021.02.11.02.47.27;	author jbev;	state Exp;
@@ -16,15 +21,31 @@ desc
 @
 
 
+1.2
+log
+@Add page command and remove -v option.
+@
+text
+@$DEFM
+$PAGE 0
+$NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y1.C
+$NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y2.C
+$NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y3.C
+$NBCC -C -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y4.C
+$PAGE 24
+$ENDM
+@
+
+
 1.1
 log
 @Initial revision
 @
 text
-@$DEFM
+@d2 6
+a7 4
 $NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y1.C
 $NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y2.C
 $NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y3.C
 $NBCC -C -V -N -B^(BIN) -I^(NBINCLUDE) -DWORD32 -DMPX Y4.C
-$ENDM
 @

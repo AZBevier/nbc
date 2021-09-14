@@ -5,8 +5,8 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -29,7 +29,7 @@ DOCS = ci.m co.m ident.m merge.m rcsclean.m rcsdiff.m rcsfile.m \
 
 MAIN = $(OBJS)
 
-SLD = ld.ci3x ld.co3x ld.ident3x ld.merge3x ld.rcs1x ld.rcscl3x \
+SLD = ld.ci3x ld.co3x ld.ident3x ld.merge3x ld.rcs3x ld.rcscl3x \
 	ld.rcsdf3x ld.rcsmg3x ld.rlog3x
 
 #LD = LD.RCS
@@ -65,7 +65,7 @@ install: all
 	done
 #	mpxblk <$(HDRS) >$(LBIN)/$(HD)
 	@for n in $(SLD) ; do \
-		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		nn=`echo $$n | sed 's/3x//' | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 #	mpxblk <$(SLD) >$(LBIN)/$(LD)
@@ -76,7 +76,7 @@ install: all
 	done
 	@for n in $(DOCS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
-		$(MOVE) $$n $(LBIN)/$$nn ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 	/bin/chmod 664 $(LBIN)/*.?
 

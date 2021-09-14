@@ -1,8 +1,7 @@
 head	1.13;
 access;
 symbols;
-locks
-	jbev:1.13; strict;
+locks; strict;
 comment	@ * @;
 
 

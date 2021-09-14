@@ -1,9 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.09.13.19.10.37;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.06.28.21.08.47;	author jbev;	state Exp;
@@ -21,9 +26,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Do clean before install.
+@Update mpxmac location.
 @
 text
 @#
@@ -33,8 +38,8 @@ text
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
 SYSBIN = /system/bin
+CFLAGS = -C -DMPX -M$(SYSBIN)/m.mpxmac3x -P$(SYSBIN)/mpxpre3x
 LBIN = ./mpx3x
 INSTALL = cp
 MOVE = mv
@@ -53,7 +58,7 @@ LD = LD.NBYACC
 SMK = mk.nbyac3x
 MK = MK.NBYACC
 
-all:	clean $(MAIN)
+all:	clean $(SLD) $(SMK) $(MAIN)
 	-/bin/echo $(MAIN) objects created
 
 $(MAIN):	$(MAKEFILE) $(PAR) $(DEPS) $(SRCS)
@@ -93,6 +98,20 @@ install: all    # build if necessary, and then copy main to system directory
 	/bin/chmod 664 $(LBIN)/DEXTERN
 	/bin/chmod 664 $(LBIN)/FILES
 
+@
+
+
+1.2
+log
+@Do clean before install.
+@
+text
+@a7 1
+CFLAGS = -C -DMPX -M$(SLIB)/m.mpxmac3x -P$(SLIB)/mpxpre3x
+d9 1
+d28 1
+a28 1
+all:	clean $(MAIN)
 @
 
 

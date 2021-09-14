@@ -54,12 +54,12 @@ R5       DEQU       5               ! REGISTER 5 EQUATE
 R6       DEQU       6               ! REGISTER 6 EQUATE
 R7       DEQU       7               ! REGISTER 7 EQUATE
          SPACE     1
-         IFF       C.MPX1X,SKIP
+         IFF       C.MPX1X,SKIP1
 C.MGRAN  DEQU       X'AC4'          CPU MAP GRANULARITY FOR 3X
-SKIP     ANOP
-         IFT       C.MPX1X,SKIP
+SKIP1    ANOP
+         IFT       C.MPX1X,SKIP2
 C.MGRAN  DEQU       X'ACC'          CPU MAP GRANULARITY FOR 1X
-SKIP     ANOP
+SKIP2    ANOP
 STK7X    DEQU       -2              ! SIZE OF C STK ON 32/7X
 *                                    INCLUDING IO BUFS AT TOP
 STK3X    DEQU       -8              ! SIZE OF C STK ON 32/27

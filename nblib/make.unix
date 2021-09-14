@@ -125,7 +125,7 @@ MAIN = $(OBJS_A) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) # $(OBJ_1X)
 
 ALL:	all
 
-all:	files $(MAIN)
+all:	clean files $(MAIN)
 	$(BIN)/$(PREFIX)ar -rc $(CLIBPREFIX) $(OBJS_A)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ1)
 	$(BIN)/$(PREFIX)ar -rv $(CLIBPREFIX) $(OBJ2)
@@ -151,6 +151,9 @@ CLOBBER: clobber
 
 clobber: clean
 	-rm -f clib cdir
+	-rm -f clb cdr
+	-rm -f $(BIN)/clb
+	-rm -f $(BIN)/cdr
 
 DEPEND: depend
 

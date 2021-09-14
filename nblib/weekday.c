@@ -28,8 +28,8 @@
 #include	"libgen.h"
 
 int
-weekday(day)
-long day;				/* absolute date */
+weekday(dayn)
+long dayn;				/* absolute date */
 {
-    return( (day+5) % 7 );		/* day 1 is a Saturday */
+    return ((int)((dayn+5) % 7));	/* day 1 is a Saturday */
 }

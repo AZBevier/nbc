@@ -11,4 +11,4 @@ C.DPMODE SETF
 C.DPDEV  SETF
 MPX_SVC  SET       6
 C.MPXOUT SETF
-*        REIS
+         REIS

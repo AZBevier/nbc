@@ -1,9 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.07.12.23.05.10;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.07.04.15.27.54;	author jbev;	state Exp;
@@ -21,12 +26,13 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Correct program name.
+@Add page cmd.
 @
 text
 @DEFM
+$PAGE 0
 IFT PATH=OBJ.O SKIP
 CREA OBJ.O
 %SKIP
@@ -61,7 +67,18 @@ $NOTE *** ERROR *** CATALOG OF TRUE FAILED
 %ENDJOB
 PAGE
 EOJ
+$PAGE 24
 ENDM
+@
+
+
+1.2
+log
+@Correct program name.
+@
+text
+@d2 1
+d37 1
 @
 
 

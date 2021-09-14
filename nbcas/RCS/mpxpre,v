@@ -1,9 +1,14 @@
-head	1.1;
+head	1.2;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.2
+date	2021.09.13.22.25.39;	author jbev;	state Exp;
+branches;
+next	1.1;
 
 1.1
 date	95.03.28.21.56.16;	author jbev;	state Exp;
@@ -16,9 +21,9 @@ desc
 @
 
 
-1.1
+1.2
 log
-@Initial revision
+@Default to mpx35 prefile.
 @
 text
 @* PRE FILE FOR NON-EXTENDED MODE OF MPX-32 REV 3                MPX_NON         
@@ -26,4 +31,26 @@ C.3227   SETT
 C.TRACF  SETF                                                                   
 C.MEMO   SETF                                                                   
 BOPT_MPX SETF                                                                   
+* PRE FILE FOR NON-EXTENDED MODE OF MPX-32 REV 3  RELEASE 3.5   MPX_NON         
+C.3227   SETT                                                                   
+C.TRACF  SETF                                                                   
+C.MEMO   SETF                                                                   
+C.MPX1X  SETF
+C.MPX3X  SETF
+BOPT_MPX SETF                                                                   
+C.FWMID  SETF                                                   EMMM-35A        
+C.DPMODE SETF                                                   EMMM-35B        
+C.DPDEV  SETF                                                   EMMM-35B        
+MPX_SVC  SET       6                                            ECAL-35         
+C.MPXOUT SETF                                                   EOUT-35         
+*        REIS                                                   EOUT-35         
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d6 13
 @

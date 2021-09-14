@@ -5,8 +5,8 @@
 #
 CC = nbcc
 SLIB = /system/lib
-CFLAGS = -C -1 -DMPX -DMPX1X -M$(SLIB)/m.mpxmac1x -P$(SLIB)/mpxpre1x
 SYSBIN = /system/bin
+CFLAGS = -C -1 -DMPX -DMPX1X -M$(SYSBIN)/m.mpxmac1x -P$(SYSBIN)/mpxpre1x
 LBIN = ./mpx1x
 INSTALL = cp
 MOVE = mv
@@ -65,7 +65,7 @@ install: all
 	done
 #	mpxblk <$(HDRS) >$(LBIN)/$(HD)
 	@for n in $(SLD) ; do \
-		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
+		nn=`echo $$n | sed 's/1x//' | tr "[a-z]" "[A-Z]"` ; \
 		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 #	mpxblk <$(SLD) >$(LBIN)/$(LD)
@@ -76,7 +76,7 @@ install: all
 	done
 	@for n in $(DOCS) ; do \
 		nn=`echo $$n | tr "[a-z]" "[A-Z]"` ; \
-		$(MOVE) $$n $(LBIN)/$$nn ; \
+		mpxblk <$$n >$(LBIN)/$$nn ; \
 	done
 #	mpxblk <$(SDOC) >$(LBIN)/$(DOC)
 	/bin/chmod 664 $(LBIN)/*.?

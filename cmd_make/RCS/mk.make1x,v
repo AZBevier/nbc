@@ -1,9 +1,14 @@
-head	1.2;
+head	1.3;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.3
+date	2021.07.13.00.39.01;	author jbev;	state Exp;
+branches;
+next	1.2;
 
 1.2
 date	2021.07.06.22.35.26;	author jbev;	state Exp;
@@ -21,9 +26,9 @@ desc
 @
 
 
-1.2
+1.3
 log
-@Correct defines.
+@Fix filenamaes.
 @
 text
 @$DEFM
@@ -35,10 +40,21 @@ $NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) RULES.C
 $NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) DOSYS.C
 $NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) DYNDEP.C
 $NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) DOCD.C
-$NBYACC GRAM.Y
+$^(BIN)NBYACC GRAM.Y
 $CP Y.TAB.C CGRAM.C
 $NBCC -C -1 -N -B^(BIN) -DMPX -DMPX1X -I^(CINCLUDE) GRAM.C
 $ENDM
+@
+
+
+1.2
+log
+@Correct defines.
+@
+text
+@d10 1
+a10 1
+$NBYACC GRAM.Y
 @
 
 

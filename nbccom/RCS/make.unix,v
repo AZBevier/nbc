@@ -1,9 +1,14 @@
-head	1.3;
+head	1.4;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.4
+date	2021.09.13.22.06.17;	author jbev;	state Exp;
+branches;
+next	1.3;
 
 1.3
 date	2021.07.01.03.19.08;	author jbev;	state Exp;
@@ -26,9 +31,9 @@ desc
 @
 
 
-1.3
+1.4
 log
-@Correct makefile commands.
+@Change mpxmac location.
 @
 text
 @#
@@ -41,8 +46,8 @@ SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-#YACC = yacc
-YACC = /system/bin/nbyacc
+YACC = /usr/bin/yacc
+#YACC = /system/bin/nbyacc
 MAKEFILE = make.unix
 
 SRCS = allo.c cgram.c code.c comm1.c fixcall.c local.c local2.c \
@@ -85,7 +90,7 @@ clean:
 	-rm -f $(OBJS) $(FPOBJ) cgram.c y.tab.c version.c
 
 clobber: clean
-	-rm -f $(OBJS) $(MAIN) $(LBIN)/$(MAIN)
+	-rm -f $(OBJS) $(MAIN) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
 	-rm -f $(LBIN)/*.?
 
 # Copy the files into linux directory
@@ -103,6 +108,22 @@ install: all
 	$(MOVE) $(FPOBJ) $(OBJS) $(LBIN)
 	-rm -f $(OBJS) $(FPOBJ) # cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.?
+@
+
+
+1.3
+log
+@Correct makefile commands.
+@
+text
+@d11 2
+a12 2
+#YACC = yacc
+YACC = /system/bin/nbyacc
+d55 1
+a55 1
+	-rm -f $(OBJS) $(MAIN) $(LBIN)/$(MAIN)
+a72 1
 #	$(INSTALL) nbccomx $(SYSBIN)/nbccom
 @
 

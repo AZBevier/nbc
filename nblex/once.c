@@ -5,7 +5,7 @@
  */
 
 #ifndef lint
-static char *rcsid2 = "@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/once.c,v 1.3 2019/03/11 22:01:08 jbev Exp jbev $";
+static char *rcsid2 = "@(#) (Gould) $Header: /bulk2/simhv/nbc-master/nblex/RCS/once.c,v 1.4 2021/07/12 23:54:52 jbev Exp $";
 #endif /* lint */
 
 /*	once.c	4.1	83/08/11	*/
@@ -103,7 +103,7 @@ int debug;		/* 1 = on */
 #ifdef mpx
 extern int yydebug;	/* 1 = on */
 #else
-/*int yydebug;		/* 1 = on multidef error */
+/*int yydebug;*/		/* 1 = on multidef error */
 extern int yydebug;	/* 1 = on */
 #endif
 int charc;

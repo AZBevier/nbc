@@ -1,0 +1,30 @@
+$DEFM                                                                           
+$PAGE 0                                                                         
+$NOTE OPTI NOCO                                                                 
+$NBCC -N -C -DMPX -DUAS -DNOBUG ATOF.C                                       
+$NBCC -N -C -DMPX -DUAS -DNOBUG GETENV.C
+$NBCC -N -C -DMPX -DUAS -DNOBUG VERSION.C                                    
+$NBCC -N -C -DMPX -DUAS -DNOBUG SWITCH.C                                     
+$NBCC -N -C -DMPX -DUAS -DNOBUG FIXCALL.C                                    
+$NBCC -N -C -DMPX -DUAS -DNOBUG STAB.C                                       
+$NBCC -N -C -DMPX -DUAS -DNOBUG CODE.C                                       
+$NBCC -N -C -DMPX -DUAS -DNOBUG COMM1.C                                      
+@SYSTEM(BIN)NBYACC CGRAM.Y                                                      
+$VOLMGR                                                                         
+COPY Y.TAB.C CGRAM.C REPL=T                                                     
+EXIT                                                                            
+$NBCC -N -C -DMPX -DUAS -DNOBUG CGRAM.C                                      
+$NBCC -N -C -DMPX -DUAS -DNOBUG LOCAL.C                                      
+$NBCC -N -C -DMPX -DUAS -DNOBUG OPTIM.C                                      
+$NBCC -N -C -DMPX -DUAS -DNOBUG PFTN.C                                       
+$NBCC -N -C -DMPX -DUAS -DNOBUG SCAN.C                                       
+$NBCC -N -C -DMPX -DUAS -DNOBUG TREES.C                                      
+$NBCC -N -C -DMPX -DUAS -DNOBUG XDEFS.C                                      
+$NBCC -N -C -DMPX -DUAS -DNOBUG ALLO.C                                       
+$NBCC -N -C -DMPX -DUAS -DNOBUG LOCAL2.C                                     
+$NBCC -N -C -DMPX -DUAS -DNOBUG MATCH.C                                      
+$NBCC -N -C -DMPX -DUAS -DNOBUG ORDER.C                                      
+$NBCC -N -C -DMPX -DUAS -DNOBUG READER.C                                     
+$NBCC -N -C -DMPX -DUAS -DNOBUG TABLE.C                                      
+$PAGE                                                                           
+$ENDM                                                                           

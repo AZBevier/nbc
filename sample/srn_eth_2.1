@@ -1,0 +1,1131 @@
+
+                                               Comm-32 Ethernet
+
+                                                   Revision 2.1
+
+                                         Software Release Notes
+
+                                                  February 1991 
+
+
+
+
+
+
+
+
+324-003490-000
+
+
+
+
+LIMITED RIGHTS
+_________________________________________________________
+
+This manual is supplied without representation or
+warranty of any kind.  Encore Computer Corporation
+therefore assumes no responsibility and shall have no
+liability of any kind arising from supply or use of this
+publication or any material contained herein.
+
+
+PROPRIETARY INFORMATION
+
+The information contained herein is proprietary to Encore
+Computer Corporation and/or its vendors, and its use,
+disclosure or duplication is subject to the restrictions
+stated in the standard Encore Computer Corporation
+License terms and conditions or the appropriate third-
+party sublicense agreement.
+
+
+RESTRICTED RIGHTS
+
+Use, duplication, or disclosure by the Government is
+subject to restrictions as set forth in subdivision (c)
+(1) (ii) of the Rights in Technical Data and Computer
+Software clause at 252.227.7013.
+
+Encore Computer Corporation
+6901 West Sunrise Boulevard
+Fort Lauderdale, Florida  33313
+
+
+
+UTX/32, MPX-32, ACX-32, and Comm-32 are trademarks of
+Encore Computer Corporation.
+
+Concept/32 is a registered trademark of Encore Computer
+Corporation.
+
+Pronet-80 is a registered trademark of Proteon, Inc.
+
+HYPERchannel is a registered trademark of Network Systems
+Corporation.
+
+DECnet is a trademark of Digital Equipment Corporation.
+
+IBM is a registered trademark of International Business
+Machines.
+
+UNIX is a registered trademark of AT&T Bell Laboratories.
+
+Ethernet is a trademark of Xerox Corporation.
+
+
+
+Copyright 1991 by Encore Computer Corporation
+All Rights Reserved
+Printed in the U.S.A.
+
+
+
+Contents
+____________________________________________________________
+
+
+1 OVERVIEW
+
+  Summary of Contents
+  Documentation
+    Comm-32 Ethernet Documentation
+    Documentation Conventions
+      Bold Type
+      Non-Proportional Type
+      Italic Type
+      Braces
+      Brackets
+      Horizontal Ellipses
+      Vertical Ellipses
+      Control Characters
+
+2 CONTENTS OF THIS RELEASE
+
+  Product Name
+  Model Number
+  Software Revision Number
+  Revision Date
+  Model Number(s) to Purchase Subscription Service Programs 
+  Revision History
+  Prerequisites
+  Package Contents
+  Package Formats
+  Documentation Delivered With This Product
+  Related Documentation
+
+3 PRODUCT INFORMATION
+
+  About Comm-32 Ethernet
+
+4 REQUIREMENTS
+
+  Introduction
+  Disk Space Requirements
+  Mandatory Prerequisite(s)
+  Physical Requirements
+  Software Requirements
+
+5 INSTALLATION INSTRUCTIONS
+
+  Binary Installation
+    Installation Procedure
+      Restore the Files to Disk
+  Software Configuration
+    Perform a COMPRESS
+    Modify the SYSGEN directives
+      Controller
+      Device
+      Sequence
+    Perform a SYSGEN
+      Sample SYSGEN Directive File
+    Modify the Ethernet D.INIT Control File
+    Modify the MPX-32 Macro Library and SRTL
+      MPX-32 Macro Library
+      Scientific Run-Time Library
+    Restart The System
+
+6 PRODUCT HINTS
+
+  General Hints
+
+7 KNOWN PROBLEMS
+
+  Introduction
+
+8 PROBLEM REPORT SUMMARY
+
+  Introduction
+  Online Viewing of Problem Reports
+  Problem Reporting
+    By Telephone
+    With PR Forms
+
+
+
+
+1 OVERVIEW
+____________________________________________________________
+
+
+Summary of Contents
+
+    These Software Release Notes (SRN) provide information
+    on using Revision 2.1 of the Comm-32 Ethernet software
+    with the MPX-32 Operating System, version 3.4U03 or later.
+
+
+    The file on the installation tape containing the SRN
+    (SRN_ETHER_2.1) may be printed from the TSM> prompt. The
+    file may also be examined online. It was included to
+    provide users with the latest information about Revision
+    2.1.  Note that the hardcopy and installation-tape versions
+    may differ because of last minute changes.
+
+    The topics contained in this SRN are in the following order:
+
+
+    + Overview
+
+    + Contents of this Revision
+
+    + Product Information
+
+    + Requirements
+
+    + Installation Instructions
+
+    + Product Hints
+
+    + Known Problems
+
+    + Problem Report Summary
+
+
+Documentation
+
+
+Comm-32 Ethernet Documentation
+
+
+    The documentation for Revision 2.1 of Comm-32 Ethernet
+    consists of the following manuals:
+
+    Comm-32 Ethernet Software Manual, Revision 2.0 (323-003490-100)
+
+    Comm-32 Ethernet Software Release Notes (324-003490-000)
+
+Documentation Conventions
+
+
+    The following typographic conventions used throughout
+    this document are intended to increase the document's
+    readability and enhance your understanding of its contents.
+
+Bold Type
+
+
+    In command lines, boldfaced information must be entered
+    exactly as shown.
+
+    Example
+
+      TSM> OPCOM SEND T X25
+
+
+Non-Proportional Type
+
+
+    In file entries, information in non-proportional type
+    must be entered exactly as shown.
+
+    Example
+
+      struct x25_cug [
+
+    In messages, information in non-proportional type is
+    text written by the system.
+
+    Example
+
+      PAD: RESET confirmed
+
+
+Italic Type
+
+    In file entries and command syntax, information you provide
+    is printed in italics.
+
+    Example File entry.
+
+      TSM> $USERNAME name
+
+    Example Command syntax.
+
+      from file
+
+    In system messages, variable information is printed in italics.
+
+    Example
+
+      UNABLE TO DELETE FILE - VMxx
+
+    Note:  In text, italics are used for emphasis.
+
+Braces
+
+
+    When braces surround parameters that are separated by a
+    vertical bar(s), only one parameter is required.
+
+    Example
+
+      $ASSIGN {LO | ER} TO {pathname}
+
+
+Brackets
+
+    In command syntax, parameters inside brackets are optional.
+
+    Example
+
+      from [file]
+
+
+Horizontal Ellipses
+
+    In text and messages, horizontal ellipses indicate that
+    similar information has been omitted.
+
+    Example
+
+      RPAR? [1,2,...,22]
+
+
+Vertical Ellipses
+
+    Vertical ellipses in command syntax, file entries, and
+    messages indicate that similar lines have been omitted.
+
+    Example
+
+      PAD: RPAR 2:v
+            .
+            .
+            .
+      PAD: RPAR 22:v
+
+
+Control Characters
+
+    A circumflex (^) followed immediately by a capital
+    letter indicates a control-character sequence. To enter
+    a control character, press and hold the control key
+    (Ctrl or CTRL) while typing the specified control character.
+
+    Example
+
+      ^X
+
+
+2 CONTENTS OF THIS RELEASE
+____________________________________________________________
+
+
+Product Name
+
+    Comm-32 Ethernet
+
+
+Model Number
+
+    1113-0303 (Binary Single System/Node)
+
+
+Software Revision Number
+
+    2.1
+
+
+Revision Date
+
+    February 1991
+
+
+Model Number(s) to Purchase Subscription Service Programs
+
+    FP-1113-0303   Premier Support Service
+
+    FS-1113-0303   Standard Support Service
+
+    FU-1113-0303   Software Update Service
+
+
+    Please contact your local Encore sales service representative
+    for complete information on the Service Programs.
+
+
+Revision History
+
+    Description           Level             Date
+    -------------------   -------------     --------------
+    Original Release      Revision 1.0      June 1985
+    Patch Release         Revision 1.0A     September 1985
+    Maintenance Release   Revision 1.1      March 1986
+    Maintenance Release   Revision 2.0      October 1986
+    Maintenance Release   Revision 2.1      February 1991
+
+
+Prerequisites
+
+    Encore Proprietary Software License Form 620-28
+
+    Also see the minimum requirements in chapter 4.
+
+
+Package Contents
+
+    Three Volume Manager (VOLMGR) save images.
+
+
+    Image 1 This SRN
+
+    Image 2 Ethernet files
+
+    Image 3 Ethernet demonstration files
+
+
+
+Package Formats
+
+    Three Volume Manager (VOLMGR) save images as follows:
+
+
+   Save Image 1
+
+   Image         File(s)          Contents
+   -----         -------          --------
+      1    (SYSTEM)SRN_ETHER_2.1  This SRN
+
+   Save Image 2
+
+   Image         File(s)          Contents
+   -----         -------          --------
+      1      (SYSTEM)JM.LANMC     JCL to add Ethernet macros
+      2      (SYSTEM)JR.LANRT     JCL to add Ethernet runtime
+      3      (SYSTEM)D.INIT       Ethernet init. file
+      4      (SYSTEM)ECTP         CTP module
+      5      (OBJECT)ON.ENIF      Object for Ethernet interrupt
+      6      (OBJECT)ON.ENXIO     Object for Ethernet handler
+      7      (OBJECT_OUT)ON.ENIF  Object for Ethernet interrupt
+      8      (OBJECT_OUT)ON.ENXIO Object for Ethernet handler
+      9      (SYSTEM)SM.LANMC     Source for Ethernet macros
+     10      (SYSTEM)SR.LANRT     Source for Ethernet runtime
+     11      (SYSTEM)ENETOP       Network manager module
+     12      (SYSTEM)ESTATS       Status logger
+
+   Save Image 3
+
+   Image         File(s)            Contents
+   -----         -------            --------
+      1      (SYSTEM)ANNO.ETHER   Demo annotation file
+      2      (SYSTEM)U.ETHTRAN    Source for demo transmitter
+      3      (SYSTEM)U.ETHRECV    Source for demo receiver
+      4      (SYSTEM)ETHERDEMO    TSM macro to activate demo
+      5      (SYSTEM)BUILD.DEMO   TSM macro to assemble demo
+      6      (SYSTEM)U.FETHRECV   Demo file FORTRAN source
+      7      (SYSTEM)U.FETHTRAN   Demo file FORTRAN source
+      8      (SYSTEM)BUILD.FTDEMO JCL to build demo
+      9      (SYSTEM)ETHERDEMO.FT JCL to run demo
+
+
+
+Documentation Delivered With This Product
+
+    + Comm-32 Ethernet Software Manual, Revision 2.0 (323-003490-100)
+
+    + Comm-32 Ethernet Software Release Notes (324-003490-000)
+
+
+Related Documentation
+
+    + Comm-32 Environment Services Operations, Revision 2.0.
+      (323-006490-200)
+
+    + Ethernet Controller Technical Manual
+      (303-003370-XXX)
+
+    + MPX-32 Reference Manual*
+
+    + MPX-32 Technical Manual*
+
+     * For current publication numbers, contact your Encore
+       representative.
+
+
+
+3 PRODUCT INFORMATION
+____________________________________________________________
+
+
+About Comm-32 Ethernet
+
+    The Comm-32 Ethernet Handler serves as the user's
+    interface to the Model 8516 Ethernet controller, when
+    the controller operates on an Encore Concept/32 computer
+    that uses the MPX-32 Operating System (Revision 3.4U03
+    or above). Together, Comm-32 Ethernet and the Ethernet
+    controller support the Ethernet 2.0 and IEEE 802.3
+    specifications.
+
+
+4 REQUIREMENTS
+____________________________________________________________
+
+
+Introduction
+
+    This chapter contains the system requirements for Comm-32
+    Ethernet, Revision 2.1.
+
+
+Disk Space Requirements
+
+    To use this binary installation package, adequate disk
+    space must be available on the system. 866 blocks of
+    available space are needed for this installation, and
+    150 blocks are required for optional files. (Space for
+    temporary and SLO files is not included.)
+
+
+Mandatory Prerequisite(s)
+
+
+    Model 8516      Ethernet Controller
+                    P/N 160-103675-001AA
+                    Firmware Rev. 531-322947-004, and
+    Model 1113      Comm-32 Ethernet Handler, Rev. 2.1 or later.
+
+                    or
+
+    Model 73-8516   Ethernet Plus Controller
+                    P/N 160-113145-001D
+                    Firmware Rev. 531-103284-002, and
+    Model 1113      Comm-32 Ethernet Handler, Rev. 2.1 or later.
+
+
+
+Physical Requirements
+
+    Physical requirements for binary installation package processing:
+
+
+    1. One compatible input device for the distribution medium:
+
+              1/2" 9-Track tape drive
+
+    2. One compatible auxiliary input device for batch processing:
+
+              One TSM terminal (with lower-case capability).
+
+    3. Model 8516      Ethernet Controller
+                       P/N 160-103675-001AA
+                       Firmware Rev. 531-322947-004, and
+
+                    or
+
+       Model 73-8516   Ethernet Plus Controller
+                       P/N 160-113145-001D
+                       Firmware Rev. 531-103284-002, and
+
+    4. Adequate disk space (see Disk Space section).
+
+
+
+Software Requirements
+
+
+    One of the following operating systems:
+
+          1401 MPX-32 Operating System Revision 3.4U03 or above.
+
+    The following product installed on that system:
+
+          1407 MPX-32 Utilities Revision 3.2 or above.
+
+    The following products are prerequisites for using the FORTRAN
+    interface:
+
+          1413-23  FORTRAN 77+ Compiler, Revision 5.0 or above.
+          1411-23  Scientific Run-Time Library, Revision 5.0 or above.
+
+    The following processors are used during the installation of
+    Comm-32 Ethernet:
+
+           VOLMGR
+           COMPRESS
+           SYSGEN
+           A text editor
+
+
+5 INSTALLATION INSTRUCTIONS
+____________________________________________________________
+
+
+Binary Installation
+
+    To install the Comm-32 Ethernet, Revision 2.1 binary
+    installation media on your system, restore the
+    appropriate files from the installation tape, then
+    configure your system by creating a new system image
+    that incorporates Ethernet.  The installer should be
+    familiar with MPX-32 installation and system generation
+    procedures.
+
+
+    A. Installation
+
+       1.Restore the files from a tape drive to the system's disk.
+
+    B. Software Configuration
+
+       1. Modify the MPX-32 COMPRESS directives.
+       2. Perform a COMPRESS.
+       3. Modify the MPX-32 SYSGEN directives.
+       4. Perform a SYSGEN.
+       5. Modify the Ethernet control file "D.INIT".
+       6. Append "SM.LANMC" and "SR.LANRT" to the MPX-32 Macro Library
+          and the MPX-32 Scientific Run-Time Library, respectively.
+       7. Restart the system.
+
+
+
+Installation Procedure
+
+
+Restore the Files to Disk
+
+
+    + Mount the installation medium on the appropriate unit.
+
+      TSM>AS TAP TO DEV=DEVMNC BLOC=N
+
+    + Invoke the Volume Manager and ensure that the tape is
+      positioned by rewinding the tape.
+
+      TSM>VOLMGR
+      VOL>REWIND
+
+    + Skip the first image which contains this SRN file.
+
+      VOL>SKIP I
+
+    + Restore the Ethernet files.
+
+      VOL>RESTORE VOLUME=SYSTEM
+
+    + If desired, restore the demonstration files and
+      examples.
+
+      VOL>RESTORE VOLUME = SYSTEM
+
+    + Rewind the tape and exit the Volume Manager.
+
+      VOL>REWIND
+      VOL>EXIT
+
+
+
+Software Configuration
+
+    The COMPRESS input file must be updated to include the
+    object module "ON.ENXIO" and "ON.ENIF". A starter
+    COMPRESS directives file is provided on the MPX-32
+    master SDT tape and is originally named as follows:
+
+
+                                To be used
+    COMPRESS Input File      with machine type
+    -------------------      -----------------
+            JH.32            Any CONCEPT machine with MPX-32
+                             3.4U03 or above operating system
+
+
+
+    Note:  When operating in the mapped-out mode on a
+           CONCEPT 32/2000, the JH.32_OUT file must be
+           modified.
+
+    Enter the following commands in response to the TSM prompt:
+
+    TSM>EDIT XX
+
+          Where XX is a work-file code
+
+    EDT>USE JH.32
+
+    EDT>CR
+
+          Where CR is a carriage return
+
+
+
+    The COMPRESS input file is now displayed. Add file names
+    "ON.ENXIO", and "ON.ENIF" immediately in front of the
+    system allocation module named "OH.GPMCS" by using the
+    editor as follows:
+
+
+    EDT>COL XX.X
+
+              Where,
+
+                  XX.X      is the line number to collect
+                  ON.ENXIO  Ethernet handler
+                  ON.ENIF   Ethernet interrupt fielder
+
+    EDT>STORE JH.32 UNN   Store into an Ethernet COMPRESS input file
+    EDT>EXIT              Exit editor
+
+
+Perform a COMPRESS
+
+
+    To perform a COMPRESS, run the following TSM macro:
+
+    TSM>MN.CMPR JH.32 ON.32
+
+            OR
+
+    TSM>MN.CMPR JH.32_OUT ON.32_OUT (For CONCEPT 32/2000 mapped-out operation)
+
+
+    The system object modules are copied to the "ON.32" or
+    "ON.32_OUT" object input files and are displayed on the
+    terminal.
+
+Modify the SYSGEN directives
+
+
+    The following MPX-32 SYSGEN directives are used when
+    configuring Ethernet software:
+
+                           CONTROLLER
+                             DEVICE
+                              POOL
+                            SEQUENCE
+
+Controller
+
+
+    Each //HARDWARE section controller directive you supply
+    to the SYSGEN directive file configures an MPX Ethernet
+    controller.  Note that the maximum configuration is four
+    controllers per system.
+
+    Syntax -
+
+    CONTROLLER=TTCC,PRIORITY=INTLEV,CLASS=F,MUX=XIO,HANDLER=(N.ENIF,I)
+
+
+    Where,
+
+
+          TT       is the two-character ASCII device code
+                        (CA =  communication adapter)
+          CC       is the two hexadecimal digit channel number
+          INTLEV   is the two hexadecimal digit interrupt level
+          F        Extended I/O (device class)
+          XIO      Extended I/O device.
+          N.ENIF   XIO interrupt fielder name.
+          I        Interrupt level reentrancy designator.
+
+
+Device
+
+
+    The //HARDWARE section device directives further define
+    the Ethernet controller by designating "N.ENXIO" as the
+    device handler. Note that the option "SHR" must be
+    specified here to run a statistics logging utility.
+
+    Syntax -
+
+    DEVICE=(00,A,L),[DTC=TT],HANDLER=N.ENXIO [,SHR]
+
+    Where,
+
+
+          00       is the two hexadecimal digit device subaddress
+          A        is an optional parameter specifying the decimal
+                   number of devices starting at the subaddress
+          L        is an optional parameter specifying the hexadecimal
+                   address increment for each additional device
+          TT       is the optional two-character device mnemonic
+                        (CA =  COMMUNICATION ADAPTER)
+          N.ENXIO  Seven-character Ethernet handler name
+          SHR      Allows the device to be shared
+
+
+
+Sequence
+
+    The //SOFTWARE section sequence directive specifies the
+    names of load modules that are activated after booting
+    the system. The network initializer task, "ENETOP", can
+    be included with this directive. If you want MPX
+    Ethernet to be initialized automatically after your
+    system is booted, add this directive at the end of the
+    /PARAMETERS subsection of the SYSGEN list.
+
+    Syntax -
+
+    SEQUENCE=(ENETOP)
+
+    Where,
+
+
+          ENETOP  -  Initializes the Ethernet controller.
+
+
+
+Perform a SYSGEN
+
+    To perform a SYSGEN, run the following macro:
+
+    TSM>MN.GEN [YOURDIR] [??]
+
+    Where YOURDIR is the file name of your SYSGEN directives
+    and ?? reflects the machine type.
+
+    Note:  Your SYSGEN directives must assign Logical File
+           Code OBJ to the COMPRESS output files ON.32 or
+           ON.32_OUT.
+
+
+Sample SYSGEN Directive File
+
+    A sample SYSGEN directive file is shown below.
+
+
+
+     DEFM
+     $IFT PATH @SYSTEM(SYSTEM)ENTMAP SKIP
+     $CREATE @SYSTEM(SYSTEM)ENTMAP
+     %SKIP
+     $AS DIR TO SYC
+     $AS OBJ TO @SYSTEM(OBJECT)ON.32 BLOC=Y
+     $AS SLO TO @SYSTEM(SYSTEM)ENTMAP ACCESS=(U) BLOCK=Y PRINT
+     $SYSGEN
+     TITLE= ** ETHERNET RELEASE 2.1 SYSGEN MPX-32 3.4U03 **
+     //HARDWARE
+     /PARAMETER
+     MACHINE=3267
+     /PARAMETER
+     /MEMORY
+     SIZE=64,TYPE=E,CLASS=S         ! MAP BLOCKS 0-63
+     SIZE=192,TYPE=H,CLASS=S        ! MAP BLOCKS 64-255
+     /CHANNELS
+     CONTROLLER=DM08,PRIORITY=06,CLASS=F,MUX=XIO
+     DEVICE=00,DISC=ANY
+     DEVICE=02,DISC=ANY
+     DEVICE=06,DISC=(MH300,D),DTC=DM                      DUAL-PORT DISC
+     CONTROLLER=M910,PRIORITY=08,CLASS=F,MUX=XIO
+     DEVICE=00,DTC=M9
+     CONTROLLER=CT7E,PRIORITY=13,CLASS=F,MUX=IOP,SUBCH=F
+     DEVICE=FC,DTC=CT,LINSIZ=80,PAGE=23
+     CONTROLLER=LF7E,PRIORITY=13,CLASS=F,MUX=IOP,SUBCH=F
+     DEVICE=F8,DTC=FL,DISC=FL001
+     DEVICE=F1,DTC=FL,DISC=FL001
+     DEVICE=F8,DTC=LP,SPOOL=(BL,RL)
+     CONTROLLER=TY7E,PRIORITY=13,CLASS=F,MUX=IOP,SUBCH=A,HANDLER=(H.IFXIO,I)
+     DEVICE=(A0,8),DTC=TY,LINSIZ=80,PAGE=23,HANDLER=(H.F8XIO,S)
+     CONTROLLER=TY7E,PRIORITY=13,CLASS=F,MUX=IOP,SUBCH=C,HANDLER=(H.IFXIO,I)
+     DEVICE=(C0,8),DTC=TY,LINSIZ=80,PAGE=23,HANDLER=(H.F8XIO,S)
+     CONTROLLER=CA18,PRIORITY=09,CLASS=F,MUX=XIO,HANDLER=(N.ENIF,I)
+     DEVICE=(00,6,1),SHR,DTC=CA,HANDLER=N.ENXIO
+     CONTROLLER=NU00,CLASS=F
+     DEVICE=00,SHR,DTC=NU,SPOOL=(BB,RB)           NULL DEVICE
+     /INTERRUPTS
+     PRIORITY=18,RTOM=(7F,06),PROGRAM=H.IPCL      REAL TIME CLOCK INTERRUPT
+     PRIORITY=1C,RTOM=(7F,03)                     INDIRECTLY CONNECTED
+     PRIORITY=5F,RTOM=(7F,04),PROGRAM=H.IPIT,INTV IOP INTERVAL TIMER
+     /TRAPS
+     USERPROG=H.DMPMT        SYSTEM CRASH DUMP HANDLER (OPTIONAL)
+     USERPROG=DEBUG          SYSTEM DEBUGGER (OPTIONAL)
+     /SYSDEVS
+     LOD=LP7EF8              SLO DEFAULT DEVICE
+     //SOFTWARE
+     /PARAMETERS
+     SYSTEM=ENTSYS           SYSTEM IMAGE FILE NAME
+     SYMTAB=ENTTAB           SYSTEM SYMBOL TABLE FILE NAME
+     SEQUENCE=(ENETOP)
+     DBGFILE=SYMDB
+     DISP=32                 NO. OF DISPATCH QUEUE ENTRIES
+     POOL=5000               MEMORY POOL SIZE IN WORDS
+     NTIM=60                 INTERRUPTS PER TIME UNIT
+     MTIM=60                 INTERRUPTS PER SECOND
+     ITIM=384                TIME INTERVAL
+     ITLB=1C                 INDIRECTLY CONNECTED INTERRUPT LEVEL
+     TQFULL=400              LARGEST TIME QUANTUM
+     TQMIN=100               SMALLEST TIME QUANTUM
+     MODE=SNOP
+     DTSAVE=5
+     BATCHPRI=62             BASE PRIORITY OF BATCH TASKS
+     TERMPRI=60              BASE PRIORITY OF INTERACTIVE TASKS
+     PATCH=100               PATCH AREA SIZE IN BYTES
+     /TABLES
+     JOBS=6                  MAXIMUM NO. OF CONCURRENT BATCH JOBS
+     SHARE=10                MAXIMUM NO. OF SHARED MEMORY TABLE ENTRIES
+     TIMER=8                 MAXIMUM NO. OF TIMER TABLE ENTRIES
+     /FILES
+     //END
+
+
+
+Modify the Ethernet D.INIT Control File
+
+
+    D.INIT is used by the network initialization task named
+    ENETOP.  It is stored as a system file under the
+    reserved name "D.INIT".  D.INIT provides the parameters
+    necessary to initialize the controller.
+
+    When MPX Ethernet is installed on your host computer, a
+    starter copy of this file is placed in the SYSTEM
+    directory.  If you use a text editor to retrieve this
+    file, it looks like this:
+
+
+    XX               Controller Address (Channel Address)
+    N                Mode (Ethernet 1=1; Ethernet 2=2; IEEE 802.3=3)
+    XXXXXXXXXXXX     Physical/Local Address (12 hex numbers)
+    AAA              Addressing Mode - Promiscuous (On/Off)
+    AAA              Multicast Mode (On/Off)
+    XXXXXXXXXXXX     Multicast Addresses (12 hex numbers each)
+
+
+    Using the editor, replace the letters with the items
+    that are appropriate to your system. For more
+    information, please see chapter three of the software
+    manual.
+
+
+Modify the MPX-32 Macro Library and SRTL
+
+
+    Note:  The Scientific Run-Time Library must be at
+           Revision level 5.0 or higher.
+
+
+MPX-32 Macro Library
+
+    The Ethernet macro file "SM.LANMC" is appended to MPX-32
+    macro library by submitting the following TSM job
+    stream.
+
+    TSM>SUBMIT JM.LANMC
+
+    Note:  First time installation causes the macro
+           librarian to abort because it is trying to delete
+           non-existent macros.  This abort message should
+           be followed by a message stating that the macros
+           have been successfully installed. Ignore the
+           first abort message if the second message
+           appears.
+
+Scientific Run-Time Library
+
+    The Ethernet runtime file, "SR.LANRT", is added to the
+    MPX-32 native mode Scientific Run-Time LIBRARY by
+    submitting the following TSM job stream.
+
+    TSM>SUBMIT JR.LANRT SRTL SRTD
+
+    Note:  Be sure to install the Ethernet Macro Library
+           before you install the Ethernet Scientific Run-
+           Time Library.
+
+
+    Note:  SRTL and SRTD are the library and directory
+           names, respectively. If not supplied, SRTL and
+           SRTD defaults to SRTL50N and SRTD50N.
+
+
+Restart The System
+
+    If the Ethernet configuration is going to run on the
+    system which it was built on, the following restart
+    procedure can be used:
+
+    TSM>RESTART [????????]
+
+        Where ???????? is the name of the system into
+        which Ethernet was SYSGEN'd.
+
+
+    The system responds:
+
+
+    DO YOU WISH TO RESTART? (Y OR N):
+
+
+    A "Y" response brings up the system containing Ethernet.
+
+
+    Ethernet is ready for use once ENETOP has run. If the
+    MPX-32 SYSGEN directive is used to run "ENETOP"
+    automatically, (SEQUENCE=ENETOP ) then Ethernet is ready
+    for use immediately after the system boots up.
+
+
+6 PRODUCT HINTS
+____________________________________________________________
+
+
+General Hints
+
+    + Under certain conditions during heavy use, the
+      Ethernet controller has a tendency to give priority to
+      some logical subchannels; this tendency occurs under
+      conditions in which Comm-32 Ethernet continuously
+      queues frames for transmission without letup. The
+      conditions are abnormal and are unlikely to occur
+      during an Ethernet or IEEE 802.3 network's normal
+      operation.
+
+      The described tendency can only occur if you have
+      assigned more than two logical subchannels for
+      transmitting frames.  Under the heavy loading of
+      continuous transmit requests, the controller services
+      requests for the two (transmitting) subchannels that
+      have the lowest numbers, to the exclusion of the other
+      subchannels. Logical subchannels are numbered 0
+      through 15.  Transmit requests queued for the higher
+      number subchannels time out, causing frequent
+      malfunction resets; this results in significantly
+      reduced efficiency.
+
+      If your implementation requires the kind of heavy
+      transmitting capability described here, you can avoid
+      the problem by queuing transmit requests on only two
+      logical subchannels.
+
+    + Multiple subchannel use of NOWAIT I/O increases the
+      demand on memory pool space. If the pool size is
+      inadequate for your I/O usage, a timeout can occur
+      causing an automatic malfunction reset.
+
+
+7 KNOWN PROBLEMS
+____________________________________________________________
+
+
+Introduction
+
+    None
+
+
+8 PROBLEM REPORT SUMMARY
+____________________________________________________________
+
+
+Introduction
+
+    You can check on the status of any Comm-32 software
+    Problem Report (PR) by logging on to a system at Encore
+    Computer Corporation in Fort Lauderdale. This procedure
+    is discussed in the section, ONLINE VIEWING OF PRs.
+
+    To learn how to report new problems with Comm-32 Ethernet,
+    Revision 2.1, software and documents, refer to the
+    section, PROBLEM REPORTING.
+
+    The following PRs have been addressed in Revision 2.1 of
+    Comm-32 Ethernet:
+
+
+              87001687
+              90000083
+              90000095
+
+
+
+Online Viewing of Problem Reports
+
+    Encore Computer Corporation Customer Services maintains
+    an problem-report database for Service Program customers.
+    If you are a Service Program customer, use a modem to
+    log on to a UTX/32 system at Encore Computer Corporation
+    in Fort Lauderdale. Dial (305) 797-5837 and log in as cstspr.
+    Be sure the modem is set to:
+
+    + 1200 baud
+
+    + Full duplex
+
+    + 8-bit characters
+
+    + One stop bit
+
+    + No parity
+
+
+    Call 1-800-TECHAID to report any difficulties with the
+    online database.
+
+
+Problem Reporting
+
+    There are two ways to report problems with Comm-32 Ethernet,
+    Revision 2.1, software and documentation.
+
+    + call the toll-free telephone number
+
+    + fill out a PR form.
+
+
+    The following sections give more information on the use
+    of these methods.
+
+By Telephone
+
+    To report a software or documentation problem by telephone,
+    within the USA., call a customer service representative at
+    1-800-TECHAID. You will be asked to provide the following
+    information:
+
+    + The call number (if this is a follow-up call)
+
+    + Your name
+
+    + Company name
+
+    + Contract number
+
+    + System number
+
+    + Telephone number
+
+    + Machine type
+
+    + Operating system and revision number
+
+    + Product and revision number
+
+    + Problem description
+
+
+    If possible, have an auto-answer modem connected to the
+    appropriate MPX/32 system. Customer Services personnel
+    should then be able to provide remote hardware or
+    software support.
+
+
+With PR Forms
+
+    A software or documentation problem can be reported by
+    filling out a PR form and sending the form with the
+    appropriate supplemental information to the address
+    indicated on the form.  Forms may be obtained from your
+    local Encore Computer Corporation office.
+

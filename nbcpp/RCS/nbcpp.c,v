@@ -1,9 +1,14 @@
-head	1.10;
+head	1.11;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.11
+date	2021.09.13.22.11.47;	author jbev;	state Exp;
+branches;
+next	1.10;
 
 1.10
 date	2021.06.28.17.19.01;	author jbev;	state Exp;
@@ -61,9 +66,9 @@ desc
 @
 
 
-1.10
+1.11
 log
-@Correct warning error.
+@Update version to 1.4
 @
 text
 @/*~!nbcpp.c*/
@@ -90,6 +95,9 @@ text
 
 /*
  * $Log: nbcpp.c,v $
+ * Revision 1.10  2021/06/28 17:19:01  jbev
+ * Correct warning error.
+ *
  * Revision 1.9  2019/01/10 23:44:03  jbev
  * Fix warnings for Linux port
  *
@@ -128,7 +136,8 @@ text
 
 /* cpp.c 1.0  */
 /* char release[] = "J B Systems Rel 1.0.1"; */
-char release[] = "J B Systems Rel 1.0.2";
+/*char release[] = "J B Systems Rel 1.0.2"; */
+char release[] = "J B Systems NBC Rel 1.4";
 
 #ifdef FLEXNAMES
 #define NCPS       128
@@ -2279,7 +2288,7 @@ char *argv[];
   dirs[nd++] = "@@system(cinclude)";
 #else
   dirs[nd++] = "@@system(nbinclude)";
-  dirs[nd++] = "@@system(cinclude)";
+/*  dirs[nd++] = "@@system(cinclude)"; */
 #endif /* MPX1X */
 #endif
   dirs[nd++] = 0;
@@ -2414,6 +2423,21 @@ register char *ptr1, *ptr2;
 /*
  * (c) Copyright 1986 Gould Inc. All Rights Reserved.
  */
+@
+
+
+1.10
+log
+@Correct warning error.
+@
+text
+@d25 3
+d66 2
+a67 1
+char release[] = "J B Systems Rel 1.0.2";
+d2218 1
+a2218 1
+  dirs[nd++] = "@@system(cinclude)";
 @
 
 
