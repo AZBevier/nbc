@@ -8,11 +8,14 @@
 
 #ifndef lint
 static char *rcsid =
- "$Id: code.c,v 1.14 2019/02/24 17:15:30 jbev Exp $";
+ "$Id: code.c,v 1.15 2022/03/13 22:10:20 jbev Exp $";
 #endif
 
 /*
  * $Log: code.c,v $
+ * Revision 1.15  2022/03/13 22:10:20  jbev
+ * A.out.h is a local include, not system.
+ *
  * Revision 1.14  2019/02/24 17:15:30  jbev
  * Comment out stdlib.h include for mpx
  *
@@ -44,7 +47,7 @@ static char *rcsid =
 #ifndef mpx
 #include <stdlib.h>
 #endif
-#include <a.out.h>
+#include "a.out.h"
 
 extern int lflag;
 

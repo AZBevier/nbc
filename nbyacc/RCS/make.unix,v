@@ -1,9 +1,14 @@
-head	1.7;
+head	1.8;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.8
+date	2022.07.29.21.34.50;	author jbev;	state Exp;
+branches;
+next	1.7;
 
 1.7
 date	2021.09.13.19.11.35;	author jbev;	state Exp;
@@ -46,9 +51,9 @@ desc
 @
 
 
-1.7
+1.8
 log
-@Remove /system/bin/nbyacc on make clobber.
+@Remove yaccpar before copying in read only file.
 @
 text
 @#
@@ -98,14 +103,26 @@ install:	all		# build if necessary, and then copy main to system directory
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	/bin/rm -f $(LBIN)/$(PAR)
 	$(INSTALL) $(PAR) $(LBIN)/$(PAR)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	/bin/rm -f $(SYSLIB)/$(PAR)
 	$(INSTALL) $(LBIN)/$(PAR) $(SYSLIB)/$(PAR)
 	$(INSTALL) $(DEPS) $(LBIN)
 	$(INSTALL) $(SRCS) $(LBIN)
 	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/dextern $(LBIN)/files $(LBIN)/*.?
 
+@
+
+
+1.7
+log
+@Remove /system/bin/nbyacc on make clobber.
+@
+text
+@d48 1
+d51 1
 @
 
 

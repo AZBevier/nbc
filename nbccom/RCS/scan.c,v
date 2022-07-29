@@ -1,9 +1,14 @@
-head	1.21;
+head	1.22;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.22
+date	2022.03.13.22.10.20;	author jbev;	state Exp;
+branches;
+next	1.21;
 
 1.21
 date	2021.09.13.22.03.21;	author jbev;	state Exp;
@@ -116,9 +121,9 @@ desc
 @
 
 
-1.21
+1.22
 log
-@Change version to 1.4.
+@A.out.h is a local include, not system.
 @
 text
 @/* scan.c */
@@ -130,7 +135,7 @@ text
  */
 
 #ifndef lint
-static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp jbev $";
+static char *rcsid = "$Id: scan.c,v 1.21 2021/09/13 22:03:21 jbev Exp jbev $";
 #endif
 
 /*
@@ -140,6 +145,9 @@ static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp jbev $";
 
 /*
  * $Log: scan.c,v $
+ * Revision 1.21  2021/09/13 22:03:21  jbev
+ * Change version to 1.4.
+ *
  * Revision 1.20  2019/02/24 19:33:29  jbev
  * Remove stdlib.h include for mpx
  *
@@ -193,7 +201,7 @@ static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp jbev $";
  */
 
 #include "mfile1.h"
-#include <a.out.h>
+#include "a.out.h"
 #include <ctype.h>
 #ifndef mpx
 #include <stdlib.h>
@@ -1925,6 +1933,21 @@ char       *s;
     cerror("ran out of hash tables");
     return(0);
 }
+@
+
+
+1.21
+log
+@Change version to 1.4.
+@
+text
+@d10 1
+a10 1
+static char *rcsid = "$Id: scan.c,v 1.20 2019/02/24 19:33:29 jbev Exp jbev $";
+d20 3
+d76 1
+a76 1
+#include <a.out.h>
 @
 
 

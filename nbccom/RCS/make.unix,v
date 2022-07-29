@@ -1,9 +1,14 @@
-head	1.4;
+head	1.5;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.5
+date	2022.03.13.21.58.12;	author jbev;	state Exp;
+branches;
+next	1.4;
 
 1.4
 date	2021.09.13.22.06.17;	author jbev;	state Exp;
@@ -31,9 +36,9 @@ desc
 @
 
 
-1.4
+1.5
 log
-@Change mpxmac location.
+@Use nbyacc instead of Linux yacc.  Fails on Mint.
 @
 text
 @#
@@ -46,8 +51,8 @@ SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-YACC = /usr/bin/yacc
-#YACC = /system/bin/nbyacc
+#YACC = /usr/bin/yacc
+YACC = /system/bin/nbyacc
 MAKEFILE = make.unix
 
 SRCS = allo.c cgram.c code.c comm1.c fixcall.c local.c local2.c \
@@ -108,6 +113,18 @@ install: all
 	$(MOVE) $(FPOBJ) $(OBJS) $(LBIN)
 	-rm -f $(OBJS) $(FPOBJ) # cgram.c y.tab.c #version.c
 	/bin/chmod 664 $(LBIN)/*.?
+@
+
+
+1.4
+log
+@Change mpxmac location.
+@
+text
+@d11 2
+a12 2
+YACC = /usr/bin/yacc
+#YACC = /system/bin/nbyacc
 @
 
 

@@ -1,9 +1,14 @@
-head	1.14;
+head	1.15;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.15
+date	2022.03.13.22.10.20;	author jbev;	state Exp;
+branches;
+next	1.14;
 
 1.14
 date	2019.02.24.17.15.30;	author jbev;	state Exp;
@@ -81,9 +86,9 @@ desc
 @
 
 
-1.14
+1.15
 log
-@Comment out stdlib.h include for mpx
+@A.out.h is a local include, not system.
 @
 text
 @/* code.c */
@@ -96,11 +101,14 @@ text
 
 #ifndef lint
 static char *rcsid =
- "$Id: code.c,v 1.13 2019/01/31 21:43:27 jbev Exp jbev $";
+ "$Id: code.c,v 1.14 2019/02/24 17:15:30 jbev Exp jbev $";
 #endif
 
 /*
  * $Log: code.c,v $
+ * Revision 1.14  2019/02/24 17:15:30  jbev
+ * Comment out stdlib.h include for mpx
+ *
  * Revision 1.13  2019/01/31 21:43:27  jbev
  * Update for Linux
  *
@@ -129,7 +137,7 @@ static char *rcsid =
 #ifndef mpx
 #include <stdlib.h>
 #endif
-#include <a.out.h>
+#include "a.out.h"
 
 extern int lflag;
 
@@ -1063,6 +1071,21 @@ void p1init()
 /*    	printf("	slad	r4,3\n	srld	r4,26\n");  /* magic number */
 #endif /* SECTION_FIX */
 }
+@
+
+
+1.14
+log
+@Comment out stdlib.h include for mpx
+@
+text
+@d11 1
+a11 1
+ "$Id: code.c,v 1.13 2019/01/31 21:43:27 jbev Exp jbev $";
+d16 3
+d47 1
+a47 1
+#include <a.out.h>
 @
 
 

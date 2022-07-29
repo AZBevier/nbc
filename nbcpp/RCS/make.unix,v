@@ -1,9 +1,14 @@
-head	1.5;
+head	1.6;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.6
+date	2022.03.13.21.56.15;	author jbev;	state Exp;
+branches;
+next	1.5;
 
 1.5
 date	2021.09.13.22.14.14;	author jbev;	state Exp;
@@ -36,15 +41,18 @@ desc
 @
 
 
-1.5
+1.6
 log
-@Change mpxpre location.
+@Use nbyacc instead of Linux yacc.  Fails on Mint.
 @
 text
 @# Makefile for nbcpp for running on Linux
 #
 #
 # *$Log: make.unix,v $
+# *Revision 1.5  2021/09/13 22:14:14  jbev
+# *Change mpxpre location.
+# *
 # *Revision 1.4  2021/07/14 22:20:04  jbev
 # *Use linux yacc for build.
 # *
@@ -73,8 +81,8 @@ CFLAGS = -O -DMPX -DYYDEBUG -m32 #-Wall
 SYSBIN = /system/bin
 LBIN = ./linux
 INSTALL = cp
-YACC = /usr/bin/yacc
-#YACC = /system/bin/nbyacc
+#YACC = /usr/bin/yacc
+YACC = /system/bin/nbyacc
 MOVE = mv
 MAKEFILE = make.unix
 
@@ -122,6 +130,19 @@ install: all
 	-rm -f $(OBJS)
 	/bin/chmod 664 $(LBIN)/*.?
 
+@
+
+
+1.5
+log
+@Change mpxpre location.
+@
+text
+@d5 3
+d36 2
+a37 2
+YACC = /usr/bin/yacc
+#YACC = /system/bin/nbyacc
 @
 
 

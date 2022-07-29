@@ -22,6 +22,9 @@
 
 /*
  * $Log: nbcpp.c,v $
+ * Revision 1.12  2022/07/23 23:46:08  jbev
+ * Correct signed/unsigned char test for some Linux versions.  Test now fixed for all.
+ *
  * Revision 1.11  2021/09/13 22:11:47  jbev
  * Update version to 1.4
  *
@@ -238,7 +241,7 @@ STATIC int lineno[MAXINC];
 
 STATIC char *dirs[MAXINC]; /* -I and <> directories */
 extern char *copy(), *subst(), *trmdir(), *strchr(), *strrchr(), *strcpy(), *strcat();
-extern unsigned int strlen();
+extern long unsigned int strlen();
 struct symtab *stsym();
 #ifndef mpx
 STATIC FILE *fin = stdin;
@@ -655,7 +658,7 @@ again:
                 ++p;
             }
 /*          if (strncmp(p, "NOBASE", 6) == 0 && */
-            if (strncmp(p, "NOBASE", (unsigned int)6) == 0 &&
+            if (strncmp(p, "NOBASE", (long unsigned int)6) == 0 &&
                 flslvl == 1
                 )
               (void) fputs("/*NOBASE*/",
@@ -1953,7 +1956,9 @@ struct symtab *sp;
     fasscan();
   }
   for (;;) { /* push definition onto front of input stack */
-    while (!iswarn(*--vp)) {
+    /* while (!iswarn(*--vp)) { */
+    /* The above test does not work on all linux releases.  Now fixed. */
+    while (((*--vp) != warnc) && (*vp != 0)) {
       if (bob(p)) {
         outp = inp = p;
         p = unfill(p);

@@ -2,6 +2,9 @@
 #
 #
 # *$Log: make.unix,v $
+# *Revision 1.6  2022/03/13 21:56:15  jbev
+# *Use nbyacc instead of Linux yacc.  Fails on Mint.
+# *
 # *Revision 1.5  2021/09/13 22:14:14  jbev
 # *Change mpxpre location.
 # *
@@ -33,8 +36,8 @@ CFLAGS = -O -DMPX -DYYDEBUG -m32 #-Wall
 SYSBIN = /system/bin
 LBIN = ./linux
 INSTALL = cp
-YACC = /usr/bin/yacc
-#YACC = /system/bin/nbyacc
+#YACC = /usr/bin/yacc
+YACC = /system/bin/nbyacc
 MOVE = mv
 MAKEFILE = make.unix
 

@@ -8,7 +8,7 @@
  */
 
 #ifndef lint
-static char *rcsid = "$Id: local2.c,v 1.29 2021/07/01 02:49:13 jbev Exp $";
+static char *rcsid = "$Id: local2.c,v 1.30 2022/03/13 22:10:20 jbev Exp $";
 #endif
 
 /*
@@ -18,6 +18,9 @@ static char *rcsid = "$Id: local2.c,v 1.29 2021/07/01 02:49:13 jbev Exp $";
 
 /*
  * $Log: local2.c,v $
+ * Revision 1.30  2022/03/13 22:10:20  jbev
+ * A.out.h is a local include, not system.
+ *
  * Revision 1.29  2021/07/01 02:49:13  jbev
  * correct some external definitions.
  *
@@ -69,7 +72,7 @@ static char *rcsid = "$Id: local2.c,v 1.29 2021/07/01 02:49:13 jbev Exp $";
 
 #include "mfile2.h"
 #include "ctype.h"
-#include <a.out.h>
+#include "a.out.h"
 #include <string.h>
 
 #ifdef FORT

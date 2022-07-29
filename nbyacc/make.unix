@@ -45,8 +45,10 @@ install:	all		# build if necessary, and then copy main to system directory
 			mkdir $(LBIN); \
 	fi;
 	$(MOVE) $(MAIN) $(LBIN)/$(MAIN)
+	/bin/rm -f $(LBIN)/$(PAR)
 	$(INSTALL) $(PAR) $(LBIN)/$(PAR)
 	$(INSTALL) $(LBIN)/$(MAIN) $(SYSBIN)/$(MAIN)
+	/bin/rm -f $(SYSLIB)/$(PAR)
 	$(INSTALL) $(LBIN)/$(PAR) $(SYSLIB)/$(PAR)
 	$(INSTALL) $(DEPS) $(LBIN)
 	$(INSTALL) $(SRCS) $(LBIN)

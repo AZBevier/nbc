@@ -1,9 +1,14 @@
-head	1.29;
+head	1.30;
 access;
 symbols;
 locks; strict;
 comment	@ * @;
 
+
+1.30
+date	2022.03.13.22.10.20;	author jbev;	state Exp;
+branches;
+next	1.29;
 
 1.29
 date	2021.07.01.02.49.13;	author jbev;	state Exp;
@@ -156,9 +161,9 @@ desc
 @
 
 
-1.29
+1.30
 log
-@correct some external definitions.
+@A.out.h is a local include, not system.
 @
 text
 @/* local2.c */
@@ -171,7 +176,7 @@ text
  */
 
 #ifndef lint
-static char *rcsid = "$Id: local2.c,v 1.28 2019/03/02 23:31:40 jbev Exp jbev $";
+static char *rcsid = "$Id: local2.c,v 1.29 2021/07/01 02:49:13 jbev Exp jbev $";
 #endif
 
 /*
@@ -181,6 +186,9 @@ static char *rcsid = "$Id: local2.c,v 1.28 2019/03/02 23:31:40 jbev Exp jbev $";
 
 /*
  * $Log: local2.c,v $
+ * Revision 1.29  2021/07/01 02:49:13  jbev
+ * correct some external definitions.
+ *
  * Revision 1.28  2019/03/02 23:31:40  jbev
  * Call do free in common.h as standard free call.
  *
@@ -229,7 +237,7 @@ static char *rcsid = "$Id: local2.c,v 1.28 2019/03/02 23:31:40 jbev Exp jbev $";
 
 #include "mfile2.h"
 #include "ctype.h"
-#include <a.out.h>
+#include "a.out.h"
 #include <string.h>
 
 #ifdef FORT
@@ -2879,6 +2887,21 @@ int reg, offset, type, ftnnox;
     printf(",%dw+LA%d,sp\n", offset / (SZINT/SZCHAR), ftnnox);
 }
 
+@
+
+
+1.29
+log
+@correct some external definitions.
+@
+text
+@d11 1
+a11 1
+static char *rcsid = "$Id: local2.c,v 1.28 2019/03/02 23:31:40 jbev Exp jbev $";
+d21 3
+d72 1
+a72 1
+#include <a.out.h>
 @
 
 

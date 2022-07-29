@@ -7,7 +7,7 @@
  */
 
 #ifndef lint
-static char *rcsid = "$Id: scan.c,v 1.21 2021/09/13 22:03:21 jbev Exp $";
+static char *rcsid = "$Id: scan.c,v 1.22 2022/03/13 22:10:20 jbev Exp $";
 #endif
 
 /*
@@ -17,6 +17,9 @@ static char *rcsid = "$Id: scan.c,v 1.21 2021/09/13 22:03:21 jbev Exp $";
 
 /*
  * $Log: scan.c,v $
+ * Revision 1.22  2022/03/13 22:10:20  jbev
+ * A.out.h is a local include, not system.
+ *
  * Revision 1.21  2021/09/13 22:03:21  jbev
  * Change version to 1.4.
  *
@@ -73,7 +76,7 @@ static char *rcsid = "$Id: scan.c,v 1.21 2021/09/13 22:03:21 jbev Exp $";
  */
 
 #include "mfile1.h"
-#include <a.out.h>
+#include "a.out.h"
 #include <ctype.h>
 #ifndef mpx
 #include <stdlib.h>

@@ -8,8 +8,8 @@ SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp
 MOVE = mv
-YACC = /usr/bin/yacc
-#YACC = /system/bin/nbyacc
+#YACC = /usr/bin/yacc
+YACC = /system/bin/nbyacc
 MAKEFILE = make.unix
 
 SRCS = allo.c cgram.c code.c comm1.c fixcall.c local.c local2.c \

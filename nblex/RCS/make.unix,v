@@ -1,9 +1,14 @@
-head	1.10;
+head	1.11;
 access;
 symbols;
 locks; strict;
 comment	@# @;
 
+
+1.11
+date	2022.03.13.21.48.14;	author jbev;	state Exp;
+branches;
+next	1.10;
 
 1.10
 date	2021.09.13.19.15.37;	author jbev;	state Exp;
@@ -61,9 +66,9 @@ desc
 @
 
 
-1.10
+1.11
 log
-@Update mpxmac location.
+@Use nbyacc to process parser.y.  Fails on Mint using /usr/bin/yacc.
 @
 text
 @#
@@ -76,8 +81,8 @@ SYSLIB = /system/lib
 LBIN = ./linux
 INSTALL = cp -p
 MOVE = mv
-YACC = /usr/bin/yacc
-#YACC = /system/bin/nbyacc
+#YACC = /usr/bin/yacc
+YACC = /system/bin/nbyacc
 MAKEFILE = make.unix
 
 OBJS = lmain.o sub1.o sub2.o header.o parser.o
@@ -138,6 +143,18 @@ install: all	# build if necessary, and then copy main to system directory
 	$(MOVE) $(OBJS) $(LBIN)
 	/bin/chmod 664 $(LBIN)/nrform $(LBIN)/ncform $(LBIN)/*.?
 	/bin/chmod 664 $(SYSLIB)/nrform $(SYSLIB)/ncform
+@
+
+
+1.10
+log
+@Update mpxmac location.
+@
+text
+@d11 2
+a12 2
+YACC = /usr/bin/yacc
+#YACC = /system/bin/nbyacc
 @
 
 
